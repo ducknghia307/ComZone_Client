@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
   return (
     <nav className="bg-white border-b shadow-sm w-full ">
-      <div className=" flex flex-col items-center py-4 REM list-none w-full px-4 lg:px-24 ">
-        <div className="flex items-center justify-between lg:text-2xl w-full ">
-          <div className="flex py-4">
+      <div className=" flex flex-col items-center py-4 REM list-none w-full lg:px-12 ">
+        <div className="flex items-center justify-between lg:text-xl w-full ">
+          <div className="flex py-2">
             <Link
               className="text-black  px-6 border-r border-r-solid border-r-1 border-r-black hover:text-gray-600"
               to={""}
@@ -17,12 +17,12 @@ const Navbar = () => {
               <li>Trở thành Người Bán</li>
             </Link>
           </div>
-          <div className="flex py-4 items-center">
+          <div className="flex py-2 items-center">
             <Link className="text-black px-6 hover:text-gray-600" to={""}>
               <li className="flex items-center">
                 <svg
-                  width="50"
-                  height="50"
+                  width="30"
+                  height="30"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -48,17 +48,17 @@ const Navbar = () => {
         </div>
         <div className="flex items-center w-full justify-between">
           <Link to={"/"}>
-            <img className="h-28 w-full" src={Logo} alt="ComZone" />
+            <img className="h-20 w-full ml-2" src={Logo} alt="ComZone" />
           </Link>
-          <div className="relative w-full max-w-6xl">
+          <div className="relative w-full max-w-4xl">
             <input
               type="text"
               placeholder="Bạn đang tìm kiếm truyện gì ?"
-              className="w-full border border-gray-300 rounded-lg py-3.5 pl-4 pr-8 focus:outline-none focus:ring-2 focus:ring-gray-500 text-xl"
+              className="w-full border border-gray-300 rounded-lg py-3 pl-4 pr-8 focus:outline-none focus:ring-2 focus:ring-gray-500 text-md"
             />
             <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-lg px-3 py-2 ">
               <svg
-                className="h-6 w-12"
+                className="h-5 w-8"
                 aria-labelledby="title desc"
                 role="img"
                 xmlns="http://www.w3.org/2000/svg"
@@ -77,8 +77,8 @@ const Navbar = () => {
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 256 256"
-              width="50"
-              height="50"
+              width="30"
+              height="30"
             >
               <rect width="256" height="256" fill="none" />
               <circle cx="80" cy="216" r="20" />
@@ -94,7 +94,7 @@ const Navbar = () => {
             </svg>
           </Link>
         </div>
-        <div className="flex w-full py-2 ml-20 mt-4 text-2xl">
+        <div className="flex w-full py-2 ml-20 mt-4 text-lg">
           <Link className="text-black  px-6   hover:text-gray-600" to={""}>
             <li>TRANG CHỦ</li>
           </Link>

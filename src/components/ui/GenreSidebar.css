@@ -1,0 +1,91 @@
+.all-genres-section {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 32px;
+}
+
+.all-genres-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 4 cards per row on large screens */
+    gap: 30px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-left: 0; /* Remove padding on the sides */
+    padding-right: 0; 
+}
+
+.all-genres-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.all-genres-card img {
+    margin-bottom: 15px;
+    width: 160px;
+    height: 230px;
+    object-fit: cover;
+}
+
+.all-genres-card p {
+    margin: 5px 0;
+}
+
+.all-genres-card .price {
+    font-size: 24px;
+    color: #ff4d4f;
+    font-weight: bold;
+}
+
+.all-genres-card .title {
+    font-weight: 600;
+    font-size: 18px;
+    color: #808089;
+}
+
+.all-genres-card .description {
+    font-size: 18px;
+    color: #000;
+}
+
+.rating-sold {
+    display: flex;
+    align-items: center;
+}
+
+.rating-sold .divider {
+    width: 1px;
+    height: 16px;
+    background-color: #808089;
+    margin: 0 10px;
+}
+
+.rating-sold .rating {
+    color: #ffc107;
+}
+
+.rating-sold .sold-info {
+    font-size: 16px;
+    color: #808089;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .all-genres-cards {
+        grid-template-columns: repeat(3, 1fr); /* 3 cards per row for tablets */
+    }
+}
+
+@media (max-width: 800px) {
+    .all-genres-cards {
+        grid-template-columns: repeat(2, 1fr); /* 2 cards per row for small tablets */
+    }
+}
+
+@media (max-width: 464px) {
+    .all-genres-cards {
+        grid-template-columns: 1fr; /* 1 card per row for mobile devices */
+    }
+}

@@ -1,24 +1,25 @@
 import React from "react";
 import Logo from "../../assets/hcn-logo.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 const Navbar = () => {
+  const location = useLocation();
   return (
     <nav className="bg-white border-b shadow-sm w-full ">
       <div className=" flex flex-col items-center py-4 REM list-none w-full lg:px-12 ">
         <div className="flex items-center justify-between lg:text-xl w-full ">
           <div className="flex py-2">
             <Link
-              className="text-black  px-6 border-r border-r-solid border-r-1 border-r-black hover:text-gray-600"
+              className="text-black  px-6 border-r border-r-solid border-r-1 border-r-black hover:text-black"
               to={""}
             >
               <li>Kênh Người Bán</li>
             </Link>
-            <Link className="text-black px-6 hover:text-gray-600" to={""}>
+            <Link className="text-black px-6 hover:text-black" to={""}>
               <li>Trở thành Người Bán</li>
             </Link>
           </div>
           <div className="flex py-2 items-center">
-            <Link className="text-black px-6 hover:text-gray-600" to={""}>
+            <Link className="text-black px-6 hover:text-black" to={""}>
               <li className="flex items-center">
                 <svg
                   width="30"
@@ -36,12 +37,12 @@ const Navbar = () => {
               </li>
             </Link>
             <Link
-              className="text-black px-6 border-r border-r-solid border-r-1 border-r-black hover:text-gray-600"
+              className="text-black px-6 border-r border-r-solid border-r-1 border-r-black hover:text-black"
               to={""}
             >
               <li>Đăng Nhập</li>
             </Link>
-            <Link className="text-black px-6 hover:text-gray-600" to={""}>
+            <Link className="text-black px-6 hover:text-black" to={""}>
               <li>Đăng Ký</li>
             </Link>
           </div>
@@ -73,7 +74,7 @@ const Navbar = () => {
               </svg>
             </button>
           </div>
-          <Link className="  px-6 hover:text-gray-600" to={""}>
+          <Link className="  px-6 hover:text-black" to={""}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 256 256"
@@ -95,14 +96,37 @@ const Navbar = () => {
           </Link>
         </div>
         <div className="flex w-full py-2 ml-20 mt-4 text-lg">
-          <Link className="text-black  px-6   hover:text-gray-600" to={""}>
+          <Link
+            className={`text-black px-6 hover:text-black ${
+              location.pathname === "/" ? "font-bold" : ""
+            }`}
+            to="/"
+          >
             <li>TRANG CHỦ</li>
           </Link>
-          <Link className="text-black  px-6  hover:text-gray-600" to={""}>
+          <Link
+            className={`text-black px-6 hover:text-black ${
+              location.pathname === "/auctions" ? "font-bold" : ""
+            }`}
+            to="/auctions"
+          >
             <li>CÁC CUỘC ĐẤU GIÁ</li>
           </Link>
-          <Link className="text-black  px-6  hover:text-gray-600" to={""}>
+          <Link
+            className={`text-black px-6 hover:text-black ${
+              location.pathname === "/genres" ? "font-bold" : ""
+            }`}
+            to="/genres"
+          >
             <li>TẤT CẢ THỂ LOẠI</li>
+          </Link>
+          <Link
+            className={`text-black px-6 hover:text-black ${
+              location.pathname === "/blog" ? "font-bold" : ""
+            }`}
+            to="/blog"
+          >
+            <li>BLOG TRAO ĐỔI</li>
           </Link>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "../../pages/HomePage";
 import Genres from "../../pages/Genres";
 import Auctions from "../../pages/Auctions";
+import ComicDetail from "../../pages/ComicDetails";
 // import Blogs from "../../pages/Blogs";
 
 
@@ -13,6 +14,7 @@ const AppRouter = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/genres" element={<Genres />} />
         <Route path="/auctions" element={<Auctions />} />
+        <Route path="/detail" element={<ComicDetail />} />
         {/* <Route path="/blog" element={<Blogs />} /> */}
       </Routes>
     </div>

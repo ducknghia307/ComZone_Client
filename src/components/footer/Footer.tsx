@@ -4,15 +4,15 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <footer className="bg-black text-white mx-auto  REM flex flex-col items-center justify-center w-full">
-      <div className="flex items-center justify-between px-10 py-4 w-[75%]">
-        <div className="flex flex-col gap-8">
-          <img className="h-48" src={Logo} alt="" />
+      <div className="flex lg:flex-row flex-col items-center justify-between px-10 py-4 w-[75%]">
+        <div className="flex flex-col lg:gap-8 lg:items-start items-center lg:p-0 pb-8">
+          <img className="lg:h-40 h-28" src={Logo} alt="" />
           <div className="flex flex-col gap-4">
-            <div className="flex flex-row gap-2 items-center text-xl">
+            <div className="flex flex-row gap-2 items-center text-lg">
               <svg
                 fill="#ffffff"
-                height="32px"
-                width="32px"
+                height="24px"
+                width="24px"
                 version="1.1"
                 id="Capa_1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -31,10 +31,10 @@ const Footer = () => {
               </svg>
               :support@comiczone.com
             </div>
-            <div className="flex flex-row gap-2 items-center text-xl">
+            <div className="flex flex-row gap-2 items-center text-lg">
               <svg
-                width="32px"
-                height="32px"
+                width="24px"
+                height="24px"
                 viewBox="0 0 24 24"
                 fill="#ffffff"
                 xmlns="http://www.w3.org/2000/svg"
@@ -56,8 +56,8 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-row gap-32">
-          <div className="list-none text-xl gap-2 flex flex-col">
+        <div className="flex flex-col lg:flex-row md:flex-row lg:gap-32 gap-8">
+          <div className="list-none text-lg gap-2 flex flex-col">
             <h4 className="font-extralight mb-4">Danh mục chính</h4>
             <Link className="text-white" to={""}>
               <li className="hover:text-gray-300">Truyện Mới Nhất</li>
@@ -75,7 +75,7 @@ const Footer = () => {
               <li className="hover:text-gray-300">Sưu Tầm</li>
             </Link>
           </div>
-          <div className="list-none text-xl gap-2 flex flex-col ">
+          <div className="list-none text-lg gap-2 flex flex-col ">
             <h4 className="font-extralight mb-4">Hỗ Trợ</h4>
             <Link className="text-white" to={""}>
               <li className="hover:text-gray-300">Trạng Thái Đơn Hàng</li>
@@ -95,7 +95,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="w-[75%] border-t border-t-solid px-10 py-4 text-lg">
+      <div className="w-[75%] border-t border-t-solid px-10 py-4 lg:text-lg text-sm font-extralight">
         © 2024 ComicZone. All rights reserved.
       </div>
     </footer>

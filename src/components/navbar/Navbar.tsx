@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import Logo from "../../assets/hcn-logo.png";
 import { Link, useLocation } from "react-router-dom";
 const Navbar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen); // Toggle the menu open/close
+  };
   const location = useLocation();
   return (
     <nav className="bg-white border-b shadow-sm w-full ">
-      <div className=" flex flex-col items-center py-4 REM list-none w-full lg:px-12 ">
-        <div className="flex items-center justify-between lg:text-xl w-full ">
+      <div className=" flex flex-col items-center py-4 REM list-none w-full lg:px-12 px-8">
+        {/* 1 ne */}
+        <div className="lg:flex sm:hidden hidden items-center justify-between lg:text-xl w-full  ">
           <div className="flex py-2">
             <Link
               className="text-black  px-6 border-r border-r-solid border-r-1 border-r-black hover:text-black"
@@ -19,7 +24,7 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="flex py-2 items-center">
-            <Link className="text-black px-6 hover:text-black" to={""}>
+            {/* <Link className="text-black px-6 hover:text-black" to={""}>
               <li className="flex items-center">
                 <svg
                   width="30"
@@ -35,7 +40,7 @@ const Navbar = () => {
                 </svg>
                 Thông Báo
               </li>
-            </Link>
+            </Link> */}
             <Link
               className="text-black px-6 border-r border-r-solid border-r-1 border-r-black hover:text-black"
               to={""}
@@ -47,17 +52,22 @@ const Navbar = () => {
             </Link>
           </div>
         </div>
+        {/* 2 ne */}
         <div className="flex items-center w-full justify-between">
           <Link to={"/"}>
-            <img className="h-20 w-full ml-2" src={Logo} alt="ComZone" />
+            <img
+              className="h-16 w-auto ml-2 sm:h-20 md:h-24 lg:h-28 xl:h-32"
+              src={Logo}
+              alt="ComZone"
+            />
           </Link>
-          <div className="relative w-full max-w-4xl">
+          <div className="flex items-center lg:w-full lg:max-w-4xl lg:flex lg:relative">
             <input
               type="text"
               placeholder="Bạn đang tìm kiếm truyện gì ?"
-              className="w-full border border-gray-300 rounded-lg py-3 pl-4 pr-8 focus:outline-none focus:ring-2 focus:ring-gray-500 text-md"
+              className="hidden lg:flex w-full border border-gray-300 rounded-lg py-3 pl-4 pr-8 focus:outline-none focus:ring-2 focus:ring-gray-500 text-md"
             />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-lg px-3 py-2 ">
+            <button className="hidden lg:flex lg:absolute md:absolute lg:right-2 md:right-2 md:top-[22%] lg:top-1/2 transform -translate-y-1/2 bg-black text-white rounded-lg px-3 py-2 ">
               <svg
                 className="h-5 w-8"
                 aria-labelledby="title desc"
@@ -73,8 +83,45 @@ const Navbar = () => {
                 </g>
               </svg>
             </button>
+            {/* hamburger */}
+            <div className="flex lg:hidden flex-row items-center">
+              <Link
+                className="text-black px-2 border-r border-r-solid border-r-1 border-r-black hover:text-black text-sm md:text-base"
+                to={""}
+              >
+                <li>Đăng Nhập</li>
+              </Link>
+              <Link
+                className="text-black px-2 hover:text-black text-sm md:text-base"
+                to={""}
+              >
+                <li>Đăng Ký</li>
+              </Link>
+              {/* menu-btn */}
+              <button
+                className="ml-2 border p-1 rounded-lg"
+                onClick={toggleMenu}
+              >
+                <svg
+                  width="28px"
+                  height="28px"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4 6H20M4 12H20M4 18H20"
+                    stroke="#000000"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
-          <Link className="  px-6 hover:text-black" to={""}>
+          {/* cart nha */}
+          <Link className="  px-6 hover:text-black lg:flex hidden" to={"/cart"}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 256 256"
@@ -95,7 +142,8 @@ const Navbar = () => {
             </svg>
           </Link>
         </div>
-        <div className="flex w-full py-2 ml-20 mt-4 text-lg">
+        {/* 3 ne */}
+        <div className="hidden lg:flex md:flex lg:w-full py-2 lg:ml-20 my-2 lg:text-lg md:text-sm">
           <Link
             className={`text-black px-6 hover:text-black ${
               location.pathname === "/" ? "font-bold" : ""
@@ -129,6 +177,112 @@ const Navbar = () => {
             <li>BLOG TRAO ĐỔI</li>
           </Link>
         </div>
+        <div className="flex items-center w-full max-w-full md:max-w-xl lg:max-w-xl relative lg:hidden">
+          <input
+            type="text"
+            placeholder="Bạn đang tìm kiếm truyện gì ?"
+            className="flex w-full border border-gray-300 rounded-lg py-3 pl-4 pr-8 focus:outline-none focus:ring-2 focus:ring-gray-500 text-md"
+          />
+          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-lg px-3 py-2">
+            <svg
+              className="h-5 w-8"
+              aria-labelledby="title desc"
+              role="img"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 19.9 19.7"
+            >
+              <title id="title">Search Icon</title>
+              <desc id="desc">A magnifying glass icon.</desc>
+              <g className="search-path" stroke="#FFFFFF" strokeWidth="2">
+                <path strokeLinecap="square" d="M18.5 18.3l-5.4-5.4" />
+                <circle cx="8" cy="8" r="7" />
+              </g>
+            </svg>
+          </button>
+        </div>
+
+        {menuOpen && (
+          <div className="lg:hidden flex flex-col w-full mt-4 absolute top-0 left-0 bg-white z-10">
+            <div className=" flex justify-end mr-4">
+              <svg
+                width="20px"
+                height="20px"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                onClick={toggleMenu}
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M19.207 6.207a1 1 0 0 0-1.414-1.414L12 10.586 6.207 4.793a1 1 0 0 0-1.414 1.414L10.586 12l-5.793 5.793a1 1 0 1 0 1.414 1.414L12 13.414l5.793 5.793a1 1 0 0 0 1.414-1.414L13.414 12l5.793-5.793z"
+                  fill="#000000"
+                />
+              </svg>
+            </div>
+            <div className="flex flex-col items-center">
+              <Link
+                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
+                  location.pathname === "/" ? "font-bold" : ""
+                }`}
+                to="/"
+                onClick={toggleMenu}
+              >
+                TRANG CHỦ
+              </Link>
+              <Link
+                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
+                  location.pathname === "/auctions" ? "font-bold" : ""
+                }`}
+                to="/auctions"
+                onClick={toggleMenu}
+              >
+                CÁC CUỘC ĐẤU GIÁ
+              </Link>
+              <Link
+                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
+                  location.pathname === "/genres" ? "font-bold" : ""
+                }`}
+                to="/genres"
+                onClick={toggleMenu}
+              >
+                TẤT CẢ THỂ LOẠI
+              </Link>
+              <Link
+                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
+                  location.pathname === "/blog" ? "font-bold" : ""
+                }`}
+                to="/blog"
+                onClick={toggleMenu}
+              >
+                BLOG TRAO ĐỔI
+              </Link>
+              <Link
+                className={"text-black px-6 py-2 hover:text-black "}
+                to="/"
+                onClick={toggleMenu}
+              >
+                KÊNH NGƯỜI BÁN
+              </Link>
+              <Link
+                className={"text-black px-6 py-2 hover:text-black "}
+                to="/"
+                onClick={toggleMenu}
+              >
+                TRỞ THÀNH NGƯỜI BÁN
+              </Link>
+              <Link
+                className={`text-black px-6 py-2 hover:text-black ${
+                  location.pathname === "/cart" ? "font-bold" : ""
+                }`}
+                to="/cart"
+                onClick={toggleMenu}
+              >
+                GIỎ HÀNG
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

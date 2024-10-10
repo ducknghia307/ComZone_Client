@@ -137,7 +137,7 @@
 //                                     date={Date.now() + 100000000}  
 //                                     renderer={renderer}
 //                                 />
-//                                 <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+//                                 <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
 //                             </div>
 //                         ))}
 //                     </div>
@@ -158,6 +158,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import StarIcon from '@mui/icons-material/Star';
 import Countdown from "react-countdown";
 import { Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const responsive = {
     superLargeDesktop: {
@@ -224,6 +225,11 @@ const renderer = ({ days, hours, minutes, seconds }) => {
     };
 
 const Auctions = () => {
+    const navigate = useNavigate(); // Initialize the useNavigate hook
+
+    const handleDetailClick = () => {
+        navigate('/auctiondetail'); // Navigate to the auction detail page
+    };
     return (
         <div className="w-full py-8">
             <div className="section-title text-2xl font-bold">
@@ -252,7 +258,7 @@ const Auctions = () => {
                             date={Date.now() + 100000000}  // Example: 100000000 ms from now
                             renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+                        <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
                     </div>
 
                     <div className="auction-card">
@@ -268,7 +274,7 @@ const Auctions = () => {
                             date={Date.now() + 100000000}  // Example: 100000000 ms from now
                             renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+                        <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
                     </div>
 
                     <div className="auction-card">
@@ -284,7 +290,7 @@ const Auctions = () => {
                             date={Date.now() + 100000000}  // Example: 100000000 ms from now
                             renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+                        <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
                     </div>
 
                     <div className="auction-card">
@@ -300,7 +306,7 @@ const Auctions = () => {
                             date={Date.now() + 100000000}  // Example: 100000000 ms from now
                             renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+                        <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
                     </div>
 
                     <div className="auction-card">
@@ -316,7 +322,7 @@ const Auctions = () => {
                             date={Date.now() + 100000000}  // Example: 100000000 ms from now
                             renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+                        <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
                     </div>
 
                     <div className="auction-card">
@@ -332,7 +338,7 @@ const Auctions = () => {
                             date={Date.now() + 100000000}  // Example: 100000000 ms from now
                             renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+                        <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
                     </div>
 
                     <div className="auction-card">
@@ -348,7 +354,7 @@ const Auctions = () => {
                             date={Date.now() + 100000000}  // Example: 100000000 ms from now
                             renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+                        <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
                     </div>
 
                     <div className="auction-card">
@@ -364,7 +370,7 @@ const Auctions = () => {
                             date={Date.now() + 100000000}  // Example: 100000000 ms from now
                             renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+                        <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
                     </div>
 
                     <div className="auction-card">
@@ -380,7 +386,7 @@ const Auctions = () => {
                             date={Date.now() + 100000000}  // Example: 100000000 ms from now
                             renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
+                        <Button className="detail-button" onClick={handleDetailClick} variant="contained">Xem Chi Tiết</Button>
                     </div>
 
                 </Carousel>

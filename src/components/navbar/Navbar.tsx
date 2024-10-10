@@ -220,7 +220,7 @@ const Navbar = () => {
                 />
               </svg>
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center w-full">
               <Link
                 className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
                   location.pathname === "/" ? "font-bold" : ""
@@ -258,7 +258,9 @@ const Navbar = () => {
                 BLOG TRAO ĐỔI
               </Link>
               <Link
-                className={"text-black px-6 py-2 hover:text-black "}
+                className={
+                  "text-black px-6 py-2 hover:text-black border-t-2 border-black md:border-none w-3/4 text-center "
+                }
                 to="/"
                 onClick={toggleMenu}
               >

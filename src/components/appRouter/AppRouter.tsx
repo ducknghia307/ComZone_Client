@@ -5,6 +5,7 @@ import Genres from "../../pages/Genres";
 import Auctions from "../../pages/Auctions";
 import Cart from "../../pages/Cart";
 import ComicDetail from "../../pages/ComicDetails";
+import Checkout from "../../pages/Checkout";
 // import Blogs from "../../pages/Blogs";
 
 const AppRouter = () => {
@@ -17,6 +18,7 @@ const AppRouter = () => {
         <Route path="/detail" element={<ComicDetail />} />
         {/* <Route path="/blog" element={<Blogs />} /> */}
         <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
       </Routes>
     </div>
   );

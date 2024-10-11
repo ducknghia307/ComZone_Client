@@ -2,8 +2,8 @@ import React from "react";
 
 const OrderCheck = () => {
   return (
-    <div className="w-ful px-8 py-4 bg-white">
-      <div className="w-full  flex flex-col">
+    <div className="w-ful px-8 py-4 ">
+      <div className="w-full  flex flex-col bg-white">
         <h2 className=" font-bold">KIỂM TRA LẠI ĐƠN HÀNG</h2>
         <table className="w-full mt-4">
           {/* <thead>

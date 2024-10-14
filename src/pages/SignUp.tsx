@@ -161,7 +161,13 @@ const SignUp = () => {
             <h4 className="font-thin text-sm italic text-center mt-2">hoặc</h4>
 
             <div className="mt-2 text-center">
-              <button className="w-full bg-white border border-gray-300 text-black py-2 rounded-md flex items-center justify-center hover:bg-gray-100 transition duration-300">
+              <button
+                className="w-full bg-white border border-gray-300 text-black py-2 rounded-md flex items-center justify-center hover:bg-gray-100 transition duration-300"
+                onClick={() =>
+                  (window.location.href =
+                    "http://localhost:3000/auth/google/login")
+                }
+              >
                 <svg
                   width="20px"
                   height="20px"

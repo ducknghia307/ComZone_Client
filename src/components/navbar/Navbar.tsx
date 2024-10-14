@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Logo from "../../assets/hcn-logo.png";
 import { Link, useLocation } from "react-router-dom";
+import type { MenuProps } from "antd";
+import { Dropdown } from "antd";
 interface UserInfo {
   createdAt: string;
   email: string;
@@ -50,13 +52,44 @@ const Navbar = () => {
   }, [token]);
   const location = useLocation();
   console.log(userInfo);
-
+  const handleLogout = () => {
+    sessionStorage.removeItem("accessToken");
+    window.location.href = "/";
+  };
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <Link
+          to={"/accountManagement"}
+          className="REM text-base text-center w-full"
+        >
+          Quản lí tài khoản
+        </Link>
+      ),
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "2",
+      label: (
+        <div
+          className="REM text-base text-center w-full"
+          onClick={handleLogout}
+        >
+          Đăng xuất
+        </div>
+      ),
+    },
+  ];
   return (
     <nav className="bg-white border-b shadow-sm w-full ">
       <div className=" flex flex-col items-center py-4 REM list-none w-full lg:px-12 px-8">
         {/* 1 ne */}
         {window.location.pathname !== "/signin" &&
-          window.location.pathname !== "/signup" && (
+          window.location.pathname !== "/signup" &&
+          window.location.pathname !== "/forgot" && (
             <div className="lg:flex sm:hidden hidden items-center justify-between lg:text-xl w-full  ">
               <div className="flex py-2">
                 <Link
@@ -87,7 +120,7 @@ const Navbar = () => {
                   </div>
                 ) : (
                   <div className="flex items-center gap-5">
-                    <li className="flex items-center">
+                    <li className="flex items-center cursor-pointer">
                       <svg
                         width="30"
                         height="30"
@@ -102,27 +135,33 @@ const Navbar = () => {
                       </svg>
                       Thông Báo
                     </li>
-                    <Link
-                      to={"/profile"}
-                      className="flex flex-row gap-1 items-center"
+                    <Dropdown
+                      menu={{ items }}
+                      placement="topRight"
+                      trigger={["click"]}
                     >
-                      <svg
-                        width="25px"
-                        height="25px"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                      <li
+                        // to={"/profile"}
+                        className="flex flex-row gap-1 items-center cursor-pointer"
                       >
-                        <path
-                          d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                          stroke="#000000"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      {userInfo.name}
-                    </Link>
+                        <svg
+                          width="25px"
+                          height="25px"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                            stroke="#000000"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        {userInfo.name}
+                      </li>
+                    </Dropdown>
                   </div>
                 )}
               </div>
@@ -131,7 +170,8 @@ const Navbar = () => {
         {/* 2 ne */}
         <div className="flex items-center w-full justify-between">
           {window.location.pathname !== "/signin" &&
-            window.location.pathname !== "/signup" && (
+            window.location.pathname !== "/signup" &&
+            window.location.pathname !== "/forgot" && (
               <Link to={"/"}>
                 <img
                   className="h-16 w-auto ml-2 sm:h-20 md:h-24 lg:h-28 xl:h-32" // Set the image height to h-4
@@ -142,13 +182,15 @@ const Navbar = () => {
             )}
 
           {(window.location.pathname === "/signin" ||
-            window.location.pathname === "/signup") && (
+            window.location.pathname === "/signup" ||
+            window.location.pathname === "/forgot") && (
             <Link to={"/"}>
               <img className="h-16 w-auto ml-2 " src={Logo} alt="ComZone" />
             </Link>
           )}
           {window.location.pathname !== "/signin" &&
-            window.location.pathname !== "/signup" && (
+            window.location.pathname !== "/signup" &&
+            window.location.pathname !== "/forgot" && (
               <div className="flex items-center lg:w-full lg:max-w-4xl lg:flex lg:relative">
                 <input
                   type="text"
@@ -211,7 +253,8 @@ const Navbar = () => {
             )}
           {/* cart nha */}
           {window.location.pathname !== "/signin" &&
-            window.location.pathname !== "/signup" && (
+            window.location.pathname !== "/signup" &&
+            window.location.pathname !== "/forgot" && (
               <Link
                 className="  px-6 hover:text-black lg:flex hidden"
                 to={"/cart"}
@@ -239,7 +282,8 @@ const Navbar = () => {
         </div>
         {/* 3 ne */}
         {window.location.pathname !== "/signin" &&
-          window.location.pathname !== "/signup" && (
+          window.location.pathname !== "/signup" &&
+          window.location.pathname !== "/forgot" && (
             <div className="hidden lg:flex md:flex lg:w-full py-2 lg:ml-20 my-2 lg:text-lg md:text-sm">
               <Link
                 className={`text-black px-6 hover:text-black ${

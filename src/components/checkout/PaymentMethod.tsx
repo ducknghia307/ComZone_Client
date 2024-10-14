@@ -21,8 +21,11 @@ const PaymentMethod = () => {
               strokeLinejoin="round"
             />
           </svg>
-          <h4 className="font-extralight ml-2">Số dư ví:</h4>
-          <h4 className="font-bold ml-1">400,000đ</h4>
+          <div className="flex items-end">
+            <h4 className="font-extralight ml-2">Số dư ví:</h4>
+            <h4 className="font-bold ml-1">400,000</h4>
+            <h4 className="font-extralight text-xs mb-0.5">VND</h4>
+          </div>
         </div>
       </div>
       <div className="flex lg:flex-row md:flex-row flex-col gap-2 lg:w-3/4  justify-center">

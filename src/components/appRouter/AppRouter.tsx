@@ -11,6 +11,8 @@ import AccountManagement from "../../pages/AccountManagement";
 import SignIn from "../../pages/SignIn";
 import SignUp from "../../pages/SignUp";
 import ForgotPassword from "../../pages/ForgotPassword";
+import SellerManagement from "../../pages/SellerManagement";
+import CreateComic from "../../pages/CreateComic";
 // import Blogs from "../../pages/Blogs";
 
 const AppRouter = () => {
@@ -23,6 +25,8 @@ const AppRouter = () => {
         <Route path="/detail" element={<ComicDetail />} />
         <Route path="/auctiondetail" element={<AuctionDetails />} />
         <Route path="/accountmanagement" element={<AccountManagement />} />
+        <Route path="/sellermanagement" element={<SellerManagement />}/>
+        <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
         {/* <Route path="/blog" element={<Blogs />} /> */}
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

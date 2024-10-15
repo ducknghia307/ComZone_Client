@@ -273,22 +273,22 @@ const ComicDetails = () => {
               </Typography>
             </div>
 
-            <div className="rating-sold">
-              <p className="rating">
-                <p className="rating">
-                  {[...Array(5)].map((_, index) => (
-                    <StarIcon
-                      key={index}
-                      style={{ width: "20px", color: "#ffc107" }}
-                    />
-                  ))}
-                </p>
-              </p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-            <p className="price">24.000đ</p>
-          </div>
+                        <div className="rating-sold">
+                            <div className="rating">
+                                <p className="rating">
+                                    <p className="rating">{[...Array(5)].map((_, index) => (
+                                        <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />))}
+                                    </p>
+                                </p>
+                                <div className="divider"></div>
+                                <p className="sold-info">Đã bán 1014</p>
+                            </div>
+                            <Typography className='title1'>
+                                Người Bán: <span className="author-name">Abc Shop</span>
+                            </Typography>
+                        </div>
+                        <p className='price'>24.000đ</p>
+                    </div>
 
           <div className="detail2">
             <Typography className="info">Thông tin chi tiết</Typography>

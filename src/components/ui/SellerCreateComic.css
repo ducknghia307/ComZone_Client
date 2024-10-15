@@ -1,0 +1,162 @@
+.seller-container {
+    background-color: #f9f9f9;
+    padding: 40px 30px;
+}
+
+.seller-menu {
+    background-color: #fff;
+    padding: 40px;
+}
+
+.seller-menu ul {
+    list-style: none;
+    padding: 0;
+}
+
+.seller-menu ul li {
+    padding: 10px 0;
+    font-size: 17px;
+    color: #555;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.seller-menu ul li svg {
+    margin-right: 8px;
+}
+
+.seller-menu ul li.active {
+    color: black;
+    font-weight: bold;
+}
+
+.seller-container .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+
+  .custom-header {
+    background-color: #000000; /* Nền màu đen */
+    color: #ffffff; /* Chữ màu trắng */
+    font-weight: bold; /* Chữ đậm */
+    text-align: center; /* Canh giữa chữ */
+}
+
+
+/* form */
+.form-container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    border: 0.1px solid #e7e7e7;
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: bold;
+    padding-top: 40px;
+}
+
+.create-comic-form {
+    /* max-width: 800px; */
+    padding: 0 80px;
+    margin: 0 auto;
+}
+
+.image-upload-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 25px 0 25px;
+    cursor: pointer;
+}
+
+.image-upload-circle {
+    width: 100px;
+    height: 100px;
+    background-color: #F3F4F6;
+    border-radius: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.image-upload-circle svg {
+    font-size: 40px;
+    color: #414141;
+}
+
+.image-upload-text {
+    color: #3B82F6;
+    font-weight: bold;
+}
+
+.text-field {
+    margin-bottom: 20px;
+}
+
+.text-field input {
+    background-color: #F5F6FA;
+}
+
+.text-field label {
+    color: #A6A6A6;
+}
+
+.selling-type-section {
+    margin-top: 20px;
+}
+
+.radio-group {
+    justify-content: flex-start;
+    margin-top: 10px;
+}
+
+.form-submit-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.form-submit-section .submit-button {
+    /* width: 300px; */
+    padding: 15px 40px;
+    background-color: black;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: none;
+}
+
+.form-submit-section .submit-button:hover {
+    background-color: #333;
+}
+
+/* Làm cho các icon filter và sort trong header có màu trắng */
+.custom-header .MuiDataGrid-sortIcon, 
+.custom-header .MuiDataGrid-iconButtonContainer {
+    color: #ffffff !important; /* Màu trắng */
+}
+
+/* Làm cho background của icon filter có thể tùy chỉnh */
+.custom-header .MuiDataGrid-columnHeader:focus-within .MuiDataGrid-iconButtonContainer {
+    background-color: transparent !important;
+}
+
+/* Làm cho icon menu (3 chấm) trong header có màu trắng */
+.custom-header .MuiDataGrid-menuIconButton {
+    color: #ffffff !important; /* Màu trắng */
+}
+

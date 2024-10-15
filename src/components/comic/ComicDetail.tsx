@@ -75,6 +75,8 @@ const ComicDetails = () => {
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
+  const [coverImage, setCoverImage] = useState("");
+  const [previewChapter, setPreviewChapter] = useState([]);
   const { id } = useParams();
 
   useEffect(() => {
@@ -82,6 +84,7 @@ const ComicDetails = () => {
       .then((response) => response.json())
       .then((comicData) => {
         console.log("Comic Data:", comicData);
+        setUsers(comicData.sellerId);
 
         // Extract genres from the comic object
         const genresData = comicData.genres || []; // Ensure genres is an array
@@ -107,6 +110,11 @@ const ComicDetails = () => {
         // Set the comic and genre data
         setComics(comicData); // Wrap in an array if you want to handle it as a list
         setGenres(genreNames); // Set genres array separately if needed
+
+        // Extract coverImage and previewChapter
+        setCoverImage(comicData.coverImage || "");
+        setPreviewChapter(comicData.previewChapter || []);
+
         setLoading(false);
       })
       .catch((error) => {
@@ -114,6 +122,7 @@ const ComicDetails = () => {
         setLoading(false);
       });
   }, [id]);
+  console.log("Preview Chapter", previewChapter);
   console.log(genres);
 
   const getGenreNames = (genreArray) => {
@@ -149,23 +158,15 @@ const ComicDetails = () => {
     setImageModalOpen(false);
   };
 
-  const images = [
-    "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg?_gl=1*f7gx7h*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODM3MTA0OC4zMi4xLjE3MjgzNzIwMDQuNTUuMC4xMDk5ODg2NjI.",
-    "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_4_tap_102.jpg",
-    "https://blogger.googleusercontent.com/img/a/AVvXsEgEajcSgInbrqIu1Hzau3OGo6wqwgpG34u3IWBqgI9LU9wj2vx7bP3buUZfByRf6PkGsh7aHS1CofZ2n52BL2xrQwIawg7rn3BI_btX6rYsx6cPASJJOu5-GXxt68Fn49ju1kBqCwH_cc6Lvj1p6pGN_OHl4pSP2ACP6Z2P_BOZMZrDvhPk0I2MD2lapA",
-  ];
+  const allImages = [coverImage, ...previewChapter];
 
   const nextImage = () => {
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex + 1) % comics[0].previewChapter.length
-    );
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % previewChapter.length);
   };
 
   const prevImage = () => {
     setCurrentImageIndex(
-      (prevIndex) =>
-        (prevIndex - 1 + comics[0].previewChapter.length) %
-        comics[0].previewChapter.length
+      (prevIndex) => (prevIndex - 1 + previewChapter.length) % previewChapter.length
     );
   };
 
@@ -175,24 +176,29 @@ const ComicDetails = () => {
         <Grid size={{ xs: 5 }} className="left-frame">
           <div className="big-img">
             <img
-              src={comics[0]?.coverImage}
+              src={coverImage}
               alt="Conan Comic"
-              style={{ width: "270px", height: "auto", cursor: "pointer" }}
+              style={{ width: "300px", height: "450px", cursor: "pointer" }}
               onClick={() => handleImageModalOpen(0)}
             />
           </div>
 
           <div className="small-img">
-            {comics[0]?.previewChapter.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Preview ${index + 1}`}
-                style={{ width: "90px", height: "auto", cursor: "pointer" }}
-                onClick={() => handleImageModalOpen(index)}
-              />
-            ))}
+            {previewChapter.length > 0 ? (
+              previewChapter.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Preview ${index + 1}`}
+                  style={{ width: "90px", height: "150px", cursor: "pointer" }}
+                  onClick={() => handleImageModalOpen(index)}
+                />
+              ))
+            ) : (
+              <p>No preview images available</p>
+            )}
           </div>
+
 
           {/* Image Modal */}
           <Modal
@@ -231,7 +237,7 @@ const ComicDetails = () => {
                 <CloseIcon />
               </IconButton>
               <img
-                src={comics[0]?.previewChapter[currentImageIndex]}
+                src={allImages[currentImageIndex]}
                 alt={`Large Comic Image ${currentImageIndex + 1}`}
                 style={{
                   maxWidth: "100%",
@@ -330,12 +336,12 @@ const ComicDetails = () => {
                   {comics.series || "Bộ truyện"}
                 </span>
               </Typography>
-              <Typography className="title1">
+              {/* <Typography className="title1">
                 Tác giả:{" "}
                 <span className="author-name">
                   {comics.author || "Tác giả"}
                 </span>
-              </Typography>
+              </Typography> */}
             </div>
 
             <div className="rating-sold">
@@ -352,7 +358,10 @@ const ComicDetails = () => {
                 <div className="divider"></div>
                 <p className="sold-info">Đã bán: {comics.sold || "Chưa có"}</p>
               </div>
-              <p className="seller-name">Người Bán: {comics.name}</p>
+              <p className="seller-name">Người Bán: <span className="author-name">
+                {users.name}
+              </span>
+                </p>
             </div>
             <p className="price">{formatPrice(comics.price || 24000)}</p>
           </div>

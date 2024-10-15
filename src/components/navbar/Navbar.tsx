@@ -188,17 +188,31 @@ const Navbar = () => {
           )}
         {/* 2 ne */}
         <div className="flex items-center w-full justify-between">
-          {window.location.pathname !== "/signin" &&
-            window.location.pathname !== "/signup" &&
-            window.location.pathname !== "/forgot" && (
-              <Link to={"/"}>
-                <img
-                  className="h-16 w-auto ml-2 sm:h-20 md:h-24 lg:h-28 xl:h-32" // Set the image height to h-4
-                  src={Logo}
-                  alt="ComZone"
-                />
-              </Link>
-            )}
+          {location.pathname === "/sellermanagement" ? (
+            // Custom Navbar for /sellermanagement
+            <Link to={"/"}>
+              <img
+                className="h-16 w-auto ml-2 sm:h-20 md:h-24 lg:h-28 xl:h-32"
+                src={Logo}
+                alt="ComZone"
+              />
+            </Link>
+          ) : (
+            // Default Navbar
+            <>
+              {window.location.pathname !== "/signin" &&
+                window.location.pathname !== "/signup" &&
+                window.location.pathname !== "/forgot" && (
+                  <Link to={"/"}>
+                    <img
+                      className="h-16 w-auto ml-2 sm:h-20 md:h-24 lg:h-28 xl:h-32"
+                      src={Logo}
+                      alt="ComZone"
+                    />
+                  </Link>
+                )}
+            </>
+          )}
 
           {(window.location.pathname === "/signin" ||
             window.location.pathname === "/signup" ||

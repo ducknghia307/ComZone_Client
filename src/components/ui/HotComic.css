@@ -34,15 +34,19 @@
     font-weight: bold;
 }
 
-.hot-comic-card .title {
-    font-weight: 600;
-    font-size: 18px;
+.hot-comic-card .author {
+    /* font-weight: 600; */
+    font-size: 16px;
     color: #808089;
 }
 
-.hot-comic-card .description {
-    font-size: 18px;
+.hot-comic-card .title {
+    font-size: 20px;
     color: #000;
+    font-weight: bold;
+    white-space: nowrap;      /* Ngăn không cho văn bản xuống dòng */
+    overflow: hidden;         /* Ẩn phần vượt quá kích thước container */
+    text-overflow: ellipsis;
 }
 
 .rating-sold {

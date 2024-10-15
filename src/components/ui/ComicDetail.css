@@ -105,10 +105,10 @@
 }
 
 .rating-sold {
-  display: flex;
-  /* justify-content: space-between; */
-  align-items: center;
-  padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
 }
 
 .rating-sold .divider {
@@ -116,6 +116,11 @@
   height: 16px;
   background-color: #808089;
   margin: 0 10px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
 }
 
 .all-genres-card .rating {

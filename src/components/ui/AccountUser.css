@@ -1,0 +1,335 @@
+.account-user-container {
+    background-color: #f9f9f9;
+    padding: 40px 30px;
+}
+
+.profile-section1 {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px solid #EAEAEA;
+}
+
+.account-menu {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 0;
+}
+
+.profile-section1 .avatar-image {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin-bottom: 30px;
+}
+
+.username {
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+}
+
+.edit-profile {
+    font-size: 18px;
+    color: #888;
+    text-decoration: none;
+    text-align: center;
+}
+
+.menu-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0px;
+    font-size: 18px;
+    color: #555;
+    cursor: pointer;
+}
+
+.menu-item svg {
+    margin-right: 15px;
+}
+
+.menu-item.active {
+    font-weight: bold;
+    color: #000;
+}
+
+.icon-bold {
+    font-weight: bold;
+}
+
+.menu-item:hover {
+    color: #000000;
+}
+
+/* status */
+.status-tabs {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    background-color: #fff;
+}
+
+.status-tab {
+    padding: 20px 50px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.status-tab:hover {
+    color: #000;
+}
+
+.status-tab.active {
+    color: #000;
+    font-weight: bold;
+}
+
+.status-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000;
+}
+
+.searchbar {
+    display: flex;
+    /* gap: 20px; */
+    padding: 10px 20px;
+    background-color: #EAEAEA;
+    color: #8d8d8d;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.status-content {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #EAEAEA;
+    background-color: #fff;
+}
+
+.status-content-detail {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.chat-button {
+    display: flex;
+    gap: 10px;
+    padding: 5px 10px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 5px;
+}
+
+.shop-button {
+    display: flex;
+    gap: 10px;
+    padding: 5px 10px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 5px;
+    border: 0.5px solid black;
+}
+
+.status-content1 {
+    border-bottom: 1px solid #EAEAEA;
+    background-color: #fff;
+}
+
+.profile-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 50px 300px;
+    background-color: #fff;
+}
+
+/* .profile-title {
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 30px;
+} */
+
+.profile-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    /* text-align: center; */
+    margin-bottom: 20px;
+}
+
+.change-photo-label {
+    display: block;
+    margin-top: 10px;
+}
+
+.change-photo-text {
+    color: #6200ea;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.avatar-image1 {
+    /* width: 100%; */
+    max-width: 180px;
+    border-radius: 50%;
+}
+
+.profile-form {
+    width: 70%;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* margin-bottom: 20px; */
+}
+
+.form-row .MuiTypography-root {
+    flex: 1;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.form-row .MuiTextField-root {
+    flex: 2;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.update-button {
+    padding: 10px 20px;
+    background-color: #000 !important;
+    color: #fff !important;
+    width: auto;
+}
+
+/* auction history */
+.searchauctionbar {
+    display: flex;
+    /* gap: 20px; */
+    padding: 10px 20px;
+    background-color: #EAEAEA;
+    color: #8d8d8d;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.status-auction-tabs {
+    display: flex;
+    justify-content: space-evenly;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    background-color: #fff;
+}
+
+.status-auction-detail{}
+
+.status-auction-content {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #EAEAEA;
+    background-color: #fff;
+}
+
+.status-auction-content-detail {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.status-auction-tab {
+    padding: 20px 50px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.status-auction-tab:hover {
+    color: #000;
+}
+
+.status-auction-tab.active {
+    color: #000;
+    font-weight: bold;
+}
+
+.status-auction-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000;
+}
+
+.countdown1 {
+    display: flex;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.countdown1-block {
+    width: 50px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.time-box1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.time-box1 .time {
+    font-size: 26px;
+    font-weight: bold;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 5px 10px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.time-box1 .label {
+    font-size: 18px;
+    color: #000;
+    margin-top: 6px;
+}
+

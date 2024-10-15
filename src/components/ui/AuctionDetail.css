@@ -1,0 +1,201 @@
+.auction-wrapper {
+    border: 1px solid #787878;
+    margin: 50px 250px;
+    background-color: #f5f5f5;
+}
+
+.title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* padding: 10px 20px; */
+    background-color: #004cff;
+    color: white;
+    font-weight: bold;
+}
+
+.condition-tag {
+    background-color: #000;
+    padding: 15px 20px;
+    color: #fff;
+    font-size: 20px;
+    width: 40%;
+}
+
+.auction-container {
+    padding: 50px;
+}
+
+.comic-info {
+    background-color: #fff;
+    padding: 30px 0px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.auction-info {
+    background-color: #fff;
+}
+
+.comic-images {
+    display: flex;
+    justify-content: center;
+}
+
+.main-comic-image {
+    max-width: 480px;
+    height: auto;
+    border: 1px solid #ddd;
+}
+
+.small-images {
+    display: flex;
+    flex-direction: column;
+    padding-left: 60px;
+}
+
+.small-comic-image {
+    width: 100px;
+    height: auto;
+    border: 1px solid #ddd;
+}
+
+.auction-info .timer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding-bottom: 30px;
+    padding-top: 30px;
+}
+
+.timer p {
+    font-size: 18px;
+    /* padding-top: 30px; */
+}
+
+.countdown {
+    display: flex;
+    justify-content: space-around;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.countdown-block {
+    width: 50px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.timer .current-price {
+    display: flex;
+    justify-content: space-around;
+}
+
+.timer .current-price p {
+    font-size: 17px;
+}
+
+.timer .current-price h2 {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.shop-info {
+    margin-top: 20px;
+    padding: 0 30px;
+}
+
+.shop-info p {
+    font-size: 20px;
+}
+
+.bid-row {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    width: 100%;
+    padding-bottom: 10px;
+}
+
+.bid-row .bid-input {
+    border: 1px solid #ddd;
+    padding: 10px;
+    width: 75%;
+    font-size: 16px;
+    outline: none;
+    height: 50px;
+}
+
+.bid-row .bid-button {
+    background-color: #000;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    width: 25%;
+    height: 50px;
+    border-radius: 0px;
+}
+
+.publisher {
+    margin-top: 30px;
+    font-size: 16px; 
+    padding: 0 30px 30px 30px;
+}
+
+.publisher-detail{
+    display: flex;
+}
+
+.timer p {
+    font-size: 18px;
+    padding-bottom: 10px;
+}
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.countdown-block {
+    width: 50px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.time-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.time-box .time {
+    font-size: 26px;
+    font-weight: bold;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 5px 10px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.time-box .label {
+    font-size: 18px;
+    color: #ffffff;
+    margin-top: 6px;
+}

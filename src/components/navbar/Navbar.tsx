@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Logo from "../../assets/hcn-logo.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
+import axios from "axios";
 interface UserInfo {
   createdAt: string;
   email: string;
@@ -20,7 +21,7 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const token = sessionStorage.getItem("accessToken");
   // console.log(token);
-
+  const navigate = useNavigate();
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -47,15 +48,33 @@ const Navbar = () => {
       setLoading(false);
     }
   };
+  const handleLogout = () => {
+    axios
+      .post(
+        "http://localhost:3000/auth/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then(() => {
+        console.log("roi nha");
+        sessionStorage.removeItem("accessToken");
+        navigate("/");
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Logout failed:", error);
+      });
+  };
   useEffect(() => {
     fetchUserInfo();
   }, [token]);
   const location = useLocation();
   console.log(userInfo);
-  const handleLogout = () => {
-    sessionStorage.removeItem("accessToken");
-    window.location.href = "/";
-  };
+
   const items: MenuProps["items"] = [
     {
       key: "1",

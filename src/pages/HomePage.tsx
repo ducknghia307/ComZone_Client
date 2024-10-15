@@ -5,25 +5,27 @@ import HotComic from "../components/home/HotComic";
 import Auctions from "../components/home/Auctions";
 import AllGenres from "../components/home/AllGenres";
 import axios from "axios";
-import "../components/ui/HomePage.css"
+import "../components/ui/HomePage.css";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
-  const [comicData, setComicData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const fetchComicData = async () => {
-    setIsLoading(true);
-    await axios
-      .get("https://669355fcc6be000fa07adfe4.mockapi.io/comic")
-      .then((res) => {
-        setComicData(res.data);
-        setIsLoading(false);
-        console.log("Data:", res.data);
-      })
-      .catch((err) => console.log(err));
-  };
+  const [token, setToken] = useState("");
+  const navigate = useNavigate();
   useEffect(() => {
-    fetchComicData();
+    const currentUrl = window.location.href;
+
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get("token");
+
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl);
+      sessionStorage.setItem("accessToken", tokenFromUrl);
+      navigate("/");
+      // console.log("Token:", tokenFromUrl);
+    }
   }, []);
+  console.log("Token:", token);
+
   return (
     <div className="homepage w-full overflow-x-hidden ">
       <CarouselComponent />

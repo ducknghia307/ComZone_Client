@@ -2,9 +2,9 @@ import React from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import "../ui/AllGenres.css";
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import StarIcon from '@mui/icons-material/Star';
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import StarIcon from "@mui/icons-material/Star";
 import { Link } from "react-router-dom";
 
 const responsive = {
@@ -54,8 +54,13 @@ const HotComic = () => {
       {/* Truyện tranh nổi bật */}
       <div className="hot-comic-section flex justify-between items-center">
         <h2 className="text-2xl font-bold">Tất Cả Thể Loại</h2>
-        <Link to="/genres" className="text-red-500 font-semibold" style={{ fontSize: '20px' }}>
-          Xem tất cả <ChevronRightIcon style={{ width: "30px", height: "30px" }} />
+        <Link
+          to="/genres"
+          className="text-red-500 font-semibold"
+          style={{ fontSize: "20px" }}
+        >
+          Xem tất cả{" "}
+          <ChevronRightIcon style={{ width: "30px", height: "30px" }} />
         </Link>
       </div>
 
@@ -74,15 +79,21 @@ const HotComic = () => {
             />
             <p className="price">64,350đ</p>
             <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
+            <p className="description">
+              Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái
+            </p>
             <div className="rating-sold">
-              <p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p>
+              <p className="rating">
+                {[...Array(5)].map((_, index) => (
+                  <StarIcon
+                    key={index}
+                    style={{ width: "20px", color: "#ffc107" }}
+                  />
+                ))}
+              </p>
               <div className="divider"></div>
               <p className="sold-info">Đã bán 1014</p>
             </div>
-
           </div>
 
           <div className="hot-comic-card">
@@ -93,15 +104,23 @@ const HotComic = () => {
             />
             <p className="price">64,350đ</p>
             <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
+            <p className="description">
+              Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái
+            </p>
             <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
+              <p className="rating">
+                <p className="rating">
+                  {[...Array(5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+              </p>
               <div className="divider"></div>
               <p className="sold-info">Đã bán 1014</p>
             </div>
-
           </div>
 
           <div className="hot-comic-card">
@@ -112,15 +131,23 @@ const HotComic = () => {
             />
             <p className="price">64,350đ</p>
             <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
+            <p className="description">
+              Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái
+            </p>
             <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
+              <p className="rating">
+                <p className="rating">
+                  {[...Array(5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+              </p>
               <div className="divider"></div>
               <p className="sold-info">Đã bán 1014</p>
             </div>
-
           </div>
 
           <div className="hot-comic-card">
@@ -131,15 +158,23 @@ const HotComic = () => {
             />
             <p className="price">64,350đ</p>
             <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
+            <p className="description">
+              Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái
+            </p>
             <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
+              <p className="rating">
+                <p className="rating">
+                  {[...Array(5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+              </p>
               <div className="divider"></div>
               <p className="sold-info">Đã bán 1014</p>
             </div>
-
           </div>
 
           <div className="hot-comic-card">
@@ -150,15 +185,23 @@ const HotComic = () => {
             />
             <p className="price">64,350đ</p>
             <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
+            <p className="description">
+              Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái
+            </p>
             <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
+              <p className="rating">
+                <p className="rating">
+                  {[...Array(5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+              </p>
               <div className="divider"></div>
               <p className="sold-info">Đã bán 1014</p>
             </div>
-
           </div>
 
           <div className="hot-comic-card">
@@ -169,15 +212,23 @@ const HotComic = () => {
             />
             <p className="price">64,350đ</p>
             <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
+            <p className="description">
+              Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái
+            </p>
             <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
+              <p className="rating">
+                <p className="rating">
+                  {[...Array(5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+              </p>
               <div className="divider"></div>
               <p className="sold-info">Đã bán 1014</p>
             </div>
-
           </div>
 
           <div className="hot-comic-card">
@@ -188,15 +239,23 @@ const HotComic = () => {
             />
             <p className="price">64,350đ</p>
             <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
+            <p className="description">
+              Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái
+            </p>
             <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
+              <p className="rating">
+                <p className="rating">
+                  {[...Array(5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+              </p>
               <div className="divider"></div>
               <p className="sold-info">Đã bán 1014</p>
             </div>
-
           </div>
 
           <div className="hot-comic-card">
@@ -207,15 +266,23 @@ const HotComic = () => {
             />
             <p className="price">64,350đ</p>
             <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
+            <p className="description">
+              Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái
+            </p>
             <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
+              <p className="rating">
+                <p className="rating">
+                  {[...Array(5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+              </p>
               <div className="divider"></div>
               <p className="sold-info">Đã bán 1014</p>
             </div>
-
           </div>
 
           <div className="hot-comic-card">
@@ -226,19 +293,26 @@ const HotComic = () => {
             />
             <p className="price">64,350đ</p>
             <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
+            <p className="description">
+              Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái
+            </p>
             <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
+              <p className="rating">
+                <p className="rating">
+                  {[...Array(5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+              </p>
               <div className="divider"></div>
               <p className="sold-info">Đã bán 1014</p>
             </div>
-
           </div>
         </Carousel>
       </div>
-
     </div>
   );
 };

@@ -10,19 +10,19 @@ const renderer = ({ days, hours, minutes, seconds }) => {
         <div className="countdown">
             <div className="time-box">
                 <span className="time">{days.toString().padStart(2, '0')}</span>
-                <span className="label">D</span>
+                <span className="label1">D</span>
             </div>
             <div className="time-box">
                 <span className="time">{hours.toString().padStart(2, '0')}</span>
-                <span className="label">H</span>
+                <span className="label1">H</span>
             </div>
             <div className="time-box">
                 <span className="time">{minutes.toString().padStart(2, '0')}</span>
-                <span className="label">M</span>
+                <span className="label1">M</span>
             </div>
             <div className="time-box">
                 <span className="time">{seconds.toString().padStart(2, '0')}</span>
-                <span className="label">S</span>
+                <span className="label1">S</span>
             </div>
         </div>
     );

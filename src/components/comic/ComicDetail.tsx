@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import "../ui/ComicDetail.css";
 import { Box, Button, IconButton, Modal, Typography } from "@mui/material";
@@ -8,6 +8,7 @@ import Carousel from "react-multi-carousel";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
+import { useParams } from "react-router-dom";
 
 const style = {
   position: "absolute",
@@ -70,6 +71,62 @@ const CustomButtonGroup = ({ next, previous, goToSlide, carouselState }) => {
 };
 
 const ComicDetails = () => {
+  const [comics, setComics] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const { id } = useParams();
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/comics/${id}`)
+      .then((response) => response.json())
+      .then((comicData) => {
+        console.log("Comic Data:", comicData);
+
+        // Extract genres from the comic object
+        const genresData = comicData.genres || []; // Ensure genres is an array
+
+        // Log the genre names directly
+        const genreNames = genresData.map((genre) => genre.name);
+        console.log("Genre Names:", genreNames); // Log genre names
+
+        // Create a map of genre IDs to genre names if needed, otherwise just use genresData
+        const genresMap = genresData.reduce((map, genre) => {
+          map[genre.id] = genre.name;
+          return map;
+        }, {});
+
+        // Update the comic to include genre names
+        const updatedComic = {
+          ...comicData,
+          genreNames: genreNames, // Use the mapped genre names
+        };
+
+        console.log("Updated Comic with Genres:", updatedComic);
+
+        // Set the comic and genre data
+        setComics(comicData); // Wrap in an array if you want to handle it as a list
+        setGenres(genreNames); // Set genres array separately if needed
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      });
+  }, [id]);
+  console.log(genres);
+
+  const getGenreNames = (genreArray) => {
+    if (!Array.isArray(genreArray) || genreArray.length === 0) {
+      return "No genres";
+    }
+    return genreArray.map((genre) => genre).join(", ");
+  };
+
+  const formatPrice = (price) => {
+    // Thêm dấu chấm ngăn cách hàng nghìn và thêm 'đ' ở cuối
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+  };
   const [open, setOpen] = React.useState(false);
 
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -99,12 +156,16 @@ const ComicDetails = () => {
   ];
 
   const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    setCurrentImageIndex(
+      (prevIndex) => (prevIndex + 1) % comics[0].previewChapter.length
+    );
   };
 
   const prevImage = () => {
     setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
+      (prevIndex) =>
+        (prevIndex - 1 + comics[0].previewChapter.length) %
+        comics[0].previewChapter.length
     );
   };
 
@@ -114,7 +175,7 @@ const ComicDetails = () => {
         <Grid size={{ xs: 5 }} className="left-frame">
           <div className="big-img">
             <img
-              src={images[0]}
+              src={comics[0]?.coverImage}
               alt="Conan Comic"
               style={{ width: "270px", height: "auto", cursor: "pointer" }}
               onClick={() => handleImageModalOpen(0)}
@@ -122,11 +183,11 @@ const ComicDetails = () => {
           </div>
 
           <div className="small-img">
-            {images.map((img, index) => (
+            {comics[0]?.previewChapter.map((img, index) => (
               <img
                 key={index}
                 src={img}
-                alt={`Conan Small Image ${index + 1}`}
+                alt={`Preview ${index + 1}`}
                 style={{ width: "90px", height: "auto", cursor: "pointer" }}
                 onClick={() => handleImageModalOpen(index)}
               />
@@ -170,7 +231,7 @@ const ComicDetails = () => {
                 <CloseIcon />
               </IconButton>
               <img
-                src={images[currentImageIndex]}
+                src={comics[0]?.previewChapter[currentImageIndex]}
                 alt={`Large Comic Image ${currentImageIndex + 1}`}
                 style={{
                   maxWidth: "100%",
@@ -258,54 +319,64 @@ const ComicDetails = () => {
 
         <Grid size={{ xs: 7 }} className="detail-frame">
           <div className="detail1" style={{ marginBottom: "20px" }}>
+            {/* Sử dụng dữ liệu từ API */}
             <Typography className="title">
-              Thám Tử Lừng Danh Conan - Tập 102
+              {comics.title || "Tên truyện"}
             </Typography>
             <div className="author">
               <Typography className="title1">
                 Bộ:{" "}
                 <span className="blue-text">
-                  Thám Tử Lừng Danh Conan Tuyển Tập Đặc Biệt
+                  {comics.series || "Bộ truyện"}
                 </span>
               </Typography>
               <Typography className="title1">
-                Tác giả: <span className="author-name">Gosho Aoyama</span>
+                Tác giả:{" "}
+                <span className="author-name">
+                  {comics.author || "Tác giả"}
+                </span>
               </Typography>
             </div>
 
-                        <div className="rating-sold">
-                            <div className="rating">
-                                <p className="rating">
-                                    <p className="rating">{[...Array(5)].map((_, index) => (
-                                        <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />))}
-                                    </p>
-                                </p>
-                                <div className="divider"></div>
-                                <p className="sold-info">Đã bán 1014</p>
-                            </div>
-                            <Typography className='title1'>
-                                Người Bán: <span className="author-name">Abc Shop</span>
-                            </Typography>
-                        </div>
-                        <p className='price'>24.000đ</p>
-                    </div>
+            <div className="rating-sold">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <p className="rating">
+                  {/* Render rating */}
+                  {[...Array(comics[0]?.rating || 5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+                <div className="divider"></div>
+                <p className="sold-info">Đã bán: {comics.sold || "Chưa có"}</p>
+              </div>
+              <p className="seller-name">Người Bán: {comics.name}</p>
+            </div>
+            <p className="price">{formatPrice(comics.price || 24000)}</p>
+          </div>
 
           <div className="detail2">
             <Typography className="info">Thông tin chi tiết</Typography>
             <div className="authorinfo">
               <Typography className="infoleft">Tác giả:</Typography>
-              <Typography className="inforight">Gosho Aoyama</Typography>
+              <Typography className="inforight">
+                {comics.author || "N/A"}
+              </Typography>
               <div className="divider"></div>
             </div>
             <div className="authorinfo">
               <Typography className="infoleft">Ngôn ngữ:</Typography>
-              <Typography className="inforight">Tiếng Việt</Typography>
+              <Typography className="inforight">
+                {comics.language || "Chưa có"}
+              </Typography>
               <div className="divider"></div>
             </div>
             <div className="authorinfo">
               <Typography className="infoleft">Thể loại:</Typography>
               <Typography className="infogenre">
-                Cuộc phiêu lưu, Bí ẩn, Lãng mạn, Cuộc sống học đường
+                {getGenreNames(genres)}
               </Typography>
               <div className="divider"></div>
             </div>
@@ -313,10 +384,11 @@ const ComicDetails = () => {
               Giá sản phẩm trên ComZone đã bao gồm thuế theo luật hiện hành. Bên
               cạnh đó, tuỳ vào loại sản phẩm, hình thức và địa chỉ giao hàng mà
               có thể phát sinh thêm chi phí khác như: Phụ phí đóng gói, phí vận
-              chuyển, phụ phí hàng cồng kềnh,...{" "}
+              chuyển, phụ phí hàng cồng kềnh,...
             </Typography>
           </div>
         </Grid>
+
         <Grid
           size={{ xs: 12 }}
           className="detail-frame2"

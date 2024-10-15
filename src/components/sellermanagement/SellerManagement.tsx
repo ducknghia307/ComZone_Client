@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Typography, TextField, Box, InputAdornment } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,30 +9,78 @@ import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import DeliveryDiningOutlinedIcon from '@mui/icons-material/DeliveryDiningOutlined';
 import "../ui/SellerCreateComic.css"
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import IconButton from '@mui/material/IconButton';
 
 const SellerManagement = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState('comic');
     const [selectionModel, setSelectionModel] = useState([]);
+    const [comics, setComics] = useState([]);
+    const [genres, setGenres] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Gọi API để lấy danh sách comics và genres
+        Promise.all([
+            fetch('http://localhost:3000/comics').then((response) => response.json()),
+            fetch('http://localhost:3000/genres').then((response) => response.json())
+        ])
+            .then(([comicsData, genresData]) => {
+                console.log('Comics:', comicsData);
+                console.log('Genres:', genresData);
+                setComics(comicsData);
+                setGenres(genresData);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+                setLoading(false);
+            });
+    }, []);
+
 
     const handleMenuItemClick = (item) => {
         setSelectedMenuItem(item);
         if (item === 'comic') {
-            navigate('/sellermanagement'); 
+            navigate('/sellermanagement');
         }
     };
 
+    const getGenreNames = (genreArray) => {
+        if (!Array.isArray(genreArray) || genreArray.length === 0) {
+            return 'No genres';
+        }
+        // Lấy tất cả tên thể loại
+        return genreArray.map(genre => genre.name).join(', ');
+    };
+
+
+
     const columns: GridColDef[] = [
         {
-            field: 'image', headerName: 'Ảnh truyện', flex: 0.75, headerClassName: 'custom-header', headerAlign: 'center', align: 'center',
+            field: 'coverImage', headerName: 'Ảnh truyện', flex: 0.75, headerClassName: 'custom-header', headerAlign: 'center', align: 'center',
             renderCell: (params) => (
                 <img src={params.value} alt="Truyện" style={{ width: 70, height: 100 }} />
             )
         },
-        { field: 'title', headerName: 'Tên truyện', flex: 1, headerClassName: 'custom-header', headerAlign: 'center', align: 'center' },
+        { field: 'title', headerName: 'Tên truyện', flex: 1.5, headerClassName: 'custom-header', headerAlign: 'center', align: 'center' },
         { field: 'author', headerName: 'Tác giả', flex: 1, headerClassName: 'custom-header', headerAlign: 'center', align: 'center' },
-        { field: 'price', headerName: 'Giá (đ)', flex: 0.5, headerClassName: 'custom-header', headerAlign: 'center', align: 'center', sortComparator: (v1, v2) => Number(v1) - Number(v2),},
-        { field: 'genre', headerName: 'Thể loại', flex: 2.25, headerClassName: 'custom-header', headerAlign: 'center', align: 'center' },
+        { field: 'price', headerName: 'Giá (đ)', flex: 0.5, headerClassName: 'custom-header', headerAlign: 'center', align: 'center', sortComparator: (v1, v2) => Number(v1) - Number(v2), },
+        {
+            field: 'genreIds',
+            headerName: 'Thể loại',
+            flex: 1.25,
+            headerClassName: 'custom-header',
+            headerAlign: 'center',
+            align: 'center',
+            renderCell: (params) => {
+                const genres = params.row.genres;
+                console.log('Genres params:', genres);
+                return <span>{getGenreNames(genres)}</span>;
+            }
+        },
         { field: 'language', headerName: 'Ngôn ngữ', flex: 0.75, headerClassName: 'custom-header', headerAlign: 'center', align: 'center' },
         {
             field: 'status', headerName: 'Trạng thái', flex: 0.75, headerClassName: 'custom-header', headerAlign: 'center', align: 'center'
@@ -40,78 +88,28 @@ const SellerManagement = () => {
         {
             field: 'actions', headerName: 'Xem/Xóa', flex: 1, headerClassName: 'custom-header', headerAlign: 'center', align: 'center', renderCell: () => (
                 <>
-                    <Button variant="text" color="primary">View</Button>
-                    <Button variant="text" color="error">Delete</Button>
+                    <IconButton aria-label="edit" color="primary">
+                        <EditOutlinedIcon sx={{ border: '1px solid #D5D5D5', borderRadius: '5px' }} />
+                    </IconButton>
+                    <IconButton aria-label="delete" color="error">
+                        <DeleteOutlineOutlinedIcon sx={{ border: '1px solid #D5D5D5', borderRadius: '5px' }} />
+                    </IconButton>
                 </>
             )
-        },
-    ];
-
-    const rows = [
-        {
-            id: 1,
-            image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3MA07l4q4eYYmFiBvHJYJa0HgfknJYxmUQg&s',
-            title: 'Thám tử lừng danh Conan',
-            author: 'Gosho Aoyama',
-            price: '50.000',
-            genre: 'Cuộc phiêu lưu, Bí ẩn, Lãng mạn, Cuộc sống học đường',
-            language: 'Tiếng việt',
-            status: 'Đang bán',
-        },
-        {
-            id: 2,
-            image: 'https://example.com/image2.jpg',
-            title: 'Thám tử lừng danh Conan',
-            author: 'Gosho Aoyama',
-            price: '140.000',
-            genre: 'Cuộc phiêu lưu, Bí ẩn, Lãng mạn, Cuộc sống học đường',
-            language: 'Tiếng việt',
-            status: 'Ngừng bán',
-        },
-        {
-            id: 3,
-            image: 'https://example.com/image2.jpg',
-            title: 'Thám tử lừng danh Conan',
-            author: 'Gosho Aoyama',
-            price: '60.000',
-            genre: 'Cuộc phiêu lưu, Bí ẩn, Lãng mạn, Cuộc sống học đường',
-            language: 'Tiếng việt',
-            status: 'Ngừng bán',
-        }, {
-            id: 4,
-            image: 'https://example.com/image2.jpg',
-            title: 'Thám tử lừng danh Conan',
-            author: 'Gosho Aoyama',
-            price: '170.000',
-            genre: 'Cuộc phiêu lưu, Bí ẩn, Lãng mạn, Cuộc sống học đường',
-            language: 'Tiếng việt',
-            status: 'Ngừng bán',
-        },
-        {
-            id: 5,
-            image: 'https://example.com/image2.jpg',
-            title: 'Thám tử lừng danh Conan',
-            author: 'Gosho Aoyama',
-            price: '10.000',
-            genre: 'Cuộc phiêu lưu, Bí ẩn, Lãng mạn, Cuộc sống học đường',
-            language: 'Tiếng việt',
-            status: 'Ngừng bán',
-        },
-        {
-            id: 6,
-            image: 'https://example.com/image2.jpg',
-            title: 'Thám tử lừng danh Conan',
-            author: 'Gosho Aoyama',
-            price: '200.000',
-            genre: 'Cuộc phiêu lưu, Bí ẩn, Lãng mạn, Cuộc sống học đường',
-            language: 'Tiếng việt',
-            status: 'Ngừng bán',
         },
     ];
 
     const paginationModel = { page: 0, pageSize: 5 };
 
     const renderContent = () => {
+        if (loading) {
+            return <Typography>Loading comics...</Typography>;
+        }
+
+        if (comics.length === 0) {
+            return <Typography>No comics found.</Typography>;
+        }
+
         switch (selectedMenuItem) {
             case 'comic':
                 return (
@@ -142,12 +140,12 @@ const SellerManagement = () => {
 
                         <div style={{ height: 'auto', width: '100%' }}>
                             <DataGrid
-                                rows={rows}
+                                rows={comics}
                                 columns={columns}
                                 initialState={{ pagination: { paginationModel } }}
                                 pageSizeOptions={[5, 10]}
                                 rowHeight={120}
-                                disableExtendRowFullWidth={false}
+                                // disableExtendRowFullWidth={false}
                                 sx={{
                                     border: 1,
                                     "& .MuiDataGrid-columnHeader": {
@@ -181,6 +179,7 @@ const SellerManagement = () => {
                 return <Typography variant="h4">Chọn một mục để hiển thị nội dung</Typography>;
         }
     };
+
 
     return (
         <div className='seller-container'>

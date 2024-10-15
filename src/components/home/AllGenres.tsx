@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import "../ui/AllGenres.css";
@@ -49,6 +49,28 @@ const CustomButtonGroup = ({ next, previous, goToSlide, carouselState }) => {
 };
 
 const HotComic = () => {
+  const [comics, setComics] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Call API để lấy danh sách comics
+    fetch("http://localhost:3000/comics")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Comics:', comics);
+        setComics(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching comics:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  const formatPrice = (price) => {
+    // Thêm dấu chấm ngăn cách hàng nghìn và thêm 'đ' ở cuối
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + 'đ';
+  };
   return (
     <div className="w-full py-8">
       {/* Truyện tranh nổi bật */}
@@ -59,185 +81,45 @@ const HotComic = () => {
         </Link>
       </div>
 
-      <div className="hot-comic-cards mt-4">
-        <Carousel
-          responsive={responsive}
-          customButtonGroup={<CustomButtonGroup />}
-          renderButtonGroupOutside={true}
-        >
-          {/* Cards hot comic */}
-          <div className="hot-comic-card">
-            <img
-              src="https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg"
-              alt="Hot Comic"
-              className=" object-cover mx-auto"
-            />
-            <p className="price">64,350đ</p>
-            <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
-            <div className="rating-sold">
-              <p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-
-          </div>
-
-          <div className="hot-comic-card">
-            <img
-              src="https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg"
-              alt="Hot Comic"
-              className=" object-cover mx-auto"
-            />
-            <p className="price">64,350đ</p>
-            <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
-            <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-
-          </div>
-
-          <div className="hot-comic-card">
-            <img
-              src="https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg"
-              alt="Hot Comic"
-              className=" object-cover mx-auto"
-            />
-            <p className="price">64,350đ</p>
-            <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
-            <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-
-          </div>
-
-          <div className="hot-comic-card">
-            <img
-              src="https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg"
-              alt="Hot Comic"
-              className=" object-cover mx-auto"
-            />
-            <p className="price">64,350đ</p>
-            <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
-            <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-
-          </div>
-
-          <div className="hot-comic-card">
-            <img
-              src="https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg"
-              alt="Hot Comic"
-              className=" object-cover mx-auto"
-            />
-            <p className="price">64,350đ</p>
-            <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
-            <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-
-          </div>
-
-          <div className="hot-comic-card">
-            <img
-              src="https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg"
-              alt="Hot Comic"
-              className=" object-cover mx-auto"
-            />
-            <p className="price">64,350đ</p>
-            <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
-            <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-
-          </div>
-
-          <div className="hot-comic-card">
-            <img
-              src="https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg"
-              alt="Hot Comic"
-              className=" object-cover mx-auto"
-            />
-            <p className="price">64,350đ</p>
-            <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
-            <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-
-          </div>
-
-          <div className="hot-comic-card">
-            <img
-              src="https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg"
-              alt="Hot Comic"
-              className=" object-cover mx-auto"
-            />
-            <p className="price">64,350đ</p>
-            <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
-            <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-
-          </div>
-
-          <div className="hot-comic-card">
-            <img
-              src="https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg"
-              alt="Hot Comic"
-              className=" object-cover mx-auto"
-            />
-            <p className="price">64,350đ</p>
-            <p className="title">MÈO MỐC</p>
-            <p className="description">Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái</p>
-            <div className="rating-sold">
-              <p className="rating"><p className="rating">{[...Array(5)].map((_, index) => (
-                <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />
-              ))}</p></p>
-              <div className="divider"></div>
-              <p className="sold-info">Đã bán 1014</p>
-            </div>
-
-          </div>
-        </Carousel>
-      </div>
+      {loading ? (
+        <p>Loading comics...</p>
+      ) : (
+        <div className="hot-comic-cards mt-4">
+          <Carousel
+            responsive={responsive}
+            customButtonGroup={<CustomButtonGroup />}
+            renderButtonGroupOutside={true}
+          >
+            {/* Render comics */}
+            {comics.map((comic) => (
+              <div className="hot-comic-card" key={comic.id}>
+                <Link to={`/detail/${comic.id}`}>
+                  <img
+                    src={comic.coverImage}
+                    alt={comic.title}
+                    className="object-cover mx-auto"
+                  />
+                  <p className="price">{formatPrice(comic.price)}</p>
+                  <p className="author">{comic.author.toUpperCase()}</p>
+                  <p className="title">{comic.title}</p>
+                  <div className="rating-sold">
+                    <p className="rating">
+                      {[...Array(5)].map((_, index) => (
+                        <StarIcon
+                          key={index}
+                          style={{ width: "20px", color: "#ffc107" }}
+                        />
+                      ))}
+                    </p>
+                    <div className="divider"></div>
+                    <p className="sold-info">Đã bán {comic.sold}</p>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </Carousel>
+        </div>
+      )}
 
     </div>
   );

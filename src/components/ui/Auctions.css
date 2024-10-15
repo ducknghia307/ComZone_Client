@@ -40,6 +40,9 @@
     font-size: 24px;
     font-weight: 700;
     margin-bottom: 15px;
+    white-space: nowrap;      /* Ngăn không cho văn bản xuống dòng */
+    overflow: hidden;         /* Ẩn phần vượt quá kích thước container */
+    text-overflow: ellipsis;
 }
 
 .auction-card .condition {

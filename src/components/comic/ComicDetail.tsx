@@ -76,7 +76,7 @@ const ComicDetails = () => {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const { id } = useParams();
-
+  const [previewChapter, setPreviewChapter] = useState([]);
   useEffect(() => {
     fetch(`http://localhost:3000/comics/${id}`)
       .then((response) => response.json())
@@ -103,7 +103,7 @@ const ComicDetails = () => {
         };
 
         console.log("Updated Comic with Genres:", updatedComic);
-
+        setPreviewChapter(comicData.previewChapter);
         // Set the comic and genre data
         setComics(comicData); // Wrap in an array if you want to handle it as a list
         setGenres(genreNames); // Set genres array separately if needed
@@ -115,6 +115,7 @@ const ComicDetails = () => {
       });
   }, [id]);
   console.log(genres);
+  console.log("previewchapter", previewChapter);
 
   const getGenreNames = (genreArray) => {
     if (!Array.isArray(genreArray) || genreArray.length === 0) {
@@ -183,7 +184,7 @@ const ComicDetails = () => {
           </div>
 
           <div className="small-img">
-            {comics[0]?.previewChapter.map((img, index) => (
+            {previewChapter.map((img, index) => (
               <img
                 key={index}
                 src={img}

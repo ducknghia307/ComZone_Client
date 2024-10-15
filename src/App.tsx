@@ -1,17 +1,17 @@
-import Navbar from './components/Navbar'
-import HomePage from './components/HomePage'
-import Footer from './components/Footer'
+import Navbar from "./components/navbar/Navbar";
+import AppRouter from "./components/appRouter/AppRouter";
+import Footer from "./components/footer/Footer";
 
 function App() {
-
-
   return (
-    <>
-   <Navbar/>
-   <HomePage/>
-   <Footer/>
-    </>
-  )
+    <div className="w-full min-h-screen flex flex-col justify-between ">
+      <Navbar />
+      <div className="grow">
+        <AppRouter />
+      </div>
+      <Footer />
+    </div>
+  );
 }
 
-export default App
+export default App;

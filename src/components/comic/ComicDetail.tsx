@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import "../ui/ComicDetail.css";
 import { Box, Button, IconButton, Modal, Typography } from "@mui/material";
@@ -8,6 +8,12 @@ import Carousel from "react-multi-carousel";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+
+interface UserInfo {
+  id: string;
+}
 
 const style = {
   position: "absolute",
@@ -70,6 +76,54 @@ const CustomButtonGroup = ({ next, previous, goToSlide, carouselState }) => {
 };
 
 const ComicDetails = () => {
+  const [comics, setComics] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [coverImage, setCoverImage] = useState("");
+  const [previewChapter, setPreviewChapter] = useState([]);
+  const { id } = useParams();
+  // const [userInfo, setUserInfo] = useState<UserInfo>();
+  const token = sessionStorage.getItem("accessToken");
+  const [comicId, setComicId] = useState("");
+  const [userId, setUserId] = useState("");
+  const navigate = useNavigate();
+  useEffect(() => {
+    fetch(`http://localhost:3000/comics/${id}`)
+      .then((response) => response.json())
+      .then((comicData) => {
+        console.log("Comic Data:", comicData);
+        setUsers(comicData.sellerId);
+
+        const genresData = comicData.genres || [];
+
+        const genreNames = genresData.map((genre) => genre.name);
+
+        setPreviewChapter(comicData.previewChapter);
+        setComics(comicData);
+        setComicId(comicData.id);
+        setGenres(genreNames);
+        setCoverImage(comicData.coverImage || "");
+        setPreviewChapter(comicData.previewChapter || []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      });
+  }, [id]);
+
+  const getGenreNames = (genreArray) => {
+    if (!Array.isArray(genreArray) || genreArray.length === 0) {
+      return "No genres";
+    }
+    return genreArray.map((genre) => genre).join(", ");
+  };
+
+  const formatPrice = (price) => {
+    // Thêm dấu chấm ngăn cách hàng nghìn và thêm 'đ' ở cuối
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+  };
   const [open, setOpen] = React.useState(false);
 
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -92,20 +146,72 @@ const ComicDetails = () => {
     setImageModalOpen(false);
   };
 
-  const images = [
-    "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg?_gl=1*f7gx7h*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODM3MTA0OC4zMi4xLjE3MjgzNzIwMDQuNTUuMC4xMDk5ODg2NjI.",
-    "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_4_tap_102.jpg",
-    "https://blogger.googleusercontent.com/img/a/AVvXsEgEajcSgInbrqIu1Hzau3OGo6wqwgpG34u3IWBqgI9LU9wj2vx7bP3buUZfByRf6PkGsh7aHS1CofZ2n52BL2xrQwIawg7rn3BI_btX6rYsx6cPASJJOu5-GXxt68Fn49ju1kBqCwH_cc6Lvj1p6pGN_OHl4pSP2ACP6Z2P_BOZMZrDvhPk0I2MD2lapA",
-  ];
+  const allImages = [coverImage, ...previewChapter];
 
   const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    setCurrentImageIndex(
+      (prevIndex) => (prevIndex + 1) % previewChapter.length
+    );
   };
 
   const prevImage = () => {
     setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
+      (prevIndex) =>
+        (prevIndex - 1 + previewChapter.length) % previewChapter.length
     );
+  };
+
+  const fetchUserInfo = async () => {
+    if (token) {
+      try {
+        const response = await fetch("http://localhost:3000/users/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user info");
+        }
+        const data = await response.json();
+        setUserId(data.id);
+      } catch {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchUserInfo();
+  }, [token]);
+  console.log(userId);
+
+  const handleAddToCart = async () => {
+    if (token) {
+      try {
+        const response = await axios.post(
+          `http://localhost:3000/cart/${comicId}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setOpen(true);
+        setTimeout(() => {
+          handleClose();
+        }, 2000);
+        console.log("Item added to cart:", response.data);
+      } catch (error) {
+        console.error("Error adding item to cart:", error);
+      }
+    } else {
+      alert("You need to sign in to add items to your cart.");
+      navigate("/signin");
+    }
   };
 
   return (
@@ -114,23 +220,27 @@ const ComicDetails = () => {
         <Grid size={{ xs: 5 }} className="left-frame">
           <div className="big-img">
             <img
-              src={images[0]}
+              src={coverImage}
               alt="Conan Comic"
-              style={{ width: "270px", height: "auto", cursor: "pointer" }}
+              style={{ width: "300px", height: "450px", cursor: "pointer" }}
               onClick={() => handleImageModalOpen(0)}
             />
           </div>
 
           <div className="small-img">
-            {images.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Conan Small Image ${index + 1}`}
-                style={{ width: "90px", height: "auto", cursor: "pointer" }}
-                onClick={() => handleImageModalOpen(index)}
-              />
-            ))}
+            {previewChapter.length > 0 ? (
+              previewChapter.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Preview ${index + 1}`}
+                  style={{ width: "90px", height: "150px", cursor: "pointer" }}
+                  onClick={() => handleImageModalOpen(index)}
+                />
+              ))
+            ) : (
+              <p>No preview images available</p>
+            )}
           </div>
 
           {/* Image Modal */}
@@ -170,7 +280,7 @@ const ComicDetails = () => {
                 <CloseIcon />
               </IconButton>
               <img
-                src={images[currentImageIndex]}
+                src={allImages[currentImageIndex]}
                 alt={`Large Comic Image ${currentImageIndex + 1}`}
                 style={{
                   maxWidth: "100%",
@@ -220,7 +330,7 @@ const ComicDetails = () => {
 
           <div className="button">
             <Button
-              onClick={handleOpen}
+              onClick={handleAddToCart}
               sx={{ textTransform: "none" }}
               className="button1"
             >
@@ -258,54 +368,66 @@ const ComicDetails = () => {
 
         <Grid size={{ xs: 7 }} className="detail-frame">
           <div className="detail1" style={{ marginBottom: "20px" }}>
+            {/* Sử dụng dữ liệu từ API */}
             <Typography className="title">
-              Thám Tử Lừng Danh Conan - Tập 102
+              {comics.title || "Tên truyện"}
             </Typography>
             <div className="author">
               <Typography className="title1">
                 Bộ:{" "}
                 <span className="blue-text">
-                  Thám Tử Lừng Danh Conan Tuyển Tập Đặc Biệt
+                  {comics.series || "Bộ truyện"}
                 </span>
               </Typography>
-              <Typography className="title1">
-                Tác giả: <span className="author-name">Gosho Aoyama</span>
-              </Typography>
+              {/* <Typography className="title1">
+                Tác giả:{" "}
+                <span className="author-name">
+                  {comics.author || "Tác giả"}
+                </span>
+              </Typography> */}
             </div>
 
-                        <div className="rating-sold">
-                            <div className="rating">
-                                <p className="rating">
-                                    <p className="rating">{[...Array(5)].map((_, index) => (
-                                        <StarIcon key={index} style={{ width: "20px", color: "#ffc107" }} />))}
-                                    </p>
-                                </p>
-                                <div className="divider"></div>
-                                <p className="sold-info">Đã bán 1014</p>
-                            </div>
-                            <Typography className='title1'>
-                                Người Bán: <span className="author-name">Abc Shop</span>
-                            </Typography>
-                        </div>
-                        <p className='price'>24.000đ</p>
-                    </div>
+            <div className="rating-sold">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <p className="rating">
+                  {/* Render rating */}
+                  {[...Array(comics[0]?.rating || 5)].map((_, index) => (
+                    <StarIcon
+                      key={index}
+                      style={{ width: "20px", color: "#ffc107" }}
+                    />
+                  ))}
+                </p>
+                <div className="divider"></div>
+                <p className="sold-info">Đã bán: {comics.sold || "Chưa có"}</p>
+              </div>
+              <p className="seller-name">
+                Người Bán: <span className="author-name">{users.name}</span>
+              </p>
+            </div>
+            <p className="price">{formatPrice(comics.price || 24000)}</p>
+          </div>
 
           <div className="detail2">
             <Typography className="info">Thông tin chi tiết</Typography>
             <div className="authorinfo">
               <Typography className="infoleft">Tác giả:</Typography>
-              <Typography className="inforight">Gosho Aoyama</Typography>
+              <Typography className="inforight">
+                {comics.author || "N/A"}
+              </Typography>
               <div className="divider"></div>
             </div>
             <div className="authorinfo">
               <Typography className="infoleft">Ngôn ngữ:</Typography>
-              <Typography className="inforight">Tiếng Việt</Typography>
+              <Typography className="inforight">
+                {comics.language || "Chưa có"}
+              </Typography>
               <div className="divider"></div>
             </div>
             <div className="authorinfo">
               <Typography className="infoleft">Thể loại:</Typography>
               <Typography className="infogenre">
-                Cuộc phiêu lưu, Bí ẩn, Lãng mạn, Cuộc sống học đường
+                {getGenreNames(genres)}
               </Typography>
               <div className="divider"></div>
             </div>
@@ -313,10 +435,11 @@ const ComicDetails = () => {
               Giá sản phẩm trên ComZone đã bao gồm thuế theo luật hiện hành. Bên
               cạnh đó, tuỳ vào loại sản phẩm, hình thức và địa chỉ giao hàng mà
               có thể phát sinh thêm chi phí khác như: Phụ phí đóng gói, phí vận
-              chuyển, phụ phí hàng cồng kềnh,...{" "}
+              chuyển, phụ phí hàng cồng kềnh,...
             </Typography>
           </div>
         </Grid>
+
         <Grid
           size={{ xs: 12 }}
           className="detail-frame2"

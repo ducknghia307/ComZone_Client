@@ -1,0 +1,16 @@
+:where(.css-dev-only-do-not-override-ccdg5a).ant-select-outlined:not(
+    .ant-select-customize-input
+  )
+  .ant-select-selector {
+  display: flex;
+  align-items: center;
+  border: 1px solid #000000 !important;
+  /* background: #0ccc; */
+  padding: 20px 10px;
+}
+span.anticon.anticon-down.ant-select-suffix {
+  margin-top: 8px;
+}
+span.anticon.anticon-search.ant-select-suffix {
+  margin-top: 8px;
+}

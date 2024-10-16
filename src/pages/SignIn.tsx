@@ -97,66 +97,6 @@ const SignIn = () => {
                   placeholder="Mật Khẩu"
                   required
                 />
-                {/* <button
-                  type="button"
-                  className="absolute inset-y-0 right-3 flex items-center text-gray-600"
-                  onClick={togglePasswordVisibility}
-                >
-                  {showPassword ? (
-                    <svg
-                      width="20px"
-                      height="20px"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12 15C10.343 15 9 13.657 9 12C9 10.343 10.343 9 12 9C13.657 9 15 10.343 15 12C15 13.657 13.657 15 12 15Z"
-                        stroke="#000000"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12 4C7.523 4 3.733 7.943 2.459 12C3.733 16.057 7.523 20 12 20C16.478 20 20.269 16.057 21.543 12C20.269 7.943 16.478 4 12 4Z"
-                        stroke="#000000"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      width="20px"
-                      height="20px"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12 15C10.343 15 9 13.657 9 12C9 10.343 10.343 9 12 9C13.657 9 15 10.343 15 12C15 13.657 13.657 15 12 15Z"
-                        stroke="#000000"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12 4C7.523 4 3.733 7.943 2.459 12C3.733 16.057 7.523 20 12 20C16.478 20 20.269 16.057 21.543 12C20.269 7.943 16.478 4 12 4Z"
-                        stroke="#000000"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M3 3L21 21"
-                        stroke="#000000"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  )}
-                </button> */}
               </div>
             </div>
 

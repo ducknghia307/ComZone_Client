@@ -20,7 +20,6 @@ const Navbar = () => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [loading, setLoading] = useState(true);
   const token = sessionStorage.getItem("accessToken");
-  // console.log(token);
   const navigate = useNavigate();
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -34,7 +33,6 @@ const Navbar = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        // console.log("User infor:", response.json());
 
         if (!response.ok) {
           throw new Error("Failed to fetch user info");
@@ -73,7 +71,6 @@ const Navbar = () => {
     fetchUserInfo();
   }, [token]);
   const location = useLocation();
-  console.log(userInfo);
 
   const items: MenuProps["items"] = [
     {

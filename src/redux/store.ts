@@ -1,11 +1,11 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import authReducer from "./features/auth/authSlice";
+// import authReducer from "./features/auth/authSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore, Persistor } from "redux-persist";
 // import conversationReducer from "@/redux/features/conversation/conversationSlice";
 
 const rootReducer = combineReducers({
-  auth: authReducer,
+  // auth: authReducer,
   // conversation: conversationReducer,
 });
 

@@ -1,18 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import Sidebar from "../components/sidebar/Sidebar";
 import "../components/ui/HomePage.css"
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import Auctions from "../components/auctions/Auctions"
 
 const AllAuctions = () => {
+
+    const [filteredGenres, setFilteredGenres] = useState([]);
+    const [filteredAuthors, setFilteredAuthors] = useState([]);
+
+    const handleGenreFilterChange = (selectedGenres) => {
+        setFilteredGenres(selectedGenres);
+    };
+
+    const handleAuthorFilterChange = (selectedAuthors) => {
+        setFilteredAuthors(selectedAuthors);
+    };
+
     return (
         <div className="homepage w-full overflow-x-hidden px-4">
             <Grid container spacing={0}>
-                <Grid item xs={2}>
-                    <Sidebar />
+                <Grid size={2}>
+                    <Sidebar onGenreFilterChange={handleGenreFilterChange} onAuthorFilterChange={handleAuthorFilterChange}/>
                 </Grid>
-                <Grid item xs={10}>
-                    <Auctions />
+                <Grid size={10}>
+                    <Auctions filteredGenres={filteredGenres} filteredAuthors={filteredAuthors}/>
                 </Grid>
 
             </Grid>

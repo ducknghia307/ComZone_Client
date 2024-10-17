@@ -3,6 +3,7 @@ import TotalPrice from "../components/cart/TotalPrice";
 import axios from "axios";
 import CurrencySplitter from "../components/assistants/Spliter";
 import { useNavigate } from "react-router-dom";
+import { privateAxios } from "../middleware/axiosInstance";
 
 interface Comic {
   id: string;
@@ -61,10 +62,9 @@ const Cart = () => {
     if (!userId) return; // Only fetch if userId is available
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:3000/cart", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await privateAxios.get("/cart");
       setCartData(response.data); // Set the fetched cart data
+      console.log(response);
     } catch (error) {
       console.error("Error fetching cart data:", error);
     } finally {

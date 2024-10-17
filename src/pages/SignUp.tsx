@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import backgr from "../assets/bookshelf.jpg";
 import { Link, useNavigate } from "react-router-dom";
+import { publicAxios } from "../middleware/axiosInstance";
 
 const SignUp = () => {
   // State to manage form inputs
@@ -9,10 +10,14 @@ const SignUp = () => {
     username: "",
     password: "",
     confirmPassword: "",
+    codeOTP: "",
   });
 
+  // State to manage the current stage
+  const [stage, setStage] = useState("email");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prevState) => ({
@@ -21,11 +26,47 @@ const SignUp = () => {
     }));
   };
 
-  // Handle form submission
+  // Handle email submission
+  const handleSubmitEmail = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await publicAxios.post("otp/register", {
+        email: formData.email,
+      });
+      console.log(response);
+      if (response.status === 201) {
+        setStage("otp");
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      setError("An error occurred while sending OTP.");
+    }
+  };
+
+  // Handle OTP submission
+  const handleSubmitOTP = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await publicAxios.post("/otp/verify", {
+        email: formData.email,
+        otp: formData.codeOTP,
+      });
+
+      console.log(response);
+
+      if (response.status === 201) {
+        setStage("password");
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      setError("An error occurred during OTP verification.");
+    }
+  };
+
+  // Handle form submission for final step (password)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Password matching validation
     if (formData.password !== formData.confirmPassword) {
       setError("Mật khẩu xác nhận không khớp.");
       return;
@@ -34,29 +75,20 @@ const SignUp = () => {
     setError(""); // Clear error if passwords match
 
     try {
-      const response = await fetch("http://localhost:3000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          name: formData.username,
-          password: formData.password,
-        }),
+      const response = await publicAxios.post("auth/register", {
+        email: formData.email,
+        name: formData.username,
+        password: formData.password,
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Registration successful:", result);
+      if (response.status === 201) {
         navigate("/signin", { state: { email: formData.email } });
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Đăng ký thất bại, vui lòng thử lại.");
+        setError("Registration failed. Please try again.");
       }
     } catch (error) {
       console.error("Error during registration:", error);
-      setError("Có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.");
+      setError("An error occurred during registration.");
     }
   };
 
@@ -68,53 +100,88 @@ const SignUp = () => {
       }}
     >
       <div className="py-12 w-full flex justify-center">
-        <div className="bg-white  p-8 rounded-md shadow-md w-full max-w-md">
+        <div className="bg-white p-8 rounded-md shadow-md w-full max-w-md">
           <h2 className="text-3xl font-bold text-center mb-6">Đăng Ký</h2>
 
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label
-                className=" text-sm font-semibold mb-2 flex items-center gap-0.5"
-                htmlFor="email"
-              >
-                Email <p className="text-red-600 italic">*</p>
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                placeholder="Email"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                className=" text-sm font-semibold mb-2 flex items-center gap-0.5"
-                htmlFor="username"
-              >
-                Tên người dùng <p className="text-red-600 italic">*</p>
-              </label>
-              <input
-                type="text"
-                id="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                placeholder="Tên"
-              />
-            </div>
+          {stage === "email" && (
+            <form onSubmit={handleSubmitEmail}>
+              <div className="mb-4">
+                <label className="text-sm font-semibold mb-2" htmlFor="email">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  placeholder="Email"
+                />
+              </div>
 
-            <div className="mb-4">
-              <label
-                className=" text-sm font-semibold mb-2 flex items-center gap-0.5"
-                htmlFor="password"
+              <button
+                type="submit"
+                className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition duration-300 mt-2"
               >
-                Mật Khẩu <p className="text-red-600 italic">*</p>
-              </label>
-              <div className="relative">
+                Xác thực email
+              </button>
+            </form>
+          )}
+
+          {stage === "otp" && (
+            <form onSubmit={handleSubmitOTP}>
+              <div className="mb-4">
+                <label className="text-sm font-semibold mb-2" htmlFor="codeOTP">
+                  Mã OTP
+                </label>
+                <input
+                  type="text"
+                  id="codeOTP"
+                  value={formData.codeOTP}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  placeholder="Nhập mã OTP"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition duration-300 mt-2"
+              >
+                Xác nhận OTP
+              </button>
+            </form>
+          )}
+
+          {stage === "password" && (
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label
+                  className="text-sm font-semibold mb-2"
+                  htmlFor="username"
+                >
+                  Tên người dùng
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  placeholder="Tên"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  className="text-sm font-semibold mb-2"
+                  htmlFor="password"
+                >
+                  Mật Khẩu
+                </label>
                 <input
                   type="password"
                   id="password"
@@ -125,16 +192,14 @@ const SignUp = () => {
                   placeholder="Mật Khẩu"
                 />
               </div>
-            </div>
 
-            <div className="mb-4">
-              <label
-                className="flex items-center gap-0.5 text-sm font-semibold mb-2"
-                htmlFor="confirmPassword"
-              >
-                Xác Nhận Lại Mật Khẩu <p className="text-red-600 italic">*</p>
-              </label>
-              <div className="relative">
+              <div className="mb-4">
+                <label
+                  className="text-sm font-semibold mb-2"
+                  htmlFor="confirmPassword"
+                >
+                  Xác Nhận Lại Mật Khẩu
+                </label>
                 <input
                   type="password"
                   id="confirmPassword"
@@ -144,72 +209,17 @@ const SignUp = () => {
                   className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   placeholder="Xác Nhận Lại Mật Khẩu"
                 />
+                {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
               </div>
-              {/* Error message for password mismatch */}
-              {error && (
-                <p className="absolute text-red-500 text-sm mt-1">{error}</p>
-              )}
-            </div>
 
-            <button
-              type="submit"
-              className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition duration-300 mt-4"
-            >
-              Đăng Ký
-            </button>
-
-            <h4 className="font-thin text-sm italic text-center mt-2">hoặc</h4>
-
-            <div className="mt-2 text-center">
               <button
-                className="w-full bg-white border border-gray-300 text-black py-2 rounded-md flex items-center justify-center hover:bg-gray-100 transition duration-300"
-                onClick={() =>
-                  (window.location.href =
-                    "http://localhost:3000/auth/google/login")
-                }
+                type="submit"
+                className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition duration-300 mt-4"
               >
-                <svg
-                  width="20px"
-                  height="20px"
-                  viewBox="0 0 32 32"
-                  data-name="Layer 1"
-                  className="mr-2"
-                  id="Layer_1"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M23.75,16A7.7446,7.7446,0,0,1,8.7177,18.6259L4.2849,22.1721A13.244,13.244,0,0,0,29.25,16"
-                    fill="#00ac47"
-                  />
-                  <path
-                    d="M23.75,16a7.7387,7.7387,0,0,1-3.2516,6.2987l4.3824,3.5059A13.2042,13.2042,0,0,0,29.25,16"
-                    fill="#4285f4"
-                  />
-                  <path
-                    d="M8.25,16a7.698,7.698,0,0,1,.4677-2.6259L4.2849,9.8279a13.177,13.177,0,0,0,0,12.3442l4.4328-3.5462A7.698,7.698,0,0,1,8.25,16Z"
-                    fill="#ffba00"
-                  />
-                  <polygon
-                    fill="#2ab2db"
-                    points="8.718 13.374 8.718 13.374 8.718 13.374 8.718 13.374"
-                  />
-                  <path
-                    d="M16,8.25a7.699,7.699,0,0,1,4.558,1.4958l4.06-3.7893A13.2152,13.2152,0,0,0,4.2849,9.8279l4.4328,3.5462A7.756,7.756,0,0,1,16,8.25Z"
-                    fill="#ea4435"
-                  />
-                  <polygon
-                    fill="#2ab2db"
-                    points="8.718 18.626 8.718 18.626 8.718 18.626 8.718 18.626"
-                  />
-                  <path
-                    d="M29.25,15v1L27,19.5H16.5V14H28.25A1,1,0,0,1,29.25,15Z"
-                    fill="#4285f4"
-                  />
-                </svg>
-                Đăng nhập bằng Google
+                Đăng Ký
               </button>
-            </div>
-          </form>
+            </form>
+          )}
 
           <p className="mt-4 text-center text-sm">
             Đã có tài khoản?{" "}

@@ -79,16 +79,25 @@ const Auctions = () => {
     const [comics, setComics] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const token = sessionStorage.getItem("accessToken"); // Lấy token từ sessionStorage
+
     useEffect(() => {
-        // Call API để lấy danh sách comics
-        fetch("http://localhost:3000/comics")
-            .then((response) => response.json())
+        // Gọi API để lấy danh sách comics có status là 'available'
+        fetch("http://localhost:3000/comics/status/available", {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then((data) => {
-                console.log('All Comics:', data); // Log toàn bộ dữ liệu
-                data.forEach((comic, index) => {
-                    console.log(`Comic ${index + 1}:`, comic); // Log chi tiết từng comic để kiểm tra thuộc tính isAuction
-                });
-                // Lọc ra các comic có isAuction là 1
+                console.log('Available Comics:', data); 
+                // Lọc các comics có isAuction là true
                 const auctionComics = data.filter((comic) => comic.isAuction === true);
                 console.log('Auction Comics:', auctionComics);
                 setComics(auctionComics);
@@ -99,11 +108,11 @@ const Auctions = () => {
                 setLoading(false);
             });
     }, []);
-    
 
-    const handleDetailClick = () => {
-        navigate('/auctiondetail'); // Navigate to the auction detail page
+    const handleDetailClick = (comicId) => {
+        navigate(`/auctiondetail/${comicId}`); // Điều hướng với ID của comic
     };
+    
     return (
         <div className="w-full py-8">
             <div className="section-title text-2xl font-bold">

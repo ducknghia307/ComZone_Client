@@ -273,9 +273,8 @@ const AccountUser = () => {
                             {!editing ? (
                                 <Button
                                     variant="contained"
-                                    color="primary"
                                     onClick={handleEditClick}
-                                    sx={{ fontSize: '20px' }}
+                                    sx={{ fontSize: '20px', backgroundColor:'#000', color:'#fff' }}
                                 >
                                     Cập Nhật Hồ Sơ
                                 </Button>
@@ -479,67 +478,127 @@ const AccountUser = () => {
 
         return filteredAuctions.map(auction => {
             const isWin = auction.status === 'completed' && auction.isWin;
-            const cardBackgroundColor = auction.status === 'completed'
-                ? isWin ? '#D6FFD8' : '#E9E9E9'
-                : getAuctionStatusColor(auction.status);
 
             return (
-                <div key={auction.id} style={{
-                    backgroundColor: cardBackgroundColor,
-                    borderRadius: '8px',
-                    marginBottom: '20px',
-                    padding: '16px',
-                }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', padding: '10px 30px' }}>
+                <div key={auction.id}
+                    style={{
+                        backgroundColor: '#fff',  // Giữ màu nền trắng
+                        borderRadius: '8px',
+                        marginBottom: '20px',
+                        padding: '16px',
+                        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                    }}
+                >
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '12px',
+                            padding: '10px 30px'
+                        }}
+                    >
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <StoreOutlinedIcon style={{ marginRight: '8px' }} />
-                            <Typography sx={{ fontSize: '20px' }} variant="subtitle1">{auction.shopName}</Typography>
+                            <Typography sx={{ fontSize: '20px' }} variant="subtitle1">
+                                {auction.shopName}
+                            </Typography>
                         </div>
-                        <Typography sx={{ margin: 'auto 0', color: getAuctionStatusTextColor(auction.status), fontSize: '20px' }}>{getAuctionStatusText(auction.status)}</Typography>
+
+                        {/* Chip màu cho status đấu giá */}
+                        <div
+                            style={{
+                                backgroundColor: getAuctionStatusTextColor(auction.status),
+                                padding: '5px 10px',
+                                borderRadius: '16px',
+                            }}
+                        >
+                            <Typography sx={{ fontSize: '16px', color: '#fff' }}>
+                                {getAuctionStatusText(auction.status)}
+                            </Typography>
+                        </div>
                     </div>
 
                     <div style={{ padding: '0px 30px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', gap: "20px" }}>
-                                <img src={auction.imgUrl} alt={auction.productName} style={{ width: '180px', marginRight: '16px' }} />
+                                <img
+                                    src={auction.imgUrl}
+                                    alt={auction.productName}
+                                    style={{ width: '150px', marginRight: '16px' }}
+                                />
                                 <div>
-                                    <Typography sx={{ fontSize: '32px', fontWeight: 'bold' }} variant="body1">{auction.productName}</Typography>
-                                    {/* Chi tiết cho cuộc đấu giá đang diễn ra */}
+                                    <Typography
+                                        sx={{ fontSize: '28px', fontWeight: 'bold' }}
+                                        variant="body1"
+                                    >
+                                        {auction.productName}
+                                    </Typography>
+
                                     {auction.status === 'ongoing' && (
                                         <div>
-                                            <Typography sx={{ fontSize: '24px', marginTop: '12px' }} variant="body2">Giá hiện tại: <span style={{ color: "#0000FF" }}>{auction.currentPrice}</span></Typography>
-                                            <Typography sx={{ fontSize: '24px', marginTop: '8px' }} variant="body2">Bạn đã đặt giá: <span style={{ color: "#FF7F00" }}>{auction.userBid}</span></Typography>
+                                            <Typography
+                                                sx={{ fontSize: '20px', marginTop: '12px' }}
+                                                variant="body2"
+                                            >
+                                                Giá hiện tại: <span style={{ color: "#0000FF" }}>{auction.currentPrice}</span>
+                                            </Typography>
+                                            <Typography
+                                                sx={{ fontSize: '20px', marginTop: '8px' }}
+                                                variant="body2"
+                                            >
+                                                Bạn đã đặt giá: <span style={{ color: "#FF7F00" }}>{auction.userBid}</span>
+                                            </Typography>
                                         </div>
                                     )}
 
-                                    {/* Chi tiết cho cuộc đấu giá đã kết thúc */}
                                     {auction.status === 'completed' && (
                                         <div>
                                             {isWin ? (
-                                                <div>
-                                                    <Typography sx={{ fontSize: '24px', marginTop: '12px' }} variant="body2">Giá cuối cùng: <span style={{ color: "#32CD32" }}>{auction.finalPrice}</span></Typography>
-                                                </div>
+                                                <Typography
+                                                    sx={{ fontSize: '24px', marginTop: '12px' }}
+                                                    variant="body2"
+                                                >
+                                                    Giá cuối cùng: <span style={{ color: "#32CD32" }}>{auction.finalPrice}</span>
+                                                </Typography>
                                             ) : (
-                                                <div>
-                                                    <Typography sx={{ fontSize: '24px', marginTop: '12px' }} variant="body2">Bạn đã đặt giá: <span style={{ color: "#FF7F00" }}>{auction.userBid}</span></Typography>
-                                                    <Typography sx={{ fontSize: '24px', marginTop: '8px' }} variant="body2">Giá chiến thắng: <span style={{ color: "#FF0000" }}>{auction.finalPrice}</span></Typography>
-                                                </div>
+                                                <>
+                                                    <Typography
+                                                        sx={{ fontSize: '24px', marginTop: '12px' }}
+                                                        variant="body2"
+                                                    >
+                                                        Bạn đã đặt giá: <span style={{ color: "#FF7F00" }}>{auction.userBid}</span>
+                                                    </Typography>
+                                                    <Typography
+                                                        sx={{ fontSize: '24px', marginTop: '8px' }}
+                                                        variant="body2"
+                                                    >
+                                                        Giá chiến thắng: <span style={{ color: "#FF0000" }}>{auction.finalPrice}</span>
+                                                    </Typography>
+                                                </>
                                             )}
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Countdown logic based on status */}
                             {auction.status !== 'canceled' && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
-                                    <Typography sx={{ fontSize: '20px', fontWeight: 'bold' }}>Thời gian còn lại:</Typography>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '30px'
+                                    }}
+                                >
+                                    <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>
+                                        Thời gian còn lại:
+                                    </Typography>
                                     {auction.status === 'ongoing' ? (
                                         <Countdown
-                                            date={Date.now() + 100000000}  // Example: 100000000 ms from now
+                                            date={Date.now() + 100000000}
                                             renderer={renderer}
                                         />
-                                    ) : auction.status === 'completed' ? (
+                                    ) : (
                                         <div className="countdown1">
                                             <div className="time-box1">
                                                 <span className="time">00</span>
@@ -558,19 +617,33 @@ const AccountUser = () => {
                                                 <span className="label">S</span>
                                             </div>
                                         </div>
-                                    ) : null}
+                                    )}
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px', paddingBottom: '20px', paddingRight: '20px' }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            marginTop: '12px',
+                            paddingBottom: '20px',
+                            paddingRight: '20px'
+                        }}
+                    >
                         {auction.status === 'ongoing' ? (
-                            <Button variant="contained" style={{ backgroundColor: '#000000', color: '#FFFFFF', fontSize: '20px' }}>
+                            <Button
+                                variant="contained"
+                                style={{ backgroundColor: '#000000', color: '#FFFFFF', fontSize: '16px' }}
+                            >
                                 TRỞ LẠI CUỘC ĐẤU GIÁ
                             </Button>
                         ) : (
-                            <Button variant="contained" style={{ backgroundColor: '#000000', color: '#FFFFFF', fontSize: '20px' }}>
+                            <Button
+                                variant="contained"
+                                style={{ backgroundColor: '#000000', color: '#FFFFFF', fontSize: '16px' }}
+                            >
                                 XEM CHI TIẾT ĐẤU GIÁ
                             </Button>
                         )}
@@ -579,7 +652,6 @@ const AccountUser = () => {
             );
         });
     };
-
 
 
     const getStatusText = (status) => {

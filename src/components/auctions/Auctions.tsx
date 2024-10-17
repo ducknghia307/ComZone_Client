@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../ui/AuctionSidebar.css";
 import Countdown from "react-countdown";
 import { Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const renderer = ({ days, hours, minutes, seconds }) => {
     return (
@@ -26,55 +27,57 @@ const renderer = ({ days, hours, minutes, seconds }) => {
     );
 };
 
-const AllAuctions = () => {
-    const genres = [
-        {
-            imgSrc: "https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg",
-            price: "64,350đ",
-            title: "MÈO MỐC",
-            description: "Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái",
-        },{
-            imgSrc: "https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg",
-            price: "64,350đ",
-            title: "MÈO MỐC",
-            description: "Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái",
-        },{
-            imgSrc: "https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg",
-            price: "64,350đ",
-            title: "MÈO MỐC",
-            description: "Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái",
-        },{
-            imgSrc: "https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg",
-            price: "64,350đ",
-            title: "MÈO MỐC",
-            description: "Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái",
-        },{
-            imgSrc: "https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg",
-            price: "64,350đ",
-            title: "MÈO MỐC",
-            description: "Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái",
-        },{
-            imgSrc: "https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg",
-            price: "64,350đ",
-            title: "MÈO MỐC",
-            description: "Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái",
-        },{
-            imgSrc: "https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg",
-            price: "64,350đ",
-            title: "MÈO MỐC",
-            description: "Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái",
-        },{
-            imgSrc: "https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg",
-            price: "64,350đ",
-            title: "MÈO MỐC",
-            description: "Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái",
-        },{
-            imgSrc: "https://cdn0.fahasa.com/media/catalog/product/b/_/b_a-t_y-du-h_-5_1.jpg",
-            price: "64,350đ",
-            title: "MÈO MỐC",
-            description: "Tây Du Hí 5 - Ngôi Làng Nơi Thần Tiên Trở Thành Yêu Quái",
-        },
-    ];
+const AllAuctions = ({ filteredGenres, filteredAuthors }) => {
+
+    const navigate = useNavigate();
+    const [comics, setComics] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const token = sessionStorage.getItem("accessToken"); // Lấy token từ sessionStorage
+
+    useEffect(() => {
+        // Gọi API để lấy danh sách comics có status là 'available'
+        fetch("http://localhost:3000/comics/status/available", {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log('Available Comics:', data); 
+                // Lọc các comics có isAuction là true
+                const auctionComics = data.filter((comic) => comic.isAuction === true);
+                console.log('Auction Comics:', auctionComics);
+                setComics(auctionComics);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error("Error fetching comics:", error);
+                setLoading(false);
+            });
+    }, []);
+
+    const handleDetailClick = (comicId) => {
+        navigate(`/auctiondetail/${comicId}`); // Điều hướng với ID comic
+    };
+
+    const params = new URLSearchParams(location.search);
+    const searchQuery = params.get('query');
+
+    // Lọc comics dựa trên query từ URL
+    const filteredComics = comics.filter((comic) => {
+        const genreMatch = filteredGenres.length > 0 ? comic.genres && comic.genres.some((genre) => filteredGenres.includes(genre.name)) : true;
+        const authorMatch = filteredAuthors.length > 0 ? filteredAuthors.includes(comic.author) : true;
+        const titleMatch = searchQuery ? comic.title.toLowerCase().includes(searchQuery.toLowerCase()) : true;
+        return genreMatch && authorMatch && titleMatch;
+    });
+
 
     return (
         <div className="mb-10">
@@ -87,45 +90,65 @@ const AllAuctions = () => {
             </div>
 
             <div className="auction-cards mt-4">
-                {genres.map((genre, index) => (
-                    <div className="auction-card" key={index}>
-                        <img
-                            src="https://cdn0.fahasa.com/media/catalog/product/m/a/marvel_spider_man_tattle_tales_1_2022_08_22_15_39_32.jpg?_gl=1*1psv686*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODIzMzYzMi4yOC4xLjE3MjgyMzM2NzguMTQuMC4xMjg4NzY4MTk4"
-                            alt=""
-                            className=" object-cover mx-auto"
-                        />
-                        <p className="title">Spider Man Comic</p>
-                        <p className="condition">VF: 8.0</p>
-                        <p className="endtime">KẾT THÚC TRONG</p>
-                        <Countdown
-                            date={Date.now() + 100000000}  // Example: 100000000 ms from now
-                            renderer={renderer}
-                        />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
-                    </div>
-                ))}
+                {filteredComics.length > 0 ? (
+                    filteredComics.map((comic) => (
+                        <div className="auction-card" key={comic.id}>
+                            <img
+                                src={comic.coverImage}
+                                alt={comic.title}
+                                className=" object-cover mx-auto"
+                            />
+                            <p className="title">{comic.title}</p>
+                            <p className="condition">{comic.condition}</p>
+                            <p className="endtime">KẾT THÚC TRONG</p>
+                            <Countdown
+                                date={Date.now() + 100000000}
+                                renderer={renderer}
+                            />
+                            <Button
+                                className="detail-button"
+                                onClick={() => handleDetailClick(comic.id)}
+                                variant="contained"
+                            >
+                                Xem Chi Tiết
+                            </Button>
+                        </div>
+                    ))
+                ) : (
+                    <p>Không tìm thấy kết quả phù hợp</p>
+                )}
             </div>
             <div className="auction-section-detail2 flex justify-between items-center">
                 <h2 className="text-2xl font-bold">Sắp diễn ra</h2>
             </div>
             <div className="auction-cards mt-4">
-                {genres.map((genre, index) => (
-                    <div className="auction-card" key={index}>
-                        <img
-                            src="https://cdn0.fahasa.com/media/catalog/product/m/a/marvel_spider_man_tattle_tales_1_2022_08_22_15_39_32.jpg?_gl=1*1psv686*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODIzMzYzMi4yOC4xLjE3MjgyMzM2NzguMTQuMC4xMjg4NzY4MTk4"
-                            alt=""
-                            className=" object-cover mx-auto"
-                        />
-                        <p className="title">Spider Man Comic</p>
-                        <p className="condition">VF: 8.0</p>
-                        <p className="endtime">BẮT ĐẦU TRONG</p>
-                        <Countdown
-                            date={Date.now() + 100000000}  // Example: 100000000 ms from now
-                            renderer={renderer}
-                        />
-                        <Button className="detail-button" variant="contained">Xem Chi Tiết</Button>
-                    </div>
-                ))}
+                {filteredComics.length > 0 ? (
+                    filteredComics.map((comic) => (
+                        <div className="auction-card" key={comic.id}>
+                            <img
+                                src={comic.coverImage}
+                                alt={comic.title}
+                                className=" object-cover mx-auto"
+                            />
+                            <p className="title">{comic.title}</p>
+                            <p className="condition">{comic.condition}</p>
+                            <p className="endtime">KẾT THÚC TRONG</p>
+                            <Countdown
+                                date={Date.now() + 100000000}
+                                renderer={renderer}
+                            />
+                            <Button
+                                className="detail-button"
+                                // onClick={() => handleDetailClick(comic.id)}
+                                variant="contained"
+                            >
+                                Xem Chi Tiết
+                            </Button>
+                        </div>
+                    ))
+                ) : (
+                    <p>Không tìm thấy kết quả phù hợp</p>
+                )}
             </div>
 
         </div>

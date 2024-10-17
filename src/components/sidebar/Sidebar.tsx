@@ -2,39 +2,106 @@ import React, { useState, useEffect } from "react";
 import { Checkbox, FormControlLabel, FormGroup, Collapse } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import axios from 'axios';
 import "../ui/Sidebar.css";
 
-const Sidebar = () => {
+const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange }) => {
     const [isGenreOpen, setIsGenreOpen] = useState(true);
     const [isConditionOpen, setIsConditionOpen] = useState(true);
     const [isAuthorOpen, setIsAuthorOpen] = useState(true);
+    const [comics, setComics] = useState([]);
     const [genres, setGenres] = useState([]);
-    const [conditions, setConditions] = useState([]);
     const [authors, setAuthors] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedGenres, setSelectedGenres] = useState([]);
+    const [selectedAuthors, setSelectedAuthors] = useState([]);
 
-    // Fetch data from API
     useEffect(() => {
-        axios.get('https://666aae407013419182d06da5.mockapi.io/genres')
-            .then((response) => {
-                const fetchedGenres = response.data;
-                setGenres(fetchedGenres);
+        fetch('http://localhost:3000/genres')
+            .then((response) => response.json())
+            .then((genreData) => {
 
-                // Extract unique conditions and authors from the fetched genres
-                const uniqueConditions = [...new Set(fetchedGenres.map((genre) => genre.condition))];
-                setConditions(uniqueConditions);
+                // Extract genres from the comic object
+                const genresData = genreData.genres || []; // Ensure genres is an array
 
-                const uniqueAuthors = [...new Set(fetchedGenres.map((genre) => genre.author))];
-                setAuthors(uniqueAuthors);
+                // Log the genre names directly
+                const genreNames = genresData.map((genre) => genre.name);
+                console.log("Genre Names:", genreNames); // Log genre names
+
+                // Create a map of genre IDs to genre names if needed, otherwise just use genresData
+                const genresMap = genresData.reduce((map, genre) => {
+                    map[genre.id] = genre.name;
+                    return map;
+                }, {});
+
+                // Update the comic to include genre names
+                const updatedComic = {
+                    ...genreData,
+                    genreNames: genreNames, // Use the mapped genre names
+                };
+
+                console.log("Updated Comic with Genres:", updatedComic);
+
+                setGenres(genreData);
+
+                setLoading(false);
+
+                // Fetch authors from /comics API status available
+                fetch('http://localhost:3000/comics/status/available')
+                    .then((response) => response.json())
+                    .then((comicsData) => {
+                        console.log("Comics Data:", comicsData);
+                        // Extract unique authors from the comics data
+                        const authorsData = [...new Set(comicsData.map(comic => comic.author))];
+                        setAuthors(authorsData);
+                        setLoading(false);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching authors:", error);
+                        setLoading(false);
+                    });
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
+                setLoading(false);
             });
     }, []);
+    console.log(genres);
 
     const toggleGenre = () => setIsGenreOpen(!isGenreOpen);
     const toggleCondition = () => setIsConditionOpen(!isConditionOpen);
     const toggleAuthor = () => setIsAuthorOpen(!isAuthorOpen);
+
+    const handleGenreChange = (event) => {
+        const genre = event.target.name;
+        const isChecked = event.target.checked;
+        let updatedSelectedGenres;
+
+        if (isChecked) {
+            updatedSelectedGenres = [...selectedGenres, genre];
+        } else {
+            updatedSelectedGenres = selectedGenres.filter((g) => g !== genre);
+        }
+        setSelectedGenres(updatedSelectedGenres);
+        if (typeof onGenreFilterChange === "function") {
+            onGenreFilterChange(updatedSelectedGenres);
+        }
+    };
+
+    const handleAuthorChange = (event) => {
+        const author = event.target.name;
+        const isChecked = event.target.checked;
+        let updatedSelectedAuthors;
+
+        if (isChecked) {
+            updatedSelectedAuthors = [...selectedAuthors, author];
+        } else {
+            updatedSelectedAuthors = selectedAuthors.filter((a) => a !== author);
+        }
+        setSelectedAuthors(updatedSelectedAuthors);
+        if (typeof onAuthorFilterChange === "function") {
+            onAuthorFilterChange(updatedSelectedAuthors);
+        }
+    };
 
     return (
         <div className="sidebar">
@@ -54,9 +121,9 @@ const Sidebar = () => {
                         <FormGroup>
                             {genres.map((genre) => (
                                 <FormControlLabel
-                                    key={genre.id}
-                                    control={<Checkbox name={genre.name} />}
-                                    label={`Truyện tranh ${genre.name}`}
+                                    key={genre.id}  
+                                    control={<Checkbox name={genre.name} onChange={handleGenreChange} />} 
+                                    label={genre.name} 
                                 />
                             ))}
                         </FormGroup>
@@ -73,13 +140,13 @@ const Sidebar = () => {
                 <Collapse in={isConditionOpen}>
                     <div className="condition-list mt-4">
                         <FormGroup>
-                            {conditions.map((condition, index) => (
+                            {/* {conditions.map((condition, index) => (
                                 <FormControlLabel
                                     key={index}
                                     control={<Checkbox name={condition} />}
                                     label={condition}
                                 />
-                            ))}
+                            ))} */}
                         </FormGroup>
                     </div>
                 </Collapse>
@@ -96,8 +163,8 @@ const Sidebar = () => {
                         <FormGroup>
                             {authors.map((author, index) => (
                                 <FormControlLabel
-                                    key={index}
-                                    control={<Checkbox name={author} />}
+                                    key={index}  // Using index for now since authors might not have unique IDs
+                                    control={<Checkbox name={author} onChange={handleAuthorChange}/>}
                                     label={author}
                                 />
                             ))}

@@ -8,7 +8,12 @@ import Carousel from "react-multi-carousel";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+
+interface UserInfo {
+  id: string;
+}
 
 const style = {
   position: "absolute",
@@ -78,7 +83,11 @@ const ComicDetails = () => {
   const [coverImage, setCoverImage] = useState("");
   const [previewChapter, setPreviewChapter] = useState([]);
   const { id } = useParams();
-
+  // const [userInfo, setUserInfo] = useState<UserInfo>();
+  const token = sessionStorage.getItem("accessToken");
+  const [comicId, setComicId] = useState("");
+  const [userId, setUserId] = useState("");
+  const navigate = useNavigate();
   useEffect(() => {
     fetch(`http://localhost:3000/comics/${id}`)
       .then((response) => response.json())
@@ -86,35 +95,16 @@ const ComicDetails = () => {
         console.log("Comic Data:", comicData);
         setUsers(comicData.sellerId);
 
-        // Extract genres from the comic object
-        const genresData = comicData.genres || []; // Ensure genres is an array
+        const genresData = comicData.genres || [];
 
-        // Log the genre names directly
         const genreNames = genresData.map((genre) => genre.name);
-        console.log("Genre Names:", genreNames); // Log genre names
 
-        // Create a map of genre IDs to genre names if needed, otherwise just use genresData
-        const genresMap = genresData.reduce((map, genre) => {
-          map[genre.id] = genre.name;
-          return map;
-        }, {});
-
-        // Update the comic to include genre names
-        const updatedComic = {
-          ...comicData,
-          genreNames: genreNames, // Use the mapped genre names
-        };
-
-        console.log("Updated Comic with Genres:", updatedComic);
-
-        // Set the comic and genre data
-        setComics(comicData); // Wrap in an array if you want to handle it as a list
-        setGenres(genreNames); // Set genres array separately if needed
-
-        // Extract coverImage and previewChapter
+        setPreviewChapter(comicData.previewChapter);
+        setComics(comicData);
+        setComicId(comicData.id);
+        setGenres(genreNames);
         setCoverImage(comicData.coverImage || "");
         setPreviewChapter(comicData.previewChapter || []);
-
         setLoading(false);
       })
       .catch((error) => {
@@ -122,8 +112,6 @@ const ComicDetails = () => {
         setLoading(false);
       });
   }, [id]);
-  console.log("Preview Chapter", previewChapter);
-  console.log(genres);
 
   const getGenreNames = (genreArray) => {
     if (!Array.isArray(genreArray) || genreArray.length === 0) {
@@ -161,13 +149,69 @@ const ComicDetails = () => {
   const allImages = [coverImage, ...previewChapter];
 
   const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % previewChapter.length);
+    setCurrentImageIndex(
+      (prevIndex) => (prevIndex + 1) % previewChapter.length
+    );
   };
 
   const prevImage = () => {
     setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + previewChapter.length) % previewChapter.length
+      (prevIndex) =>
+        (prevIndex - 1 + previewChapter.length) % previewChapter.length
     );
+  };
+
+  const fetchUserInfo = async () => {
+    if (token) {
+      try {
+        const response = await fetch("http://localhost:3000/users/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user info");
+        }
+        const data = await response.json();
+        setUserId(data.id);
+      } catch {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchUserInfo();
+  }, [token]);
+  console.log(userId);
+
+  const handleAddToCart = async () => {
+    if (token) {
+      try {
+        const response = await axios.post(
+          `http://localhost:3000/cart/${comicId}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setOpen(true);
+        setTimeout(() => {
+          handleClose();
+        }, 2000);
+        console.log("Item added to cart:", response.data);
+      } catch (error) {
+        console.error("Error adding item to cart:", error);
+      }
+    } else {
+      alert("You need to sign in to add items to your cart.");
+      navigate("/signin");
+    }
   };
 
   return (
@@ -198,7 +242,6 @@ const ComicDetails = () => {
               <p>No preview images available</p>
             )}
           </div>
-
 
           {/* Image Modal */}
           <Modal
@@ -287,7 +330,7 @@ const ComicDetails = () => {
 
           <div className="button">
             <Button
-              onClick={handleOpen}
+              onClick={handleAddToCart}
               sx={{ textTransform: "none" }}
               className="button1"
             >
@@ -358,10 +401,9 @@ const ComicDetails = () => {
                 <div className="divider"></div>
                 <p className="sold-info">Đã bán: {comics.sold || "Chưa có"}</p>
               </div>
-              <p className="seller-name">Người Bán: <span className="author-name">
-                {users.name}
-              </span>
-                </p>
+              <p className="seller-name">
+                Người Bán: <span className="author-name">{users.name}</span>
+              </p>
             </div>
             <p className="price">{formatPrice(comics.price || 24000)}</p>
           </div>

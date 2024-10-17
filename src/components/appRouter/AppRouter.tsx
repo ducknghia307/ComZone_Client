@@ -23,10 +23,11 @@ const AppRouter = () => {
         <Route path="/genres" element={<Genres />} />
         <Route path="/auctions" element={<Auctions />} />
         <Route path="/detail/:id" element={<ComicDetail />} />
-        <Route path="/auctiondetail" element={<AuctionDetails />} />
+        <Route path="/auctiondetail/:id" element={<AuctionDetails />} />
         <Route path="/accountmanagement" element={<AccountManagement />} />
         <Route path="/sellermanagement" element={<SellerManagement />}/>
         <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
+        <Route path="/search" element={<Genres />} />
         {/* <Route path="/blog" element={<Blogs />} /> */}
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

@@ -44,15 +44,19 @@
 }
 
 .main-comic-image {
-    max-width: 480px;
-    height: auto;
-    border: 1px solid #ddd;
+    width: 480px;
+    height: 600px;
+    object-fit: cover;
 }
 
 .small-images {
     display: flex;
     flex-direction: column;
     padding-left: 60px;
+    gap: 10px;
+    max-height: 600px; /* Giới hạn chiều cao */
+    overflow-y: auto; /* Kích hoạt thanh cuộn dọc */
+    padding-right: 5px;
 }
 
 .small-comic-image {

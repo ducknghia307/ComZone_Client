@@ -6,12 +6,14 @@
 
 .all-genres-cards {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 4 cards per row on large screens */
+    grid-template-columns: repeat(5, 1fr);
+    /* 4 cards per row on large screens */
     gap: 30px;
     margin-left: 20px;
     margin-right: 20px;
-    padding-left: 0; /* Remove padding on the sides */
-    padding-right: 0; 
+    padding-left: 0;
+    /* Remove padding on the sides */
+    padding-right: 0;
 }
 
 .all-genres-card {
@@ -50,6 +52,16 @@
     color: #000;
 }
 
+.no-auction-comics,
+.no-regular-comics {
+    font-style: italic;
+    color: gray;
+    text-align: left;
+    margin-top: 20px;
+    width: 400px;
+}
+
+
 .rating-sold {
     display: flex;
     align-items: center;
@@ -74,18 +86,21 @@
 /* Responsive adjustments */
 @media (max-width: 1024px) {
     .all-genres-cards {
-        grid-template-columns: repeat(3, 1fr); /* 3 cards per row for tablets */
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 cards per row for tablets */
     }
 }
 
 @media (max-width: 800px) {
     .all-genres-cards {
-        grid-template-columns: repeat(2, 1fr); /* 2 cards per row for small tablets */
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 cards per row for small tablets */
     }
 }
 
 @media (max-width: 464px) {
     .all-genres-cards {
-        grid-template-columns: 1fr; /* 1 card per row for mobile devices */
+        grid-template-columns: 1fr;
+        /* 1 card per row for mobile devices */
     }
 }

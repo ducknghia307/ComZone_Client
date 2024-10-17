@@ -48,16 +48,27 @@ const CustomButtonGroup = ({ next, previous, goToSlide, carouselState }) => {
   );
 };
 
-const HotComic = () => {
+const AllGenres = () => {
   const [comics, setComics] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const token = sessionStorage.getItem("accessToken");
+
   useEffect(() => {
-    // Call API để lấy danh sách comics
-    fetch("http://localhost:3000/comics")
-      .then((response) => response.json())
+    // Gọi API để lấy danh sách comics có status là 'available'
+    fetch("http://localhost:3000/comics/status/available", {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
       .then((data) => {
-        console.log("Comics:", comics);
+        console.log('Available Comics:', data);
         setComics(data);
         setLoading(false);
       })
@@ -92,7 +103,7 @@ const HotComic = () => {
         <div className="hot-comic-cards mt-4">
           <Carousel
             responsive={responsive}
-            customButtonGroup={<CustomButtonGroup />}
+            c customButtonGroup={<CustomButtonGroup />}
             renderButtonGroupOutside={true}
           >
             {/* Render comics */}
@@ -107,7 +118,7 @@ const HotComic = () => {
                   <p className="price">{formatPrice(comic.price)}</p>
                   <p className="author">{comic.author.toUpperCase()}</p>
                   <p className="title">{comic.title}</p>
-                  <div className="rating-sold">
+                  <div className="rating-sold-comic">
                     <p className="rating">
                       {[...Array(5)].map((_, index) => (
                         <StarIcon
@@ -129,4 +140,4 @@ const HotComic = () => {
   );
 };
 
-export default HotComic;
+export default AllGenres;

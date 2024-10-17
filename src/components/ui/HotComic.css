@@ -49,13 +49,13 @@
     text-overflow: ellipsis;
 }
 
-.rating-sold {
+.rating-sold-comic {
     display: flex;
     /* justify-content: space-between; */
     align-items: center;
 }
 
-.rating-sold .divider {
+.rating-sold-comic .divider {
     width: 0.25px;
     height: 16px;
     background-color: #808089;

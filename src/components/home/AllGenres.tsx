@@ -103,7 +103,7 @@ const AllGenres = () => {
         <div className="hot-comic-cards mt-4">
           <Carousel
             responsive={responsive}
-            customButtonGroup={<CustomButtonGroup />}
+            c customButtonGroup={<CustomButtonGroup />}
             renderButtonGroupOutside={true}
           >
             {/* Render comics */}

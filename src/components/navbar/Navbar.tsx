@@ -4,6 +4,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import axios from "axios";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { logOut } from "../../redux/features/auth/authSlice";
 interface UserInfo {
   createdAt: string;
   email: string;
@@ -20,19 +22,20 @@ const Navbar = () => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const { accessToken } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
 
-  const token = sessionStorage.getItem("accessToken");
   const navigate = useNavigate();
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
   const fetchUserInfo = async () => {
-    if (token) {
+    if (accessToken) {
       try {
         const response = await fetch("http://localhost:3000/users/profile", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -49,29 +52,13 @@ const Navbar = () => {
     }
   };
   const handleLogout = () => {
-    axios
-      .post(
-        "http://localhost:3000/auth/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then(() => {
-        console.log("roi nha");
-        sessionStorage.removeItem("accessToken");
-        navigate("/");
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Logout failed:", error);
-      });
+    dispatch(logOut());
+    navigate("/");
+    window.location.reload();
   };
   useEffect(() => {
     fetchUserInfo();
-  }, [token]);
+  }, [accessToken]);
 
   const handleSearch = () => {
     if (searchTerm.trim()) {

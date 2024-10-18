@@ -1,9 +1,30 @@
 import React, { useEffect, useState } from "react";
 import TotalPrice from "../components/cart/TotalPrice";
-import axios from "axios";
+
 import CurrencySplitter from "../components/assistants/Spliter";
 import { useNavigate } from "react-router-dom";
+import { privateAxios } from "../middleware/axiosInstance";
 import { Comic, Role } from "../common/base.interface";
+
+// interface Comic {
+//   id: string;
+//   createdAt: string;
+//   updatedAt: string;
+//   deletedAt: string | null;
+//   title: string;
+//   author: string;
+//   description: string;
+//   coverImage: string[];
+//   publishedDate: string;
+//   price: number;
+//   status: string;
+//   quantity: number;
+//   previewChapter: string[];
+//   isAuction: boolean;
+//   isExchange: boolean;
+//   comicCommission: number;
+//   selected?: boolean;
+// }
 
 interface User {
   id: string;
@@ -32,17 +53,15 @@ const Cart = () => {
   const [cartData, setCartData] = useState<CartData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
-  const token = sessionStorage.getItem("accessToken");
   const [userId, setUserId] = useState("");
   const navigate = useNavigate();
   const fetchCartData = async () => {
     if (!userId) return; // Only fetch if userId is available
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:3000/cart", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await privateAxios.get("/cart");
       setCartData(response.data); // Set the fetched cart data
+      console.log(response);
     } catch (error) {
       console.error("Error fetching cart data:", error);
     } finally {
@@ -51,24 +70,11 @@ const Cart = () => {
   };
 
   const fetchUserInfo = async () => {
-    if (token) {
-      try {
-        const response = await fetch("http://localhost:3000/users/profile", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch user info");
-        }
-        const data = await response.json();
-        setUserId(data.id);
-      } catch {
-        console.log("...");
-      }
-    } else {
+    try {
+      const response = await privateAxios("/users/profile");
+      const data = response.data;
+      setUserId(data.id);
+    } catch {
       console.log("...");
     }
   };
@@ -134,7 +140,7 @@ const Cart = () => {
 
   useEffect(() => {
     fetchUserInfo();
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchCartData();
@@ -258,10 +264,6 @@ const Cart = () => {
         </div>
         <div className="lg:w-1/4 w-full bg-white p-4 rounded-md shadow-sm h-full">
           <div className="p-4 bg-white rounded-md">
-            <div className="flex justify-between mb-4">
-              <span>Thành tiền</span>
-              <span>{CurrencySplitter(totalPrice)} đ</span>
-            </div>
             <div className="flex justify-between font-bold text-lg">
               <span>Tổng Số Tiền</span>
               <span className="text-red-500">

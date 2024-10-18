@@ -10,6 +10,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { privateAxios } from "../../middleware/axiosInstance";
+import { useAppSelector } from "../../redux/hooks";
 
 interface UserInfo {
   id: string;
@@ -88,6 +90,7 @@ const ComicDetails = () => {
   const [comicId, setComicId] = useState("");
   const [userId, setUserId] = useState("");
   const navigate = useNavigate();
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
   useEffect(() => {
     fetch(`http://localhost:3000/comics/${id}`)
       .then((response) => response.json())
@@ -189,17 +192,9 @@ const ComicDetails = () => {
   console.log(userId);
 
   const handleAddToCart = async () => {
-    if (token) {
+    if (accessToken) {
       try {
-        const response = await axios.post(
-          `http://localhost:3000/cart/${comicId}`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await privateAxios.post(`/cart/${comicId}`);
         setOpen(true);
         setTimeout(() => {
           handleClose();

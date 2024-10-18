@@ -1,62 +1,19 @@
 import axios from "axios";
+import { makeStore } from "../redux/store";
+
+const { store } = makeStore();
 
 // Axios instance setup
 const privateAxios = axios.create({
-  baseURL: "http://localhost:3000/", // Change to your production base URL
+  baseURL: "http://localhost:3000/",
   withCredentials: true,
 });
 
 const publicAxios = axios.create({
-  baseURL: "http://localhost:3000/", // Change to your production base URL
+  baseURL: "http://localhost:3000/",
   withCredentials: true,
 });
 
-// Check if the code is running in the browser
-const isBrowser = typeof document !== "undefined";
-
-// Function to save tokens as cookies
-export const saveTokens = (accessToken, refreshToken) => {
-  if (isBrowser) {
-    document.cookie = `accessToken=${accessToken}; path=/; max-age=${
-      60 * 60 * 24 * 7
-    }`; // 1 week
-    document.cookie = `refreshToken=${refreshToken}; path=/; max-age=${
-      60 * 60 * 24 * 7
-    }`; // 1 week
-  }
-};
-
-// Function to set Authorization token
-export const setAuthToken = (token) => {
-  if (token) {
-    privateAxios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  } else {
-    delete privateAxios.defaults.headers.common["Authorization"];
-  }
-};
-
-// Function to retrieve token from cookies
-const getTokenFromCookies = (tokenName) => {
-  if (isBrowser) {
-    const cookieArr = document.cookie.split(";");
-    let token = null;
-    cookieArr.forEach((cookie) => {
-      const [name, value] = cookie.trim().split("=");
-      if (name === tokenName) {
-        token = value;
-      }
-    });
-    return token;
-  }
-  return null;
-};
-
-// Set the initial token if it exists
-if (isBrowser) {
-  setAuthToken(getTokenFromCookies("accessToken"));
-}
-
-// Request interceptor for publicAxios
 publicAxios.interceptors.request.use(
   (config) => {
     config.headers["Content-Type"] = "application/json";
@@ -71,6 +28,11 @@ publicAxios.interceptors.request.use(
 privateAxios.interceptors.request.use(
   (config) => {
     config.headers["Content-Type"] = "application/json";
+    const state = store.getState();
+    const accessToken = state.auth.accessToken;
+    if (accessToken) {
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
     return config;
   },
   (error) => {
@@ -85,8 +47,8 @@ privateAxios.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-
-    // Handle token refresh if 401 or 403 is received
+    const state = store.getState();
+    const oldRefreshToken = state.auth.refreshToken;
     if (
       error.response &&
       (error.response.status === 401 || error.response.status === 403) &&
@@ -94,26 +56,12 @@ privateAxios.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        const refreshToken = getTokenFromCookies("refreshToken");
-        const response = await privateAxios.post(
-          "/auth/refresh",
-          {},
-          {
-            headers: { Authorization: `Bearer ${refreshToken}` },
-          }
-        );
+        const { token } = await getNewTokens(oldRefreshToken);
+        if (token) {
+          originalRequest.headers["Authorization"] = `Bearer ${token}`;
 
-        const newAccessToken = response.data.accessToken;
-
-        // Save the new access token in cookies
-        if (isBrowser) {
-          saveTokens(newAccessToken, refreshToken);
+          return privateAxios(originalRequest); // Retry the original request
         }
-
-        setAuthToken(newAccessToken); // Update the authorization header
-        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-
-        return privateAxios(originalRequest); // Retry the original request
       } catch (refreshError) {
         // Handle refresh token failure, redirect to login or show error
         console.error("Error refreshing token:", refreshError);
@@ -125,4 +73,11 @@ privateAxios.interceptors.response.use(
   }
 );
 
+const getNewTokens = async (accessToken: string) => {
+  return await privateAxios.post("/auth/refresh", {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+};
 export { privateAxios, publicAxios };

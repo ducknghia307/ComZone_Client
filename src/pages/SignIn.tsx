@@ -1,37 +1,31 @@
 import React, { useEffect, useState } from "react";
 import backgr from "../assets/bookshelf.jpg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios"; // Import Axios
+import { publicAxios } from "../middleware/axiosInstance";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { LoginUser } from "../redux/features/auth/authActionCreators";
 
 const SignIn = () => {
+  const dispatch = useAppDispatch();
+  const { isLoading } = useAppSelector((state) => state.auth);
+
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // const [showPassword, setShowPassword] = useState(false);
   const location = useLocation();
   const [emailRegister, setEmailRegister] = useState("");
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Email:", email);
     console.log("Password:", password);
 
     try {
-      const response = await axios.post("http://localhost:3000/auth/login", {
-        email,
-        password,
-      });
-      console.log("Response:", response);
-      if (response.data) {
-        console.log("Login successful:", response.data);
-        console.log("token:", response.data.accessToken);
-        sessionStorage.setItem("accessToken", response.data.accessToken);
-        navigate("/");
-      } else {
-        console.error("Login failed:", response.data.message);
-        setEmail("");
-        setEmailRegister("");
-        setPassword("");
-      }
+      // Pass email and password as formValues to the LoginUser function
+      const formValues = { email, password };
+      dispatch(LoginUser(formValues));
+      navigate("/");
     } catch (error) {
       console.error("Error logging in:", error);
       setEmail("");

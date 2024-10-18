@@ -89,7 +89,7 @@ const SignIn = () => {
               </label>
               <div className="relative">
                 <input
-                  // type={showPassword ? "text" : "password"}
+                  type={"password"}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

@@ -20,7 +20,7 @@ const Checkout = () => {
           </span>
         </div>
         <button className="px-8 py-2 font-bold text-white bg-black rounded-md">
-          Xác nhận thanh toán
+          Xác nhận đặt hàng
         </button>
       </div>
     </div>

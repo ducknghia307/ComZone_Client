@@ -271,10 +271,6 @@ const Cart = () => {
         </div>
         <div className="lg:w-1/4 w-full bg-white p-4 rounded-md shadow-sm h-full">
           <div className="p-4 bg-white rounded-md">
-            <div className="flex justify-between mb-4">
-              <span>Thành tiền</span>
-              <span>{CurrencySplitter(totalPrice)} đ</span>
-            </div>
             <div className="flex justify-between font-bold text-lg">
               <span>Tổng Số Tiền</span>
               <span className="text-red-500">

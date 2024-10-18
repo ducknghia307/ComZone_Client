@@ -1,0 +1,100 @@
+/* OrderHistory.css */
+
+/* Status tabs */
+.status-tabs {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    background-color: #fff;
+}
+
+.status-tab {
+    padding: 20px 50px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.status-tab:hover {
+    color: #000;
+}
+
+.status-tab.active {
+    color: #000;
+    font-weight: bold;
+}
+
+.status-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000;
+}
+
+/* Search bar */
+.searchbar {
+    display: flex;
+    padding: 10px 20px;
+    background-color: #EAEAEA;
+    color: #8d8d8d;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+/* Purchase history content */
+.purchase-history-content {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.status-detail {
+    margin-bottom: 20px;
+}
+
+.status-content {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 30px;
+    border-bottom: 1px solid #EAEAEA;
+    background-color: #fff;
+}
+
+.status-content-detail {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.chat-button {
+    display: flex;
+    gap: 10px;
+    padding: 5px 10px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 5px;
+}
+
+.shop-button {
+    display: flex;
+    gap: 10px;
+    padding: 5px 10px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 5px;
+    border: 0.5px solid black;
+}
+
+.status-content1 {
+    padding: 20px 50px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #EAEAEA;
+    background-color: #fff;
+}

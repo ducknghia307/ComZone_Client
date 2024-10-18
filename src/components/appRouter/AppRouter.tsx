@@ -13,7 +13,7 @@ import SignUp from "../../pages/SignUp";
 import ForgotPassword from "../../pages/ForgotPassword";
 import SellerManagement from "../../pages/SellerManagement";
 import CreateComic from "../../pages/CreateComic";
-// import Blogs from "../../pages/Blogs";
+import Blogs from "../../pages/Blogs";
 
 const AppRouter = () => {
   return (
@@ -28,7 +28,7 @@ const AppRouter = () => {
         <Route path="/sellermanagement" element={<SellerManagement />}/>
         <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
         <Route path="/search" element={<Genres />} />
-        {/* <Route path="/blog" element={<Blogs />} /> */}
+        <Route path="/blog" element={<Blogs />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/signin" element={<SignIn />} />

@@ -77,8 +77,8 @@ const Navbar = () => {
     if (searchTerm.trim()) {
       window.location.href = `/search?query=${encodeURIComponent(searchTerm)}`;
     }
-  };  
-  
+  };
+
   const location = useLocation();
 
   const items: MenuProps["items"] = [
@@ -223,10 +223,10 @@ const Navbar = () => {
           {(window.location.pathname === "/signin" ||
             window.location.pathname === "/signup" ||
             window.location.pathname === "/forgot") && (
-              <Link to={"/"}>
-                <img className="h-16 w-auto ml-2 " src={Logo} alt="ComZone" />
-              </Link>
-            )}
+            <Link to={"/"}>
+              <img className="h-16 w-auto ml-2 " src={Logo} alt="ComZone" />
+            </Link>
+          )}
           {window.location.pathname !== "/signin" &&
             window.location.pathname !== "/signup" &&
             window.location.pathname !== "/forgot" && (
@@ -238,12 +238,15 @@ const Navbar = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       handleSearch();
                     }
                   }}
                 />
-                <button onClick={handleSearch} className="hidden lg:flex lg:absolute md:absolute lg:right-2 md:right-2 md:top-[22%] lg:top-1/2 transform -translate-y-1/2 bg-black text-white rounded-lg px-3 py-2 ">
+                <button
+                  onClick={handleSearch}
+                  className="hidden lg:flex lg:absolute md:absolute lg:right-2 md:right-2 md:top-[22%] lg:top-1/2 transform -translate-y-1/2 bg-black text-white rounded-lg px-3 py-2 "
+                >
                   <svg
                     className="h-5 w-8"
                     aria-labelledby="title desc"
@@ -332,29 +335,33 @@ const Navbar = () => {
           window.location.pathname !== "/forgot" && (
             <div className="hidden lg:flex md:flex lg:w-full py-2 lg:ml-20 my-2 lg:text-lg md:text-sm">
               <Link
-                className={`text-black px-6 hover:text-black ${location.pathname === "/" ? "font-bold" : ""
-                  }`}
+                className={`text-black px-6 hover:text-black ${
+                  location.pathname === "/" ? "font-bold" : ""
+                }`}
                 to="/"
               >
                 <li>TRANG CHỦ</li>
               </Link>
               <Link
-                className={`text-black px-6 hover:text-black ${location.pathname === "/auctions" ? "font-bold" : ""
-                  }`}
+                className={`text-black px-6 hover:text-black ${
+                  location.pathname === "/auctions" ? "font-bold" : ""
+                }`}
                 to="/auctions"
               >
                 <li>CÁC CUỘC ĐẤU GIÁ</li>
               </Link>
               <Link
-                className={`text-black px-6 hover:text-black ${location.pathname === "/genres" ? "font-bold" : ""
-                  }`}
+                className={`text-black px-6 hover:text-black ${
+                  location.pathname === "/genres" ? "font-bold" : ""
+                }`}
                 to="/genres"
               >
                 <li>TẤT CẢ THỂ LOẠI</li>
               </Link>
               <Link
-                className={`text-black px-6 hover:text-black ${location.pathname === "/blog" ? "font-bold" : ""
-                  }`}
+                className={`text-black px-6 hover:text-black ${
+                  location.pathname === "/blog" ? "font-bold" : ""
+                }`}
                 to="/blog"
               >
                 <li>BLOG TRAO ĐỔI</li>
@@ -367,14 +374,17 @@ const Navbar = () => {
             placeholder="Bạn đang tìm kiếm truyện gì ?"
             className="flex w-full border border-gray-300 rounded-lg py-3 pl-4 pr-8 focus:outline-none focus:ring-2 focus:ring-gray-500 text-md"
             value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSearch();
-                    }
-                  }}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
           />
-          <button onClick={handleSearch} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-lg px-3 py-2">
+          <button
+            onClick={handleSearch}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-lg px-3 py-2"
+          >
             <svg
               className="h-5 w-8"
               aria-labelledby="title desc"
@@ -404,8 +414,8 @@ const Navbar = () => {
                 onClick={toggleMenu}
               >
                 <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M19.207 6.207a1 1 0 0 0-1.414-1.414L12 10.586 6.207 4.793a1 1 0 0 0-1.414 1.414L10.586 12l-5.793 5.793a1 1 0 1 0 1.414 1.414L12 13.414l5.793 5.793a1 1 0 0 0 1.414-1.414L13.414 12l5.793-5.793z"
                   fill="#000000"
                 />
@@ -413,32 +423,36 @@ const Navbar = () => {
             </div>
             <div className="flex flex-col items-center w-full">
               <Link
-                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${location.pathname === "/" ? "font-bold" : ""
-                  }`}
+                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
+                  location.pathname === "/" ? "font-bold" : ""
+                }`}
                 to="/"
                 onClick={toggleMenu}
               >
                 TRANG CHỦ
               </Link>
               <Link
-                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${location.pathname === "/auctions" ? "font-bold" : ""
-                  }`}
+                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
+                  location.pathname === "/auctions" ? "font-bold" : ""
+                }`}
                 to="/auctions"
                 onClick={toggleMenu}
               >
                 CÁC CUỘC ĐẤU GIÁ
               </Link>
               <Link
-                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${location.pathname === "/genres" ? "font-bold" : ""
-                  }`}
+                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
+                  location.pathname === "/genres" ? "font-bold" : ""
+                }`}
                 to="/genres"
                 onClick={toggleMenu}
               >
                 TẤT CẢ THỂ LOẠI
               </Link>
               <Link
-                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${location.pathname === "/blog" ? "font-bold" : ""
-                  }`}
+                className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
+                  location.pathname === "/blog" ? "font-bold" : ""
+                }`}
                 to="/blog"
                 onClick={toggleMenu}
               >
@@ -461,8 +475,9 @@ const Navbar = () => {
                 TRỞ THÀNH NGƯỜI BÁN
               </Link>
               <Link
-                className={`text-black px-6 py-2 hover:text-black ${location.pathname === "/cart" ? "font-bold" : ""
-                  }`}
+                className={`text-black px-6 py-2 hover:text-black ${
+                  location.pathname === "/cart" ? "font-bold" : ""
+                }`}
                 to="/cart"
                 onClick={toggleMenu}
               >

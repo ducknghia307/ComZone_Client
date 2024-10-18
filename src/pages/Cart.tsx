@@ -3,26 +3,7 @@ import TotalPrice from "../components/cart/TotalPrice";
 import axios from "axios";
 import CurrencySplitter from "../components/assistants/Spliter";
 import { useNavigate } from "react-router-dom";
-
-interface Comic {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  title: string;
-  author: string;
-  description: string;
-  coverImage: string[];
-  publishedDate: string;
-  price: number;
-  status: string;
-  quantity: number;
-  previewChapter: string[];
-  isAuction: boolean;
-  isExchange: boolean;
-  comicCommission: number;
-  selected?: boolean;
-}
+import { Comic, Role } from "../common/base.interface";
 
 interface User {
   id: string;
@@ -36,10 +17,7 @@ interface User {
   status: string;
   is_verified: boolean;
   refresh_token: string;
-  role: {
-    id: number;
-    role_name: string;
-  };
+  role: Role;
 }
 
 interface CartData {

@@ -6,26 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { privateAxios } from "../middleware/axiosInstance";
 import { Comic, Role } from "../common/base.interface";
 
-// interface Comic {
-//   id: string;
-//   createdAt: string;
-//   updatedAt: string;
-//   deletedAt: string | null;
-//   title: string;
-//   author: string;
-//   description: string;
-//   coverImage: string[];
-//   publishedDate: string;
-//   price: number;
-//   status: string;
-//   quantity: number;
-//   previewChapter: string[];
-//   isAuction: boolean;
-//   isExchange: boolean;
-//   comicCommission: number;
-//   selected?: boolean;
-// }
-
 interface User {
   id: string;
   createdAt: string;
@@ -126,6 +106,33 @@ const Cart = () => {
         };
       });
     }
+  };
+
+  const handleCheckout = () => {
+    if (!cartData) return;
+
+    // Filter selected comics and map to include quantities
+    const selectedComicsWithQuantities = cartData.comics
+      .filter((comic) => comic.selected)
+      .map((comic) => ({
+        ...comic,
+        quantity: cartData.quantities[comic.id] || 0,
+      }));
+
+    // Save selected items with quantities in sessionStorage
+    sessionStorage.setItem(
+      "selectedComics",
+      JSON.stringify(selectedComicsWithQuantities)
+    );
+
+    // Log the selected items with quantities
+    console.log(
+      "Selected items with quantities:",
+      selectedComicsWithQuantities
+    );
+
+    // Navigate to checkout page
+    navigate("/checkout");
   };
 
   const totalPrice = cartData
@@ -272,7 +279,7 @@ const Cart = () => {
             </div>
             <button
               className="w-full mt-4 py-2 bg-black text-white font-semibold rounded-md"
-              onClick={() => navigate("/checkout")}
+              onClick={handleCheckout}
             >
               THANH TOÁN
             </button>

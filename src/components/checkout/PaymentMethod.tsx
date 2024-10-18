@@ -44,8 +44,8 @@ const PaymentMethod = (amount: { total: number }) => {
         className={`w-full p-4 mb-4 rounded-lg border h-28 ${
           selectedMethod === "wallet"
             ? "border-black border-2"
-            : "border-gray-300"
-        } flex items-center justify-between`}
+            : "border-gray-300 hover:bg-gray-100 hover:border-black cursor-pointer"
+        } flex items-center justify-between duration-200`}
         onClick={() => setSelectedMethod("wallet")}
       >
         <div className="flex items-center">
@@ -140,8 +140,10 @@ const PaymentMethod = (amount: { total: number }) => {
       {/* Option 2: Thanh Toán Khi Nhận Hàng */}
       <div
         className={`w-full p-4 rounded-lg border h-28 ${
-          selectedMethod === "cod" ? "border-black border-2" : "border-gray-300"
-        } flex items-center`}
+          selectedMethod === "cod"
+            ? "border-black border-2"
+            : "border-gray-300 hover:bg-gray-100 hover:border-black cursor-pointer"
+        } flex items-center duration-200`}
         onClick={() => setSelectedMethod("cod")}
       >
         <input

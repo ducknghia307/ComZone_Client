@@ -7,34 +7,28 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import MultipleStopOutlinedIcon from '@mui/icons-material/MultipleStopOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { Button, MenuItem, TextField, Typography } from '@mui/material';
-import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
-import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
-import Countdown from 'react-countdown';
 import UserWallet from "../wallet/UserWallet"
 import ExchangeHistory from "../exchange/ExchangeHistory"
 import OrderHistory from '../order/OrderHistory';
 import AuctionHistory from '../auction/AuctionHistory';
 
-const AccountUser = () => {
+const AccountUser: React.FC = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState('purchase');
-    const [selectedStatus, setSelectedStatus] = useState('all');
-    const [selectedAuctionStatus, setSelectedAuctionStatus] = useState('all');
 
     const [editing, setEditing] = useState(false);
-    const [newAvatar, setNewAvatar] = useState(null);
+    const [newAvatar, setNewAvatar] = useState<string | null>(null);
 
-    const handleMenuItemClick = (item) => {
+    const handleMenuItemClick = (item: string) => {
         setSelectedMenuItem(item);
     };
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
         if (file) {
-            setNewAvatar(URL.createObjectURL(file));
+          setNewAvatar(URL.createObjectURL(file));
         }
-    };
+      };
 
     const handleEditClick = () => {
         setEditing(true);
@@ -254,61 +248,6 @@ const AccountUser = () => {
             default:
                 return <div>Chọn một mục để xem chi tiết...</div>;
         }
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'pending':
-                return '#f28144';
-            case 'packing':
-                return '#fc65fc';
-            case 'delivering':
-                return '#28bacf';
-            case 'delivered':
-                return '#32CD32';
-            case 'completed':
-                return '#228B22';
-            case 'cancelled':
-                return '#FF4500';
-            default:
-                return '#000';
-        }
-    };
-
-    const getAuctionStatusTextColor = (status) => {
-        switch (status) {
-            case 'ongoing':
-                return '#28bacf';
-            case 'completed':
-                return '#228B22';
-            case 'canceled':
-                return '#FF4500';
-            default:
-                return '#000';
-        }
-    };
-
-    const renderer = ({ days, hours, minutes, seconds }) => {
-        return (
-            <div className="countdown1">
-                <div className="time-box1">
-                    <span className="time">{days.toString().padStart(2, '0')}</span>
-                    <span className="label">D</span>
-                </div>
-                <div className="time-box1">
-                    <span className="time">{hours.toString().padStart(2, '0')}</span>
-                    <span className="label">H</span>
-                </div>
-                <div className="time-box1">
-                    <span className="time">{minutes.toString().padStart(2, '0')}</span>
-                    <span className="label">M</span>
-                </div>
-                <div className="time-box1">
-                    <span className="time">{seconds.toString().padStart(2, '0')}</span>
-                    <span className="label">S</span>
-                </div>
-            </div>
-        );
     };
 
     return (

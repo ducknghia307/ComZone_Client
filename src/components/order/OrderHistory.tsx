@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { TextField, Typography, Button } from '@mui/material';
+import { Button, TextField, Typography } from '@mui/material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import "../ui/OrderHistory.css"
+import ModalOrder from '../modal/ModalOrder';
 
 interface Order {
     id: number;
@@ -20,6 +21,7 @@ interface OrderHistoryProps {
 
 const OrderHistory: React.FC<OrderHistoryProps> = ({ orders }) => {
     const [selectedStatus, setSelectedStatus] = useState('all');
+    const [openModal, setOpenModal] = useState(false);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -57,6 +59,14 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ orders }) => {
             default:
                 return 'Tất cả';
         }
+    };
+
+    const handleOpenModal = () => {
+        setOpenModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
     };
 
     const filteredOrders = selectedStatus === 'all'
@@ -126,7 +136,70 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ orders }) => {
                         <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '20px', gap: '10px', backgroundColor: '#fff' }}>
                             <Typography sx={{ fontSize: '20px' }}>Thành tiền: </Typography>
                             <Typography sx={{ fontSize: '28px', color: '#000' }}>{order.price}</Typography>
+
+
                         </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0px 20px 20px 20px' }}>
+                            {order.status === 'delivered' ? (
+                                <>
+                                    <div style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
+                                        <Button
+                                            sx={{
+                                                color: '#000',
+                                                backgroundColor: '#fff',
+                                                border: '1px solid black',
+                                                fontWeight: 'bold',
+                                                fontSize: '16px'
+                                            }}
+                                        >
+                                            Xem Chi Tiết
+                                        </Button>
+                                    </div>
+
+                                    <div style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                                        <Button
+                                            sx={{
+                                                color: '#fff',
+                                                backgroundColor: '#00BFA6',
+                                                fontWeight: 'bold',
+                                                fontSize: '16px'
+                                            }}
+                                            onClick={handleOpenModal}
+                                        >
+                                            Đã Nhận Được Hàng
+                                        </Button>
+                                        <Button
+                                            sx={{
+                                                color: '#fff',
+                                                backgroundColor: '#FFB74D',
+                                                fontWeight: 'bold',
+                                                fontSize: '16px',
+                                            }}
+                                        >
+                                            Chưa Nhận Được Hàng
+                                        </Button>
+                                    </div>
+                                </>
+                            ) : (
+                                <div style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'flex-end' }}>
+                                    <Button
+                                        sx={{
+                                            color: '#000',
+                                            backgroundColor: '#fff',
+                                            border: '1px solid black',
+                                            fontWeight: 'bold',
+                                            fontSize: '16px',
+                                            padding: '5px 20px'
+                                        }}
+                                    >
+                                        Xem Chi Tiết
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Modal */}
+                        <ModalOrder open={openModal} onClose={handleCloseModal} />
                     </div>
                 ))}
             </div>

@@ -6,6 +6,8 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import StarIcon from "@mui/icons-material/Star";
 import { Link } from "react-router-dom";
+import { publicAxios } from "../../middleware/axiosInstance";
+import { Comic } from "../../common/base.interface";
 
 const responsive = {
   superLargeDesktop: {
@@ -27,7 +29,15 @@ const responsive = {
   },
 };
 
-const CustomButtonGroup = ({ next, previous, goToSlide, carouselState }) => {
+const CustomButtonGroup = ({
+  next,
+  previous,
+  carouselState,
+}: {
+  next: () => void;
+  previous: () => void;
+  carouselState: { currentSlide: number; totalItems: number; slidesToShow: number };
+}) => {
   const { currentSlide, totalItems, slidesToShow } = carouselState;
   const isFirstSlide = currentSlide === 0;
   const isLastSlide = currentSlide + slidesToShow >= totalItems;
@@ -48,40 +58,55 @@ const CustomButtonGroup = ({ next, previous, goToSlide, carouselState }) => {
   );
 };
 
-const AllGenres = () => {
-  const [comics, setComics] = useState([]);
-  const [loading, setLoading] = useState(true);
+const AllGenres: React.FC = () => {
+  const [comics, setComics] = useState<Comic[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const token = sessionStorage.getItem("accessToken");
+  // const token = sessionStorage.getItem("accessToken");
+
+  // useEffect(() => {
+  //   // Gọi API để lấy danh sách comics có status là 'available'
+  //   fetch("http://localhost:3000/comics/status/available", {
+  //     headers: {
+  //       'Authorization': `Bearer ${token}`
+  //     }
+  //   })
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error('Network response was not ok');
+  //       }
+  //       return response.json();
+  //     })
+  //     .then((data) => {
+  //       console.log('Available Comics:', data);
+  //       setComics(data);
+  //       setLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching comics:", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
 
   useEffect(() => {
-    // Gọi API để lấy danh sách comics có status là 'available'
-    fetch("http://localhost:3000/comics/status/available", {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log('Available Comics:', data);
-        setComics(data);
-        setLoading(false);
-      })
-      .catch((error) => {
+    const fetchComics = async () => {
+      try {
+        const response = await publicAxios.get<Comic[]>("/comics/status/available");
+        setComics(response.data);
+      } catch (error) {
         console.error("Error fetching comics:", error);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchComics();
   }, []);
 
-  const formatPrice = (price) => {
-    // Thêm dấu chấm ngăn cách hàng nghìn và thêm 'đ' ở cuối
+  const formatPrice = (price: number) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
+
   return (
     <div className="w-full py-8">
       {/* Truyện tranh nổi bật */}
@@ -103,7 +128,7 @@ const AllGenres = () => {
         <div className="hot-comic-cards mt-4">
           <Carousel
             responsive={responsive}
-            customButtonGroup={<CustomButtonGroup />}
+            customButtonGroup={<CustomButtonGroup next={() => {}} previous={() => {}} carouselState={{ currentSlide: 0, totalItems: 0, slidesToShow: 0 }} />}
             renderButtonGroupOutside={true}
           >
             {/* Render comics */}
@@ -111,7 +136,7 @@ const AllGenres = () => {
               <div className="hot-comic-card" key={comic.id}>
                 <Link to={`/detail/${comic.id}`}>
                   <img
-                    src={comic.coverImage}
+                    src={comic.coverImage?.[0] || "/default-cover.jpg"}
                     alt={comic.title}
                     className="object-cover mx-auto"
                   />
@@ -128,7 +153,7 @@ const AllGenres = () => {
                       ))}
                     </p>
                     <div className="divider"></div>
-                    <p className="sold-info">Đã bán {comic.sold}</p>
+                    <p className="sold-info">Đã bán 123</p>
                   </div>
                 </Link>
               </div>

@@ -14,6 +14,7 @@ import ForgotPassword from "../../pages/ForgotPassword";
 import SellerManagement from "../../pages/SellerManagement";
 import CreateComic from "../../pages/CreateComic";
 import Blogs from "../../pages/Blogs";
+import SellerEditComicDetail from "../comic/SellerEditComicDetail";
 
 const AppRouter = () => {
   return (
@@ -27,6 +28,7 @@ const AppRouter = () => {
         <Route path="/accountmanagement" element={<AccountManagement />} />
         <Route path="/sellermanagement" element={<SellerManagement />}/>
         <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
+        <Route path="/sellermanagement/edit/:id" element={<SellerEditComicDetail />} />
         <Route path="/search" element={<Genres />} />
         <Route path="/blog" element={<Blogs />} />
         <Route path="/cart" element={<Cart />} />

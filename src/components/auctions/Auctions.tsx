@@ -3,67 +3,59 @@ import "../ui/AuctionSidebar.css";
 import Countdown from "react-countdown";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { publicAxios } from "../../middleware/axiosInstance";
 
-const renderer = ({ days, hours, minutes, seconds }) => {
+const renderer = ({ days, hours, minutes, seconds } : any) => {
     return (
         <div className="countdown">
             <div className="time-box">
                 <span className="time">{days.toString().padStart(2, '0')}</span>
-                <span className="label">D</span>
+                <span className="label">Ngày</span>
             </div>
             <div className="time-box">
                 <span className="time">{hours.toString().padStart(2, '0')}</span>
-                <span className="label">H</span>
+                <span className="label">Giờ</span>
             </div>
             <div className="time-box">
                 <span className="time">{minutes.toString().padStart(2, '0')}</span>
-                <span className="label">M</span>
+                <span className="label">Phút</span>
             </div>
             <div className="time-box">
                 <span className="time">{seconds.toString().padStart(2, '0')}</span>
-                <span className="label">S</span>
+                <span className="label">Giây</span>
             </div>
         </div>
     );
 };
 
-const AllAuctions = ({ filteredGenres, filteredAuthors }) => {
+const AllAuctions = ({ filteredGenres, filteredAuthors }: any) => {
 
     const navigate = useNavigate();
-    const [comics, setComics] = useState([]);
+    const [comics, setComics] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const token = sessionStorage.getItem("accessToken"); // Lấy token từ sessionStorage
-
     useEffect(() => {
-        // Gọi API để lấy danh sách comics có status là 'available'
-        fetch("http://localhost:3000/comics/status/available", {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log('Available Comics:', data); 
-                // Lọc các comics có isAuction là true
-                const auctionComics = data.filter((comic) => comic.isAuction === true);
-                console.log('Auction Comics:', auctionComics);
+        const fetchComics = async () => {
+            try {
+                const response = await publicAxios.get("/comics/status/available");
+                const data = response.data;
+                console.log("Available Comics:", data);
+
+                const auctionComics = data.filter((comic: any) => comic.isAuction);
+                console.log("Auction Comics:", auctionComics);
+
                 setComics(auctionComics);
-                setLoading(false);
-            })
-            .catch((error) => {
+            } catch (error) {
                 console.error("Error fetching comics:", error);
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+
+        fetchComics();
     }, []);
 
-    const handleDetailClick = (comicId) => {
+    const handleDetailClick = (comicId: string) => {
         navigate(`/auctiondetail/${comicId}`); // Điều hướng với ID comic
     };
 
@@ -72,12 +64,13 @@ const AllAuctions = ({ filteredGenres, filteredAuthors }) => {
 
     // Lọc comics dựa trên query từ URL
     const filteredComics = comics.filter((comic) => {
-        const genreMatch = filteredGenres.length > 0 ? comic.genres && comic.genres.some((genre) => filteredGenres.includes(genre.name)) : true;
+        const genreMatch = filteredGenres.length > 0 ? comic.genres && comic.genres.some((genre:any) => filteredGenres.includes(genre.name)) : true;
         const authorMatch = filteredAuthors.length > 0 ? filteredAuthors.includes(comic.author) : true;
         const titleMatch = searchQuery ? comic.title.toLowerCase().includes(searchQuery.toLowerCase()) : true;
         return genreMatch && authorMatch && titleMatch;
     });
 
+    if (loading) return <p>Loading auctions...</p>;
 
     return (
         <div className="mb-10">

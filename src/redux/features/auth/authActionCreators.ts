@@ -1,6 +1,6 @@
 import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
 import { revertAll } from "../../globalActions";
-import { AppDispatch, RootState } from "../../store"; // Assuming these types exist in your project
+import { AppDispatch } from "../../store"; // Assuming these types exist in your project
 import { AxiosError } from "axios";
 import { authSlice } from "./authSlice";
 
@@ -17,11 +17,9 @@ interface ErrorResponse extends AxiosError {
 }
 
 export function LoginUser(formValues: FormValues) {
-  return async (dispatch: AppDispatch, getState: () => RootState) => {
+  return async (dispatch: AppDispatch) => {
     // Update loading state
-    dispatch(
-      authSlice.actions.updateIsLoading({ isLoading: true, error: false })
-    );
+    dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
 
     try {
       // Make API call with the passed formValues
@@ -30,7 +28,7 @@ export function LoginUser(formValues: FormValues) {
         password: formValues.password,
       });
 
-      console.log(response);
+      console.log("vai", response);
       // Dispatch login action with tokens
       dispatch(
         authSlice.actions.login({
@@ -41,34 +39,18 @@ export function LoginUser(formValues: FormValues) {
       );
 
       // Update loading state after successful login
-      dispatch(
-        authSlice.actions.updateIsLoading({ isLoading: false, error: false })
-      );
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
     } catch (error: any) {
       console.log(error);
 
       // Update error state
-      dispatch(
-        authSlice.actions.updateIsLoading({ isLoading: false, error: true })
-      );
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
     }
   };
 }
 
-// export function handleRefreshToken({
-//   accessToken,
-//   refreshToken,
-// }: {
-//   accessToken: string;
-//   refreshToken: string;
-// }) {
-//   return async (dispatch: AppDispatch, getState: () => RootState) => {
-//     dispatch(authSlice.actions.saveNewTokens({ accessToken, refreshToken }));
-//   };
-// }
-
 export function LogoutUser() {
-  return async (dispatch: AppDispatch, getState: () => RootState) => {
+  return async (dispatch: AppDispatch) => {
     // Update loading state
     dispatch(
       authSlice.actions.updateIsLoading({ isLoading: true, error: false })
@@ -96,52 +78,27 @@ export function LogoutUser() {
     }
   };
 }
-// export function RegisterUser(formValues) {
-//   return async (dispatch, getState) => {
-//     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
+// Google login action in authActionCreators.ts
+export function loginWithGoogle(token: string) {
+  return async (dispatch: AppDispatch) => {
+    try {
+      // Update loading state
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
 
-//     await axios
-//       .post("/auth/signup", {
-//         ...formValues,
-//       })
-//       .then(function (response) {
-//         // dispatch(slice.actions.updateRegisterEmail({ email: response.data.metadata.user.usr_email }));
-//         dispatch(
-//           slice.actions.logIn({
-//             isLoggedIn: true,
-//             token: response.data.metadata.tokens.accessToken,
-//             refreshToken: response.data.metadata.tokens.refreshToken,
-//             user_id: response.data.metadata.user._id,
-//             email: response.data.metadata.user.usr_email,
-//             user: response.data.metadata.user,
-//           })
-//         );
-//         dispatch(SetUser(response.data.metadata.user));
-//         window.localStorage.setItem("user_id", response.data.metadata.user._id);
-//         dispatch(
-//           showSnackbar({ severity: "success", message: response.data.message })
-//         );
-//         dispatch(
-//           slice.actions.updateIsLoading({ isLoading: false, error: false })
-//         );
-//       })
-//       .catch(function (error) {
-//         console.log(error);
-//         dispatch(
-//           showSnackbar({
-//             severity: "error",
-//             message: error.error?.message || "Try again later!",
-//           })
-//         );
-//         dispatch(
-//           slice.actions.updateIsLoading({ error: true, isLoading: false })
-//         );
-//       })
-//       .finally(() => {
-//         // if (!getState().auth.error) {
-//         //     // window.location.href = '/auth/verify';
-//         //     window.location.href = '/app';
-//         // }
-//       });
-//   };
-// }
+      // Dispatch login action with tokens received from Google callback
+      dispatch(
+        authSlice.actions.login({
+          isLoggedIn: true,
+          accessToken: token,
+          refreshToken: null, // Since you might not have refreshToken from Google
+        })
+      );
+
+      // Update loading state after successful login
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+    } catch (error) {
+      console.log(error);
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+    }
+  };
+}

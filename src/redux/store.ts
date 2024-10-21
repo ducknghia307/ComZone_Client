@@ -3,49 +3,39 @@ import authReducer from "./features/auth/authSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore, Persistor } from "redux-persist";
 import { encryptTransform } from "redux-persist-transform-encrypt";
+import autoMergeLevel2 from "redux-persist/es/stateReconciler/autoMergeLevel2";
 
 // Encryption transformer for the auth slice only
-const authEncryptor = encryptTransform({
-  secretKey: "my-super-secret-key",
-  onError: function (error) {
-    console.error("Encryption error:", error);
-  },
-});
-
-const authPersistConfig = {
-  key: "auth",
+const rootPersistConfig = {
+  key: "root",
   storage,
-  transforms: [authEncryptor],
-};
-
-// Persist config for conversation slice without encryption
-const conversationPersistConfig = {
-  key: "conversation",
-  storage,
+  stateReconciler: autoMergeLevel2, // This is optional, but can help with merging state
+  keyPrefix: "redux-", // Optional prefix for storage key names
+  transforms: [
+    encryptTransform({
+      secretKey: "my-super-secret-key",
+      onError: function (error) {
+        console.error("Encryption error:", error); // Ensure error handling is robust
+      },
+    }),
+  ],
+  whitelist: ["auth"], // Whitelist reducers to be persisted
+  // blacklist: ['conversation'], // Optionally use blacklist to exclude specific reducers
 };
 
 const rootReducer = combineReducers({
-  auth: persistReducer(authPersistConfig, authReducer),
-  // conversation: persistReducer(conversationPersistConfig, conversationReducer),
+  auth: authReducer,
+  // Add other reducers here if needed
 });
-
-const persistConfig = {
-  key: "root",
-  storage,
-  whitelist: ["auth", "conversation"],
-};
-
-// Apply persisted reducer
-const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // Store setup
 export const makeStore = () => {
   const store = configureStore({
-    reducer: persistedReducer,
+    reducer:  persistReducer(rootPersistConfig, rootReducer),
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
-        serializableCheck: false,
-        immutableCheck: false,
+        serializableCheck: false, // Disable serializable check for non-serializable values
+        immutableCheck: false, // Disable immutable state invariant for better performance
       }),
   });
 

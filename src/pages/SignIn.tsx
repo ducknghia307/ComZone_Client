@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import backgr from "../assets/bookshelf.jpg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { publicAxios } from "../middleware/axiosInstance";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { LoginUser } from "../redux/features/auth/authActionCreators";
 
@@ -18,14 +17,13 @@ const SignIn = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-
     try {
       // Pass email and password as formValues to the LoginUser function
       const formValues = { email, password };
-      dispatch(LoginUser(formValues));
-      navigate("/");
+      await dispatch(LoginUser(formValues));
+
+      window.location.href = "/";
+
     } catch (error) {
       console.error("Error logging in:", error);
       setEmail("");

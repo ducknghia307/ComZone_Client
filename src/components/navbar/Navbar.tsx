@@ -3,9 +3,10 @@ import Logo from "../../assets/hcn-logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
-import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { logOut } from "../../redux/features/auth/authSlice";
+import { LogoutUser } from "../../redux/features/auth/authActionCreators";
+import { privateAxios } from "../../middleware/axiosInstance";
 interface UserInfo {
   createdAt: string;
   email: string;
@@ -32,18 +33,11 @@ const Navbar = () => {
   const fetchUserInfo = async () => {
     if (accessToken) {
       try {
-        const response = await fetch("http://localhost:3000/users/profile", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch user info");
-        }
-        const data = await response.json();
-        setUserInfo(data);
+        const response = await privateAxios.get("users/profile")
+      
+      
+    console.log(response)
+        setUserInfo(response.data);
       } catch {
         setLoading(false);
       }
@@ -51,14 +45,15 @@ const Navbar = () => {
       setLoading(false);
     }
   };
-  const handleLogout = () => {
-    dispatch(logOut());
-    navigate("/");
+  const handleLogout = async () => {
+    await dispatch(LogoutUser());
+    window.location.href = "/";
+
     window.location.reload();
   };
   useEffect(() => {
     fetchUserInfo();
-  }, [accessToken]);
+  }, []);
 
   const handleSearch = () => {
     if (searchTerm.trim()) {

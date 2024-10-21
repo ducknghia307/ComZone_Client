@@ -1,8 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-
 import { revertAll } from "../../globalActions";
-// Action to revert all state
 
+// Initial state for the auth slice
 const initialState = {
   isLoggedIn: false,
   refreshToken: "",
@@ -10,6 +9,7 @@ const initialState = {
   accessToken: "",
 };
 
+// Auth slice to manage authentication state
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -18,19 +18,23 @@ export const authSlice = createSlice({
       state.isLoading = action.payload.isLoading;
     },
     login: (state, action) => {
+      state.isLoggedIn = true; // Set user as logged in
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
     },
+    saveNewTokens(state, action) {
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+      console.log('111111111111111111111111111',action.payload.accessToken);
+      
+    },
   },
   extraReducers: (builder) => {
-    builder.addCase(revertAll, () => initialState);
+    builder.addCase(revertAll, () => initialState); // Revert state on logout
   },
 });
 
-export const { login, updateIsLoading } = authSlice.actions;
-
-export const logOut = () => (dispatch: any) => {
-  dispatch(revertAll());
-};
+// Export the action creators
+export const { login, updateIsLoading, saveNewTokens } = authSlice.actions;
 
 export default authSlice.reducer;

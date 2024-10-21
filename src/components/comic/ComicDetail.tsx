@@ -86,15 +86,15 @@ const ComicDetails = () => {
   const [previewChapter, setPreviewChapter] = useState([]);
   const { id } = useParams();
   // const [userInfo, setUserInfo] = useState<UserInfo>();
-  const token = sessionStorage.getItem("accessToken");
   const [comicId, setComicId] = useState("");
   const [userId, setUserId] = useState("");
   const navigate = useNavigate();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   useEffect(() => {
-    fetch(`http://localhost:3000/comics/${id}`)
-      .then((response) => response.json())
-      .then((comicData) => {
+    privateAxios
+      .get(`/comics/${id}`)
+      .then((response) => {
+        const comicData = response.data;
         console.log("Comic Data:", comicData);
         setUsers(comicData.sellerId);
 
@@ -165,20 +165,11 @@ const ComicDetails = () => {
   };
 
   const fetchUserInfo = async () => {
-    if (token) {
+    if (accessToken) {
       try {
-        const response = await fetch("http://localhost:3000/users/profile", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await privateAxios.get("/users/profile");
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch user info");
-        }
-        const data = await response.json();
-        setUserId(data.id);
+        setUserId(response.data.id);
       } catch {
         setLoading(false);
       }
@@ -188,8 +179,7 @@ const ComicDetails = () => {
   };
   useEffect(() => {
     fetchUserInfo();
-  }, [token]);
-  console.log(userId);
+  }, [accessToken]);
 
   const handleAddToCart = async () => {
     if (accessToken) {

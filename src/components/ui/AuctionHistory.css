@@ -1,0 +1,102 @@
+/* AuctionHistory.css */
+.searchauctionbar {
+    display: flex;
+    /* gap: 20px; */
+    padding: 10px 20px;
+    background-color: #EAEAEA;
+    color: #8d8d8d;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.status-auction-tabs {
+    display: flex;
+    justify-content: space-evenly;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    background-color: #fff;
+}
+
+.status-auction-tab {
+    padding: 20px 50px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.status-auction-tab:hover {
+    color: #000;
+}
+
+.status-auction-tab.active {
+    color: #000;
+    font-weight: bold;
+}
+
+.status-auction-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000;
+}
+
+.status-auction-content {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #EAEAEA;
+    background-color: #fff;
+}
+
+.status-auction-content-detail {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.countdown1 {
+    display: flex;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.countdown1-block {
+    width: 50px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.time-box1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.time-box1 .time {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 5px 10px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.time-box1 .label {
+    font-size: 18px;
+    color: #000;
+    margin-top: 6px;
+}

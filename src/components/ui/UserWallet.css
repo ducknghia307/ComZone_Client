@@ -1,0 +1,14 @@
+.wallet-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 30px 80px;
+    background-color: #fff;
+}
+
+.wallet-table-container {
+    margin-top: 20px;
+}
+
+button {
+    text-transform: none;
+}

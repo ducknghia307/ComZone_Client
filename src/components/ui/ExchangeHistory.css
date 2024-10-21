@@ -1,0 +1,22 @@
+.MuiTableCell-root {
+    font-size: 16px;
+    padding: 16px;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+    font-weight: bold;
+    text-align: center;
+}
+
+.MuiTableBody-root .MuiTableCell-root {
+    text-align: center;
+}
+
+.MuiTypography-root {
+    margin: 20px 0;
+}
+
+.MuiTablePagination-root {
+    background-color: #f1f1f1;
+}
+

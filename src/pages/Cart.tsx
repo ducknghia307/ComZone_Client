@@ -4,26 +4,7 @@ import TotalPrice from "../components/cart/TotalPrice";
 import CurrencySplitter from "../components/assistants/Spliter";
 import { useNavigate } from "react-router-dom";
 import { privateAxios } from "../middleware/axiosInstance";
-
-interface Comic {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  title: string;
-  author: string;
-  description: string;
-  coverImage: string[];
-  publishedDate: string;
-  price: number;
-  status: string;
-  quantity: number;
-  previewChapter: string[];
-  isAuction: boolean;
-  isExchange: boolean;
-  comicCommission: number;
-  selected?: boolean;
-}
+import { Comic, Role } from "../common/base.interface";
 
 interface User {
   id: string;
@@ -37,10 +18,7 @@ interface User {
   status: string;
   is_verified: boolean;
   refresh_token: string;
-  role: {
-    id: number;
-    role_name: string;
-  };
+  role: Role;
 }
 
 interface CartData {
@@ -128,6 +106,33 @@ const Cart = () => {
         };
       });
     }
+  };
+
+  const handleCheckout = () => {
+    if (!cartData) return;
+
+    // Filter selected comics and map to include quantities
+    const selectedComicsWithQuantities = cartData.comics
+      .filter((comic) => comic.selected)
+      .map((comic) => ({
+        ...comic,
+        quantity: cartData.quantities[comic.id] || 0,
+      }));
+
+    // Save selected items with quantities in sessionStorage
+    sessionStorage.setItem(
+      "selectedComics",
+      JSON.stringify(selectedComicsWithQuantities)
+    );
+
+    // Log the selected items with quantities
+    console.log(
+      "Selected items with quantities:",
+      selectedComicsWithQuantities
+    );
+
+    // Navigate to checkout page
+    navigate("/checkout");
   };
 
   const totalPrice = cartData
@@ -266,10 +271,6 @@ const Cart = () => {
         </div>
         <div className="lg:w-1/4 w-full bg-white p-4 rounded-md shadow-sm h-full">
           <div className="p-4 bg-white rounded-md">
-            <div className="flex justify-between mb-4">
-              <span>Thành tiền</span>
-              <span>{CurrencySplitter(totalPrice)} đ</span>
-            </div>
             <div className="flex justify-between font-bold text-lg">
               <span>Tổng Số Tiền</span>
               <span className="text-red-500">
@@ -278,7 +279,7 @@ const Cart = () => {
             </div>
             <button
               className="w-full mt-4 py-2 bg-black text-white font-semibold rounded-md"
-              onClick={() => navigate("/checkout")}
+              onClick={handleCheckout}
             >
               THANH TOÁN
             </button>

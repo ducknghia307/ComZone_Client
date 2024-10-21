@@ -152,17 +152,14 @@ const ComicDetails = () => {
   const allImages = [coverImage, ...previewChapter];
 
   const nextImage = () => {
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex + 1) % previewChapter.length
-    );
-  };
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
+};
 
-  const prevImage = () => {
+const prevImage = () => {
     setCurrentImageIndex(
-      (prevIndex) =>
-        (prevIndex - 1 + previewChapter.length) % previewChapter.length
+        (prevIndex) => (prevIndex - 1 + allImages.length) % allImages.length
     );
-  };
+};
 
   const fetchUserInfo = async () => {
     if (accessToken) {

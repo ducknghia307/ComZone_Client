@@ -153,13 +153,13 @@ const ComicDetails = () => {
 
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
-};
+  };
 
-const prevImage = () => {
+  const prevImage = () => {
     setCurrentImageIndex(
-        (prevIndex) => (prevIndex - 1 + allImages.length) % allImages.length
+      (prevIndex) => (prevIndex - 1 + allImages.length) % allImages.length
     );
-};
+  };
 
   const fetchUserInfo = async () => {
     if (accessToken) {
@@ -174,6 +174,7 @@ const prevImage = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchUserInfo();
   }, [accessToken]);

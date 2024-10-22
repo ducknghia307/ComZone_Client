@@ -11,14 +11,17 @@ import {
   WardDrop,
 } from "../../common/base.interface";
 import { Province } from "../../common/base.interface";
+import { privateAxios } from "../../middleware/axiosInstance";
 
 interface UserComponentProps {
   userInfo: UserInfo;
   onClose: () => void;
+  refreshAddresses: () => void;
 }
 const NewAddressForm: React.FC<UserComponentProps> = ({
   userInfo,
   onClose,
+  refreshAddresses,
 }) => {
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [provinceDrop, setProvinceDrop] = useState<ProvinceDrop[]>([]);
@@ -29,7 +32,6 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
   const [wards, setWards] = useState<Ward[]>([]);
   const [wardDrop, setWardDrop] = useState<WardDrop[]>([]);
   const [selectWard, setSelectWard] = useState<Ward | null>(null); //
-  const token = sessionStorage.getItem("accessToken");
   const [name, setName] = useState(userInfo.name);
   const [phone, setPhone] = useState<string>(userInfo.phone || "");
   const [detailAddress, setDetailAddress] = useState("");
@@ -58,14 +60,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
 
   const fetchProvinces = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/viet-nam-address/provinces",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await privateAxios("/viet-nam-address/provinces");
       const data = response.data;
       const formattedData = data.map((province: Province) => ({
         value: province.code,
@@ -82,13 +77,8 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
       setDistricts([]);
     }
     try {
-      const response = await axios.get(
-        `http://localhost:3000/viet-nam-address/districts/${value}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await privateAxios(
+        `/viet-nam-address/districts/${value}`
       );
       const data = response.data;
       const formattedData = data.map((district: District) => ({
@@ -106,15 +96,9 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
   const fetchWards = async (districtCode: number) => {
     if (!districtCode) return;
     try {
-      const response = await axios.get(
-        `http://localhost:3000/viet-nam-address/wards/${districtCode}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await privateAxios(
+        `/viet-nam-address/wards/${districtCode}`
       );
-
       const data = response.data;
       const formattedData = data.map((ward: Ward) => ({
         value: ward.code,
@@ -220,23 +204,17 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
     console.log(addressData);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/user-addresses",
-        addressData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await privateAxios.post("/user-addresses", addressData);
       console.log("Address saved successfully:", response.data);
       openNotificationWithIcon(
         "success",
         "Success",
         "Address saved successfully."
       );
-      window.location.reload();
+      setTimeout(() => {
+        refreshAddresses();
+        onClose();
+      }, 1000);
     } catch (error) {
       if (error instanceof AxiosError) {
         const statusCode = error.response?.status;
@@ -253,7 +231,6 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
             "Bạn đã có 3 địa chỉ. Nếu muốn thêm hãy xóa 1 địa chỉ."
           );
         } else {
-          // Handle errors without a response (e.g., network errors)
           console.error("Error saving address:", error);
           openNotificationWithIcon(
             "error",

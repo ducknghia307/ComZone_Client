@@ -12,12 +12,14 @@ import {
   Ward,
   WardDrop,
 } from "../../common/base.interface";
+import { privateAxios } from "../../middleware/axiosInstance";
 
 const EditAddress: React.FC<{
   address: Address;
   onSave: (updatedAddress: Address) => void;
   onCancel: () => void;
-}> = ({ address, onSave, onCancel }) => {
+  refreshAddresses: () => void;
+}> = ({ address, onSave, onCancel, refreshAddresses }) => {
   console.log("Edit Address:", address);
 
   const [provinces, setProvinces] = useState<Province[]>([]);
@@ -37,16 +39,9 @@ const EditAddress: React.FC<{
   const [setAsDefault, setSetAsDefault] = useState(false);
   const [api, contextHolder] = notification.useNotification();
 
-  const token = sessionStorage.getItem("accessToken");
-
   const fetchProvinces = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/viet-nam-address/provinces",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await privateAxios("/viet-nam-address/provinces");
       setProvinceDrop(
         response.data.map((province: Province) => ({
           value: province.code,
@@ -61,9 +56,8 @@ const EditAddress: React.FC<{
 
   const fetchAddressCode = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/user-addresses/address-code/${address.id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const response = await privateAxios(
+        `/user-addresses/address-code/${address.id}`
       );
       setAddressCode(response.data);
       setSelectedProvince(response.data.provinceCode);
@@ -78,11 +72,8 @@ const EditAddress: React.FC<{
 
   const fetchDistricts = async (provinceCode: number) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/viet-nam-address/districts/${provinceCode}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const response = await privateAxios(
+        `/viet-nam-address/districts/${provinceCode}`
       );
       setDistrictDrop(
         response.data.map((district: District) => ({
@@ -98,11 +89,8 @@ const EditAddress: React.FC<{
 
   const fetchWards = async (districtCode: number) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/viet-nam-address/wards/${districtCode}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const response = await privateAxios(
+        `/viet-nam-address/wards/${districtCode}`
       );
       setWardDrop(
         response.data.map((ward: Ward) => ({
@@ -160,27 +148,30 @@ const EditAddress: React.FC<{
     };
 
     try {
-      // Update address
-      await axios.patch(
-        `http://localhost:3000/user-addresses/${address.id}`,
-        updatedAddress,
-        { headers: { Authorization: `Bearer ${token}` } }
+      // Update the address first
+      const response = await privateAxios.patch(
+        `/user-addresses/${address.id}`,
+        updatedAddress
       );
+      console.log(response);
 
-      // If checkbox is ticked, set as default
+      // Only attempt to set as default if the checkbox is checked
       if (setAsDefault) {
-        await axios.patch(
-          `http://localhost:3000/user-addresses/default/${address.id}`,
-          {},
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        try {
+          await privateAxios.patch(`/user-addresses/default/${address.id}`);
+        } catch (error) {
+          console.error("Error setting address as default:", error);
+          throw new Error("Failed to set the address as default.");
+        }
       }
+
       notification.success({
         message: "Success",
-        description: "Address set as default successfully.",
+        description: "Address updated successfully.",
       });
 
-      // onSave(updatedAddress);
+      await refreshAddresses();
+      onCancel();
     } catch (error) {
       console.error("Error updating address:", error);
       notification.error({
@@ -189,22 +180,22 @@ const EditAddress: React.FC<{
       });
     }
   };
+
   const handleDelete = async () => {
-    const token = sessionStorage.getItem("accessToken");
     try {
-      const response = await axios.delete(
-        `http://localhost:3000/user-addresses/${address.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const response = await privateAxios.delete(
+        `/user-addresses/${address.id}`
       );
+
       console.log("Address deleted successfully:", response.data);
       notification.success({
         message: "Success",
         description: "Address deleted successfully.",
       });
+      // setTimeout(() => {
+      await refreshAddresses();
       onCancel();
-      window.location.reload();
+      // }, 2000);
     } catch (error) {
       console.error("Error deleting address:", error);
       notification.error({
@@ -213,10 +204,6 @@ const EditAddress: React.FC<{
       });
     }
   };
-  // console.log(addressCode);
-  // console.log("Province code:", addressCode?.provinceCode);
-  // console.log("Province drop:", provinceDrop);
-  // console.log("District code:", addressCode?.districtCode);
   const confirm: PopconfirmProps["onConfirm"] = (e) => {
     handleDelete();
     console.log(e);
@@ -226,8 +213,6 @@ const EditAddress: React.FC<{
     console.log(e);
     message.error("Click on No");
   };
-
-  console.log("ward drop:", wardDrop);
 
   return (
     <>

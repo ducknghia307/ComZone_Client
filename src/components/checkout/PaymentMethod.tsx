@@ -1,42 +1,98 @@
 import { useEffect, useState } from "react";
 import { BaseInterface } from "../../common/base.interface";
-import axios from "axios";
-
+import { privateAxios } from "../../middleware/axiosInstance";
+import CurrencySplitter from "../assistants/Spliter";
+import { Modal } from "antd";
+import ZaloPay from "../../assets/zalopay.png";
+import VNPay from "../../assets/vnpay.png";
+import TickCircle from "../../assets/tick-circle.png";
+// import { useNavigate } from "react-router-dom";
 interface Wallet extends BaseInterface {
   balance: number;
   nonWithdrawableAmount: number;
   status: number;
 }
 
-const PaymentMethod = (amount: { total: number }) => {
-  const token = sessionStorage.getItem("accessToken");
-
-  const [wallet, setWallet] = useState<Wallet>();
+const PaymentMethod = ({
+  amount,
+  wallet,
+  onMethodSelect,
+}: {
+  amount: number;
+  wallet: Wallet | null;
+  onMethodSelect: (method: string) => void;
+}) => {
+  // const [wallet, setWallet] = useState<Wallet>();
   const [selectedMethod, setSelectedMethod] = useState("wallet");
   const [hideBalance, setHideBalance] = useState(true);
+  const [selectedWalletMethod, setSelectedWalletMethod] = useState<string>("");
+  const [selectedAmount, setSelectedAmount] = useState<number>(0);
+  // const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchUserWallet = async () => {
-    await axios
-      .get("http://localhost:3000/wallets/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setWallet(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const showModal = () => {
+    setIsModalOpen(true);
   };
 
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setSelectedWalletMethod("");
+    setSelectedAmount(0);
+    setIsModalOpen(false);
+  };
+
+  // const fetchUserWallet = async () => {
+  //   try {
+  //     const response = await privateAxios("/wallets/user");
+  //     const data = await response.data;
+  //     console.log(data);
+
+  //     setWallet(data);
+  //   } catch {
+  //     console.log("...");
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchUserWallet();
+  // }, []);
   useEffect(() => {
-    fetchUserWallet();
-  }, []);
+    onMethodSelect(selectedMethod);
+  }, [selectedMethod]);
+  const handlePayment = async () => {
+    if (!selectedAmount) {
+      // Make sure an amount is selected
+      return;
+    }
+
+    try {
+      if (selectedWalletMethod === "ZaloPay") {
+        const response = await privateAxios.post("/zalopay/checkout", {
+          amount: selectedAmount,
+          type: "DEPOSIT",
+        });
+        console.log(response);
+        window.location.href = response.data.orderurl;
+      } else if (selectedWalletMethod === "VNPay") {
+        const response = await privateAxios.post("/vnpay/checkout", {
+          amount: selectedAmount,
+          type: "DEPOSIT",
+        });
+        console.log(response);
+        window.location.href = response.data.url;
+      } else {
+        console.error("No valid payment method selected");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+    }
+  };
 
   return (
-    <div className="w-full bg-white px-8 py-4 flex flex-col rounded-lg">
+    <div className="w-full bg-white px-8 py-4 flex flex-col rounded-t-lg">
       <h2 className="font-bold mb-4">PHƯƠNG THỨC THANH TOÁN</h2>
 
       {/* Option 1: Thanh Toán Bằng Ví Comzone */}
@@ -59,43 +115,27 @@ const PaymentMethod = (amount: { total: number }) => {
           />
           <div className="flex flex-col gap-1">
             <div className="flex flex-row gap-1 items-center">
-              <svg
-                width="30"
-                height="30"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="mr-2"
-              >
-                <path
-                  d="M12 14.0005L8 14M21 12V11.2C21 10.0799 21 9.51984 20.782 9.09202C20.5903 8.71569 20.2843 8.40973 19.908 8.21799C19.4802 8 18.9201 8 17.8 8H3M21 12V16M21 12H19C17.8954 12 17 12.8954 17 14C17 15.1046 17.8954 16 19 16H21M21 16V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8V8M18 8V7.2C18 6.0799 18 5.51984 17.782 5.09202C17.5903 4.71569 17.2843 4.40973 16.908 4.21799C16.4802 4 15.9201 4 14.8 4H6.2C5.07989 4 4.51984 4 4.09202 4.21799C3.71569 4.40973 3.40973 4.71569 3.21799 5.09202C3 5.51984 3 6.0799 3 7.2V8"
-                  stroke="#000000"
-                  strokeWidth="1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <img
+                src="https://images-ext-1.discordapp.net/external/m1iq6Vi9sJIxPZYtk5n9CCfmi2A43Dbqt4RObJjKT7Y/https/cdn-icons-png.flaticon.com/512/6020/6020687.png?format=webp&quality=lossless&width=460&height=460"
+                alt=""
+                className="h-10 w-10"
+              />
+
               <p className="font-bold">THANH TOÁN BẰNG VÍ COMZONE</p>
+              <span className="ml-2 py-1 px-2 bg-cyan-900 rounded-lg text-white text-xs">
+                Khuyên dùng
+              </span>
             </div>
             <div className="flex flex-row gap-1 items-center">
-              <svg
-                width="30"
-                height="30"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="mr-2"
-              >
-                <path
-                  d="M6 9.5V14.5M18 9.5V14.5M3.11111 6H20.8889C21.5025 6 22 6.53726 22 7.2V16.8C22 17.4627 21.5025 18 20.8889 18H3.11111C2.49746 18 2 17.4627 2 16.8V7.2C2 6.53726 2.49746 6 3.11111 6ZM14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12C9.5 10.6193 10.6193 9.5 12 9.5C13.3807 9.5 14.5 10.6193 14.5 12Z"
-                  stroke="#000000"
-                  strokeWidth="1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <h3 className="text-sm text-gray-500">
-                Số dư ví: {hideBalance ? "******" : wallet?.balance} đ
+              {/* <img src={Money} alt="" className="h-8 w-8" /> */}
+              <h3 className="text-sm text-gray-500 ml-12">
+                Số dư ví:{" "}
+                {hideBalance ? (
+                  "******"
+                ) : (
+                  <>{CurrencySplitter(wallet?.balance || 0)}</>
+                )}{" "}
+                đ
               </h3>
               <button
                 onClick={() => setHideBalance(!hideBalance)}
@@ -127,13 +167,137 @@ const PaymentMethod = (amount: { total: number }) => {
         {/* Balance Error and Recharge Button */}
         <div
           className={`text-right ${
-            (!amount.total || wallet?.balance! >= amount.total) && "hidden"
+            (!amount || (wallet && wallet.balance >= amount)) && "hidden"
           }`}
         >
           <p className="text-red-500 font-thin mb-1">Số dư hiện không đủ</p>
-          <button className="bg-cyan-600 text-white px-6 py-2 rounded-md hover:opacity-75">
+          <button
+            className="bg-cyan-600 text-white px-6 py-2 rounded-md hover:opacity-75"
+            onClick={showModal}
+          >
             NẠP TIỀN VÀO VÍ
           </button>
+          <Modal
+            // title="NẠP TIỀN VÀO VÍ"
+            className="REM "
+            open={isModalOpen}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            footer={null}
+          >
+            <div className="w-full">
+              <h2 className="text-xl font-bold mb-4 w-full text-center">
+                NẠP TIỀN VÀO VÍ
+              </h2>
+
+              <div className="flex justify-between mb-4">
+                <h3 className="text-base">Số dư hiện tại:</h3>
+                <div className="font-semibold">
+                  {CurrencySplitter(Number(wallet?.balance))} đ
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <h3 className="font-bold mb-2 text-base">Nhập số tiền nạp:</h3>
+                <input
+                  type="text"
+                  placeholder="Nhập số tiền nạp"
+                  className="w-full border p-2 rounded mb-2"
+                  value={CurrencySplitter(Number(selectedAmount)) || 0}
+                  onChange={(e) => {
+                    setSelectedAmount(
+                      Number(e.target.value.replace(/[^0-9.-]+/g, ""))
+                    );
+                  }}
+                />
+                <p className="text-red-500 text-xs italic">
+                  Cần phải nạp thêm:{" "}
+                  {CurrencySplitter(amount - Number(wallet?.balance))} đ
+                </p>
+              </div>
+
+              <div className="flex flex-wrap justify-start gap-2 mb-4 w-full max-w-lg mx-auto">
+                {[
+                  20000, 50000, 100000, 200000, 500000, 1000000, 1500000,
+                  2000000,
+                ]
+                  .filter(
+                    (value) =>
+                      value >= Math.max(0, amount - Number(wallet?.balance))
+                  )
+                  .map((value) => (
+                    <button
+                      key={value}
+                      className=" px-2 bg-white border border-gray-500 hover:bg-gray-200 duration-200 rounded text-black"
+                      onClick={() => setSelectedAmount(value)}
+                    >
+                      {CurrencySplitter(value)}
+                    </button>
+                  ))}
+              </div>
+
+              <h3 className="font-bold mb-2 mt-8">Chọn hình thức nạp:</h3>
+              <div className="flex justify-center gap-4 mb-4">
+                <button
+                  className={`relative p-2 rounded-lg border-2 ${
+                    selectedWalletMethod === "ZaloPay"
+                      ? "border-black"
+                      : "border-gray-300"
+                  }`}
+                  onClick={() => setSelectedWalletMethod("ZaloPay")}
+                >
+                  <div className="flex items-center ">
+                    {/* Display TickCircle if ZaloPay is selected */}
+                    {selectedWalletMethod === "ZaloPay" && (
+                      <img
+                        src={TickCircle}
+                        alt="tick"
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6"
+                      />
+                    )}
+                    <img
+                      src={ZaloPay}
+                      alt="ZaloPay"
+                      className="w-auto h-8 cursor-pointer hover:opacity-80 duration-200"
+                    />
+                  </div>
+                </button>
+
+                <button
+                  className={`relative p-2 rounded-lg border-2 ${
+                    selectedMethod === "VNPay"
+                      ? "border-black"
+                      : "border-gray-300"
+                  }`}
+                  onClick={() => setSelectedWalletMethod("VNPay")}
+                >
+                  <div className="flex items-center ">
+                    {/* Display TickCircle if VNPay is selected */}
+                    {selectedWalletMethod === "VNPay" && (
+                      <img
+                        src={TickCircle}
+                        alt="tick"
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6"
+                      />
+                    )}
+                    <img
+                      src={VNPay}
+                      alt="VNPay"
+                      className="w-auto h-8 cursor-pointer hover:opacity-80 duration-200"
+                    />
+                  </div>
+                </button>
+              </div>
+              <div className="w-full flex items-center justify-center mt-8">
+                <button
+                  className="bg-black text-white py-2 px-8 rounded-lg font-bold hover:opacity-90"
+                  onClick={handlePayment}
+                >
+                  TIẾN HÀNH THANH TOÁN
+                </button>
+              </div>
+            </div>
+          </Modal>
         </div>
       </div>
 
@@ -156,23 +320,12 @@ const PaymentMethod = (amount: { total: number }) => {
         />
         <div className="flex items-center">
           {/* Cash on Delivery Icon */}
-          <svg
-            width="30"
-            height="30"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="mr-2"
-          >
-            <path
-              d="M12 14.0005L8 14M21 12V11.2C21 10.0799 21 9.51984 20.782 9.09202C20.5903 8.71569 20.2843 8.40973 19.908 8.21799C19.4802 8 18.9201 8 17.8 8H3M21 12V16M21 12H19C17.8954 12 17 12.8954 17 14C17 15.1046 17.8954 16 19 16H21M21 16V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8V8M18 8V7.2C18 6.0799 18 5.51984 17.782 5.09202C17.5903 4.71569 17.2843 4.40973 16.908 4.21799C16.4802 4 15.9201 4 14.8 4H6.2C5.07989 4 4.51984 4 4.09202 4.21799C3.71569 4.40973 3.40973 4.71569 3.21799 5.09202C3 5.51984 3 6.0799 3 7.2V8"
-              stroke="#000000"
-              strokeWidth="1"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <h4 className="font-bold">THANH TOÁN KHI NHẬN HÀNG</h4>
+          <img
+            src="https://images-ext-1.discordapp.net/external/8HO1TdE688wNSIPu1fBpZhwFmNdyGN_T5DHPy_KFu5w/https/cdn-icons-png.flaticon.com/512/5163/5163782.png?format=webp&quality=lossless&width=576&height=576"
+            alt=""
+            className="h-10 w-10"
+          />
+          <h4 className="font-bold ml-2">THANH TOÁN KHI NHẬN HÀNG</h4>
         </div>
       </div>
     </div>

@@ -15,6 +15,7 @@ import SellerManagement from "../../pages/SellerManagement";
 import CreateComic from "../../pages/CreateComic";
 import Blogs from "../../pages/Blogs";
 import SellerEditComicDetail from "../comic/SellerEditComicDetail";
+import OrderComplete from "../../pages/OrderComplete";
 
 const AppRouter = () => {
   return (
@@ -26,9 +27,12 @@ const AppRouter = () => {
         <Route path="/detail/:id" element={<ComicDetail />} />
         <Route path="/auctiondetail/:id" element={<AuctionDetails />} />
         <Route path="/accountmanagement" element={<AccountManagement />} />
-        <Route path="/sellermanagement" element={<SellerManagement />}/>
+        <Route path="/sellermanagement" element={<SellerManagement />} />
         <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
-        <Route path="/sellermanagement/edit/:id" element={<SellerEditComicDetail />} />
+        <Route
+          path="/sellermanagement/edit/:id"
+          element={<SellerEditComicDetail />}
+        />
         <Route path="/search" element={<Genres />} />
         <Route path="/blog" element={<Blogs />} />
         <Route path="/cart" element={<Cart />} />
@@ -36,6 +40,7 @@ const AppRouter = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot" element={<ForgotPassword />} />
+        <Route path="/order/complete" element={<OrderComplete />} />
       </Routes>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Address } from "../../common/base.interface";
 import EditAddress from "./EditAddress"; // Import the EditAddress component
 
@@ -7,7 +7,9 @@ interface AddressListProps {
   selectedAddress: Address | null;
   setSelectedAddress: (addressId: string) => void;
   updateAddress: (addressId: string, updatedAddress: Address) => void;
+  refreshAddresses: () => void;
   onAddAddress?: () => void;
+  handleSetIsEdit: boolean;
 }
 
 const AddressList: React.FC<AddressListProps> = ({
@@ -15,7 +17,9 @@ const AddressList: React.FC<AddressListProps> = ({
   selectedAddress,
   setSelectedAddress,
   updateAddress,
+  refreshAddresses,
   onAddAddress,
+  handleSetIsEdit,
 }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -28,6 +32,7 @@ const AddressList: React.FC<AddressListProps> = ({
   const handleSave = (updatedAddress: Address) => {
     if (editingAddress) {
       updateAddress(editingAddress.id, updatedAddress);
+      refreshAddresses();
     }
     setIsEdit(false);
     setEditingAddress(null);
@@ -38,7 +43,9 @@ const AddressList: React.FC<AddressListProps> = ({
     setEditingAddress(null);
   };
   console.log(addresses);
-
+  useEffect(() => {
+    setIsEdit(false);
+  }, [handleSetIsEdit]);
   return (
     <>
       {isEdit ? (
@@ -52,6 +59,7 @@ const AddressList: React.FC<AddressListProps> = ({
               address={editingAddress}
               onSave={handleSave}
               onCancel={handleCancel}
+              refreshAddresses={refreshAddresses}
             />
           )
         : addresses.map((address) => {

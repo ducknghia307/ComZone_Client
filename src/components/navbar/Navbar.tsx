@@ -25,6 +25,7 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { accessToken } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+  console.log("token:", accessToken);
 
   const navigate = useNavigate();
   const toggleMenu = () => {
@@ -33,10 +34,9 @@ const Navbar = () => {
   const fetchUserInfo = async () => {
     if (accessToken) {
       try {
-        const response = await privateAxios.get("users/profile")
-      
-      
-    console.log(response)
+        const response = await privateAxios.get("users/profile");
+
+        console.log(response);
         setUserInfo(response.data);
       } catch {
         setLoading(false);

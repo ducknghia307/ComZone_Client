@@ -74,7 +74,7 @@ export interface Auction {
   id: string;
   shopName: string;
   productName: string;
-  status: 'ongoing' | 'completed' | 'canceled';
+  status: "ongoing" | "completed" | "canceled";
   imgUrl: string;
   currentPrice?: string;
   userBid?: string;
@@ -102,6 +102,7 @@ export interface Comic {
   comicCommission: number;
   selected?: boolean;
   genres?: Genre[];
+  sellerId: UserInfo;
 }
 
 //role

@@ -16,6 +16,11 @@ import CreateComic from "../../pages/CreateComic";
 import Blogs from "../../pages/Blogs";
 import SellerEditComicDetail from "../comic/SellerEditComicDetail";
 import OrderComplete from "../../pages/OrderComplete";
+import OrderUser from "../../pages/OrderUser";
+import Profile from "../../pages/Profile";
+import AuctionUser from "../../pages/AuctionUser";
+import WalletUser from "../../pages/WalletUser";
+import ExchangeUser from "../../pages/ExchangeUser";
 
 const AppRouter = () => {
   return (
@@ -26,7 +31,12 @@ const AppRouter = () => {
         <Route path="/auctions" element={<Auctions />} />
         <Route path="/detail/:id" element={<ComicDetail />} />
         <Route path="/auctiondetail/:id" element={<AuctionDetails />} />
-        <Route path="/accountmanagement" element={<AccountManagement />} />
+        {/* <Route path="/accountmanagement" element={<AccountManagement />} /> */}
+        <Route path="/accountmanagement/purchase" element={<OrderUser />} />
+        <Route path="/accountmanagement/profile" element={<Profile />} />
+        <Route path="/accountmanagement/auction" element={<AuctionUser />} />
+        <Route path="/accountmanagement/wallet" element={<WalletUser />} />
+        <Route path="/accountmanagement/exchange" element={<ExchangeUser />} />
         <Route path="/sellermanagement" element={<SellerManagement />} />
         <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
         <Route

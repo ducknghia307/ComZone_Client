@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import "../components/ui/AccountUser.css";
 import Grid from '@mui/material/Grid2';
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
-import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
-import MultipleStopOutlinedIcon from '@mui/icons-material/MultipleStopOutlined';
 import OrderHistory from '../components/order/OrderHistory';
 import Sidebar from '../components/accountmanagement/Sidebar';
 

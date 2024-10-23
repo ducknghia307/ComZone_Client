@@ -6,6 +6,7 @@ import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import "../ui/OrderHistory.css"
 import ModalOrder from '../modal/ModalOrder';
 import { privateAxios } from '../../middleware/axiosInstance';
+import OrderDetailsModal from '../modal/OrderDetailModal';
 
 interface Order {
     id: number;
@@ -25,6 +26,11 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [openModal, setOpenModal] = useState(false);
     const [orders, setOrders] = useState<Order[]>([]);
+
+    const [isOrderDetailsOpen, setOrderDetailsOpen] = useState(false);
+    const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
 
     useEffect(() => {
         const fetchOrdersWithItems = async () => {
@@ -58,15 +64,6 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
 
         fetchOrdersWithItems();
     }, []);
-
-    // const orders = [
-    //     { id: 1, status: 'pending', shopName: 'Tạp Hóa Truyện', productName: 'Thám Tử Lừng Danh Conan - Tập 102', price: '29.000đ', imgUrl: 'https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg' },
-    //     { id: 2, status: 'packing', shopName: 'Abc Shop', productName: 'One Piece - Tập 101', price: '39.000đ', imgUrl: 'https://cdn0.fahasa.com/media/catalog/product/o/n/one_piece_-_tap_101_-_ban_bia_ao_bia_gap_bia_1__1.jpg?_gl=1*t4s1ch*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODQ4OTc1OC4zNi4xLjE3Mjg0ODk3ODcuMzEuMC4xNTg5MzI2OQ..' },
-    //     { id: 3, status: 'delivering', shopName: 'Abc Shop', productName: 'Naruto - Tập 50', price: '49.000đ', imgUrl: 'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/naruto_tap_50_thuy_lao_tu_chien_tai_ban_2022/2024_04_05_09_50_39_1-390x510.jpg?_gl=1*m22ao5*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODQ4OTc1OC4zNi4xLjE3Mjg0ODk4MTIuNi4wLjE1ODkzMjY5' },
-    //     { id: 4, status: 'delivered', shopName: 'Abc Shop', productName: 'Attack on Titan - Tập 24', price: '59.000đ', imgUrl: 'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/_24___attack_on_titan_24/2023_04_14_15_19_24_1-390x510.jpg' },
-    //     { id: 5, status: 'completed', shopName: 'Abc Shop', productName: 'Doraemon - Tập 15', price: '19.000đ', imgUrl: 'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/doraemon___chu_meo_may_den_tu_tuong_lai___tap_15_tai_ban_2023/2024_06_08_10_37_33_1-390x510.jpg?_gl=1*9asfdx*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODQ4OTc1OC4zNi4xLjE3Mjg0ODk4OTkuMi4wLjE1ODkzMjY5' },
-    //     { id: 6, status: 'cancelled', shopName: 'Abc Shop', productName: 'Dragon Ball - Tập 24', price: '99.000đ', imgUrl: 'https://cdn0.fahasa.com/media/catalog/product/2/4/24_3b445abed5484fbca9eb0cf899682_1.jpg' },
-    // ];
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -112,6 +109,16 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
 
     const handleCloseModal = () => {
         setOpenModal(false);
+    };
+
+    const openOrderDetailsModal = (order: Order) => {
+        setSelectedOrder(order);
+        setOrderDetailsOpen(true);
+    };
+
+    const closeOrderDetailsModal = () => {
+        setOrderDetailsOpen(false);
+        setSelectedOrder(null);
     };
 
     const filteredOrders = selectedStatus === 'all'
@@ -171,13 +178,13 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                             {order.items.map((item: any) => (
                                 <div
                                     key={item.id}
-                                    style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '10px' }}
+                                    style={{ display: 'flex', gap: '20px', marginBottom: '10px' }}
                                 >
                                     {/* Hình ảnh sản phẩm */}
                                     <img
                                         src={item.comics.coverImage || 'https://via.placeholder.com/150'}
                                         alt={item.name}
-                                        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                                        style={{ width: '100px', height: '140px', objectFit: 'cover' }}
                                     />
 
                                     {/* Tên và giá sản phẩm */}
@@ -186,15 +193,24 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                                         <Typography sx={{ fontSize: '18px' }}>x{item.quantity}</Typography>
                                     </div>
 
-                                    <Typography sx={{ fontSize: '20px', color: '#000', marginLeft: 'auto' }}>
-                                        <Typography sx={{ fontSize: '18px' }}>{Number(item.comics.price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>                                    </Typography>
+                                    <div style={{
+                                        marginLeft: 'auto',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}>
+                                        <Typography sx={{ fontSize: '20px' }}>
+                                            {Number(item.comics.price).toLocaleString('vi-VN', {
+                                                style: 'currency', currency: 'VND'
+                                            })}
+                                        </Typography>
+                                    </div>
                                 </div>
                             ))}
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '20px', gap: '10px', backgroundColor: '#fff' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '20px', gap: '10px', backgroundColor: '#fff', alignItems: 'center' }}>
                             <Typography sx={{ fontSize: '20px' }}>Thành tiền: </Typography>
-                            <Typography sx={{ fontSize: '28px', color: '#000', }}>
+                            <Typography sx={{ fontSize: '28px', color: '#f77157' }}>
                                 {Number(order.total_price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                             </Typography>
                         </div>
@@ -252,6 +268,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                                             fontSize: '16px',
                                             padding: '5px 20px'
                                         }}
+                                        onClick={() => openOrderDetailsModal(order)}
                                     >
                                         Xem Chi Tiết
                                     </Button>
@@ -259,8 +276,15 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                             )}
                         </div>
 
-                        {/* Modal */}
+                        {/* Modal đã nhận được hàng*/}
                         <ModalOrder open={openModal} onClose={handleCloseModal} />
+
+                        {/* Modal xem chi tiết*/}
+                        <OrderDetailsModal
+                            open={isOrderDetailsOpen}
+                            onClose={closeOrderDetailsModal}
+                            order={selectedOrder}
+                        />
                     </div>
                 ))}
             </div>

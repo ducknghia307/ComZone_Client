@@ -12,6 +12,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import IconButton from '@mui/material/IconButton';
+import { privateAxios } from '../../middleware/axiosInstance';
 
 const SellerManagement = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState('comic');
@@ -24,8 +25,8 @@ const SellerManagement = () => {
     useEffect(() => {
         // Gọi API để lấy danh sách comics và genres
         Promise.all([
-            fetch('http://localhost:3000/comics').then((response) => response.json()),
-            fetch('http://localhost:3000/genres').then((response) => response.json())
+            privateAxios.get('/comics').then((response) => response.data),
+            privateAxios.get('/genres').then((response) => response.data),
         ])
             .then(([comicsData, genresData]) => {
                 console.log('Comics:', comicsData);
@@ -56,8 +57,6 @@ const SellerManagement = () => {
         return genreArray.map(genre => genre.name).join(', ');
     };
 
-
-
     const columns: GridColDef[] = [
         {
             field: 'coverImage', headerName: 'Ảnh truyện', flex: 0.75, headerClassName: 'custom-header', headerAlign: 'center', align: 'center',
@@ -86,9 +85,9 @@ const SellerManagement = () => {
             field: 'status', headerName: 'Trạng thái', flex: 0.75, headerClassName: 'custom-header', headerAlign: 'center', align: 'center'
         },
         {
-            field: 'actions', headerName: 'Xem/Xóa', flex: 1, headerClassName: 'custom-header', headerAlign: 'center', align: 'center', renderCell: () => (
+            field: 'actions', headerName: 'Xem/Xóa', flex: 1, headerClassName: 'custom-header', headerAlign: 'center', align: 'center', renderCell: (params) => (
                 <>
-                    <IconButton aria-label="edit" color="primary">
+                    <IconButton aria-label="edit" color="primary" onClick={() => navigate(`/sellermanagement/edit/${params.row.id}`)}>
                         <EditOutlinedIcon sx={{ border: '1px solid #D5D5D5', borderRadius: '5px' }} />
                     </IconButton>
                     <IconButton aria-label="delete" color="error">

@@ -176,6 +176,7 @@ const ComicDetails = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchUserInfo();
   }, [accessToken]);

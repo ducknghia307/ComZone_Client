@@ -65,6 +65,23 @@ export interface GetAddressCode {
   provinceCode: number;
   wardCode: number;
 }
+
+export interface Genre {
+  name: string;
+}
+
+export interface Auction {
+  id: string;
+  shopName: string;
+  productName: string;
+  status: "ongoing" | "completed" | "canceled";
+  imgUrl: string;
+  currentPrice?: string;
+  userBid?: string;
+  finalPrice?: string;
+  isWin?: boolean;
+}
+
 //comic
 export interface Comic {
   id: string;
@@ -84,6 +101,8 @@ export interface Comic {
   isExchange: boolean;
   comicCommission: number;
   selected?: boolean;
+  genres?: Genre[];
+  sellerId: UserInfo;
 }
 
 //role

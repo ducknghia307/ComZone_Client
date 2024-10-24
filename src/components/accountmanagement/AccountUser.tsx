@@ -7,34 +7,29 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import MultipleStopOutlinedIcon from '@mui/icons-material/MultipleStopOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { Button, MenuItem, TextField, Typography } from '@mui/material';
-import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
-import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
-import Countdown from 'react-countdown';
 import UserWallet from "../wallet/UserWallet"
 import ExchangeHistory from "../exchange/ExchangeHistory"
 import OrderHistory from '../order/OrderHistory';
 import AuctionHistory from '../auction/AuctionHistory';
+import ProfileUser from '../../pages/ProfileUser';
 
-const AccountUser = () => {
+const AccountUser: React.FC = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState('purchase');
-    const [selectedStatus, setSelectedStatus] = useState('all');
-    const [selectedAuctionStatus, setSelectedAuctionStatus] = useState('all');
 
     const [editing, setEditing] = useState(false);
-    const [newAvatar, setNewAvatar] = useState(null);
+    const [newAvatar, setNewAvatar] = useState<string | null>(null);
 
-    const handleMenuItemClick = (item) => {
+    const handleMenuItemClick = (item: string) => {
         setSelectedMenuItem(item);
     };
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
         if (file) {
-            setNewAvatar(URL.createObjectURL(file));
+          setNewAvatar(URL.createObjectURL(file));
         }
-    };
+      };
 
     const handleEditClick = () => {
         setEditing(true);
@@ -88,160 +83,7 @@ const AccountUser = () => {
                 );
             case 'profile':
                 return (
-                    <div className="profile-container">
-                        <Typography sx={{ fontSize: '35px', fontWeight: 'bolder', textAlign: 'center', marginBottom: '20px' }} className="profile-title">HỒ SƠ CỦA TÔI</Typography>
-                        <Grid container spacing={0} alignItems="center">
-                            {/* Avatar Section */}
-                            <Grid size={3}>
-                                <div className="profile-image">
-                                    <img
-                                        src={newAvatar || profileData.avatar}
-                                        alt="avatar"
-                                        className="avatar-image1"
-                                        style={{ width: '100%', height: 'auto', borderRadius: '50%' }}
-                                    />
-                                    {editing && (
-                                        <>
-                                            <label htmlFor="avatar-upload" className="change-photo-label">
-                                                <Typography color="primary" className="change-photo-text">
-                                                    Đổi ảnh đại diện
-                                                </Typography>
-                                            </label>
-                                            <input
-                                                id="avatar-upload"
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleFileChange}
-                                                style={{ display: 'none' }}
-                                            />
-                                        </>
-                                    )}
-                                </div>
-                            </Grid>
-
-                            {/* Form Section */}
-                            <Grid size={9}>
-                                <form noValidate autoComplete="off" className="profile-form">
-                                    <div className="form-row">
-                                        <Typography>Email:</Typography>
-                                        <TextField
-                                            fullWidth
-                                            margin="normal"
-                                            // label="Email"
-                                            variant="outlined"
-                                            value={profileData.email}
-                                            disabled
-                                            className="profile-field"
-                                            size="small"
-                                        />
-                                    </div>
-                                    <div className="form-row">
-                                        <Typography>Username:</Typography>
-                                        <TextField
-                                            fullWidth
-                                            margin="normal"
-                                            // label="Username"
-                                            name="username"
-                                            variant="outlined"
-                                            value={profileData.username}
-                                            className="profile-field"
-                                            size="small"
-                                        />
-                                    </div>
-                                    <div className="form-row">
-                                        <Typography>Số Điện Thoại:</Typography>
-                                        <TextField
-                                            fullWidth
-                                            margin="normal"
-                                            // label="Phone number"
-                                            name="phoneNumber"
-                                            variant="outlined"
-                                            value={profileData.phoneNumber}
-                                            className="profile-field"
-                                            size="small"
-                                        />
-                                    </div>
-                                    <div className="form-row">
-                                        <Typography>Giới Tính:</Typography>
-                                        <TextField
-                                            fullWidth
-                                            margin="normal"
-                                            select
-                                            // label="Gender"
-                                            name="gender"
-                                            variant="outlined"
-                                            value={profileData.gender}
-                                            className="profile-field"
-                                            size="small"
-                                        >
-                                            <MenuItem value="Female">Female</MenuItem>
-                                            <MenuItem value="Male">Male</MenuItem>
-                                        </TextField>
-                                    </div>
-                                    <div className="form-row">
-                                        <Typography>Địa Chỉ:</Typography>
-                                        <TextField
-                                            fullWidth
-                                            margin="normal"
-                                            // label="Address"
-                                            name="address"
-                                            variant="outlined"
-                                            value={profileData.address}
-                                            className="profile-field"
-                                            size="small"
-                                        />
-                                    </div>
-                                    <div className="form-row">
-                                        <Typography>Ngày Sinh:</Typography>
-                                        <TextField
-                                            fullWidth
-                                            margin="normal"
-                                            // label="Date of Birth"
-                                            name="dateOfBirth"
-                                            variant="outlined"
-                                            value={profileData.dateOfBirth}
-                                            className="profile-field"
-                                            size="small"
-                                        />
-                                    </div>
-                                </form>
-                            </Grid>
-                        </Grid>
-
-                        {/* Button Section */}
-                        <div className="button-container">
-                            {!editing ? (
-                                <Button
-                                    variant="contained"
-                                    onClick={handleEditClick}
-                                    sx={{ fontSize: '20px', backgroundColor:'#000', color:'#fff' }}
-                                >
-                                    Cập Nhật Hồ Sơ
-                                </Button>
-                            ) : (
-                                <>
-                                    <Button
-                                        variant="contained"
-                                        color="error"
-                                        onClick={handleCancelClick}
-                                        sx={{ fontSize: '20px', marginRight: '10px' }}
-                                    >
-                                        Hủy
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        color="success"
-                                        onClick={handleConfirmClick}
-                                        sx={{ fontSize: '20px' }}
-                                    >
-                                        Xác Nhận
-                                    </Button>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-
+                    <ProfileUser />
                 );
             case 'auction':
                 return (
@@ -254,61 +96,6 @@ const AccountUser = () => {
             default:
                 return <div>Chọn một mục để xem chi tiết...</div>;
         }
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'pending':
-                return '#f28144';
-            case 'packing':
-                return '#fc65fc';
-            case 'delivering':
-                return '#28bacf';
-            case 'delivered':
-                return '#32CD32';
-            case 'completed':
-                return '#228B22';
-            case 'cancelled':
-                return '#FF4500';
-            default:
-                return '#000';
-        }
-    };
-
-    const getAuctionStatusTextColor = (status) => {
-        switch (status) {
-            case 'ongoing':
-                return '#28bacf';
-            case 'completed':
-                return '#228B22';
-            case 'canceled':
-                return '#FF4500';
-            default:
-                return '#000';
-        }
-    };
-
-    const renderer = ({ days, hours, minutes, seconds }) => {
-        return (
-            <div className="countdown1">
-                <div className="time-box1">
-                    <span className="time">{days.toString().padStart(2, '0')}</span>
-                    <span className="label">D</span>
-                </div>
-                <div className="time-box1">
-                    <span className="time">{hours.toString().padStart(2, '0')}</span>
-                    <span className="label">H</span>
-                </div>
-                <div className="time-box1">
-                    <span className="time">{minutes.toString().padStart(2, '0')}</span>
-                    <span className="label">M</span>
-                </div>
-                <div className="time-box1">
-                    <span className="time">{seconds.toString().padStart(2, '0')}</span>
-                    <span className="label">S</span>
-                </div>
-            </div>
-        );
     };
 
     return (

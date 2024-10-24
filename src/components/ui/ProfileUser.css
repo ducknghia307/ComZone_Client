@@ -1,0 +1,56 @@
+.profile-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 50px 300px;
+    background-color: #fff;
+}
+
+.profile-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.change-photo-label {
+    display: block;
+    margin-top: 10px;
+}
+
+.change-photo-text {
+    color: #6200ea;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.avatar-image1 {
+    max-width: 180px;
+    border-radius: 50%;
+}
+
+.profile-form {
+    width: 70%;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-row .MuiTypography-root {
+    flex: 1;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.form-row .MuiTextField-root {
+    flex: 2;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}

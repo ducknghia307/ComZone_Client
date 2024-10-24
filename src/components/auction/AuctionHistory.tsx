@@ -4,15 +4,16 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import Countdown from 'react-countdown';
 import '../ui/AuctionHistory.css';
+import { Auction } from '../../common/base.interface';
 
-const AuctionHistory = ({ auctions }) => {
+interface AuctionHistoryProps {
+    auctions: Auction[];
+  }
+
+  const AuctionHistory: React.FC<AuctionHistoryProps> = ({ auctions }) => {
     const [selectedAuctionStatus, setSelectedAuctionStatus] = useState('all');
 
-    const filteredAuctions = selectedAuctionStatus === 'all'
-        ? auctions
-        : auctions.filter(auction => auction.status === selectedAuctionStatus);
-
-    const getAuctionStatusTextColor = (status) => {
+    const getAuctionStatusTextColor = (status: string) => {
         switch (status) {
             case 'ongoing':
                 return '#28bacf';
@@ -25,7 +26,7 @@ const AuctionHistory = ({ auctions }) => {
         }
     };
 
-    const getAuctionResultColor = (isWin) => {
+    const getAuctionResultColor = (isWin: boolean) => {
         return isWin ? '#D6FFD8' : '#E9E9E9'; // Xanh lá cho win, xám cho lose
     };
 
@@ -35,7 +36,7 @@ const AuctionHistory = ({ auctions }) => {
             : auctions.filter(auction => auction.status === selectedAuctionStatus);
 
         return filteredAuctions.map(auction => {
-            const isWin = auction.status === 'completed' && auction.isWin;
+            const isWin = auction.status === 'completed' && (auction.isWin ?? false);
 
             return (
                 <div key={auction.id}
@@ -163,19 +164,19 @@ const AuctionHistory = ({ auctions }) => {
                                         <div className="countdown1">
                                             <div className="time-box1">
                                                 <span className="time">00</span>
-                                                <span className="label">D</span>
+                                                <span className="label">Ngày</span>
                                             </div>
                                             <div className="time-box1">
                                                 <span className="time">00</span>
-                                                <span className="label">H</span>
+                                                <span className="label">Giờ</span>
                                             </div>
                                             <div className="time-box1">
                                                 <span className="time">00</span>
-                                                <span className="label">M</span>
+                                                <span className="label">Phút</span>
                                             </div>
                                             <div className="time-box1">
                                                 <span className="time">00</span>
-                                                <span className="label">S</span>
+                                                <span className="label">Giây</span>
                                             </div>
                                         </div>
                                     )}
@@ -214,28 +215,28 @@ const AuctionHistory = ({ auctions }) => {
         });
     };
 
-    const renderer = ({ days, hours, minutes, seconds }) => (
+    const renderer = ({ days, hours, minutes, seconds }: any) => (
         <div className="countdown1">
             <div className="time-box1">
                 <span className="time">{days.toString().padStart(2, '0')}</span>
-                <span className="label">D</span>
+                <span className="label">Ngày</span>
             </div>
             <div className="time-box1">
                 <span className="time">{hours.toString().padStart(2, '0')}</span>
-                <span className="label">H</span>
+                <span className="label">Giờ</span>
             </div>
             <div className="time-box1">
                 <span className="time">{minutes.toString().padStart(2, '0')}</span>
-                <span className="label">M</span>
+                <span className="label">Phút</span>
             </div>
             <div className="time-box1">
                 <span className="time">{seconds.toString().padStart(2, '0')}</span>
-                <span className="label">S</span>
+                <span className="label">Giây</span>
             </div>
         </div>
     );
 
-    const getAuctionStatusText = (status) => {
+    const getAuctionStatusText = (status: string) => {
         switch (status) {
             case 'ongoing':
                 return "Cuộc Đấu Giá Đang diễn ra";

@@ -6,6 +6,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import StarIcon from "@mui/icons-material/Star";
 import { Link } from "react-router-dom";
+import { publicAxios } from "../../middleware/axiosInstance";
 
 const responsive = {
   superLargeDesktop: {
@@ -27,7 +28,15 @@ const responsive = {
   },
 };
 
-const CustomButtonGroup = ({ next, previous, goToSlide, carouselState }) => {
+const CustomButtonGroup = ({
+  next,
+  previous,
+  carouselState,
+}: {
+  next: () => void;
+  previous: () => void;
+  carouselState: { currentSlide: number; totalItems: number; slidesToShow: number };
+}) => {
   const { currentSlide, totalItems, slidesToShow } = carouselState;
   const isFirstSlide = currentSlide === 0;
   const isLastSlide = currentSlide + slidesToShow >= totalItems;
@@ -48,42 +57,30 @@ const CustomButtonGroup = ({ next, previous, goToSlide, carouselState }) => {
   );
 };
 
-const HotComic = () => {
-  const [comics, setComics] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const token = sessionStorage.getItem("accessToken");
+const HotComic: React.FC = () => {
+  const [comics, setComics] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Gọi API để lấy danh sách comics có status là 'available'
-    fetch("http://localhost:3000/comics/status/available", {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log('Available Comics:', data);
-        setComics(data);
-        setLoading(false);
-      })
-      .catch((error) => {
+    const fetchComics = async () => {
+      try {
+        const response = await publicAxios.get("/comics/status/available");
+        setComics(response.data);
+      } catch (error) {
         console.error("Error fetching comics:", error);
+      } finally {
         setLoading(false);
-      });
-  }, []);
-  
+      }
+    };
 
-  const formatPrice = (price) => {
-    // Thêm dấu chấm ngăn cách hàng nghìn và thêm 'đ' ở cuối
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + 'đ';
+    fetchComics();
+  }, []);
+
+
+  const formatPrice = (price: number) => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
-  
+
 
   return (
     <div className="w-full py-8">
@@ -106,7 +103,7 @@ const HotComic = () => {
         <div className="hot-comic-cards mt-4">
           <Carousel
             responsive={responsive}
-            customButtonGroup={<CustomButtonGroup />}
+            customButtonGroup={<CustomButtonGroup next={() => { }} previous={() => { }} carouselState={{ currentSlide: 0, totalItems: 0, slidesToShow: 0 }} />}
             renderButtonGroupOutside={true}
           >
             {/* Render comics */}

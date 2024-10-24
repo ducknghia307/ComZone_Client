@@ -1,39 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { TextField, Button, Typography, Autocomplete, Chip, IconButton } from '@mui/material';
+import { privateAxios } from '../../middleware/axiosInstance';
 import Grid from '@mui/material/Grid2';
+import "../ui/SellerCreateComic.css";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ImportContactsRoundedIcon from '@mui/icons-material/ImportContactsRounded';
 import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
 import DeliveryDiningOutlinedIcon from '@mui/icons-material/DeliveryDiningOutlined';
-import { TextField, Button, Typography, Autocomplete, IconButton, Chip } from '@mui/material';
-import "../ui/SellerCreateComic.css";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
-import { privateAxios, publicAxios } from '../../middleware/axiosInstance';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 
-interface Genre {
-    id: string;
-    name: string;
-}
-
-interface ComicFormData {
-    title: string;
-    author: string;
-    genre: Genre[];
-    price: string;
-    language: string;
-    series: string;
-    quantity: string;
-    description: string;
-    isAuction: boolean;
-    isExchange: boolean;
-    comicCommission: string;
-}
-
-const SellerCreateComic = () => {
+const EditComicDetail = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
+
     const [selectedMenuItem, setSelectedMenuItem] = useState<string>('comic');
-    const [formData, setFormData] = useState<ComicFormData>({
+
+    const [coverImages, setCoverImages] = useState<string[]>([]);
+    const [contentImages, setContentImages] = useState<string[]>([]);
+
+    const [formData, setFormData] = useState({
         title: '',
         author: '',
         genre: [],
@@ -47,38 +34,16 @@ const SellerCreateComic = () => {
         comicCommission: '0',
     });
 
-    const [genres, setGenres] = useState<Genre[]>([]);
-    const [coverImages, setCoverImages] = useState<string[]>([]);
-    const [contentImages, setContentImages] = useState<string[]>([]);
-
     useEffect(() => {
-        publicAxios.get('/genres')
+        privateAxios.get(`/comics/${id}`)
             .then((response) => {
-                const genreData = response.data;
-
-                // Đảm bảo genres là một mảng
-                const genresData: Genre[] = genreData.genres || [];
-
-                // Lấy tên các thể loại và in ra console
-                const genreNames = genresData.map((genre) => genre.name);
-                console.log("Genre Names:", genreNames);
-
-                // Cập nhật comic để bao gồm tên thể loại
-                const updatedComic = {
-                    ...genreData,
-                    genreNames: genreNames,
-                };
-
-                console.log("Updated Comic with Genres:", updatedComic);
-
-                setGenres(genreData);
+                const comic = response.data;
+                setFormData(comic);
+                setCoverImages(comic.coverImage || []);
+                setContentImages(comic.previewChapter || []);
             })
-            .catch((error) => {
-                console.error("Error fetching data:", error);
-            });
-    }, []);
-
-    console.log(genres);
+            .catch((error) => console.error('Error fetching comic:', error));
+    }, [id]);
 
     const handleFileChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -87,28 +52,11 @@ const SellerCreateComic = () => {
     ) => {
         const files = event.target.files;
         const fileArray = files ? Array.from(files).map(file => URL.createObjectURL(file)) : [];
-    
-        // Kiểm tra nếu số lượng ảnh vượt quá giới hạn
         if (fileArray.length > maxImages) {
             alert(`Bạn chỉ có thể tải lên tối đa ${maxImages} ảnh!`);
             return;
         }
-    
-        setImageState(fileArray); // Thay thế ảnh cũ bằng ảnh mới
-    };
-
-    const handleGenreChange = (event: any, newValue: Genre[]) => {
-        setFormData({ ...formData, genre: newValue });
-    };
-
-
-    const handleMenuItemClick = (item: string) => {
-        setSelectedMenuItem(item);
-    };
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setImageState(fileArray);
     };
 
     const handleRemoveImage = (
@@ -120,44 +68,17 @@ const SellerCreateComic = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        // Chuẩn bị dữ liệu gửi đi
-        const comicData = {
-            // sellerId: "your-seller-id", 
-            genreIds: formData.genre.map((g) => g.id),
-            title: formData.title,
-            author: formData.author,
-            description: formData.description,
+        privateAxios.put(`/comics/${id}`, {
+            ...formData,
             coverImage: coverImages,
             previewChapter: contentImages,
-            publishedDate: new Date().toISOString(),
-            price: parseFloat(formData.price) || 0,
-            quantity: parseInt(formData.quantity) || 1,
-            isAuction: formData.isAuction ? 1 : 0,
-            isExchange: formData.isExchange ? 1 : 0,
-            comicCommission: parseFloat(formData.comicCommission) || 0,
-        };
-
-        console.log("Comic Data to Send:", comicData);
-        console.log("Comic Data to Send:", JSON.stringify(comicData, null, 2));
-
-        // Gửi dữ liệu lên API
-        privateAxios.post('/comics', comicData)
-            .then((response) => {
-                console.log('Comic Created:', response.data);
-                alert('Truyện mới đã được thêm thành công!');
+        })
+            .then(() => {
+                alert('Cập nhật truyện thành công!');
                 navigate('/sellermanagement');
             })
-            .catch((error) => {
-                console.error('Error creating comic:', error);
-                alert('Đã có lỗi xảy ra khi thêm truyện.');
-            });
+            .catch((error) => console.error('Error updating comic:', error));
     };
-
-    // const handleDropdownChange = (name: keyof ComicFormData, value: string) => {
-    //     setFormData({ ...formData, [name]: value === '1' }); // Set true for '1', false for '0'
-    // };    
-
 
     const renderImageUploadSection = (
         title: string,
@@ -224,23 +145,22 @@ const SellerCreateComic = () => {
             </div>
         </>
     );
-    
 
-    const renderCreateComicForm = () => (
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const renderEditComicForm = () => (
         <div className="form-container">
             <div className="create-comic-form">
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <ArrowBackIcon sx={{ fontSize: '40px', cursor: 'pointer' }} onClick={() => navigate('/sellermanagement')} />
+                    <Typography sx={{ paddingBottom: '50px', color: '#000', fontWeight: 'bold', margin: '0 auto' }} variant="h4" className="form-title">CHỈNH SỬA TRUYỆN</Typography>
+                </div>
                 <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <ArrowBackIcon sx={{ fontSize: '40px', cursor: 'pointer' }} onClick={() => navigate('/sellermanagement')} />
-                        <Typography sx={{ paddingBottom: '50px', color: '#000', fontWeight: 'bold', margin: '0 auto' }} variant="h4" className="form-title">THÊM TRUYỆN MỚI</Typography>
-                    </div>
-
-                    {/* Phần tải lên ảnh bìa - tối đa 4 ảnh */}
                     {renderImageUploadSection("Ảnh Bìa", coverImages, setCoverImages, 4)}
-
-                    {/* Phần tải lên ảnh nội dung - tối đa 5 ảnh */}
                     {renderImageUploadSection("Ảnh Nội Dung", contentImages, setContentImages, 5)}
-
                     <Grid container columnSpacing={7} rowSpacing={3} sx={{ paddingTop: '20px' }}>
                         <Grid size={6}>
                             <Typography sx={{ paddingBottom: '10px', color: '#000', fontWeight: 'bold' }}>Tên Truyện</Typography>
@@ -266,7 +186,7 @@ const SellerCreateComic = () => {
                                 className="text-field"
                             />
                         </Grid>
-                        <Grid size={6}>
+                        {/* <Grid size={6}>
                             <Typography sx={{ paddingBottom: '10px', color: '#000', fontWeight: 'bold' }}>Thể Loại</Typography>
                             <Autocomplete
                                 multiple
@@ -291,8 +211,7 @@ const SellerCreateComic = () => {
                                     ))
                                 }
                             />
-
-                        </Grid>
+                        </Grid> */}
                         <Grid size={6}>
                             <Typography sx={{ paddingBottom: '10px', color: '#000', fontWeight: 'bold' }}>Giá</Typography>
                             <TextField
@@ -397,12 +316,9 @@ const SellerCreateComic = () => {
                             />
                         </Grid>
                     </Grid>
-                    <div className="form-submit-section">
-                        <Button
-                            type="submit" variant="contained" className="submit-button">
-                            Xác Nhận
-                        </Button>
-                    </div>
+                    <Button type="submit" variant="contained" sx={{ marginTop: '20px' }}>
+                        Cập Nhật
+                    </Button>
                 </form>
             </div>
         </div>
@@ -411,7 +327,7 @@ const SellerCreateComic = () => {
     const renderContent = () => {
         switch (selectedMenuItem) {
             case 'comic':
-                return renderCreateComicForm();
+                return renderEditComicForm();
             case 'auction':
                 return <Typography variant="h4">Quản Lý Đấu Giá</Typography>;
             case 'delivery':
@@ -419,6 +335,10 @@ const SellerCreateComic = () => {
             default:
                 return <Typography variant="h4">Chọn một mục để hiển thị nội dung</Typography>;
         }
+    };
+
+    const handleMenuItemClick = (item: string) => {
+        setSelectedMenuItem(item);
     };
 
     return (
@@ -448,7 +368,8 @@ const SellerCreateComic = () => {
                         </ul>
                     </div>
                 </Grid> */}
-                <Grid size={10} sx={{ padding: '0 80px', margin:'auto' }}>
+                {/* <Grid size={10} sx={{ padding: '0 80px' }}> */}
+                <Grid size={10} sx={{ padding: '0 80px', margin: 'auto' }}>
                     <div className="content-section">
 
                         {renderContent()}
@@ -459,4 +380,4 @@ const SellerCreateComic = () => {
     );
 };
 
-export default SellerCreateComic;
+export default EditComicDetail;

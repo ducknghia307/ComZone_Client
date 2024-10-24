@@ -5,25 +5,26 @@ import { Button, Typography } from '@mui/material';
 import Countdown from 'react-countdown';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import { useParams } from 'react-router-dom';
+import { publicAxios } from '../../middleware/axiosInstance';
 
-const renderer = ({ days, hours, minutes, seconds }) => {
+const renderer = ({ days, hours, minutes, seconds }: any) => {
     return (
         <div className="countdown">
             <div className="time-box">
                 <span className="time">{days.toString().padStart(2, '0')}</span>
-                <span className="label1">D</span>
+                <span className="label1">Ngày</span>
             </div>
             <div className="time-box">
                 <span className="time">{hours.toString().padStart(2, '0')}</span>
-                <span className="label1">H</span>
+                <span className="label1">Giờ</span>
             </div>
             <div className="time-box">
                 <span className="time">{minutes.toString().padStart(2, '0')}</span>
-                <span className="label1">M</span>
+                <span className="label1">Phút</span>
             </div>
             <div className="time-box">
                 <span className="time">{seconds.toString().padStart(2, '0')}</span>
-                <span className="label1">S</span>
+                <span className="label1">Giây</span>
             </div>
         </div>
     );
@@ -31,45 +32,32 @@ const renderer = ({ days, hours, minutes, seconds }) => {
 
 const ComicAuction = () => {
 
-    const { id } = useParams(); // Lấy ID từ URL
-    const [comic, setComic] = useState(null);
-    const [users, setUsers] = useState([]);
+    const { id } = useParams<{ id: string }>(); // Get ID from URL
+    const [comic, setComic] = useState<any>(null); 
+    const [users, setUsers] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [coverImage, setCoverImage] = useState("");
-    const [previewChapter, setPreviewChapter] = useState([]);
-    const token = sessionStorage.getItem("accessToken");
-
-
-    const [mainImage, setMainImage] = useState("");
+    const [mainImage, setMainImage] = useState<string>("");
+    const [previewChapter, setPreviewChapter] = useState<string[]>([]);
 
     useEffect(() => {
-        // Gọi API để lấy thông tin chi tiết của comic theo ID
-        fetch(`http://localhost:3000/comics/${id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
+        const fetchComicDetails = async () => {
+            try {
+                const response = await publicAxios.get(`/comics/${id}`);
+                const data = response.data;
                 console.log('Comic Detail:', data);
-                setUsers(data.sellerId);
+
+                setUsers(data.sellerId); // Assuming sellerId contains user details
                 setComic(data);
-
-                setMainImage(data.coverImage); 
+                setMainImage(data.coverImage);
                 setPreviewChapter(data.previewChapter || []);
-
-                setLoading(false);
-            })
-            .catch((error) => {
+            } catch (error) {
                 console.error("Error fetching comic details:", error);
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+
+        fetchComicDetails();
     }, [id]);
 
     console.log("Preview Chapter", previewChapter);
@@ -77,7 +65,7 @@ const ComicAuction = () => {
     if (loading) return <p>Loading comic details...</p>;
     if (!comic) return <p>Comic not found.</p>;
 
-    const handleImageClick = (imageSrc) => {
+    const handleImageClick = (imageSrc: string) => {
         setMainImage(imageSrc); // Cập nhật ảnh lớn khi click vào ảnh nhỏ
     };
 

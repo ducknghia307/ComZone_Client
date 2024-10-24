@@ -57,13 +57,9 @@ const Navbar = () => {
   const fetchUserInfo = async () => {
     if (accessToken) {
       try {
-        const response = await publicAxios.get("users/profile", {
-          headers: {
-            Authorization: "Bearer " + accessToken, // Set the Authorization header correctly
-          },
-        });
+        const response = await privateAxios.get("users/profile");
 
-        console.log("userinfo", response);
+        console.log(response);
         setUserInfo(response.data);
       } catch (error) {
         console.error("Error fetching user info:", error); // Log the error for better debugging
@@ -96,7 +92,7 @@ const Navbar = () => {
       key: "1",
       label: (
         <Link
-          to={"/accountManagement"}
+          to={"/accountManagement/profile"}
           className="REM text-base text-center w-full"
         >
           Quản lí tài khoản

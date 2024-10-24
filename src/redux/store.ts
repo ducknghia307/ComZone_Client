@@ -4,47 +4,54 @@ import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore, Persistor } from "redux-persist";
 import { encryptTransform } from "redux-persist-transform-encrypt";
 import autoMergeLevel2 from "redux-persist/es/stateReconciler/autoMergeLevel2";
+import navigateReducer from "./features/navigate/navigateSlice";
 
 // Encryption transformer for the auth slice only
 const rootPersistConfig = {
   key: "root",
   storage,
-  stateReconciler: autoMergeLevel2, // This is optional, but can help with merging state
+  stateReconciler: autoMergeLevel2, // Optional: helps with merging persisted state
   keyPrefix: "redux-", // Optional prefix for storage key names
   transforms: [
     encryptTransform({
       secretKey: "my-super-secret-key",
       onError: function (error) {
-        console.error("Encryption error:", error); // Ensure error handling is robust
+        console.error("Encryption error:", error); // Handle encryption errors
       },
     }),
   ],
-  whitelist: ["auth"], // Whitelist reducers to be persisted
-  // blacklist: ['conversation'], // Optionally use blacklist to exclude specific reducers
+  whitelist: ["auth","navigate"], // Persist only the 'auth' slice
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  // Add other reducers here if needed
+  navigate: navigateReducer, // Add other reducers here as needed
 });
+
+// Typing for RootState and AppDispatch
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppDispatch = ReturnType<typeof makeStore>["store"]["dispatch"];
+
+// Applying persistReducer with the correct typing
+const persistedReducer = persistReducer<RootState>(
+  rootPersistConfig,
+  rootReducer
+);
 
 // Store setup
 export const makeStore = () => {
   const store = configureStore({
-    reducer:  persistReducer(rootPersistConfig, rootReducer),
+    reducer: persistedReducer, // Use persisted reducer
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
-        serializableCheck: false, // Disable serializable check for non-serializable values
-        immutableCheck: false, // Disable immutable state invariant for better performance
+        serializableCheck: false, // Disable checks for non-serializable values
+        immutableCheck: false, // Disable immutable state invariant check
       }),
   });
 
   const persistor = persistStore(store) as Persistor;
   return { store, persistor };
 };
-
-// Export types for store, dispatch, and state
-export type AppStore = ReturnType<typeof makeStore>;
-export type AppDispatch = AppStore["store"]["dispatch"];
-export type RootState = ReturnType<AppStore["store"]["getState"]>;
+export type AppStore = ReturnType<typeof makeStore>["store"];
+// Export types for persistor
 export type { Persistor };

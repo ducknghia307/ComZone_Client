@@ -11,7 +11,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { callbackUrl } from "../../redux/features/navigate/navigateSlice";
 
 interface UserInfo {
   id: string;
@@ -88,6 +89,7 @@ const ComicDetails = () => {
   // const [userInfo, setUserInfo] = useState<UserInfo>();
   const [comicId, setComicId] = useState("");
   const [userId, setUserId] = useState("");
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   useEffect(() => {
@@ -153,13 +155,13 @@ const ComicDetails = () => {
 
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
-};
+  };
 
-const prevImage = () => {
+  const prevImage = () => {
     setCurrentImageIndex(
-        (prevIndex) => (prevIndex - 1 + allImages.length) % allImages.length
+      (prevIndex) => (prevIndex - 1 + allImages.length) % allImages.length
     );
-};
+  };
 
   const fetchUserInfo = async () => {
     if (accessToken) {
@@ -191,7 +193,10 @@ const prevImage = () => {
         console.error("Error adding item to cart:", error);
       }
     } else {
+      console.log("Redirecting to sign-in from:", location.pathname); // Should log the comic detail path
+
       alert("You need to sign in to add items to your cart.");
+      dispatch(callbackUrl({ navigateUrl: location.pathname }));
       navigate("/signin");
     }
   };

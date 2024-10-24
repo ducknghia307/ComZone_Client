@@ -8,6 +8,7 @@ const { store } = makeStore();
 const privateAxios = axios.create({
   baseURL: "http://localhost:3000/",
   withCredentials: true,
+  headers: { "Content-Type": "application/json" },
 });
 
 const publicAxios = axios.create({
@@ -28,6 +29,7 @@ const publicAxios = axios.create({
 // Request interceptor for privateAxios
 privateAxios.interceptors.request.use(
   (config) => {
+    // Always get the latest state
     const state = store.getState();
     const accessToken = state.auth.accessToken;
     console.log("Current accessToken before request:", accessToken); // Log the token
@@ -41,8 +43,6 @@ privateAxios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-// Response interceptor for privateAxios
 // Response interceptor for privateAxios
 privateAxios.interceptors.response.use(
   async (response) => {
@@ -60,9 +60,8 @@ privateAxios.interceptors.response.use(
       console.log("401 Unauthorized error occurred");
       try {
         const response = await getNewTokens(oldRefreshToken);
-        console.log("New tokens response:", response); 
+        console.log("New tokens response:", response);
 
-      
         store.dispatch(
           saveNewTokens({
             accessToken: response.token,
@@ -74,8 +73,8 @@ privateAxios.interceptors.response.use(
         return privateAxios(error.config);
       } catch (tokenError) {
         console.error("Token refresh failed:", tokenError);
-       
-        window.location.href = "/signin";
+
+        // window.location.href = "/signin";
         return Promise.reject(tokenError);
       }
     }
@@ -95,7 +94,7 @@ const getNewTokens = async (
       {},
       {
         headers: {
-          Authorization: "Bearer " + refreshToken, 
+          Authorization: "Bearer " + refreshToken,
         },
       }
     );

@@ -76,13 +76,13 @@ const SignUp = () => {
 
     try {
       const response = await publicAxios.post("auth/register", {
-        email: formData.email,
+        email: formData.email.toLowerCase(),
         name: formData.username,
         password: formData.password,
       });
 
       if (response.status === 201) {
-        navigate("/signin", { state: { email: formData.email } });
+        navigate("/signin");
       } else {
         setError("Registration failed. Please try again.");
       }

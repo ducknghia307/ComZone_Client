@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import backgr from "../assets/bookshelf.jpg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -7,23 +7,29 @@ import { LoginUser } from "../redux/features/auth/authActionCreators";
 const SignIn = () => {
   const dispatch = useAppDispatch();
   const { isLoading } = useAppSelector((state) => state.auth);
-
-  const navigate = useNavigate();
+  const { navigateUrl } = useAppSelector((state) => state.navigate);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // const [showPassword, setShowPassword] = useState(false);
-  const location = useLocation();
-  const [emailRegister, setEmailRegister] = useState("");
 
+  const [emailRegister, setEmailRegister] = useState("");
+  const handleLoginGoogle = async () => {
+    try {
+      window.location.href = "http://localhost:3000/auth/google/login";
+      //  window.location.reload();
+    } catch (error) {
+      console.log("Google login error:", error);
+    }
+  };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       // Pass email and password as formValues to the LoginUser function
       const formValues = { email, password };
+
       await dispatch(LoginUser(formValues));
 
-      window.location.href = "/";
-
+      window.location.href = navigateUrl ? `${navigateUrl}` : "/";
     } catch (error) {
       console.error("Error logging in:", error);
       setEmail("");
@@ -35,12 +41,6 @@ const SignIn = () => {
   //   const togglePasswordVisibility = () => {
   //     setShowPassword(!showPassword);
   //   };
-  useEffect(() => {
-    if (location.state?.email) {
-      setEmailRegister(location.state.email);
-      navigate(location.pathname, { state: {} });
-    }
-  }, [location]);
 
   return (
     <div
@@ -101,8 +101,9 @@ const SignIn = () => {
             <button
               type="submit"
               className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition duration-300"
+              disabled={isLoading}
             >
-              Đăng Nhập
+              {isLoading ? "Đang Đăng Nhập..." : "Đăng Nhập"}
             </button>
             <h4 className="font-thin text-sm italic text-center mt-2">hoặc</h4>
           </form>
@@ -110,10 +111,7 @@ const SignIn = () => {
           <div className="mt-2 text-center">
             <button
               className="w-full bg-white border border-gray-300 text-black py-2 rounded-md flex items-center justify-center hover:bg-gray-100 transition duration-300"
-              onClick={() =>
-                (window.location.href =
-                  "http://localhost:3000/auth/google/login")
-              }
+              onClick={handleLoginGoogle}
             >
               <svg
                 width="20px"

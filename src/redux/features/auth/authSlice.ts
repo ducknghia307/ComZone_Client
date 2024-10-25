@@ -18,19 +18,19 @@ export const authSlice = createSlice({
       state.isLoading = action.payload.isLoading;
     },
     login: (state, action) => {
-      state.isLoggedIn = true; // Set user as logged in
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
+      state.isLoggedIn = true;
+      console.log('33333333333333333333',action.payload.accessToken)
     },
     saveNewTokens(state, action) {
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
-      console.log('111111111111111111111111111',action.payload.accessToken);
-      
+      console.log("111111111111111111111111111", action.payload.accessToken);
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(revertAll, () => initialState); // Revert state on logout
+    builder.addCase(revertAll, () => initialState);
   },
 });
 

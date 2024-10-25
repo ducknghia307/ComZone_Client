@@ -9,13 +9,9 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { useAppSelector } from "../../redux/hooks";
-
-interface UserInfo {
-  id: string;
-}
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { callbackUrl } from "../../redux/features/navigate/navigateSlice";
 
 const style = {
   position: "absolute",
@@ -88,6 +84,7 @@ const ComicDetails = () => {
   // const [userInfo, setUserInfo] = useState<UserInfo>();
   const [comicId, setComicId] = useState("");
   const [userId, setUserId] = useState("");
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   useEffect(() => {
@@ -192,7 +189,10 @@ const ComicDetails = () => {
         console.error("Error adding item to cart:", error);
       }
     } else {
+      console.log("Redirecting to sign-in from:", location.pathname); // Should log the comic detail path
+
       alert("You need to sign in to add items to your cart.");
+      dispatch(callbackUrl({ navigateUrl: location.pathname }));
       navigate("/signin");
     }
   };

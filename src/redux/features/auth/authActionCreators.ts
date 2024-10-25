@@ -3,6 +3,7 @@ import { revertAll } from "../../globalActions";
 import { AppDispatch } from "../../store"; // Assuming these types exist in your project
 import { AxiosError } from "axios";
 import { authSlice } from "./authSlice";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // Define types for form values and responses
 interface FormValues {
@@ -79,26 +80,22 @@ export function LogoutUser() {
   };
 }
 // Google login action in authActionCreators.ts
-export function loginWithGoogle(token: string) {
-  return async (dispatch: AppDispatch) => {
-    try {
-      // Update loading state
-      dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
+// export const loginWithGoogle = ()=>{
 
-      // Dispatch login action with tokens received from Google callback
-      dispatch(
-        authSlice.actions.login({
-          isLoggedIn: true,
-          accessToken: token,
-          refreshToken: null, // Since you might not have refreshToken from Google
-        })
-      );
 
-      // Update loading state after successful login
-      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
-    } catch (error) {
-      console.log(error);
-      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
-    }
-  };
-}
+//     try {
+//       const response =  publicAxios.get("/auth/google/callback");
+//       const { id, accessToken, refreshToken } = response.data;
+//       console.log(';;;;;;;;;;;;;',response)
+
+//       // Save tokens in Redux
+//       dispatch(authSlice.actions.login({ id, accessToken, refreshToken }));
+
+//       return response.data;
+//     } catch (error) {
+//       console.error("Google login error:", error);
+//       throw error;
+//     }
+  
+// );
+// }

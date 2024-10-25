@@ -4,9 +4,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { logOut } from "../../redux/features/auth/authSlice";
+import { authSlice, logOut } from "../../redux/features/auth/authSlice";
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
-import { privateAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 interface UserInfo {
   createdAt: string;
   email: string;
@@ -23,14 +23,37 @@ const Navbar = () => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const { accessToken } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
-  console.log("token:", accessToken);
+  const { accessToken } = useAppSelector((state) => state.auth);
+  console.log("accesstoken from navbav", accessToken);
 
   const navigate = useNavigate();
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const accessToken = query.get("accessToken");
+    const refreshToken = query.get("refreshToken");
+
+    console.log("Access Token:", accessToken);
+    console.log("Refresh Token:", refreshToken);
+
+    // Dispatch tokens to Redux if available
+    if (accessToken && refreshToken) {
+      dispatch(authSlice.actions.login({ accessToken, refreshToken }));
+      console.log("Dispatched tokens to Redux");
+
+      // Clear the query params from the URL without reloading the page
+      window.history.replaceState(null, "", window.location.pathname);
+
+     
+      setTimeout(() => {
+       window.location.reload()
+      }, 100);
+    }
+  }, []);
+
   const fetchUserInfo = async () => {
     if (accessToken) {
       try {
@@ -38,22 +61,23 @@ const Navbar = () => {
 
         console.log(response);
         setUserInfo(response.data);
-      } catch {
+      } catch (error) {
+        console.error("Error fetching user info:", error); // Log the error for better debugging
         setLoading(false);
       }
     } else {
       setLoading(false);
     }
   };
+
   const handleLogout = async () => {
     await dispatch(LogoutUser());
     window.location.href = "/";
-
-    window.location.reload();
+    // window.location.reload();
   };
   useEffect(() => {
     fetchUserInfo();
-  }, []);
+  }, [accessToken]);
 
   const handleSearch = () => {
     if (searchTerm.trim()) {

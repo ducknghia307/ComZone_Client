@@ -9,14 +9,9 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { callbackUrl } from "../../redux/features/navigate/navigateSlice";
-
-interface UserInfo {
-  id: string;
-}
 
 const style = {
   position: "absolute",

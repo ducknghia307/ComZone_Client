@@ -7,7 +7,6 @@ import Cart from "../../pages/Cart";
 import ComicDetail from "../../pages/ComicDetails";
 import Checkout from "../../pages/Checkout";
 import AuctionDetails from "../../pages/AuctionDetails";
-import AccountManagement from "../../pages/AccountManagement";
 import SignIn from "../../pages/SignIn";
 import SignUp from "../../pages/SignUp";
 import ForgotPassword from "../../pages/ForgotPassword";

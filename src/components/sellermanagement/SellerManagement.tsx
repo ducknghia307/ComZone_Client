@@ -13,6 +13,8 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import IconButton from '@mui/material/IconButton';
 import { privateAxios } from '../../middleware/axiosInstance';
+import AuctionManagement from '../auctions/AuctionManagement';
+import DeliveryManagement from '../delivery/DeliveryManagement';
 
 const SellerManagement = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState('comic');
@@ -171,9 +173,9 @@ const SellerManagement = () => {
                     </div>
                 );
             case 'auction':
-                return <Typography variant="h4">Quản Lý Đấu Giá</Typography>;
+                return <AuctionManagement/>
             case 'delivery':
-                return <Typography variant="h4">Thông Tin Giao Hàng</Typography>;
+                return <DeliveryManagement/>
             default:
                 return <Typography variant="h4">Chọn một mục để hiển thị nội dung</Typography>;
         }

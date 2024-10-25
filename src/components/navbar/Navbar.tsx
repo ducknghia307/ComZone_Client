@@ -68,7 +68,7 @@ const Navbar = () => {
       key: "1",
       label: (
         <Link
-          to={"/accountManagement"}
+          to={"/accountManagement/profile"}
           className="REM text-base text-center w-full"
         >
           Quản lí tài khoản

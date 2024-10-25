@@ -57,10 +57,6 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
     }
   };
 
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
-
   const handleSetSelectedAddress = (addressId: string) => {
     const address = addresses.find((addr) => addr.id === addressId) || null;
     setSelectedAddress(address);
@@ -75,6 +71,10 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   const refreshAddresses = () => {
     fetchUserAddress();
   };
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+
   return (
     <div className="w-full bg-white px-8 py-4 rounded-lg mb-4">
       <div className="flex flex-row justify-between w-full">

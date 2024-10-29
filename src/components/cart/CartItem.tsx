@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import CurrencySplitter from "../assistants/Spliter";
+import CurrencySplitter from "../../assistants/Spliter";
 interface CartItemProps {
   title: string;
   author: string;

@@ -8,7 +8,7 @@ import {
   Comic,
   UserInfo,
 } from "../common/base.interface";
-import CurrencySplitter from "../components/assistants/Spliter";
+import CurrencySplitter from "../assistants/Spliter";
 import { privateAxios } from "../middleware/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal } from "antd";

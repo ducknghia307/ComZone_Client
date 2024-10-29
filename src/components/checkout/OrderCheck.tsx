@@ -1,5 +1,5 @@
 import React from "react";
-import CurrencySplitter from "../assistants/Spliter";
+import CurrencySplitter from "../../assistants/Spliter";
 
 interface Comic {
   id: string;

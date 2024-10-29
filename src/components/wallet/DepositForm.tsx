@@ -5,7 +5,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { BaseInterface } from "../../common/base.interface";
-import CurrencySplitter from "../assistants/Spliter";
+import CurrencySplitter from "../../assistants/Spliter";
 interface Wallet extends BaseInterface {
   balance: number;
   nonWithdrawableAmount: number;

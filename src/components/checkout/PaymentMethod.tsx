@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { BaseInterface } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
-import CurrencySplitter from "../assistants/Spliter";
+import CurrencySplitter from "../../assistants/Spliter";
 import { Modal } from "antd";
 import ZaloPay from "../../assets/zalopay.png";
 import VNPay from "../../assets/vnpay.png";

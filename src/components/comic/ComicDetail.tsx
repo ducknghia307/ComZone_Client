@@ -85,6 +85,7 @@ const ComicDetails = () => {
   const [users, setUsers] = useState([]);
   const [coverImage, setCoverImage] = useState("");
   const [previewChapter, setPreviewChapter] = useState([]);
+  console.log("zzzzzzzzzzzzzzzzz", JSON.parse(previewChapter[0]));
   const { id } = useParams();
   // const [userInfo, setUserInfo] = useState<UserInfo>();
   const [comicId, setComicId] = useState("");
@@ -104,7 +105,6 @@ const ComicDetails = () => {
 
         const genreNames = genresData.map((genre) => genre.name);
 
-        setPreviewChapter(comicData.previewChapter);
         setComics(comicData);
         setComicId(comicData.id);
         setGenres(genreNames);

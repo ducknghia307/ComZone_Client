@@ -52,6 +52,7 @@ export default function ComicsDetailTemp() {
       })
       .catch((err) => console.log(err));
   };
+  const comics = currentComics;
 
   const handleAddToCart = async () => {
     const cartKey = "cart";
@@ -70,7 +71,7 @@ export default function ComicsDetailTemp() {
             content: "Truyện này đã được thêm vào giỏ hàng.",
           });
         } else {
-          currentCart.push({ currentComics });
+          currentCart.push({ comics });
           localStorage.setItem(cartKey, JSON.stringify(currentCart));
 
           // setOpen(true);

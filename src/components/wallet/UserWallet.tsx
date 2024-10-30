@@ -20,7 +20,7 @@ import "../ui/UserWallet.css";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DepositForm from "./DepositForm";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { BaseInterface } from "../../common/base.interface";
+import { BaseInterface, UserInfo } from "../../common/base.interface";
 
 const transactions = [
   {
@@ -108,23 +108,23 @@ const transactions = [
     note: "Rút về tài khoản ngân hàng",
   },
 ];
-interface Wallet extends BaseInterface {
-  balance: number;
-  nonWithdrawableAmount: number;
-  status: number;
-}
+// interface Wallet extends BaseInterface {
+//   balance: number;
+//   nonWithdrawableAmount: number;
+//   status: number;
+// }
 const UserWallet = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [userWallet, setUserWallet] = useState<Wallet | null>(null);
-  const fetchUserWallet = async () => {
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [userInfo, setUserInfo] = useState<UserInfo>();
+  const fetchUserInfo = async () => {
     try {
-      const response = await privateAxios("/wallets/user");
+      const response = await privateAxios("/users/profile");
       const data = await response.data;
-      setUserWallet(data);
+      setUserInfo(data);
     } catch {
       console.log("...");
     }
@@ -143,14 +143,14 @@ const UserWallet = () => {
     page * rowsPerPage + rowsPerPage
   );
   useEffect(() => {
-    fetchUserWallet();
+    fetchUserInfo();
   }, []);
   return (
     <div className="wallet-container">
-      {showDepositForm ? (
+      {showDepositForm && userInfo ? (
         <DepositForm
           onBack={() => setShowDepositForm(false)}
-          userWallet={userWallet}
+          userInfo={userInfo}
         />
       ) : showWithdrawForm ? (
         <Box>
@@ -277,7 +277,7 @@ const UserWallet = () => {
                   Số dư hiện tại:
                 </Typography>
                 <Typography variant="h6" sx={{ color: "#FF8A00" }}>
-                  {isVisible ? "1.000.000 đ" : "****** đ"}
+                  {isVisible ? `${userInfo?.balance} đ` : "****** đ"}
                 </Typography>
                 <IconButton onClick={() => setIsVisible(!isVisible)}>
                   <VisibilityOffIcon />
@@ -288,7 +288,9 @@ const UserWallet = () => {
                   Hiện có thể rút:
                 </Typography>
                 <Typography variant="h6" sx={{ color: "#FF8A00" }}>
-                  {isVisible ? "500.000 đ" : "****** đ"}
+                  {isVisible
+                    ? `${userInfo?.nonWithdrawableAmount}`
+                    : "****** đ"}
                 </Typography>
                 <IconButton onClick={() => setIsVisible(!isVisible)}>
                   <VisibilityOffIcon />
@@ -355,7 +357,7 @@ const UserWallet = () => {
               </TableBody>
             </Table>
             <TablePagination
-              rowsPerPageOptions={[5, 10]}
+              rowsPerPageOptions={[10, 20]}
               component="div"
               count={transactions.length}
               rowsPerPage={rowsPerPage}

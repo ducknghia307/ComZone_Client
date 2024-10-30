@@ -17,6 +17,8 @@ export interface UserInfo {
   refresh_token: string;
   role: string | null;
   updatedAt: string;
+  balance: number;
+  nonWithdrawableAmount: number;
 }
 
 //address

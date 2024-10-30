@@ -1,5 +1,5 @@
-import React from "react";
 import { Comic, UserInfo } from "../../../common/base.interface";
+import ComicsHorizontalMenu from "../../horizontal-menu/ComicsHorizontalMenu";
 
 export default function OtherComicsFromSeller({
   seller,
@@ -15,18 +15,7 @@ export default function OtherComicsFromSeller({
         <span className="font-semibold">{seller?.name}</span>
       </p>
 
-      <div className="grid grid-cols-[repeat(auto-fill,10rem)] gap-x-2 gap-y-4 justify-between">
-        {comicsListFromSeller.map((comics: Comic) => {
-          return (
-            <div key={comics.id} className="w-full flex flex-col">
-              <div
-                className={`w-full h-56 bg-cover bg-center bg-no-repeat`}
-                style={{ backgroundImage: `url(${comics.coverImage[0]})` }}
-              ></div>
-            </div>
-          );
-        })}
-      </div>
+      <ComicsHorizontalMenu comicsList={comicsListFromSeller} />
     </div>
   );
 }

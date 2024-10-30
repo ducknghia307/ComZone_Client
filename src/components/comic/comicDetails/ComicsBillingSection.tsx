@@ -2,11 +2,15 @@ import { useState } from "react";
 import { Comic } from "../../../common/base.interface";
 import CurrencySplitter from "../../../assistants/Spliter";
 
+interface ComicsBillingSectionProps {
+  currentComics: Comic | undefined;
+  handleAddToCart: () => void;
+}
+
 export default function ComicsBillingSection({
   currentComics,
-}: {
-  currentComics: Comic | undefined;
-}) {
+  handleAddToCart,
+}: ComicsBillingSectionProps) {
   const [addedToCart, toggleAddedToCart] = useState<boolean>(false);
 
   return (
@@ -19,9 +23,7 @@ export default function ComicsBillingSection({
         <div className="w-full flex flex-col items-start justify-between">
           <p>Tạm tính:</p>
           <p className="font-medium text-[3em] flex items-start gap-1">
-            {currentComics?.price
-              ? CurrencySplitter(currentComics?.price!)
-              : ""}
+            {currentComics?.price ? CurrencySplitter(currentComics?.price) : ""}
             <span className="font-light text-[0.5em] underline">đ</span>
           </p>
         </div>
@@ -37,7 +39,10 @@ export default function ComicsBillingSection({
               ? "bg-green-600 text-white hover:bg-green-700 duration-200"
               : "border-gray-400 hover:bg-gray-100 duration-500"
           }  rounded-md text-[1.2em]`}
-          onClick={() => toggleAddedToCart(true)}
+          onClick={() => {
+            handleAddToCart();
+            toggleAddedToCart(true);
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -12,7 +12,12 @@ export default function ComicsImages({
   return (
     <div className="w-full bg-white flex flex-col items-center justify-center rounded-xl py-2 drop-shadow-md top-4 sticky">
       <div className="w-2/3 p-2">
-        <img src={currentImage} alt="" className="object-cover border" />
+        <img
+          src={currentImage}
+          alt=""
+          className="object-cover border"
+          data-addtocart
+        />
       </div>
       <div className="flex items-center justify-center gap-2">
         {imageList.map((img: string) => {

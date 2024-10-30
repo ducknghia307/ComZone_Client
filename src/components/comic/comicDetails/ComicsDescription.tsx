@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Comic } from "../../../common/base.interface";
 
 export default function ComicsDescription({
@@ -6,13 +6,14 @@ export default function ComicsDescription({
 }: {
   currentComics: Comic | undefined;
 }) {
-  const [isShowingLess, toggleIsShowingLess] = useState<boolean>(
-    currentComics?.description && currentComics?.description.length > 1000
-      ? true
-      : false
-  );
+  const [isShowingLess, toggleIsShowingLess] = useState<boolean>(false);
 
   const descriptionLines = currentComics?.description.split("\n");
+
+  useEffect(() => {
+    if (currentComics?.description && currentComics.description.length > 1000)
+      toggleIsShowingLess(true);
+  }, [currentComics]);
 
   return (
     <div className="relative w-full flex flex-col gap-2 bg-white px-4 py-4 rounded-xl drop-shadow-md">

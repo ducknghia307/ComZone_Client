@@ -101,12 +101,10 @@ export interface Comic {
   status: string;
   quantity: number;
   previewChapter: string[];
-  isAuction: boolean;
-  isExchange: boolean;
-  comicCommission: number;
   selected?: boolean;
   genres?: Genre[];
   sellerId: UserInfo;
+  onSaleSince?: Date;
 }
 
 //role

@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
-import { Comic, Genre, UserInfo } from "../../common/base.interface";
+import { Comic, UserInfo } from "../../common/base.interface";
 import { useParams } from "react-router-dom";
 import { privateAxios } from "../../middleware/axiosInstance";
 import ComicsImages from "./comicDetails/ComicsImages";
 import ComicsMainInfo from "./comicDetails/ComicsMainInfo";
-import ComicsSellerAndButtons from "./comicDetails/ComicsSeller";
 import ComZonePros from "./comicDetails/ComZonePros";
 import ComicsDetailedInfo from "./comicDetails/ComicsDetailedInfo";
 import ComicsDescription from "./comicDetails/ComicsDescription";
 import SellerFeedbackSection from "./comicDetails/SellerFeedbackSection";
 import OtherComicsFromSeller from "./comicDetails/OtherComicsFromSeller";
+import ComicsBillingSection from "./comicDetails/ComicsBillingSection";
+import ComicsSeller from "./comicDetails/ComicsSeller";
+import RecommendedComicsList from "./comicDetails/RecommendedComicsList";
 
 export default function ComicsDetailTemp() {
   const [currentComics, setCurrentComics] = useState<Comic>();
@@ -21,6 +23,7 @@ export default function ComicsDetailTemp() {
   const [comicsListFromSeller, setComicsListFromSeller] = useState<
     Comic[] | []
   >([]);
+  const [recommendedList, setRecommendedList] = useState<Comic[] | []>([]);
 
   const { id } = useParams();
 
@@ -49,7 +52,7 @@ export default function ComicsDetailTemp() {
   }, [id]);
 
   return (
-    <div className="REM min-h-[200vh] bg-gray-100">
+    <div className="REM min-h-[200vh] bg-gray-100 pb-8">
       <div className="flex flex-col justify-start items-center gap-4 px-4 pt-4 pb-8 relative">
         <div className="w-full flex items-start justify-center gap-4 relative">
           <div className="w-2/3 max-w-[80em] flex flex-col justify-end gap-4 relative">
@@ -75,10 +78,10 @@ export default function ComicsDetailTemp() {
               />
             </div>
           </div>
-          <ComicsSellerAndButtons
-            seller={seller}
-            currentComics={currentComics}
-          />
+          <div className="w-[30%] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-4 sticky">
+            <ComicsSeller seller={seller} />
+            <ComicsBillingSection currentComics={currentComics} />
+          </div>
         </div>
 
         <div className="w-full max-w-[122em] px-4">
@@ -87,6 +90,10 @@ export default function ComicsDetailTemp() {
             comicsListFromSeller={comicsListFromSeller}
           />
         </div>
+      </div>
+
+      <div className="w-full max-w-[122em] px-8">
+        <RecommendedComicsList comicsList={comicsListFromSeller} />
       </div>
     </div>
   );

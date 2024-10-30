@@ -20,6 +20,8 @@ import Profile from "../../pages/Profile";
 import AuctionUser from "../../pages/AuctionUser";
 import WalletUser from "../../pages/WalletUser";
 import ExchangeUser from "../../pages/ExchangeUser";
+import RegisterSeller from "../../pages/RegisterSeller";
+import { ConfigProvider } from "antd";
 
 const AppRouter = () => {
   return (
@@ -50,6 +52,8 @@ const AppRouter = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/order/complete" element={<OrderComplete />} />
+
+        <Route path="/registerSeller" element={<RegisterSeller />} />
       </Routes>
     </div>
   );

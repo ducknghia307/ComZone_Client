@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
-import { 
-    Box, 
-    IconButton, 
-    InputAdornment, 
-    Paper, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableContainer, 
-    TableHead, 
-    TablePagination, 
-    TableRow, 
-    TextField, 
-    Typography 
+import {
+    Box,
+    IconButton,
+    InputAdornment,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+    TextField,
+    Typography
 } from '@mui/material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ModalDelivery from '../modal/ModalDelivery';
 
 const deliveryData = [
     {
@@ -33,7 +34,7 @@ const deliveryData = [
         buyerName: 'Thanh Mai',
         orderDate: '02/10/2024',
         deliveryStatus: 'COMPLETED',
-        deliveryImage: 'https://link_to_image',
+        deliveryImage: 'https://media.tapchitaichinh.vn/w1480/images/upload/buituananh/05072019/meo-ship-hang-an-toan-cho-cac-shop-online.jpg',
         cancelReason: ''
     },
     {
@@ -65,9 +66,71 @@ const deliveryData = [
     }
 ];
 
+const getStatusChipStyles = (status: string) => {
+    switch (status) {
+        case 'PENDING':
+            return {
+                color: '#ff9800',
+                backgroundColor: '#fff3e0',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'PACKAGING':
+            return {
+                color: '#4caf50',
+                backgroundColor: '#e8f5e9',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'DELIVERING':
+            return {
+                color: '#2196f3',
+                backgroundColor: '#e3f2fd',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'COMPLETED':
+            return {
+                color: '#009688',
+                backgroundColor: '#e0f2f1',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'CANCELED':
+            return {
+                color: '#e91e63',
+                backgroundColor: '#fce4ec',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+    }
+};
+
 const DeliveryManagement = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [selectedOrder, setSelectedOrder] = useState<any>(null);
+    const [openModal, setOpenModal] = useState(false);
+
+    const handleOpenModal = (order: any) => {
+        setSelectedOrder(order);
+        setOpenModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+        setSelectedOrder(null);
+    };
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -99,7 +162,7 @@ const DeliveryManagement = () => {
                     }} size='small' placeholder="Tìm kiếm một đơn hàng..." variant="outlined" />
                 </div>
             </Box>
-            <TableContainer component={Paper}sx={{border:'1px solid black'}}>
+            <TableContainer component={Paper} sx={{ border: '1px solid black' }}>
                 <Table>
                     <TableHead>
                         <TableRow style={{ backgroundColor: 'black' }}>
@@ -120,13 +183,17 @@ const DeliveryManagement = () => {
                                 <TableCell align="center">{row.comicName}</TableCell>
                                 <TableCell align="center">{row.buyerName}</TableCell>
                                 <TableCell align="center">{row.orderDate}</TableCell>
-                                <TableCell align="center">{row.deliveryStatus}</TableCell>
+                                <TableCell align="center">
+                                    <span style={getStatusChipStyles(row.deliveryStatus)}>
+                                        {row.deliveryStatus}
+                                    </span>
+                                </TableCell>
                                 <TableCell align="center">
                                     {row.deliveryImage ? (
-                                        <img 
-                                            src={row.deliveryImage} 
-                                            alt="Delivery" 
-                                            style={{ width: 50, height: 50 }} 
+                                        <img
+                                            src={row.deliveryImage}
+                                            alt="Delivery"
+                                            style={{ width: '100%', height: 100 }}
                                         />
                                     ) : (
                                         '-'
@@ -136,7 +203,7 @@ const DeliveryManagement = () => {
                                     {row.cancelReason || '-'}
                                 </TableCell>
                                 <TableCell align="center">
-                                    <IconButton color="primary">
+                                    <IconButton color="primary" onClick={() => handleOpenModal(row)}>
                                         <InfoOutlinedIcon />
                                     </IconButton>
                                 </TableCell>
@@ -154,6 +221,21 @@ const DeliveryManagement = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </TableContainer>
+
+            {/* Hiển thị Modal */}
+            {selectedOrder && (
+                <ModalDelivery
+                    open={openModal}
+                    onClose={handleCloseModal}
+                    deliveryStatus={selectedOrder.deliveryStatus}
+                    orderId={selectedOrder.orderId}
+                    comicName={selectedOrder.comicName}
+                    buyerName={selectedOrder.buyerName}
+                    orderDate={selectedOrder.orderDate}
+                    cancelReason={selectedOrder.cancelReason}
+                    deliveryImage={selectedOrder.deliveryImage}
+                />
+            )}
         </div>
     );
 };

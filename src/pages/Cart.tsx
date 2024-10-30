@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import CurrencySplitter from "../components/assistants/Spliter";
+import CurrencySplitter from "../assistants/Spliter";
 import { useNavigate } from "react-router-dom";
 import { privateAxios } from "../middleware/axiosInstance";
 import { Comic, Role } from "../common/base.interface";

@@ -13,6 +13,7 @@ export interface UserInfo {
   is_verified: boolean;
   name: string;
   phone: string | null;
+  avatar: string | null;
   refresh_token: string;
   role: string | null;
   updatedAt: string;
@@ -92,17 +93,18 @@ export interface Comic {
   author: string;
   description: string;
   coverImage: string[];
+  condition: "SEALED" | "USED";
+  edition: "REGULAR" | "SPECIAL" | "LIMITED";
+  page: number | null;
   publishedDate: string;
   price: number;
   status: string;
   quantity: number;
   previewChapter: string[];
-  isAuction: boolean;
-  isExchange: boolean;
-  comicCommission: number;
   selected?: boolean;
   genres?: Genre[];
   sellerId: UserInfo;
+  onSaleSince?: Date;
 }
 
 //role

@@ -86,53 +86,28 @@ const Auctions: React.FC = () => {
     const [comics, setComics] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // const token = sessionStorage.getItem("accessToken"); // Lấy token từ sessionStorage
-
-    // useEffect(() => {
-    //     // Gọi API để lấy danh sách comics có status là 'available'
-    //     fetch("http://localhost:3000/comics/status/available", {
-    //         headers: {
-    //             'Authorization': `Bearer ${token}`,
-    //             'Content-Type': 'application/json'
-    //         }
-    //     })
-    //         .then((response) => {
-    //             if (!response.ok) {
-    //                 throw new Error('Network response was not ok');
-    //             }
-    //             return response.json();
-    //         })
-    //         .then((data) => {
-    //             console.log('Available Comics:', data); 
-    //             // Lọc các comics có isAuction là true
-    //             const auctionComics = data.filter((comic) => comic.isAuction === true);
-    //             console.log('Auction Comics:', auctionComics);
-    //             setComics(auctionComics);
-    //             setLoading(false);
-    //         })
-    //         .catch((error) => {
-    //             console.error("Error fetching comics:", error);
-    //             setLoading(false);
-    //         });
-    // }, []);
-
     useEffect(() => {
         const fetchComics = async () => {
-          try {
-            const response = await publicAxios.get("/comics/status/available");
-            const data = response.data;
-            const auctionComics = data.filter((comic: any) => comic.isAuction === true);
-            setComics(auctionComics);
-          } catch (error) {
-            console.error("Error fetching comics:", error);
-          } finally {
-            setLoading(false);
-          }
+            try {
+                const response = await publicAxios.get("/comics/status/auction");
+                const data = response.data;
+    
+                // Filter comics where status is AUCTION 
+                const auctionComics = data.filter(
+                    (comic: any) => comic.status === "AUCTION"
+                );
+    
+                setComics(auctionComics);
+            } catch (error) {
+                console.error("Error fetching comics:", error);
+            } finally {
+                setLoading(false);
+            }
         };
     
         fetchComics();
-      }, []);
-
+    }, []);
+    
       const handleDetailClick = (comicId: string) => {
         navigate(`/auctiondetail/${comicId}`);
       };

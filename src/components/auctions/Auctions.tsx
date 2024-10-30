@@ -37,13 +37,14 @@ const AllAuctions = ({ filteredGenres, filteredAuthors }: any) => {
     useEffect(() => {
         const fetchComics = async () => {
             try {
-                const response = await publicAxios.get("/comics/status/available");
+                const response = await publicAxios.get("/comics/status/auction");
                 const data = response.data;
-                console.log("Available Comics:", data);
-
-                const auctionComics = data.filter((comic: any) => comic.isAuction);
-                console.log("Auction Comics:", auctionComics);
-
+    
+                // Filter comics where status is AUCTION 
+                const auctionComics = data.filter(
+                    (comic: any) => comic.status === "AUCTION"
+                );
+    
                 setComics(auctionComics);
             } catch (error) {
                 console.error("Error fetching comics:", error);
@@ -51,7 +52,7 @@ const AllAuctions = ({ filteredGenres, filteredAuthors }: any) => {
                 setLoading(false);
             }
         };
-
+    
         fetchComics();
     }, []);
 

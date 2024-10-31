@@ -1,16 +1,34 @@
 import Navbar from "./components/navbar/Navbar";
 import AppRouter from "./components/appRouter/AppRouter";
 import Footer from "./components/footer/Footer";
+import { ConfigProvider } from "antd";
 
 function App() {
   return (
-    <div className="w-full min-h-screen flex flex-col justify-between ">
-      <Navbar />
-      <div className="grow">
-        <AppRouter />
+    <ConfigProvider
+      theme={{
+        components: {
+          Steps: {
+            colorPrimary: "black",
+            colorPrimaryBorder: "#859F3D",
+            lineWidth: 2,
+            dotSize: 10,
+            dotCurrentSize: 16,
+          },
+        },
+        token: {
+          fontFamily: "REM",
+        },
+      }}
+    >
+      <div className="w-full min-h-screen flex flex-col justify-between ">
+        <Navbar />
+        <div className="grow">
+          <AppRouter />
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </ConfigProvider>
   );
 }
 

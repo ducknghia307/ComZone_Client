@@ -4,24 +4,24 @@ import React, { useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { BaseInterface } from "../../common/base.interface";
-import CurrencySplitter from "../assistants/Spliter";
-interface Wallet extends BaseInterface {
-  balance: number;
-  nonWithdrawableAmount: number;
-  status: number;
-}
+import { UserInfo } from "../../common/base.interface";
+import CurrencySplitter from "../../assistants/Spliter";
+// interface Wallet extends BaseInterface {
+//   balance: number;
+//   nonWithdrawableAmount: number;
+//   status: number;
+// }
 interface DepositFormProps {
   onBack: () => void;
-  userWallet: Wallet | null;
+  userInfo: UserInfo;
 }
 
-const DepositForm: React.FC<DepositFormProps> = ({ onBack, userWallet }) => {
+const DepositForm: React.FC<DepositFormProps> = ({ onBack, userInfo }) => {
   const [isVisible, setIsVisible] = useState(false);
-  console.log(userWallet);
+  console.log(userInfo);
 
   return (
-    <div className="w-full">
+    <div className="w-full REM">
       <Box>
         <IconButton onClick={onBack}>
           <ArrowBackIcon />
@@ -47,7 +47,7 @@ const DepositForm: React.FC<DepositFormProps> = ({ onBack, userWallet }) => {
                 sx={{ color: "#FF8A00" }}
               >
                 {isVisible ? (
-                  <span>{CurrencySplitter(Number(userWallet?.balance))} đ</span>
+                  <span>{CurrencySplitter(Number(userInfo?.balance))} đ</span>
                 ) : (
                   "******** đ"
                 )}
@@ -71,6 +71,19 @@ const DepositForm: React.FC<DepositFormProps> = ({ onBack, userWallet }) => {
               //     select: <Typography>đ</Typography>,
               //   }}
             />
+          </div>
+          <div className="flex flex-wrap justify-start gap-2 w-full max-w-lg mx-auto my-4">
+            {[20000, 50000, 100000, 200000, 500000, 1000000, 1500000, 2000000]
+              // .filter((value) => value >= Math.max(0, amount - balance))
+              .map((value) => (
+                <button
+                  key={value}
+                  className=" px-2 bg-white border border-gray-500 hover:bg-gray-200 duration-200 rounded text-black"
+                  // onClick={() => setSelectedAmount(value)}
+                >
+                  {CurrencySplitter(value)}
+                </button>
+              ))}
           </div>
           <Typography
             sx={{
@@ -117,6 +130,7 @@ const DepositForm: React.FC<DepositFormProps> = ({ onBack, userWallet }) => {
               fontSize: "16px",
               fontFamily: "REM",
             }}
+            className="duration-200 hover:opacity-70"
           >
             TIẾN HÀNH NẠP TIỀN
           </Button>

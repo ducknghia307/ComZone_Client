@@ -21,9 +21,9 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 
 const auctionData = [
     {
-        frontImage: "https://link_to_front_image",
-        backImage: "https://link_to_back_image",
-        title: 'Spider Man Tập 1',
+        frontImage: "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg",
+        backImage: "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_4_tap_102.jpg",
+        title: 'Conan Tập 102',
         duration: '6 ngày',
         publisher: 'Marvel',
         price: '100.000 đ',
@@ -31,8 +31,8 @@ const auctionData = [
         auctionStatus: 'INCOMING'
     },
     {
-        frontImage: "https://link_to_front_image",
-        backImage: "https://link_to_back_image",
+        frontImage: "https://cdn0.fahasa.com/media/catalog/product/m/a/marvel_spider_man_spider_man_platinum_collection_sa_marvel_1_2020_07_09_14_06_31.jpg",
+        backImage: "https://cdn0.fahasa.com/media/catalog/product/m/a/marvel_spider_man_spider_man_platinum_collection_sa_marvel_4_2020_07_09_14_06_31.jpg?_gl=1*efy2vr*_gcl_aw*R0NMLjE3Mjk3MzU2MDQuQ2owS0NRand2ZUs0QmhENEFSSXNBS3k2cE1MWFNFQ0ZoRUo4dG10Y1d3Sm1LdzZ2YnZtcFJuZUZ2TEhldGhXcWJaRkpuZXhRdjNtN0FoTWFBbXcyRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyOTk1MzY3Ny40My4xLjE3Mjk5NTM3NjYuMzEuMC4xNTg0NDgzMDg2",
         title: 'Spider Man Tập 2',
         duration: '6 ngày',
         publisher: 'Marvel',
@@ -40,8 +40,75 @@ const auctionData = [
         registrationStatus: 'APPROVED',
         auctionStatus: 'ONGOING'
     },
-    // Add more sample data if needed
 ];
+
+const getStatusChipStyles = (status : string) => {
+    switch (status) {
+        case 'PENDING':
+            return {
+                color: '#ff9800',
+                backgroundColor: '#fff3e0',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'INCOMING':
+            return {
+                color: '#673ab7',
+                backgroundColor: '#ede7f6',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'APPROVED':
+            return {
+                color: '#4caf50',
+                backgroundColor: '#e8f5e9',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'ONGOING':
+            return {
+                color: '#2196f3',
+                backgroundColor: '#e3f2fd',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'COMPLETED':
+            return {
+                color: '#009688',
+                backgroundColor: '#e0f2f1',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'CANCELED':
+            return {
+                color: '#e91e63',
+                backgroundColor: '#fce4ec',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        case 'REJECTED':
+            return {
+                color: '#f44336',
+                backgroundColor: '#ffebee',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+    }
+};
 
 const AuctionManagement = () => {
     const [page, setPage] = useState(0);
@@ -77,7 +144,7 @@ const AuctionManagement = () => {
                     }} size='small' placeholder="Tìm kiếm truyện đấu giá..." variant="outlined" />
                 </div>
             </Box>
-            <TableContainer component={Paper} className="auction-table-container" sx={{border:'1px solid black'}}>
+            <TableContainer component={Paper} className="auction-table-container" sx={{ border: '1px solid black' }}>
                 <Table>
                     <TableHead>
                         <TableRow style={{ backgroundColor: 'black' }}>
@@ -96,17 +163,25 @@ const AuctionManagement = () => {
                         {paginatedData.map((row, index) => (
                             <TableRow key={index}>
                                 <TableCell align="center">
-                                    <img src={row.frontImage} alt="Front" style={{ width: 50, height: 70 }} />
+                                    <img src={row.frontImage} alt="Front" style={{ width: 70, height: 110, margin:'auto' }} />
                                 </TableCell>
                                 <TableCell align="center">
-                                    <img src={row.backImage} alt="Back" style={{ width: 50, height: 70 }} />
+                                    <img src={row.backImage} alt="Back" style={{ width: 70, height: 110, margin:'auto' }} />
                                 </TableCell>
                                 <TableCell align="center">{row.title}</TableCell>
                                 <TableCell align="center">{row.duration}</TableCell>
                                 <TableCell align="center">{row.publisher}</TableCell>
                                 <TableCell align="center">{row.price}</TableCell>
-                                <TableCell align="center">{row.registrationStatus}</TableCell>
-                                <TableCell align="center">{row.auctionStatus}</TableCell>
+                                <TableCell align="center">
+                                    <span style={getStatusChipStyles(row.registrationStatus)}>
+                                        {row.registrationStatus}
+                                    </span>
+                                </TableCell>
+                                <TableCell align="center">
+                                    <span style={getStatusChipStyles(row.auctionStatus)}>
+                                        {row.auctionStatus}
+                                    </span>
+                                </TableCell>
                                 <TableCell align="center">
                                     <IconButton color="primary">
                                         <EditOutlinedIcon />

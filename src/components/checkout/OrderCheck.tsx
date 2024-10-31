@@ -1,5 +1,5 @@
 import React from "react";
-import CurrencySplitter from "../assistants/Spliter";
+import CurrencySplitter from "../../assistants/Spliter";
 
 interface Comic {
   id: string;
@@ -11,7 +11,7 @@ interface Comic {
 
 interface SellerGroup {
   sellerName: string;
-  comics: { comic: Comic; quantity: number }[];
+  comics: { comic: Comic }[];
 }
 
 interface OrderCheckProps {
@@ -30,11 +30,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
       {Object.keys(groupedSelectedComics).map((sellerId) => {
         const seller = groupedSelectedComics[sellerId];
         const sellerTotalPrice = seller.comics.reduce(
-          (acc, { comic, quantity }) => acc + comic.price * quantity,
-          0
-        );
-        const sellerTotalQuantity = seller.comics.reduce(
-          (acc, { quantity }) => acc + quantity,
+          (acc, { comic }) => acc + Number(comic.price),
           0
         );
         return (
@@ -99,7 +95,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {seller.comics.map(({ comic, quantity }) => (
+                {seller.comics.map(({ comic }) => (
                   <tr key={comic.id} className="border-t px-2 py-4 ">
                     <td className="flex flex-row my-2 gap-4 w-full">
                       <img
@@ -115,11 +111,11 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                       </h4>
                     </td>
                     <td>
-                      <h4 className="text-end font-extralight">{quantity}</h4>
+                      <h4 className="text-end font-extralight">x1</h4>
                     </td>
                     <td>
                       <h4 className="text-end font-extralight">
-                        {CurrencySplitter(comic.price * quantity)}đ
+                        {CurrencySplitter(comic.price)}đ
                       </h4>
                     </td>
                   </tr>
@@ -127,9 +123,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
               </tbody>
             </table>
             <div className="flex flex-row items-center justify-end w-full py-2 gap-2 border-t-2  border-dashed mt-2">
-              <h4 className="font-extralight">
-                Tổng tiền({sellerTotalQuantity} sản phẩm):
-              </h4>
+              <h4 className="font-extralight">Tổng tiền:</h4>
               <h4 className="font-semibold text-lg text-cyan-900">
                 {CurrencySplitter(sellerTotalPrice)}đ
               </h4>

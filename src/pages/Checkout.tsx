@@ -4,11 +4,11 @@ import PaymentMethod from "../components/checkout/PaymentMethod";
 import OrderCheck from "../components/checkout/OrderCheck";
 import {
   Address,
-  BaseInterface,
+  // BaseInterface,
   Comic,
-  UserInfo,
+  // UserInfo,
 } from "../common/base.interface";
-import CurrencySplitter from "../components/assistants/Spliter";
+import CurrencySplitter from "../assistants/Spliter";
 import { privateAxios } from "../middleware/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal } from "antd";
@@ -18,15 +18,9 @@ interface SellerGroup {
   comics: { comic: Comic; quantity: number }[];
 }
 
-interface Wallet extends BaseInterface {
-  balance: number;
-  nonWithdrawableAmount: number;
-  status: number;
-}
-
 const Checkout = () => {
-  const [userInfo, setUserInfo] = useState<UserInfo>();
-  const [userWallet, setUserWallet] = useState<Wallet | null>(null);
+  // const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [userWalletBalance, setUserWalletBalance] = useState<number>(0);
   const [groupedSelectedComics, setGroupedSelectedComics] = useState<
     Record<string, SellerGroup>
   >({});
@@ -66,17 +60,9 @@ const Checkout = () => {
       const response = await privateAxios("/users/profile");
       const data = await response.data;
 
-      setUserInfo(data);
-    } catch {
-      console.log("...");
-    }
-  };
+      // setUserInfo(data);
 
-  const fetchUserWallet = async () => {
-    try {
-      const response = await privateAxios("/wallets/user");
-      const data = await response.data;
-      setUserWallet(data); // Set user wallet
+      setUserWalletBalance(Number(data.balance));
     } catch {
       console.log("...");
     }
@@ -88,16 +74,16 @@ const Checkout = () => {
       setGroupedSelectedComics(JSON.parse(comics));
     }
     fetchUserInfo();
-    fetchUserWallet();
+    // fetchUserWallet();
   }, []);
+  console.log(groupedSelectedComics);
 
   const totalPrice = Object.values(groupedSelectedComics).reduce(
     (total, sellerGroup) => {
       return (
         total +
         sellerGroup.comics.reduce(
-          (sellerTotal, { comic, quantity }) =>
-            sellerTotal + comic.price * quantity,
+          (sellerTotal, { comic }) => Number(sellerTotal) + Number(comic.price),
           0
         )
       );
@@ -106,8 +92,7 @@ const Checkout = () => {
   );
   const totalQuantity = Object.values(groupedSelectedComics).reduce(
     (total, sellerGroup) =>
-      total +
-      sellerGroup.comics.reduce((sum, { quantity }) => sum + quantity, 0),
+      total + sellerGroup.comics.reduce((sum) => sum + 1, 0),
     0
   );
   const handlePaymentMethodSelect = (method: string) => {
@@ -119,57 +104,65 @@ const Checkout = () => {
     console.log("Selected Payment Method:", selectedPaymentMethod);
 
     try {
+      const orderedComicIds: string[] = [];
       for (const sellerId in groupedSelectedComics) {
         const sellerGroup = groupedSelectedComics[sellerId];
         console.log(sellerGroup);
 
         const sellerTotalPrice = sellerGroup.comics.reduce(
-          (total, { comic, quantity }) =>
-            total + Number(comic.price) * Number(quantity),
+          (total, { comic }) => total + Number(comic.price),
           0
         );
-        console.log(sellerTotalPrice);
+        console.log("sellertotalprice:", sellerTotalPrice);
 
         const orderResponse = await privateAxios.post("/orders", {
-          seller: sellerId,
-          buyer: userInfo?.id,
-          total_price: sellerTotalPrice,
-          order_type: "NON_AUCTION",
-          payment_method: selectedPaymentMethod,
+          totalPrice: Number(sellerTotalPrice),
+          paymentMethod: selectedPaymentMethod,
         });
 
         const orderId = orderResponse.data.id;
 
-        for (const { comic, quantity } of sellerGroup.comics) {
+        for (const { comic } of sellerGroup.comics) {
           const orderItemPayload = {
             comics: comic.id,
             order: orderId,
-            quantity: Number(quantity),
-            price: Number(comic.price),
-            total_price: Number(comic.price * quantity),
           };
 
           console.log("Order Item Payload:", orderItemPayload);
 
           await privateAxios.post("/order-items", orderItemPayload);
-          const comicResponse = await privateAxios.get(`/comics/${comic.id}`);
-          const currentComicData = comicResponse.data;
-
-          const newQuantity = currentComicData.quantity - quantity;
-
-          await privateAxios.put(`/comics/${comic.id}`, {
-            quantity: newQuantity,
-          });
-          await privateAxios.delete(`/cart/comic/${comic.id}`);
-          console.log(
-            `Updated comic ${comic.id} with new quantity: ${newQuantity}`
-          );
+          orderedComicIds.push(comic.id);
         }
-        await privateAxios.patch("/wallets/pay", {
+        const resOrderDelivery = await privateAxios.post("/order-deliveries", {
+          orderId: orderId,
+          phone: selectedAddress?.phone,
+          province: selectedAddress?.province,
+          district: selectedAddress?.district,
+          ward: selectedAddress?.ward,
+          detailedAddress: selectedAddress?.detailedAddress,
+        });
+        console.log(resOrderDelivery.data);
+
+        const resTransactions = await privateAxios.post("/transactions", {
+          order: orderId,
           amount: sellerTotalPrice,
         });
+        console.log(resTransactions.data);
+        const resResult = await privateAxios.patch(
+          `/transactions/post/${resTransactions.data.id}`
+        );
+        console.log(resResult.data);
       }
       console.log("All orders successfully created!");
+      const storedCartData = localStorage.getItem("cart");
+      if (storedCartData) {
+        const parsedCartData = JSON.parse(storedCartData);
+        const updatedCartData = parsedCartData.filter(
+          (item: any) => !orderedComicIds.includes(item.comics.id)
+        );
+        localStorage.setItem("cart", JSON.stringify(updatedCartData));
+      }
+
       sessionStorage.removeItem("selectedComics");
       countDown();
       // navigate("/order/complete");
@@ -199,11 +192,13 @@ const Checkout = () => {
             <PaymentMethod
               onMethodSelect={handlePaymentMethodSelect}
               amount={totalPrice}
-              wallet={userWallet}
+              balance={userWalletBalance}
             />
             <div className="flex flex-col items-center w-full bg-white rounded-b-lg">
               <div className="flex flex-row items-center justify-end w-full py-4 gap-2 border-t-2 pr-8 border-dashed">
-                <h4 className="font-light">Tổng số tiền({totalQuantity}):</h4>
+                <h4 className="font-light">
+                  Tổng số tiền ({totalQuantity} truyện):
+                </h4>
                 <h4 className="font-semibold text-2xl text-cyan-900">
                   {CurrencySplitter(totalPrice)}đ
                 </h4>

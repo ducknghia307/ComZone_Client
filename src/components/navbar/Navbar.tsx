@@ -2,22 +2,23 @@ import React, { useEffect, useState } from "react";
 import Logo from "../../assets/hcn-logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { MenuProps } from "antd";
-import { Dropdown } from "antd";
+import { Badge, Dropdown } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { authSlice, logOut } from "../../redux/features/auth/authSlice";
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
-interface UserInfo {
-  createdAt: string;
-  email: string;
-  id: string;
-  is_verified: boolean;
-  name: string;
-  phone: string | null;
-  refresh_token: string;
-  role: string | null;
-  updatedAt: string;
-}
+import { Role, UserInfo } from "../../common/base.interface";
+// interface UserInfo {
+//   createdAt: string;
+//   email: string;
+//   id: string;
+//   is_verified: boolean;
+//   name: string;
+//   phone: string | null;
+//   refresh_token: string;
+//   role: Role;
+//   updatedAt: string;
+// }
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -26,7 +27,7 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const { accessToken } = useAppSelector((state) => state.auth);
   console.log("accesstoken from navbav", accessToken);
-
+  const [cartLength, setCartLength] = useState(0);
   const navigate = useNavigate();
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -47,11 +48,25 @@ const Navbar = () => {
       // Clear the query params from the URL without reloading the page
       window.history.replaceState(null, "", window.location.pathname);
 
-     
       setTimeout(() => {
-       window.location.reload()
+        window.location.reload();
       }, 100);
     }
+    const updateCartLength = () => {
+      const cartData = localStorage.getItem("cart");
+      const parsedCartData = cartData ? JSON.parse(cartData) : [];
+      setCartLength(parsedCartData.length);
+    };
+
+    // Initial load
+    updateCartLength();
+
+    // Listen to local storage changes
+    window.addEventListener("cartUpdated", updateCartLength);
+
+    return () => {
+      window.removeEventListener("cartUpdated", updateCartLength);
+    };
   }, []);
 
   const fetchUserInfo = async () => {
@@ -121,29 +136,34 @@ const Navbar = () => {
         {window.location.pathname !== "/signin" &&
           window.location.pathname !== "/signup" &&
           window.location.pathname !== "/forgot" && (
-            <div className="lg:flex sm:hidden hidden items-center justify-between lg:text-xl w-full  ">
+            <div className="lg:flex sm:hidden hidden items-center justify-between lg:text-lg w-full  ">
               <div className="flex py-2">
                 <Link
-                  className="text-black  px-6 border-r border-r-solid border-r-1 border-r-black hover:text-black"
+                  className="text-black  px-6   hover:text-black duration-200 hover:opacity-50"
                   to={""}
                 >
                   <li>Kênh Người Bán</li>
                 </Link>
-                <Link className="text-black px-6 hover:text-black" to={""}>
-                  <li>Trở thành Người Bán</li>
-                </Link>
+                {(!userInfo || userInfo?.role === "MEMBER") && (
+                  <Link
+                    className="text-black px-6 hover:text-black border-l border-l-solid border-l-1 border-l-black duration-200 hover:opacity-50"
+                    to={"/registerSeller"}
+                  >
+                    <li>Trở thành Người Bán</li>
+                  </Link>
+                )}
               </div>
               <div className="flex py-2 items-center">
                 {!userInfo ? (
                   <div className="flex flex-row">
                     <Link
-                      className="text-black px-6 border-r border-r-solid border-r-1 border-r-black hover:text-black"
+                      className="text-black px-6 border-r border-r-solid border-r-1 border-r-black hover:text-black duration-200 hover:opacity-50"
                       to={"/signin"}
                     >
                       <li>Đăng Nhập</li>
                     </Link>
                     <Link
-                      className="text-black px-6 hover:text-black"
+                      className="text-black px-6 hover:text-black duration-200 hover:opacity-50"
                       to={"/signup"}
                     >
                       <li>Đăng Ký</li>
@@ -151,7 +171,7 @@ const Navbar = () => {
                   </div>
                 ) : (
                   <div className="flex items-center gap-5">
-                    <li className="flex items-center cursor-pointer">
+                    <li className="flex items-center cursor-pointer duration-200 hover:opacity-50">
                       <svg
                         width="30"
                         height="30"
@@ -173,7 +193,7 @@ const Navbar = () => {
                     >
                       <li
                         // to={"/profile"}
-                        className="flex flex-row gap-1 items-center cursor-pointer"
+                        className="flex flex-row gap-1 items-center cursor-pointer duration-200 hover:opacity-50"
                       >
                         <svg
                           width="25px"
@@ -217,7 +237,7 @@ const Navbar = () => {
                 window.location.pathname !== "/forgot" && (
                   <Link to={"/"}>
                     <img
-                      className="h-16 w-auto ml-2 sm:h-20 md:h-24 lg:h-28 xl:h-32"
+                      className="h-12 w-auto ml-2 sm:h-14 md:h-16 lg:h-20 xl:h-24"
                       src={Logo}
                       alt="ComZone"
                     />
@@ -225,7 +245,7 @@ const Navbar = () => {
                 )}
             </>
           )}
-
+          {/* logo signin signup forgot */}
           {(window.location.pathname === "/signin" ||
             window.location.pathname === "/signup" ||
             window.location.pathname === "/forgot") && (
@@ -312,26 +332,28 @@ const Navbar = () => {
             window.location.pathname !== "/forgot" && (
               <Link
                 className="  px-6 hover:text-black lg:flex hidden"
-                to={"/cart"}
+                to={userInfo ? "/cart" : "/signin"}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 256 256"
-                  width="30"
-                  height="30"
-                >
-                  <rect width="256" height="256" fill="none" />
-                  <circle cx="80" cy="216" r="20" />
-                  <circle cx="184" cy="216" r="20" />
-                  <path
-                    d="M42.3,72H221.7l-24.1,84.4A16,16,0,0,1,182.2,168H81.8a16,16,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H12"
-                    fill="none"
-                    stroke="#000"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="24"
-                  />
-                </svg>
+                <Badge count={userInfo ? cartLength : 0} color="black">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 256 256"
+                    width="30"
+                    height="30"
+                  >
+                    <rect width="256" height="256" fill="none" />
+                    <circle cx="80" cy="216" r="20" />
+                    <circle cx="184" cy="216" r="20" />
+                    <path
+                      d="M42.3,72H221.7l-24.1,84.4A16,16,0,0,1,182.2,168H81.8a16,16,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H12"
+                      fill="none"
+                      stroke="#000"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="24"
+                    />
+                  </svg>
+                </Badge>
               </Link>
             )}
         </div>
@@ -339,7 +361,7 @@ const Navbar = () => {
         {window.location.pathname !== "/signin" &&
           window.location.pathname !== "/signup" &&
           window.location.pathname !== "/forgot" && (
-            <div className="hidden lg:flex md:flex lg:w-full py-2 lg:ml-20 my-2 lg:text-lg md:text-sm">
+            <div className="hidden lg:flex md:flex lg:w-full lg:ml-20 lg:mb-0 mb-2 mt-2 lg:text-base md:text-sm">
               <Link
                 className={`text-black px-6 hover:text-black ${
                   location.pathname === "/" ? "font-bold" : ""

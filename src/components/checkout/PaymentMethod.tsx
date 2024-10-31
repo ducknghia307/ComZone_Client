@@ -1,25 +1,25 @@
 import { useEffect, useState } from "react";
-import { BaseInterface } from "../../common/base.interface";
+// import { BaseInterface } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
-import CurrencySplitter from "../assistants/Spliter";
+import CurrencySplitter from "../../assistants/Spliter";
 import { Modal } from "antd";
 import ZaloPay from "../../assets/zalopay.png";
 import VNPay from "../../assets/vnpay.png";
 import TickCircle from "../../assets/tick-circle.png";
 // import { useNavigate } from "react-router-dom";
-interface Wallet extends BaseInterface {
-  balance: number;
-  nonWithdrawableAmount: number;
-  status: number;
-}
+// interface Wallet extends BaseInterface {
+//   balance: number;
+//   nonWithdrawableAmount: number;
+//   status: number;
+// }
 
 const PaymentMethod = ({
   amount,
-  wallet,
+  balance,
   onMethodSelect,
 }: {
   amount: number;
-  wallet: Wallet | null;
+  balance: number;
   onMethodSelect: (method: string) => void;
 }) => {
   // const [wallet, setWallet] = useState<Wallet>();
@@ -29,6 +29,7 @@ const PaymentMethod = ({
   const [selectedAmount, setSelectedAmount] = useState<number>(0);
   // const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(amount);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -70,19 +71,33 @@ const PaymentMethod = ({
 
     try {
       if (selectedWalletMethod === "ZaloPay") {
-        const response = await privateAxios.post("/zalopay/checkout", {
+        const resWalletDes = await privateAxios.post("/wallet-deposits", {
           amount: selectedAmount,
-          type: "DEPOSIT",
         });
-        console.log(response);
-        window.location.href = response.data.orderurl;
+        const resTransactions = await privateAxios.post("/transactions", {
+          walletDeposit: resWalletDes.data.id,
+        });
+        const resZalopay = await privateAxios.post("/zalopay/checkout", {
+          transaction: resTransactions.data.id,
+        });
+        // const response = await privateAxios.post("/zalopay/checkout", {
+        //   type: "DEPOSIT",
+        // });
+        console.log(resZalopay);
+        window.location.href = resZalopay.data.orderurl;
       } else if (selectedWalletMethod === "VNPay") {
-        const response = await privateAxios.post("/vnpay/checkout", {
+        const resWalletDes = await privateAxios.post("/wallet-deposits", {
           amount: selectedAmount,
-          type: "DEPOSIT",
         });
-        console.log(response);
-        window.location.href = response.data.url;
+        const resTransactions = await privateAxios.post("/transactions", {
+          walletDeposit: resWalletDes.data.id,
+        });
+        const resVNpay = await privateAxios.post("/vnpay/checkout", {
+          transaction: resTransactions.data.id,
+        });
+        console.log(resVNpay);
+
+        window.location.href = resVNpay.data.url;
       } else {
         console.error("No valid payment method selected");
       }
@@ -130,11 +145,7 @@ const PaymentMethod = ({
               {/* <img src={Money} alt="" className="h-8 w-8" /> */}
               <h3 className="text-sm text-gray-500 ml-12">
                 Số dư ví:{" "}
-                {hideBalance ? (
-                  "******"
-                ) : (
-                  <>{CurrencySplitter(wallet?.balance || 0)}</>
-                )}{" "}
+                {hideBalance ? "******" : <>{CurrencySplitter(balance || 0)}</>}{" "}
                 đ
               </h3>
               <button
@@ -166,9 +177,7 @@ const PaymentMethod = ({
 
         {/* Balance Error and Recharge Button */}
         <div
-          className={`text-right ${
-            (!amount || (wallet && wallet.balance >= amount)) && "hidden"
-          }`}
+          className={`text-right ${(!amount || balance >= amount) && "hidden"}`}
         >
           <p className="text-red-500 font-thin mb-1">Số dư hiện không đủ</p>
           <button
@@ -193,7 +202,7 @@ const PaymentMethod = ({
               <div className="flex justify-between mb-4">
                 <h3 className="text-base">Số dư hiện tại:</h3>
                 <div className="font-semibold">
-                  {CurrencySplitter(Number(wallet?.balance))} đ
+                  {CurrencySplitter(balance)} đ
                 </div>
               </div>
 
@@ -211,8 +220,7 @@ const PaymentMethod = ({
                   }}
                 />
                 <p className="text-red-500 text-xs italic">
-                  Cần phải nạp thêm:{" "}
-                  {CurrencySplitter(amount - Number(wallet?.balance))} đ
+                  Cần phải nạp thêm: {CurrencySplitter(amount - balance)} đ
                 </p>
               </div>
 
@@ -221,10 +229,7 @@ const PaymentMethod = ({
                   20000, 50000, 100000, 200000, 500000, 1000000, 1500000,
                   2000000,
                 ]
-                  .filter(
-                    (value) =>
-                      value >= Math.max(0, amount - Number(wallet?.balance))
-                  )
+                  .filter((value) => value >= Math.max(0, amount - balance))
                   .map((value) => (
                     <button
                       key={value}

@@ -148,14 +148,12 @@ const EditAddress: React.FC<{
     };
 
     try {
-      // Update the address first
       const response = await privateAxios.patch(
         `/user-addresses/${address.id}`,
         updatedAddress
       );
       console.log(response);
 
-      // Only attempt to set as default if the checkbox is checked
       if (setAsDefault) {
         try {
           await privateAxios.patch(`/user-addresses/default/${address.id}`);
@@ -170,8 +168,9 @@ const EditAddress: React.FC<{
         description: "Address updated successfully.",
       });
 
-      await refreshAddresses();
-      onCancel();
+      refreshAddresses();
+      // onCancel();
+      return;
     } catch (error) {
       console.error("Error updating address:", error);
       notification.error({
@@ -192,10 +191,8 @@ const EditAddress: React.FC<{
         message: "Success",
         description: "Address deleted successfully.",
       });
-      // setTimeout(() => {
-      await refreshAddresses();
+      refreshAddresses();
       onCancel();
-      // }, 2000);
     } catch (error) {
       console.error("Error deleting address:", error);
       notification.error({

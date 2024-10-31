@@ -1,25 +1,20 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  Button,
-  Typography,
-  TextField,
-  Box,
-  InputAdornment,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import Grid from "@mui/material/Grid2";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import ImportContactsRoundedIcon from "@mui/icons-material/ImportContactsRounded";
-import TvOutlinedIcon from "@mui/icons-material/TvOutlined";
-import DeliveryDiningOutlinedIcon from "@mui/icons-material/DeliveryDiningOutlined";
-import "../ui/SellerCreateComic.css";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import IconButton from "@mui/material/IconButton";
-import { privateAxios } from "../../middleware/axiosInstance";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button, Typography, TextField, Box, InputAdornment } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import Grid from '@mui/material/Grid2';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import ImportContactsRoundedIcon from '@mui/icons-material/ImportContactsRounded';
+import TvOutlinedIcon from '@mui/icons-material/TvOutlined';
+import DeliveryDiningOutlinedIcon from '@mui/icons-material/DeliveryDiningOutlined';
+import "../ui/SellerCreateComic.css"
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import IconButton from '@mui/material/IconButton';
+import { privateAxios } from '../../middleware/axiosInstance';
+import AuctionManagement from '../auctions/AuctionManagement';
+import DeliveryManagement from '../delivery/DeliveryManagement';
 
 const SellerManagement = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
@@ -217,51 +212,48 @@ const SellerManagement = () => {
               </div>
             </Box>
 
-            <div style={{ height: "auto", width: "100%" }}>
-              <DataGrid
-                rows={comics}
-                columns={columns}
-                initialState={{ pagination: { paginationModel } }}
-                pageSizeOptions={[5, 10]}
-                rowHeight={120}
-                // disableExtendRowFullWidth={false}
-                sx={{
-                  border: 1,
-                  "& .MuiDataGrid-columnHeader": {
-                    backgroundColor: "#000000",
-                    color: "#ffffff",
-                  },
-                  "& .MuiDataGrid-cell": {
-                    justifyContent: "center",
-                    display: "flex",
-                    alignItems: "center",
-                  },
-                  "& .MuiDataGrid-sortIcon": {
-                    color: "#ffffff !important",
-                  },
-                  "& .MuiDataGrid-iconButtonContainer": {
-                    color: "#ffffff !important",
-                  },
-                  "& .MuiDataGrid-menuIconButton": {
-                    color: "#ffffff !important",
-                  },
-                }}
-              />
-            </div>
-          </div>
-        );
-      case "auction":
-        return <Typography variant="h4">Quản Lý Đấu Giá</Typography>;
-      case "delivery":
-        return <Typography variant="h4">Thông Tin Giao Hàng</Typography>;
-      default:
-        return (
-          <Typography variant="h4">
-            Chọn một mục để hiển thị nội dung
-          </Typography>
-        );
-    }
-  };
+                        <div style={{ height: 'auto', width: '100%' }}>
+                            <DataGrid
+                                rows={comics}
+                                columns={columns}
+                                initialState={{ pagination: { paginationModel } }}
+                                pageSizeOptions={[5, 10]}
+                                rowHeight={120}
+                                // disableExtendRowFullWidth={false}
+                                sx={{
+                                    border: 1,
+                                    "& .MuiDataGrid-columnHeader": {
+                                        backgroundColor: "#000000",
+                                        color: "#ffffff",
+                                    },
+                                    "& .MuiDataGrid-cell": {
+                                        justifyContent: 'center',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                    },
+                                    "& .MuiDataGrid-sortIcon": {
+                                        color: "#ffffff !important",
+                                    },
+                                    "& .MuiDataGrid-iconButtonContainer": {
+                                        color: "#ffffff !important",
+                                    },
+                                    "& .MuiDataGrid-menuIconButton": {
+                                        color: "#ffffff !important",
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+                );
+            case 'auction':
+                return <AuctionManagement/>
+            case 'delivery':
+                return <DeliveryManagement/>
+            default:
+                return <Typography variant="h4">Chọn một mục để hiển thị nội dung</Typography>;
+        }
+    };
+
 
   return (
     <div className="seller-container">

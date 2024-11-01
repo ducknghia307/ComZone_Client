@@ -12,6 +12,7 @@ import CurrencySplitter from "../assistants/Spliter";
 import { privateAxios } from "../middleware/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal } from "antd";
+import DeliveryMethod from "../components/checkout/DeliveryMethod";
 // import { privateAxios } from "../middleware/axiosInstance";
 interface SellerGroup {
   sellerName: string;
@@ -189,6 +190,7 @@ const Checkout = () => {
               // totalPrice={totalPrice}
               // totalQuantity={totalQuantity}
             />
+            <DeliveryMethod />
             <PaymentMethod
               onMethodSelect={handlePaymentMethodSelect}
               amount={totalPrice}

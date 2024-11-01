@@ -140,7 +140,7 @@ const Navbar = () => {
               <div className="flex py-2">
                 <Link
                   className="text-black  px-6   hover:text-black duration-200 hover:opacity-50"
-                  to={""}
+                  to={"/sellermanagement"}
                 >
                   <li>Kênh Người Bán</li>
                 </Link>

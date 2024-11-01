@@ -49,6 +49,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
       const sortedAddresses = data.sort((a: Address, b: Address) => {
         return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
       });
+      console.log(sortedAddresses);
 
       setSelectedAddress(sortedAddresses[0] || null);
       setAddresses(sortedAddresses);
@@ -56,7 +57,9 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
       console.log("...");
     }
   };
-
+  const refreshAddresses = () => {
+    fetchUserAddress();
+  };
   const handleSetSelectedAddress = (addressId: string) => {
     const address = addresses.find((addr) => addr.id === addressId) || null;
     setSelectedAddress(address);
@@ -68,9 +71,6 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
     setAddresses(updatedAddresses);
   };
 
-  const refreshAddresses = () => {
-    fetchUserAddress();
-  };
   useEffect(() => {
     fetchUserInfo();
   }, []);
@@ -137,6 +137,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
                   updateAddress={updateAddress}
                   onAddAddress={() => setNewAddress(true)}
                   handleSetIsEdit={handleModal}
+                  refreshAddresses={refreshAddresses}
                 />
               </>
             )}
@@ -198,13 +199,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
                 />
               </svg>
               <div className="flex flex-row gap-1">
-                <h3 className="font-light">
-                  {selectedAddress?.detailedAddress},
-                </h3>
-                <h3 className="font-light">
-                  {selectedAddress?.ward}, {selectedAddress?.district},{" "}
-                  {selectedAddress?.province}
-                </h3>
+                <h3 className="font-light">{selectedAddress?.fullAddress},</h3>
               </div>
             </div>
           </>

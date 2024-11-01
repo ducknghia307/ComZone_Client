@@ -26,26 +26,27 @@ export interface Address {
   id: string;
   fullName: string;
   phone: string;
-  province: string;
-  district: string;
-  ward: string;
+  province: Province;
+  district: District;
+  ward: Ward;
   detailedAddress: string;
   isDefault: boolean;
   user: UserInfo;
+  fullAddress: string;
 }
 
 //VN address
 export interface Province {
-  province: string;
-  code: number;
+  name: string;
+  id: number;
 }
 export interface ProvinceDrop {
   label: string;
   value: number;
 }
 export interface Ward {
-  ward: string;
-  code: number;
+  name: string;
+  id: number;
 }
 
 export interface WardDrop {
@@ -54,8 +55,8 @@ export interface WardDrop {
 }
 
 export interface District {
-  district: string;
-  code: number;
+  name: string;
+  id: number;
 }
 
 export interface DistrictDrop {

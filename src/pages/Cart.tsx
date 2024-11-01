@@ -4,7 +4,7 @@ import CurrencySplitter from "../assistants/Spliter";
 import { Link, useNavigate } from "react-router-dom";
 import { privateAxios } from "../middleware/axiosInstance";
 import { Comic } from "../common/base.interface";
-import { Popconfirm, Skeleton } from "antd";
+import { Popconfirm, Skeleton, Tooltip } from "antd";
 
 interface CartData {
   comics: Comic[];
@@ -284,9 +284,22 @@ const Cart = () => {
                                   className="w-auto h-24 object-cover"
                                 />
                                 <div className="flex flex-col items-center ml-4">
-                                  <span className="font-light">
-                                    {comic.title}
-                                  </span>
+                                  <Tooltip
+                                    title={
+                                      <span className="font-light text-nowrap">
+                                        {comic.title}
+                                      </span>
+                                    }
+                                    color="#ccc"
+                                    placement="bottom"
+                                  >
+                                    <Link
+                                      to={`/detail/${comic.id}`}
+                                      className="font-light"
+                                    >
+                                      {comic.title}
+                                    </Link>
+                                  </Tooltip>
                                   {comic.status === "UNAVAILABLE" && (
                                     <span className="text-xs text-red-500">
                                       Truyện này hiện không còn trên hệ thống

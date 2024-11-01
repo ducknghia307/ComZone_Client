@@ -49,7 +49,7 @@ const App: React.FC = () => {
     fetchUserInfo();
   });
   return (
-    <div className="w-full px-10 py-4 ">
+    <div className="w-full px-32 py-16 ">
       <Steps
         current={current}
         items={items}

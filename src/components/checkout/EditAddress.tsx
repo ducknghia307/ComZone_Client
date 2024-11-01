@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { message, notification, Popconfirm, Select } from "antd";
+import { Button, message, notification, Popconfirm, Select } from "antd";
 import axios from "axios";
 import type { PopconfirmProps } from "antd";
 import {
@@ -13,6 +13,7 @@ import {
   WardDrop,
 } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const EditAddress: React.FC<{
   address: Address;
@@ -39,35 +40,42 @@ const EditAddress: React.FC<{
   const [setAsDefault, setSetAsDefault] = useState(false);
   const [api, contextHolder] = notification.useNotification();
 
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [provinceError, setProvinceError] = useState<string | null>(null);
+  const [districtError, setDistrictError] = useState<string | null>(null);
+  const [wardError, setWardError] = useState<string | null>(null);
+  const [detailAddressError, setDetailAddressError] = useState<string | null>(
+    null
+  );
+
+  console.log(refreshAddresses);
+  useEffect(() => {
+    fetchAddressCode();
+    fetchProvinces();
+  }, [address]);
   const fetchProvinces = async () => {
     try {
       const response = await privateAxios("/viet-nam-address/provinces");
       setProvinceDrop(
         response.data.map((province: Province) => ({
-          value: province.code,
-          label: province.province,
+          value: province.id,
+          label: province.name,
         }))
       );
       setProvinces(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching provinces:", error);
     }
   };
 
   const fetchAddressCode = async () => {
-    try {
-      const response = await privateAxios(
-        `/user-addresses/address-code/${address.id}`
-      );
-      setAddressCode(response.data);
-      setSelectedProvince(response.data.provinceCode);
-      setSelectedDistrict(response.data.districtCode);
-      setSelectedWard(response.data.wardCode);
-      fetchDistricts(response.data.provinceCode);
-      fetchWards(response.data.districtCode);
-    } catch (error) {
-      console.error("Error fetching code address:", error);
-    }
+    setSelectedProvince(address.province.id);
+    setSelectedDistrict(address.district.id);
+    setSelectedWard(address.ward.id);
+    fetchDistricts(address.province.id);
+    fetchWards(address.district.id);
   };
 
   const fetchDistricts = async (provinceCode: number) => {
@@ -77,8 +85,8 @@ const EditAddress: React.FC<{
       );
       setDistrictDrop(
         response.data.map((district: District) => ({
-          value: district.code,
-          label: district.district,
+          value: district.id,
+          label: district.name,
         }))
       );
       setDistricts(response.data);
@@ -94,8 +102,8 @@ const EditAddress: React.FC<{
       );
       setWardDrop(
         response.data.map((ward: Ward) => ({
-          value: ward.code,
-          label: ward.ward,
+          value: ward.id,
+          label: ward.name,
         }))
       );
       setWards(response.data);
@@ -103,11 +111,6 @@ const EditAddress: React.FC<{
       console.error("Error fetching wards:", error);
     }
   };
-
-  useEffect(() => {
-    fetchAddressCode();
-    fetchProvinces();
-  }, [address]);
 
   useEffect(() => {
     if (selectedDistrict) {
@@ -127,6 +130,7 @@ const EditAddress: React.FC<{
   };
 
   const handleDistrictChange = (value: number) => {
+    setSelectedWard(null);
     setSelectedDistrict(value);
   };
 
@@ -136,16 +140,65 @@ const EditAddress: React.FC<{
   };
 
   const handleSubmit = async () => {
+    let isValid = true;
+
+    if (!name) {
+      setNameError("Please enter your name.");
+      isValid = false;
+    } else {
+      setNameError(null);
+    }
+
+    if (!phone || !/^\d{10,11}$/.test(phone)) {
+      setPhoneError("Phone number must be 10 digits.");
+      isValid = false;
+    } else {
+      setPhoneError(null);
+    }
+
+    if (!selectedProvince) {
+      setProvinceError("Please choose a province.");
+      isValid = false;
+    } else {
+      setProvinceError(null);
+    }
+
+    if (!selectedDistrict) {
+      setDistrictError("Please choose a district.");
+      isValid = false;
+    } else {
+      setDistrictError(null);
+    }
+
+    if (!selectedWard) {
+      setWardError("Please choose a ward.");
+      isValid = false;
+    } else {
+      setWardError(null);
+    }
+
+    if (!detailAddress || detailAddress.trim().length < 1) {
+      setDetailAddressError(
+        "Please fill in the detailed address with more than one space."
+      );
+      isValid = false;
+    } else {
+      setDetailAddressError(null);
+    }
+
+    if (!isValid) return;
+
     const updatedAddress = {
       fullName: name,
       phone,
-      province: provinces.find((province) => province.code === selectedProvince)
-        ?.province,
-      district: districts.find((district) => district.code === selectedDistrict)
-        ?.district,
-      ward: wards.find((ward) => ward.code === selectedWard)?.ward,
+      province: provinces.find((province) => province.id === selectedProvince)
+        ?.id,
+      district: districts.find((district) => district.id === selectedDistrict)
+        ?.id,
+      ward: wards.find((ward) => ward.id === selectedWard)?.id,
       detailedAddress: detailAddress,
     };
+    console.log(updatedAddress);
 
     try {
       const response = await privateAxios.patch(
@@ -163,19 +216,25 @@ const EditAddress: React.FC<{
         }
       }
 
-      notification.success({
-        message: "Success",
-        description: "Address updated successfully.",
+      api.success({
+        key: "a",
+        message: "Thành công",
+        description: "Cập nhật địa chỉ thành công.",
+        duration: 2,
       });
 
       refreshAddresses();
-      // onCancel();
+      setTimeout(() => {
+        onCancel();
+      }, 2000);
       return;
     } catch (error) {
       console.error("Error updating address:", error);
-      notification.error({
+      api.error({
+        key: "a",
         message: "Error",
         description: "Failed to update the address.",
+        duration: 5,
       });
     }
   };
@@ -188,8 +247,8 @@ const EditAddress: React.FC<{
 
       console.log("Address deleted successfully:", response.data);
       notification.success({
-        message: "Success",
-        description: "Address deleted successfully.",
+        message: "Thành công",
+        description: "Đã xóa địa chỉ này.",
       });
       refreshAddresses();
       onCancel();
@@ -201,15 +260,21 @@ const EditAddress: React.FC<{
       });
     }
   };
-  const confirm: PopconfirmProps["onConfirm"] = (e) => {
-    handleDelete();
-    console.log(e);
+  const confirm = () => {
+    new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(null);
+        handleDelete();
+      }, 3000);
+    });
   };
 
   const cancel: PopconfirmProps["onCancel"] = (e) => {
     console.log(e);
     message.error("Click on No");
   };
+  console.log("province drop:", provinceDrop);
+  console.log(selectedProvince);
 
   return (
     <>
@@ -218,19 +283,21 @@ const EditAddress: React.FC<{
         <div className="flex flex-row w-full justify-between items-center mb-4">
           <h3 className="text-xl font-bold  ">Thay đổi thông tin giao hàng</h3>
           <Popconfirm
-            title="Delete the task"
-            description="Are you sure to delete this task?"
+            title="Xóa địa chỉ"
+            description="Bạn có chắc chắn khi xóa địa chỉ này?"
             onConfirm={confirm}
             onCancel={cancel}
-            okText="Yes"
-            cancelText="No"
+            okText="Có"
+            cancelText="Không"
           >
-            <button
-              className="py-2 px-4 text-white bg-red-500 rounded-lg"
-              // onClick={handleDelete}
+            <Button
+              color="danger"
+              variant="solid"
+              size="large"
+              icon={<DeleteOutlined />}
             >
               Xóa địa chỉ giao hàng
-            </button>
+            </Button>
           </Popconfirm>
         </div>
         <div className="flex flex-row w-full gap-12">
@@ -243,6 +310,9 @@ const EditAddress: React.FC<{
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+            {nameError && (
+              <span className="text-red-500  top-1">{nameError}</span>
+            )}
           </div>
           <div className="flex flex-col gap-1 w-full">
             <h3 className="font-semibold">Số điện thoại người nhận</h3>
@@ -253,6 +323,11 @@ const EditAddress: React.FC<{
               onChange={(e) => setPhone(e.target.value)}
               className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
             />
+            {phoneError && (
+              <span className="text-red-500 mt-20 absolute italic">
+                {phoneError}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex flex-row w-full gap-5 mt-8">
@@ -264,8 +339,13 @@ const EditAddress: React.FC<{
               options={provinceDrop}
               onChange={handleProvinceChange}
               className="REM"
-              value={selectedProvince || addressCode?.provinceCode}
+              value={selectedProvince}
             />
+            {provinceError && (
+              <span className="text-red-500 mt-16 pt-2 absolute italic ">
+                {provinceError}
+              </span>
+            )}
           </div>
           <div className="flex flex-col gap-1 w-full">
             <h3 className="font-semibold">Quận/Huyện</h3>
@@ -276,8 +356,13 @@ const EditAddress: React.FC<{
               onChange={handleDistrictChange}
               className="REM"
               disabled={!selectedProvince}
-              value={selectedDistrict || addressCode?.districtCode}
-            />
+              value={selectedDistrict}
+            />{" "}
+            {districtError && (
+              <span className="text-red-500 mt-16 pt-2 absolute italic ">
+                {districtError}
+              </span>
+            )}
           </div>
           <div className="flex flex-col gap-1 w-full">
             <h3 className="font-semibold">Phường/Xã</h3>
@@ -288,8 +373,13 @@ const EditAddress: React.FC<{
               onChange={handleWardChange}
               className="REM"
               disabled={!selectedDistrict}
-              value={selectedWard || addressCode?.wardCode}
+              value={selectedWard}
             />
+            {wardError && (
+              <span className="text-red-500 mt-16 pt-2 absolute italic ">
+                {wardError}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-1 w-full mt-10">
@@ -300,7 +390,12 @@ const EditAddress: React.FC<{
             className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
             value={detailAddress}
             onChange={(e) => setDetailAddress(e.target.value)}
-          />
+          />{" "}
+          {detailAddressError && (
+            <span className="text-red-500 mt-16 pt-2 absolute italic ">
+              {detailAddressError}
+            </span>
+          )}
         </div>
         <div className="flex flex-row w-full justify-between items-center mt-8">
           {!address.isDefault ? (

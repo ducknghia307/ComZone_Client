@@ -1,5 +1,5 @@
 import { notification, Select } from "antd";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import "./antdCSS.css";
 import {
@@ -63,8 +63,8 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
       const response = await privateAxios("/viet-nam-address/provinces");
       const data = response.data;
       const formattedData = data.map((province: Province) => ({
-        value: province.code,
-        label: province.province,
+        value: province.id,
+        label: province.name,
       }));
       setProvinceDrop(formattedData);
       setProvinces(data);
@@ -82,8 +82,8 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
       );
       const data = response.data;
       const formattedData = data.map((district: District) => ({
-        value: district.code,
-        label: district.district,
+        value: district.id,
+        label: district.name,
       }));
 
       setDistrictDrop(formattedData);
@@ -101,8 +101,8 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
       );
       const data = response.data;
       const formattedData = data.map((ward: Ward) => ({
-        value: ward.code,
-        label: ward.ward,
+        value: ward.id,
+        label: ward.name,
       }));
       setWardDrop(formattedData);
       setWards(data);
@@ -116,10 +116,11 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
   const handleProvinceChange = (value: number) => {
     setDistrictDrop([]);
     const selectedProvince = provinces.find(
-      (province: Province) => province.code === value
+      (province: Province) => province.id === value
     );
     setSelectProvince(selectedProvince);
     setSelectDistrict(null);
+    setSelectWard(null);
     setDistricts([]);
     setWardDrop([]);
     setProvinceError(null);
@@ -131,15 +132,13 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
     console.log(value);
 
     const selectedDistrict = districts.find(
-      (district: District) => district.code === value
+      (district: District) => district.id === value
     );
     setSelectDistrict(selectedDistrict || null);
     setSelectWard(null);
     setWardDrop([]);
     setDistrictError(null);
-    if (selectProvince && selectedDistrict) {
-      fetchWards(selectedDistrict.code);
-    }
+    fetchWards(value);
   };
 
   useEffect(() => {
@@ -155,7 +154,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
       setNameError(null);
     }
 
-    if (!phone || !/^\d{10}$/.test(phone)) {
+    if (!phone || !/^\d{10,11}$/.test(phone)) {
       setPhoneError("Phone number must be 10 digits.");
       isValid = false;
     } else {
@@ -183,8 +182,10 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
       setWardError(null);
     }
 
-    if (!detailAddress) {
-      setDetailAddressError("Please fill in the detailed address.");
+    if (!detailAddress || detailAddress.trim().length < 1) {
+      setDetailAddressError(
+        "Please fill in the detailed address with more than one space."
+      );
       isValid = false;
     } else {
       setDetailAddressError(null);
@@ -195,9 +196,9 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
     const addressData = {
       fullName: name,
       phone,
-      province: selectProvince?.province,
-      district: selectDistrict?.district,
-      ward: selectWard?.ward,
+      province: selectProvince?.id,
+      district: selectDistrict?.id,
+      ward: selectWard?.id,
       detailedAddress: detailAddress,
       isDefault,
     };
@@ -208,8 +209,8 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
       console.log("Address saved successfully:", response.data);
       openNotificationWithIcon(
         "success",
-        "Success",
-        "Address saved successfully."
+        "Thành công",
+        "Bạn đã thêm địa chỉ mới thành công."
       );
       setTimeout(() => {
         refreshAddresses();
@@ -301,6 +302,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
               options={provinceDrop}
               onChange={handleProvinceChange}
               className="REM"
+              value={selectProvince?.id}
             />
             {provinceError && (
               <span className="text-red-500 mt-16 pt-2 absolute italic ">
@@ -322,6 +324,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
               onChange={handleDistrictChange}
               className="REM"
               disabled={!selectProvince}
+              value={selectDistrict?.id}
             />
             {districtError && (
               <span className="text-red-500 mt-16 pt-2 absolute italic ">
@@ -341,13 +344,12 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
               }
               options={wardDrop}
               onChange={(value) => {
-                setSelectWard(
-                  wards.find((ward) => ward.code === value) || null
-                );
+                setSelectWard(wards.find((ward) => ward.id === value) || null);
                 setWardError(null);
               }}
               className="REM"
               disabled={!selectDistrict}
+              value={selectWard?.id}
             />
             {wardError && (
               <span className="text-red-500 mt-16 pt-2 absolute italic ">

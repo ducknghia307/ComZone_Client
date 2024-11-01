@@ -21,6 +21,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DepositForm from "./DepositForm";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { BaseInterface, UserInfo } from "../../common/base.interface";
+import CurrencySplitter from "../../assistants/Spliter";
 
 const transactions = [
   {
@@ -277,7 +278,9 @@ const UserWallet = () => {
                   Số dư hiện tại:
                 </Typography>
                 <Typography variant="h6" sx={{ color: "#FF8A00" }}>
-                  {isVisible ? `${userInfo?.balance} đ` : "****** đ"}
+                  {isVisible
+                    ? `${CurrencySplitter(userInfo?.balance)} đ`
+                    : "****** đ"}
                 </Typography>
                 <IconButton onClick={() => setIsVisible(!isVisible)}>
                   <VisibilityOffIcon />
@@ -289,7 +292,7 @@ const UserWallet = () => {
                 </Typography>
                 <Typography variant="h6" sx={{ color: "#FF8A00" }}>
                   {isVisible
-                    ? `${userInfo?.nonWithdrawableAmount}`
+                    ? `${CurrencySplitter(userInfo?.nonWithdrawableAmount)} đ`
                     : "****** đ"}
                 </Typography>
                 <IconButton onClick={() => setIsVisible(!isVisible)}>

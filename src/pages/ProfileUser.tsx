@@ -173,13 +173,26 @@ const ProfileUser: React.FC = () => {
                                     fullWidth
                                     margin="normal"
                                     variant="outlined"
-                                    name={name}
-                                    value={(profileData as any)[name]}
-                                    disabled={disabled}
+                                    value={profileData.address}
+                                    disabled
                                     className="profile-field"
                                     size="small"
                                 />
+                                <Button
+                                    variant="contained"
+                                    onClick={() => setIsAddressModalOpen(true)}
+                                    sx={{
+                                        fontSize: '14px',
+                                        backgroundColor: '#000',
+                                        color: '#fff',
+                                        height: '40px',
+                                        marginTop: '8px'
+                                    }}
+                                >
+                                    Cập nhật
+                                </Button>
                             </div>
+
                         ))}
                         {/* <div className="form-row">
                             <Typography>Địa Chỉ:</Typography>

@@ -4,6 +4,8 @@ import SellerInfomation from "../components/RegisterSeller/SellerInfomation";
 import DeliveryMethod from "../components/RegisterSeller/DeliveryMethod";
 import { privateAxios } from "../middleware/axiosInstance";
 import { UserInfo } from "../common/base.interface";
+import RegisterSellerSuccess from "../components/RegisterSeller/RegisterSellerSuccess";
+import { useNavigate } from "react-router-dom";
 
 const RegisterSeller: React.FC = () => {
   const [current, setCurrent] = useState(0);
@@ -11,7 +13,7 @@ const RegisterSeller: React.FC = () => {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [isAddressComplete, setIsAddressComplete] = useState(false);
-
+  const navigate = useNavigate();
   // New state variables to store seller information
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -111,7 +113,7 @@ const RegisterSeller: React.FC = () => {
     },
     {
       title: "Hoàn tất",
-      content: "Last-content",
+      content: <RegisterSellerSuccess />,
     },
   ];
 
@@ -119,17 +121,26 @@ const RegisterSeller: React.FC = () => {
     fetchUserInfo();
   }, []);
 
-  const handleFinish = () => {
-    console.log({
-      name,
-      email,
-      phone,
-      district,
-      province,
-      ward,
-      detailedAddress,
-    });
-    message.success("Processing complete!");
+  const handleFinish = async () => {
+    const sellerData = {
+      verifiedPhone: phone,
+      district: district,
+      province: province,
+      ward: ward,
+      detailedAddress: detailedAddress,
+    };
+
+    try {
+      const response = await privateAxios.post("/seller-details", sellerData);
+      message.success("Đăng ký thông tin người bán thành công!");
+      console.log("Response data:", response.data);
+      navigate("/sellerManagement");
+    } catch (error) {
+      message.error(
+        "Đã xảy ra lỗi khi đăng ký thông tin người bán. Vui lòng thử lại."
+      );
+      console.error("Error posting seller details:", error);
+    }
   };
 
   return (

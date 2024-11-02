@@ -1,131 +1,238 @@
-import React, { useState } from "react";
-
-interface DeliveryOption {
-  id: number;
-  name: string;
-  maxWeight: string;
-  maxDimensions: string;
-  maxOrderValue: string;
-  customerService: string;
-  restrictions: string;
-  isEnabled: boolean;
-  isPriority: boolean;
+import { Select } from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  District,
+  DistrictDrop,
+  Province,
+  ProvinceDrop,
+  Ward,
+  WardDrop,
+} from "../../common/base.interface";
+import { privateAxios } from "../../middleware/axiosInstance";
+interface DeliveryMethodProps {
+  validateAddress: (isValid: boolean) => void;
+  setDistrict: (district: number) => void;
+  setProvince: (province: number) => void;
+  setWard: (ward: number) => void;
+  setDetailedAddress: (address: string) => void;
 }
+const DeliveryMethod: React.FC<DeliveryMethodProps> = ({
+  validateAddress,
+  setDistrict,
+  setProvince,
+  setWard,
+  setDetailedAddress,
+}) => {
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [provinceDrop, setProvinceDrop] = useState<ProvinceDrop[]>([]);
+  const [selectProvince, setSelectProvince] = useState<Province | null>(); //
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [districtDrop, setDistrictDrop] = useState<DistrictDrop[]>([]);
+  const [selectDistrict, setSelectDistrict] = useState<District | null>(); //
+  const [wards, setWards] = useState<Ward[]>([]);
+  const [wardDrop, setWardDrop] = useState<WardDrop[]>([]);
+  const [selectWard, setSelectWard] = useState<Ward | null>(null);
+  const [detailAddress, setDetailAddress] = useState("");
+  const [provinceError, setProvinceError] = useState<string | null>(null);
+  const [districtError, setDistrictError] = useState<string | null>(null);
+  const [wardError, setWardError] = useState<string | null>(null);
+  const [detailAddressError, setDetailAddressError] = useState<string | null>(
+    null
+  );
 
-const deliveryOptions: DeliveryOption[] = [
-  {
-    id: 1,
-    name: "Giao Hàng Nhanh",
-    maxWeight: "100kg",
-    maxDimensions: "200cm",
-    maxOrderValue: "20 triệu đồng",
-    customerService: "1800 6328",
-    restrictions: "Không vận chuyển đồ uống và thực phẩm tươi",
-    isEnabled: true,
-    isPriority: true,
-  },
-  {
-    id: 2,
-    name: "J&T Express",
-    maxWeight: "10000g",
-    maxDimensions: "100cm",
-    maxOrderValue: "10 triệu đồng",
-    customerService: "1900 1080",
-    restrictions: "Không vận chuyển hàng dễ vỡ",
-    isEnabled: true,
-    isPriority: false,
-  },
-  {
-    id: 3,
-    name: "Ninja Van",
-    maxWeight: "5000g",
-    maxDimensions: "150cm",
-    maxOrderValue: "15 triệu đồng",
-    customerService: "1900 1108",
-    restrictions: "Không vận chuyển hàng hóa độc hại",
-    isEnabled: true,
-    isPriority: false,
-  },
-  {
-    id: 4,
-    name: "VNPost Tiết Kiệm",
-    maxWeight: "2000g",
-    maxDimensions: "120cm",
-    maxOrderValue: "5 triệu đồng",
-    customerService: "1900 6668",
-    restrictions: "Không vận chuyển hàng dễ cháy",
-    isEnabled: false,
-    isPriority: false,
-  },
-];
+  const fetchProvinces = async () => {
+    try {
+      const response = await privateAxios("/viet-nam-address/provinces");
+      const data = response.data;
+      const formattedData = data.map((province: Province) => ({
+        value: province.id,
+        label: province.name,
+      }));
+      setProvinceDrop(formattedData);
+      setProvinces(data);
+    } catch (error) {
+      console.error("Error fetching provinces:", error);
+    }
+  };
+  const fetchDistricts = async (value: number) => {
+    if (!value) {
+      setDistricts([]);
+    }
+    try {
+      const response = await privateAxios(
+        `/viet-nam-address/districts/${value}`
+      );
+      const data = response.data;
+      const formattedData = data.map((district: District) => ({
+        value: district.id,
+        label: district.name,
+      }));
 
-const DeliveryMethod: React.FC = () => {
-  const [options, setOptions] = useState(deliveryOptions);
+      setDistrictDrop(formattedData);
+      setDistricts(data);
+    } catch (error) {
+      console.error("Error fetching provinces:", error);
+    }
+  };
 
-  const toggleEnable = (id: number) => {
-    setOptions((prevOptions) =>
-      prevOptions.map((option) =>
-        option.id === id ? { ...option, isEnabled: !option.isEnabled } : option
-      )
+  const fetchWards = async (districtCode: number) => {
+    if (!districtCode) return;
+    try {
+      const response = await privateAxios(
+        `/viet-nam-address/wards/${districtCode}`
+      );
+      const data = response.data;
+      const formattedData = data.map((ward: Ward) => ({
+        value: ward.id,
+        label: ward.name,
+      }));
+      setWardDrop(formattedData);
+      setWards(data);
+    } catch (error) {
+      console.error("Error fetching wards:", error);
+    }
+  };
+
+  console.log("district", districtDrop);
+
+  const handleProvinceChange = (value: number) => {
+    setDistrictDrop([]);
+    const selectedProvince = provinces.find(
+      (province: Province) => province.id === value
+    );
+    setSelectProvince(selectedProvince);
+    setProvince(selectedProvince ? selectedProvince.id : 0);
+    setSelectDistrict(null);
+    setSelectWard(null);
+    setDistricts([]);
+    setWardDrop([]);
+    setProvinceError(null);
+
+    fetchDistricts(value);
+  };
+
+  const handleDistrictChange = (value: number) => {
+    console.log(value);
+
+    const selectedDistrict = districts.find(
+      (district: District) => district.id === value
+    );
+    setSelectDistrict(selectedDistrict || null);
+    setDistrict(selectedDistrict ? selectedDistrict.id : 0);
+    setSelectWard(null);
+    setWardDrop([]);
+    setDistrictError(null);
+    fetchWards(value);
+  };
+  const isAddressValid = (): boolean => {
+    return (
+      !!selectProvince &&
+      !!selectDistrict &&
+      !!selectWard &&
+      detailAddress.trim() !== ""
     );
   };
 
-  const setPriority = (id: number) => {
-    setOptions((prevOptions) =>
-      prevOptions.map((option) =>
-        option.id === id
-          ? { ...option, isPriority: true }
-          : { ...option, isPriority: false }
-      )
-    );
-  };
+  useEffect(() => {
+    fetchProvinces();
+  }, []);
+  useEffect(() => {
+    validateAddress(isAddressValid());
+  }, [selectProvince, selectDistrict, selectWard, detailAddress]);
 
   return (
-    <div className="p-4 bg-gray-50 rounded-md">
-      {options.map((option) => (
-        <div
-          key={option.id}
-          className="mb-4 p-4 bg-white border rounded-md shadow-sm"
-        >
-          <div className="flex justify-between items-center">
-            <h3 className="font-bold text-lg">{option.name}</h3>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="mr-2">Kích hoạt</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={option.isEnabled}
-                    onChange={() => toggleEnable(option.id)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer-checked:bg-blue-500 peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="mr-2">Ưu tiên</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={option.isPriority}
-                    onChange={() => setPriority(option.id)}
-                    disabled={!option.isEnabled}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer-checked:bg-green-500 peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                </label>
-              </div>
-            </div>
-          </div>
-          <div className="mt-2 text-sm text-gray-600">
-            <p>Khối lượng tối đa: {option.maxWeight}</p>
-            <p>Kích thước tối đa: {option.maxDimensions}</p>
-            <p>Giá trị đơn hàng tối đa: {option.maxOrderValue}</p>
-            <p>Hỗ trợ: {option.customerService}</p>
-            <p>Hạn chế: {option.restrictions}</p>
-          </div>
+    <div className="p-4 bg-white rounded-md">
+      <div className="flex flex-row w-full gap-5 mt-8">
+        <div className="flex flex-col gap-1 w-full">
+          <h3 className="font-semibold flex flex-row gap-2">
+            Tỉnh/Thành phố <p className="text-red-500">*</p>
+          </h3>
+          <Select
+            showSearch
+            placeholder="Chọn tỉnh/thành phố"
+            filterOption={(input, option) =>
+              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            }
+            options={provinceDrop}
+            onChange={handleProvinceChange}
+            className="REM"
+            value={selectProvince?.id}
+          />
+          {provinceError && (
+            <span className="text-red-500 mt-16 pt-2 absolute italic ">
+              {provinceError}
+            </span>
+          )}
         </div>
-      ))}
+        <div className="flex flex-col gap-1 w-full">
+          <h3 className="font-semibold flex flex-row gap-2">
+            Quận/Huyện <p className="text-red-500">*</p>
+          </h3>
+          <Select
+            showSearch
+            placeholder="Chọn quận/huyện"
+            filterOption={(input, option) =>
+              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            }
+            options={districtDrop}
+            onChange={handleDistrictChange}
+            className="REM"
+            disabled={!selectProvince}
+            value={selectDistrict?.id}
+          />
+          {districtError && (
+            <span className="text-red-500 mt-16 pt-2 absolute italic ">
+              {districtError}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-col gap-1 w-full">
+          <h3 className="font-semibold flex flex-row gap-2">
+            Phường/Xã <p className="text-red-500">*</p>
+          </h3>
+          <Select
+            showSearch
+            placeholder="Chọn phường/xã"
+            filterOption={(input, option) =>
+              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            }
+            options={wardDrop}
+            onChange={(value) => {
+              setSelectWard(wards.find((ward) => ward.id === value) || null);
+              setWardError(null);
+              setWard(value);
+            }}
+            className="REM"
+            disabled={!selectDistrict}
+            value={selectWard?.id}
+          />
+          {wardError && (
+            <span className="text-red-500 mt-16 pt-2 absolute italic ">
+              {wardError}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-col gap-1 w-full mt-10">
+        <h3 className="font-semibold flex flex-row gap-2">
+          Địa chỉ cụ thể (Số nhà, tên đường) <p className="text-red-500">*</p>
+        </h3>
+        <input
+          type="text"
+          placeholder="Ví dụ: 123/32 Hòa Bình"
+          className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
+          onChange={(e) => {
+            setDetailAddress(e.target.value);
+            setDetailAddressError(null);
+            setDetailedAddress(e.target.value);
+          }}
+        />
+        {detailAddressError && (
+          <span className="text-red-500 mt-16 pt-2 absolute italic ">
+            {detailAddressError}
+          </span>
+        )}
+      </div>
     </div>
   );
 };

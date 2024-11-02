@@ -45,7 +45,9 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   const fetchUserAddress = async () => {
     try {
       const response = await privateAxios("/user-addresses/user");
+
       const data = response.data;
+
       const sortedAddresses = data.sort((a: Address, b: Address) => {
         return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
       });

@@ -36,7 +36,7 @@ const EditAddress: React.FC<{
   const [detailAddress, setDetailAddress] = useState(address.detailedAddress);
   const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
   const [selectedDistrict, setSelectedDistrict] = useState<number | null>(null);
-  const [selectedWard, setSelectedWard] = useState<number | null>(null);
+  const [selectedWard, setSelectedWard] = useState<string | null>(null);
   const [setAsDefault, setSetAsDefault] = useState(false);
   const [api, contextHolder] = notification.useNotification();
 
@@ -100,13 +100,14 @@ const EditAddress: React.FC<{
       const response = await privateAxios(
         `/viet-nam-address/wards/${districtCode}`
       );
-      setWardDrop(
-        response.data.map((ward: Ward) => ({
-          value: ward.id,
-          label: ward.name,
-        }))
-      );
+      const test = response.data.map((ward: Ward) => ({
+        value: ward.id,
+        label: ward.name,
+      }));
+
+      setWardDrop(test);
       setWards(response.data);
+      console.log("aaa", response.data);
     } catch (error) {
       console.error("Error fetching wards:", error);
     }
@@ -134,9 +135,9 @@ const EditAddress: React.FC<{
     setSelectedDistrict(value);
   };
 
-  const handleWardChange = (value: number) => {
+  const handleWardChange = (value: string) => {
     setSelectedWard(value);
-    console.log(value);
+    console.log("ward:", value);
   };
 
   const handleSubmit = async () => {
@@ -273,8 +274,8 @@ const EditAddress: React.FC<{
     console.log(e);
     message.error("Click on No");
   };
-  console.log("province drop:", provinceDrop);
-  console.log(selectedProvince);
+
+  console.log(address);
 
   return (
     <>

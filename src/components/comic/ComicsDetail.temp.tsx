@@ -26,6 +26,7 @@ export default function ComicsDetailTemp() {
   const [comicsListFromSeller, setComicsListFromSeller] = useState<
     Comic[] | []
   >([]);
+  const [hasMore, setHasMore] = useState(true);
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   const dispatch = useAppDispatch();
   // const [recommendedList, setRecommendedList] = useState<Comic[] | []>([]);
@@ -145,7 +146,11 @@ export default function ComicsDetailTemp() {
         </div>
 
         <div className="w-full max-w-[122em] px-8">
-          <RecommendedComicsList comicsList={comicsListFromSeller} />
+          <RecommendedComicsList
+            comicsList={comicsListFromSeller}
+            fetchMoreData={fetchCurrentComics}
+            hasMore={hasMore}
+          />
         </div>
       </div>
     </>

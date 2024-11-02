@@ -1,5 +1,6 @@
 import React from "react";
 import CurrencySplitter from "../../assistants/Spliter";
+import DeliveryMethod from "./DeliveryMethod";
 
 interface Comic {
   id: string;
@@ -85,7 +86,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
               </svg>
               <h3 className="font-medium ml-2">{seller.sellerName}</h3>
             </div>
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <thead>
                 <tr>
                   <th className="text-start font-thin">Sản phẩm</th>
@@ -97,7 +98,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
               <tbody>
                 {seller.comics.map(({ comic }) => (
                   <tr key={comic.id} className="border-t px-2 py-4 ">
-                    <td className="flex flex-row my-2 gap-4 w-full">
+                    <td className="flex flex-row my-2 gap-4 w-full max-w-[30rem]">
                       <img
                         src={comic.coverImage}
                         alt={comic.title}
@@ -105,15 +106,15 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                       />
                       <h4 className="font-extralight">{comic.title}</h4>
                     </td>
-                    <td>
+                    <td className="max-w-[12rem] ">
                       <h4 className="text-end font-extralight">
                         {CurrencySplitter(comic.price)}đ
                       </h4>
                     </td>
-                    <td>
+                    <td className="max-w-[12rem] ">
                       <h4 className="text-end font-extralight">x1</h4>
                     </td>
-                    <td>
+                    <td className="max-w-[12rem] ">
                       <h4 className="text-end font-extralight">
                         {CurrencySplitter(comic.price)}đ
                       </h4>
@@ -122,7 +123,8 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                 ))}
               </tbody>
             </table>
-            <div className="flex flex-row items-center justify-end w-full py-2 gap-2 border-t-2  border-dashed mt-2">
+            <DeliveryMethod />
+            <div className="flex flex-row items-center justify-end w-full py-2 gap-2 border-t-2  border-dashed ">
               <h4 className="font-extralight">Tổng tiền:</h4>
               <h4 className="font-semibold text-lg text-cyan-900">
                 {CurrencySplitter(sellerTotalPrice)}đ

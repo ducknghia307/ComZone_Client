@@ -23,6 +23,7 @@ const AddressList: React.FC<AddressListProps> = ({
 }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  console.log(editingAddress);
 
   const handleEdit = (address: Address) => {
     setEditingAddress(address);
@@ -111,12 +112,36 @@ const AddressList: React.FC<AddressListProps> = ({
                         <button
                           className={`font-normal  cursor-pointer${
                             isSelected ? "text-gray-700" : "text-blue-400"
-                          }  hover:underline duration-200`}
+                          }  hover:underline duration-200 ml-8 flex flex-row gap-1 items-center`}
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent the click from firing on the address item
-                            handleEdit(address); // Trigger edit
+                            setEditingAddress(address);
+                            setIsEdit(true);
+                            console.log("asdasd", address);
                           }}
                         >
+                          <svg
+                            width="16px"
+                            height="16px"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M18.3785 8.44975L11.4637 15.3647C11.1845 15.6439 10.8289 15.8342 10.4417 15.9117L7.49994 16.5L8.08829 13.5582C8.16572 13.1711 8.35603 12.8155 8.63522 12.5363L15.5501 5.62132M18.3785 8.44975L19.7927 7.03553C20.1832 6.64501 20.1832 6.01184 19.7927 5.62132L18.3785 4.20711C17.988 3.81658 17.3548 3.81658 16.9643 4.20711L15.5501 5.62132M18.3785 8.44975L15.5501 5.62132"
+                              stroke={isSelected ? "#ffffff" : "#000000"}
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M5 20H19"
+                              stroke={isSelected ? "#ffffff" : "#000000"}
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
                           Chỉnh sửa
                         </button>
                       </div>
@@ -144,13 +169,8 @@ const AddressList: React.FC<AddressListProps> = ({
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <div className="flex flex-col gap-1">
-                        <h3 className="font-light">
-                          {address.detailedAddress}
-                        </h3>
-                        <h3 className="font-light">
-                          {address.ward}, {address.district}, {address.province}
-                        </h3>
+                      <div className="flex flex-col">
+                        <h3 className="font-light">{address.fullAddress}</h3>
                       </div>
                     </div>
                   </div>

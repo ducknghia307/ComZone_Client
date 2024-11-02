@@ -68,6 +68,16 @@ const Checkout = () => {
     }
   };
 
+  // const fetchDeliveryDetails = async () => {
+  //   try {
+  //     const response = await privateAxios.post('/orders/delivery-details', {
+  //       fromDistrict: selectedAddress?.district.id,
+  //             })
+  //   } catch (error) {
+  //     console.log("Error to post delivery details:", error);
+  //   }
+  // }
+
   const comics = sessionStorage.getItem("selectedComics");
   useEffect(() => {
     if (comics) {
@@ -174,7 +184,9 @@ const Checkout = () => {
       }
     }
   };
-
+  useEffect(() => {
+    console.log("a", selectedAddress);
+  }, [selectedAddress]);
   return (
     <>
       <div className="w-full flex flex-col px-20 py-8 bg-neutral-100 REM">
@@ -189,6 +201,7 @@ const Checkout = () => {
               // totalPrice={totalPrice}
               // totalQuantity={totalQuantity}
             />
+            {/* <DeliveryMethod /> */}
             <PaymentMethod
               onMethodSelect={handlePaymentMethodSelect}
               amount={totalPrice}

@@ -46,12 +46,12 @@ export interface ProvinceDrop {
 }
 export interface Ward {
   name: string;
-  id: number;
+  id: string;
 }
 
 export interface WardDrop {
   label: string;
-  value: number;
+  value: string;
 }
 
 export interface District {

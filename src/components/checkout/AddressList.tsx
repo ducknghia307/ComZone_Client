@@ -23,7 +23,6 @@ const AddressList: React.FC<AddressListProps> = ({
 }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
-  console.log(refreshAddresses);
   console.log(editingAddress);
 
   const handleEdit = (address: Address) => {
@@ -116,7 +115,9 @@ const AddressList: React.FC<AddressListProps> = ({
                           }  hover:underline duration-200 ml-8 flex flex-row gap-1 items-center`}
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent the click from firing on the address item
-                            handleEdit(address); // Trigger edit
+                            setEditingAddress(address);
+                            setIsEdit(true);
+                            console.log("asdasd", address);
                           }}
                         >
                           <svg

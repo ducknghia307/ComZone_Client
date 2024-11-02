@@ -12,7 +12,6 @@ import CurrencySplitter from "../assistants/Spliter";
 import { privateAxios } from "../middleware/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal } from "antd";
-import DeliveryMethod from "../components/checkout/DeliveryMethod";
 // import { privateAxios } from "../middleware/axiosInstance";
 interface SellerGroup {
   sellerName: string;
@@ -68,6 +67,16 @@ const Checkout = () => {
       console.log("...");
     }
   };
+
+  // const fetchDeliveryDetails = async () => {
+  //   try {
+  //     const response = await privateAxios.post('/orders/delivery-details', {
+  //       fromDistrict: selectedAddress?.district.id,
+  //             })
+  //   } catch (error) {
+  //     console.log("Error to post delivery details:", error);
+  //   }
+  // }
 
   const comics = sessionStorage.getItem("selectedComics");
   useEffect(() => {
@@ -175,7 +184,9 @@ const Checkout = () => {
       }
     }
   };
-
+  useEffect(() => {
+    console.log("a", selectedAddress);
+  }, [selectedAddress]);
   return (
     <>
       <div className="w-full flex flex-col px-20 py-8 bg-neutral-100 REM">
@@ -190,7 +201,7 @@ const Checkout = () => {
               // totalPrice={totalPrice}
               // totalQuantity={totalQuantity}
             />
-            <DeliveryMethod />
+            {/* <DeliveryMethod /> */}
             <PaymentMethod
               onMethodSelect={handlePaymentMethodSelect}
               amount={totalPrice}

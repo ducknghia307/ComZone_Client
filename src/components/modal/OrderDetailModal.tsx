@@ -12,7 +12,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
     if (!order) return null;
 
     return (
-        <Modal open={open} onClose={onClose}>
+        <Modal open={open} onClose={onClose} BackdropProps={{
+            style: { backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' },
+        }}>
             <Box
                 sx={{
                     position: 'absolute',
@@ -20,9 +22,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     width: 800,
-                    maxHeight: '80vh', 
+                    maxHeight: '80vh',
                     bgcolor: 'background.paper',
-                    boxShadow: 24,
+                    boxShadow: 'none',
                     p: 4,
                     borderRadius: '8px',
                     display: 'flex',
@@ -50,7 +52,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                         flex: 1,
                         overflowY: 'auto',
                         pr: 2,
-                        pt:3
+                        pt: 3
                     }}
                 >
                     {order.items.map((item: any, index: number) => (
@@ -92,7 +94,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                                     })}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                    SL: {item.quantity}
+                                    SL: x1
                                 </Typography>
                             </div>
                         </div>
@@ -112,7 +114,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                 >
                     {/* Total Price */}
                     <Typography sx={{ fontSize: '20px', fontWeight: 'bold', color: '#f77157' }}>
-                        Tổng tiền: {Number(order.total_price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                        Tổng tiền: {Number(order.totalPrice).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </Typography>
                 </Box>
             </Box>

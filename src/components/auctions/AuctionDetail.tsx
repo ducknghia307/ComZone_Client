@@ -72,7 +72,7 @@ const ComicAuction = () => {
     return (
         <div className="auction-wrapper">
             <div className="title-container">
-                <Typography style={{ paddingLeft: '40px', fontSize: '25px' }}>
+                <Typography style={{ paddingLeft: '50px', fontSize: '25px', fontWeight:'bold' }}>
                     {comic.title}
                 </Typography>
                 <div className="condition-tag">

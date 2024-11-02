@@ -3,8 +3,10 @@ import { Checkbox, FormControlLabel, FormGroup, Collapse } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import "../ui/Sidebar.css";
+import { useLocation } from "react-router-dom";
 
-const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange }) => {
+const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange, onConditionFilterChange }) => {
+    const location = useLocation();
     const [isGenreOpen, setIsGenreOpen] = useState(true);
     const [isConditionOpen, setIsConditionOpen] = useState(true);
     const [isAuthorOpen, setIsAuthorOpen] = useState(true);
@@ -14,6 +16,7 @@ const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange }) => {
     const [loading, setLoading] = useState(true);
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [selectedAuthors, setSelectedAuthors] = useState([]);
+    const [selectedConditions, setSelectedConditions] = useState([]);
 
     useEffect(() => {
         fetch('http://localhost:3000/genres')
@@ -103,6 +106,19 @@ const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange }) => {
         }
     };
 
+    const shouldShowConditionSection = ["/genres", "/auctions"].includes(location.pathname);
+
+    const handleConditionChange = (event) => {
+        const condition = event.target.name;
+        const isChecked = event.target.checked;
+        const updatedSelectedConditions = isChecked
+            ? [...selectedConditions, condition]
+            : selectedConditions.filter((c) => c !== condition);
+
+        setSelectedConditions(updatedSelectedConditions);
+        onConditionFilterChange(updatedSelectedConditions);
+    };
+
     return (
         <div className="sidebar">
             <div className="sidebar-header">
@@ -132,7 +148,7 @@ const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange }) => {
             </div>
 
             {/* Tình trạng truyện */}
-            <div className="condition-section mt-6">
+            {/* <div className="condition-section mt-6">
                 <div className="header flex justify-between items-center cursor-pointer" onClick={toggleCondition}>
                     <h3 className="text-lg font-bold">Tình trạng truyện</h3>
                     {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -140,17 +156,41 @@ const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange }) => {
                 <Collapse in={isConditionOpen}>
                     <div className="condition-list mt-4">
                         <FormGroup>
-                            {/* {conditions.map((condition, index) => (
+                            {conditions.map((condition, index) => (
                                 <FormControlLabel
                                     key={index}
                                     control={<Checkbox name={condition} />}
                                     label={condition}
                                 />
-                            ))} */}
+                            ))}
                         </FormGroup>
                     </div>
                 </Collapse>
-            </div>
+            </div> */}
+
+            {/* Hiển thị "Tình trạng truyện" khi ở các route /genres hoặc /auctions */}
+            {shouldShowConditionSection && (
+                <div className="condition-section mt-6">
+                    <div className="header flex justify-between items-center cursor-pointer" onClick={toggleCondition}>
+                        <h3 className="text-lg font-bold">Tình trạng truyện</h3>
+                        {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </div>
+                    <Collapse in={isConditionOpen}>
+                        <div className="condition-list mt-4">
+                            <FormGroup>
+                                <FormControlLabel
+                                    control={<Checkbox name="SEALED" onChange={handleConditionChange} />}
+                                    label="Nguyên Seal"
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox name="USED" onChange={handleConditionChange} />}
+                                    label="Đã Qua Sử Dụng"
+                                />
+                            </FormGroup>
+                        </div>
+                    </Collapse>
+                </div>
+            )}
 
             {/* Tác Giả */}
             <div className="author-section mt-6">

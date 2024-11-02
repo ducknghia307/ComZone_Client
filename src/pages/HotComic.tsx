@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import Sidebar from "../components/sidebar/Sidebar";
 import "../components/ui/HomePage.css"
 import Grid from '@mui/material/Grid2';
-import Genres from "../components/genres/Genres"
+import HotComics from "../components/hotcomic/HotComics";
 
-const AllGenres = () => {
+const AllHotComics = () => {
     const [filteredGenres, setFilteredGenres] = useState([]);
     const [filteredAuthors, setFilteredAuthors] = useState([]);
-    const [filteredConditions, setFilteredConditions] = useState([]);
 
     const handleGenreFilterChange = (selectedGenres) => {
         setFilteredGenres(selectedGenres);
@@ -17,18 +16,14 @@ const AllGenres = () => {
         setFilteredAuthors(selectedAuthors);
     };
 
-    const handleConditionFilterChange = (selectedCondition) => {
-        setFilteredConditions(selectedCondition);
-    };
-
     return (
         <div className="homepage w-full overflow-x-hidden px-4">
             <Grid container spacing={0}>
                 <Grid size={2}>
-                    <Sidebar onGenreFilterChange={handleGenreFilterChange} onAuthorFilterChange={handleAuthorFilterChange} onConditionFilterChange={handleConditionFilterChange}/>
+                    <Sidebar onGenreFilterChange={handleGenreFilterChange} onAuthorFilterChange={handleAuthorFilterChange} />
                 </Grid>
                 <Grid size={10}>
-                    <Genres filteredGenres={filteredGenres} filteredAuthors={filteredAuthors} filteredConditions={filteredConditions}/>
+                    <HotComics filteredGenres={filteredGenres} filteredAuthors={filteredAuthors}/>
                 </Grid>
 
             </Grid>
@@ -37,4 +32,4 @@ const AllGenres = () => {
     );
 };
 
-export default AllGenres;
+export default AllHotComics;

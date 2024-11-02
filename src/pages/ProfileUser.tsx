@@ -5,8 +5,8 @@ import "../components/ui/ProfileUser.css";
 import { privateAxios } from '../middleware/axiosInstance';
 import { useAppSelector } from '../redux/hooks';
 import { UserInfo, Address } from '../common/base.interface';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+// import { LocalizationProvider } from '@mui/x-date-pickers';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import NewAddressForm from '../components/checkout/NewAddressForm';
 
 interface ProfileData {
@@ -48,9 +48,25 @@ const ProfileUser: React.FC = () => {
         avatar: '',
     });
 
-    useEffect(() => {
-        fetchUserInfo();
-    }, [accessToken]);
+    const fetchUserAddress = async () => {
+        try {
+            const response = await privateAxios("/user-addresses/user");
+
+            const data = response.data;
+            console.log("address", data);
+
+
+            //   const sortedAddresses = data.sort((a: Address, b: Address) => {
+            //     return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
+            //   });
+            //   console.log(sortedAddresses);
+
+            //   setSelectedAddress(sortedAddresses[0] || null);
+            //   setAddresses(sortedAddresses);
+        } catch {
+            console.log("...");
+        }
+    };
 
     const fetchUserInfo = async () => {
         if (accessToken) {
@@ -81,7 +97,7 @@ const ProfileUser: React.FC = () => {
     };
 
     const handleEditClick = () => setEditing(true);
-    
+
     const handleCancelClick = () => {
         setEditing(false);
         setNewAvatar(null);
@@ -101,144 +117,149 @@ const ProfileUser: React.FC = () => {
         fetchUserInfo();
     };
 
+    useEffect(() => {
+        fetchUserInfo();
+        fetchUserAddress();
+    }, [accessToken]);
+
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <div className="profile-container w-full">
-                <Typography
-                    sx={{ fontSize: '35px', fontWeight: 'bolder', textAlign: 'center', marginBottom: '20px' }}
-                    className="profile-title"
-                >
-                    HỒ SƠ CỦA TÔI
-                </Typography>
+        // <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <div className="profile-container w-full">
+            <Typography
+                sx={{ fontSize: '35px', fontWeight: 'bolder', textAlign: 'center', marginBottom: '20px' }}
+                className="profile-title"
+            >
+                HỒ SƠ CỦA TÔI
+            </Typography>
 
-                <Grid container spacing={0} alignItems="center">
-                    <Grid size={3}>
-                        <div className="profile-image">
-                            <img
-                                src={newAvatar || profileData.avatar}
-                                alt="avatar"
-                                className="avatar-image1"
-                                style={{ width: '150px', height: 'auto', borderRadius: '50%' }}
-                            />
-                            {editing && (
-                                <>
-                                    <label htmlFor="avatar-upload" className="change-photo-label">
-                                        <Typography color="primary" className="change-photo-text">
-                                            Đổi ảnh đại diện
-                                        </Typography>
-                                    </label>
-                                    <input
-                                        id="avatar-upload"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        style={{ display: 'none' }}
-                                    />
-                                </>
-                            )}
-                        </div>
-                    </Grid>
-
-                    <Grid size={9}>
-                        <form noValidate autoComplete="off" className="profile-form">
-                            {[
-                                { label: 'Email', name: 'email', disabled: true },
-                                { label: 'Username', name: 'name' },
-                                { label: 'Số Điện Thoại', name: 'phone' },
-                            ].map(({ label, name, disabled }) => (
-                                <div key={name} className="form-row">
-                                    <Typography>{label}:</Typography>
-                                    <TextField
-                                        fullWidth
-                                        margin="normal"
-                                        variant="outlined"
-                                        name={name}
-                                        value={(profileData as any)[name]}
-                                        disabled={disabled}
-                                        className="profile-field"
-                                        size="small"
-                                    />
-                                </div>
-                            ))}
-                            <div className="form-row">
-                                <Typography>Địa Chỉ:</Typography>
-                                <div className="flex items-center gap-2">
-                                    <TextField
-                                        fullWidth
-                                        margin="normal"
-                                        variant="outlined"
-                                        value={profileData.address}
-                                        disabled
-                                        className="profile-field"
-                                        size="small"
-                                    />
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => setIsAddressModalOpen(true)}
-                                        sx={{ 
-                                            fontSize: '14px', 
-                                            backgroundColor: '#000', 
-                                            color: '#fff',
-                                            height: '40px',
-                                            marginTop: '8px'
-                                        }}
-                                    >
-                                        Cập nhật
-                                    </Button>
-                                </div>
-                            </div>
-                        </form>
-                    </Grid>
+            <Grid container spacing={0} alignItems="center">
+                <Grid size={3}>
+                    <div className="profile-image">
+                        <img
+                            src={newAvatar || profileData.avatar}
+                            alt="avatar"
+                            className="avatar-image1"
+                            style={{ width: '150px', height: 'auto', borderRadius: '50%' }}
+                        />
+                        {editing && (
+                            <>
+                                <label htmlFor="avatar-upload" className="change-photo-label">
+                                    <Typography color="primary" className="change-photo-text">
+                                        Đổi ảnh đại diện
+                                    </Typography>
+                                </label>
+                                <input
+                                    id="avatar-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    style={{ display: 'none' }}
+                                />
+                            </>
+                        )}
+                    </div>
                 </Grid>
 
-                <div className="button-container">
-                    {!editing ? (
+                <Grid size={9}>
+                    <form noValidate autoComplete="off" className="profile-form">
+                        {[
+                            { label: 'Email', name: 'email', disabled: true },
+                            { label: 'Username', name: 'name' },
+                            { label: 'Số Điện Thoại', name: 'phone' },
+                        ].map(({ label, name, disabled }) => (
+                            <div key={name} className="form-row">
+                                <Typography>{label}:</Typography>
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    variant="outlined"
+                                    name={name}
+                                    value={(profileData as any)[name]}
+                                    disabled={disabled}
+                                    className="profile-field"
+                                    size="small"
+                                />
+                            </div>
+                        ))}
+                        {/* <div className="form-row">
+                            <Typography>Địa Chỉ:</Typography>
+                            <div className="flex items-center gap-2">
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    variant="outlined"
+                                    value={profileData.address}
+                                    disabled
+                                    className="profile-field"
+                                    size="small"
+                                />
+                                <Button
+                                    variant="contained"
+                                    onClick={() => setIsAddressModalOpen(true)}
+                                    sx={{
+                                        fontSize: '14px',
+                                        backgroundColor: '#000',
+                                        color: '#fff',
+                                        height: '40px',
+                                        marginTop: '8px'
+                                    }}
+                                >
+                                    Cập nhật
+                                </Button>
+                            </div>
+                        </div> */}
+                    </form>
+                </Grid>
+            </Grid>
+
+            <div className="button-container">
+                {!editing ? (
+                    <Button
+                        variant="contained"
+                        onClick={handleEditClick}
+                        sx={{ fontSize: '20px', backgroundColor: '#000', color: '#fff' }}
+                    >
+                        Cập Nhật Hồ Sơ
+                    </Button>
+                ) : (
+                    <>
                         <Button
                             variant="contained"
-                            onClick={handleEditClick}
-                            sx={{ fontSize: '20px', backgroundColor: '#000', color: '#fff' }}
+                            color="error"
+                            onClick={handleCancelClick}
+                            sx={{ fontSize: '20px', marginRight: '10px' }}
                         >
-                            Cập Nhật Hồ Sơ
+                            Hủy
                         </Button>
-                    ) : (
-                        <>
-                            <Button
-                                variant="contained"
-                                color="error"
-                                onClick={handleCancelClick}
-                                sx={{ fontSize: '20px', marginRight: '10px' }}
-                            >
-                                Hủy
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="success"
-                                onClick={handleConfirmClick}
-                                sx={{ fontSize: '20px' }}
-                            >
-                                Xác Nhận
-                            </Button>
-                        </>
-                    )}
-                </div>
-
-                <Modal
-                    open={isAddressModalOpen}
-                    onClose={handleAddressModalClose}
-                    aria-labelledby="address-modal-title"
-                >
-                    <Box sx={modalStyle}>
-                        {userInfo && (
-                            <NewAddressForm
-                                userInfo={userInfo}
-                                onClose={handleAddressModalClose}
-                                refreshAddresses={refreshAddresses}
-                            />
-                        )}
-                    </Box>
-                </Modal>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={handleConfirmClick}
+                            sx={{ fontSize: '20px' }}
+                        >
+                            Xác Nhận
+                        </Button>
+                    </>
+                )}
             </div>
-        </LocalizationProvider>
+
+            <Modal
+                open={isAddressModalOpen}
+                onClose={handleAddressModalClose}
+                aria-labelledby="address-modal-title"
+            >
+                <Box sx={modalStyle}>
+                    {userInfo && (
+                        <NewAddressForm
+                            userInfo={userInfo}
+                            onClose={handleAddressModalClose}
+                            refreshAddresses={refreshAddresses}
+                        />
+                    )}
+                </Box>
+            </Modal>
+        </div>
+        // </LocalizationProvider>
     );
 };
 

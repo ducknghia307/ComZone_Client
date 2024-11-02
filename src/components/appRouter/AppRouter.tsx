@@ -22,6 +22,7 @@ import WalletUser from "../../pages/WalletUser";
 import ExchangeUser from "../../pages/ExchangeUser";
 import RegisterSeller from "../../pages/RegisterSeller";
 import { ConfigProvider } from "antd";
+import AllHotComics from "../../pages/HotComic";
 
 const AppRouter = () => {
   return (
@@ -29,6 +30,7 @@ const AppRouter = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/genres" element={<Genres />} />
+        <Route path="/hotcomic" element={<AllHotComics />} />
         <Route path="/auctions" element={<Auctions />} />
         <Route path="/detail/:id" element={<ComicDetail />} />
         <Route path="/auctiondetail/:id" element={<AuctionDetails />} />

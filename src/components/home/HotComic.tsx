@@ -65,7 +65,13 @@ const HotComic: React.FC = () => {
     const fetchComics = async () => {
       try {
         const response = await publicAxios.get("/comics/status/available");
-        setComics(response.data);
+        const data = response.data;
+
+        const hotComics = data.filter(
+          (comic: any) => comic.condition === "SEALED"
+        );
+
+        setComics(hotComics);
       } catch (error) {
         console.error("Error fetching comics:", error);
       } finally {
@@ -76,17 +82,15 @@ const HotComic: React.FC = () => {
     fetchComics();
   }, []);
 
-
   const formatPrice = (price: number) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
-
 
   return (
     <div className="w-full py-8">
       {/* Truyện tranh nổi bật */}
       <div className="hot-comic-section flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Truyện Tranh Nổi Bật</h2>
+        <h2 className="text-2xl font-bold">Truyện Tranh Nguyên Seal</h2>
         <a
           href="hotcomic"
           className="text-red-500 font-semibold"
@@ -118,7 +122,7 @@ const HotComic: React.FC = () => {
                   <p className="price">{formatPrice(comic.price)}</p>
                   <p className="author">{comic.author.toUpperCase()}</p>
                   <p className="title">{comic.title}</p>
-                  <div className="rating-sold-comic">
+                  {/* <div className="rating-sold-comic">
                     <p className="rating">
                       {[...Array(5)].map((_, index) => (
                         <StarIcon
@@ -129,7 +133,7 @@ const HotComic: React.FC = () => {
                     </p>
                     <div className="divider"></div>
                     <p className="sold-info">Đã bán {comic.sold}</p>
-                  </div>
+                  </div> */}
                 </Link>
               </div>
             ))}

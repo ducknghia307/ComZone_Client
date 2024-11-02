@@ -5,9 +5,10 @@ import "../ui/Auctions.css";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Countdown from "react-countdown";
-import { Button } from "@mui/material";
+import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { publicAxios } from "../../middleware/axiosInstance";
+import ChangeCircleOutlinedIcon from '@mui/icons-material/ChangeCircleOutlined';
 
 const responsive = {
     superLargeDesktop: {
@@ -58,23 +59,23 @@ const CustomButtonGroup = ({
     );
 };
 
-const renderer = ({ days, hours, minutes, seconds } : any) => {
+const renderer = ({ days, hours, minutes, seconds }: any) => {
     return (
         <div className="countdown">
             <div className="time-box">
-                <span className="time">{days.toString().padStart(2, '0')}</span>
+                <span className="time1">{days.toString().padStart(2, '0')}</span>
                 <span className="label">Ngày</span>
             </div>
             <div className="time-box">
-                <span className="time">{hours.toString().padStart(2, '0')}</span>
+                <span className="time1">{hours.toString().padStart(2, '0')}</span>
                 <span className="label">Giờ</span>
             </div>
             <div className="time-box">
-                <span className="time">{minutes.toString().padStart(2, '0')}</span>
+                <span className="time1">{minutes.toString().padStart(2, '0')}</span>
                 <span className="label">Phút</span>
             </div>
             <div className="time-box">
-                <span className="time">{seconds.toString().padStart(2, '0')}</span>
+                <span className="time1">{seconds.toString().padStart(2, '0')}</span>
                 <span className="label">Giây</span>
             </div>
         </div>
@@ -91,12 +92,12 @@ const Auctions: React.FC = () => {
             try {
                 const response = await publicAxios.get("/comics/status/auction");
                 const data = response.data;
-    
+
                 // Filter comics where status is AUCTION 
                 const auctionComics = data.filter(
                     (comic: any) => comic.status === "AUCTION"
                 );
-    
+
                 setComics(auctionComics);
             } catch (error) {
                 console.error("Error fetching comics:", error);
@@ -104,13 +105,13 @@ const Auctions: React.FC = () => {
                 setLoading(false);
             }
         };
-    
+
         fetchComics();
     }, []);
-    
-      const handleDetailClick = (comicId: string) => {
+
+    const handleDetailClick = (comicId: string) => {
         navigate(`/auctiondetail/${comicId}`);
-      };
+    };
 
     return (
         <div className="w-full py-8">
@@ -138,7 +139,11 @@ const Auctions: React.FC = () => {
                                     className=" object-cover mx-auto"
                                 />
                                 <p className="title">{comic.title}</p>
-                                <p className="condition">{comic.condition}</p>
+                                <Chip
+                                    label={comic.condition}
+                                    icon={<ChangeCircleOutlinedIcon />}
+                                    size="medium"
+                                />
                                 <p className="endtime">KẾT THÚC TRONG</p>
                                 <Countdown
                                     date={Date.now() + 100000000}

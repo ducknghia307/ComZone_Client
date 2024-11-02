@@ -26,7 +26,7 @@
     background-color: #fff;
     padding: 20px;
     border-radius: 10px;
-    max-width: 280px;
+    max-width: 250px;
 }
 
 .auction-card img {
@@ -47,7 +47,6 @@
 
 .auction-card .condition {
     font-size: 20px;
-    margin-bottom: 10px;
 }
 
 .auction-card .endtime {
@@ -68,7 +67,7 @@
     align-items: center;
 }
 
-.time-box .time {
+.time-box .time1 {
     font-size: 20px;
     font-weight: bold;
     color: #333;

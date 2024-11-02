@@ -19,7 +19,7 @@ const SellerCreateComic: React.FC = () => {
     quantity: "",
     description: "",
     publishedDate: null,
-    editionType: "", // New field
+    edition: "", // New field
     condition: "", // New field
     page: "", // New field
   });
@@ -30,6 +30,7 @@ const SellerCreateComic: React.FC = () => {
   const [isSeries, setIsSeries] = useState(false);
 
   const navigate = useNavigate();
+
   useEffect(() => {
     publicAxios
       .get("/genres")
@@ -56,6 +57,7 @@ const SellerCreateComic: React.FC = () => {
         console.error("Error fetching data:", error);
       });
   }, []);
+
   const toggleFormType = () => {
     setIsSeries((prev) => !prev);
     setFormData({
@@ -66,7 +68,7 @@ const SellerCreateComic: React.FC = () => {
       quantity: "",
       description: "",
       publishedDate: null,
-      editionType: "", // New field
+      edition: "", // New field
       condition: "", // New field
       page: "", // New field
     }); // Reset form data if necessary
@@ -75,6 +77,7 @@ const SellerCreateComic: React.FC = () => {
   const handleGenreChange = (event: any, newValue: Genre[]) => {
     setFormData({ ...formData, genre: newValue });
   };
+
   const handleUpload = async (coverImage: string, contentImages: string[]) => {
     try {
       if (!coverImage) throw new Error("Cover image is missing.");
@@ -130,9 +133,8 @@ const SellerCreateComic: React.FC = () => {
 
     const response = await handleUpload(coverImage, contentImages);
     console.log("RESPONSE", response);
-    // Chuẩn bị dữ liệu gửi đi
+    // Prepare data to send
     const comicData = {
-      // sellerId: "your-seller-id",
       genreIds: formData.genre.map((g) => g.id),
       title: formData.title,
       author: formData.author,
@@ -140,17 +142,16 @@ const SellerCreateComic: React.FC = () => {
       coverImage: response?.coverImageUrls,
       previewChapter: response?.previewChapterUrls,
       price: parseFloat(formData.price) || 0,
-      quantity: parseInt(formData.quantity) || 1,
-      editionType: formData.editionType,
+      quantity: isSeries ? parseInt(formData.quantity) || 1 : 1,
+      edition: formData.edition,
       condition: formData.condition,
       page: parseInt(formData.page) || 0,
-      publishedDate:formData.publishedDate
+      publishedDate: formData.publishedDate,
     };
 
     console.log("Comic Data to Send:", comicData);
-    // console.log("Comic Data to Send:", JSON.stringify(comicData, null, 2));
 
-    // Gửi dữ liệu lên API
+    // Send data to API
     privateAxios
       .post("/comics", comicData)
       .then((response) => {
@@ -165,40 +166,50 @@ const SellerCreateComic: React.FC = () => {
   };
 
   return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center", margin: "10px " }}>
-        <ArrowBackIcon
-          sx={{ fontSize: "40px", cursor: "pointer" }}
-          onClick={() => navigate("/sellermanagement")}
-        />
-        <Typography
-          sx={{
-            paddingBottom: "35px",
-            color: "#000",
-            fontWeight: "bold",
-            margin: "0 auto",
+    <div className="form-container">
+      <div className="create-comic-form">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            margin: "5px",
           }}
-          variant="h4"
-          className="form-title"
         >
-          {isSeries ? "THÊM BỘ TRUYỆN" : "THÊM TRUYỆN MỚI"}
-        </Typography>
-        <Button variant="outlined" onClick={toggleFormType}>
-          {isSeries ? "Thêm Truyện Mới" : "Thêm Bộ Truyện"}
-        </Button>
-      </div>
+          <ArrowBackIcon
+            sx={{ fontSize: "40px", cursor: "pointer" }}
+            onClick={() => navigate("/sellermanagement")}
+          />
+          <Typography
+            sx={{
+              paddingBottom: "35px",
+              color: "#000",
+              fontWeight: "bold",
+              marginLeft:"120px"
+            }}
+            variant="h4"
+            className="form-title"
+          >
+            {isSeries ? "THÊM BỘ TRUYỆN" : "THÊM TRUYỆN"}
+          </Typography>
+          <Button variant="outlined" onClick={toggleFormType}>
+            {isSeries ? "Thêm Truyện" : "Thêm Bộ Truyện"}
+          </Button>
+        </div>
 
-      <ComicForm
-        formData={formData}
-        setFormData={setFormData}
-        genres={genres}
-        coverImage={coverImage}
-        setCoverImage={setCoverImage}
-        contentImages={contentImages}
-        setContentImages={setContentImages}
-        handleGenreChange={handleGenreChange}
-        handleSubmit={handleSubmit}
-      />
+        <ComicForm
+        isSeries={isSeries}
+          formData={formData}
+          setFormData={setFormData}
+          genres={genres}
+          coverImage={coverImage}
+          setCoverImage={setCoverImage}
+          contentImages={contentImages}
+          setContentImages={setContentImages}
+          handleGenreChange={handleGenreChange}
+          handleSubmit={handleSubmit}
+        />
+      </div>
     </div>
   );
 };

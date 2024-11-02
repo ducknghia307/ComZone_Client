@@ -40,7 +40,7 @@ export default function ComicsDetailTemp() {
         console.log(res.data);
         setCurrentComics(res.data);
         setSeller(res.data.sellerId);
-        const images = res.data.coverImage.concat(res.data.previewChapter);
+        const images = [res.data.coverImage, ...res.data.previewChapter];
         setCurrentImage(images[0]);
         setImageList(images);
 

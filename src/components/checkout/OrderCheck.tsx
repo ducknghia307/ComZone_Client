@@ -99,7 +99,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                   <tr key={comic.id} className="border-t px-2 py-4 ">
                     <td className="flex flex-row my-2 gap-4 w-full">
                       <img
-                        src={comic.coverImage[0]}
+                        src={comic.coverImage}
                         alt={comic.title}
                         className="h-32 w-auto"
                       />

@@ -171,7 +171,7 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors }) => {
                       <div className="hot-comic-card" key={comic.id}>
                         <Link to={`/detail/${comic.id}`}>
                           <img
-                            src={comic.coverImage?.[0] || "/default-cover.jpg"}
+                            src={comic.coverImage || "/default-cover.jpg"}
                             alt={comic.title}
                             className="object-cover mx-auto"
                           />
@@ -194,7 +194,7 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors }) => {
                   <div className="hot-comic-card" key={comic.id}>
                     <Link to={`/detail/${comic.id}`}>
                       <img
-                        src={comic.coverImage?.[0] || "/default-cover.jpg"}
+                        src={comic.coverImage || "/default-cover.jpg"}
                         alt={comic.title}
                         className="object-cover mx-auto"
                       />

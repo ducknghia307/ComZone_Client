@@ -279,7 +279,7 @@ const Cart = () => {
                                   disabled={comic.status === "UNAVAILABLE"}
                                 />
                                 <img
-                                  src={comic.coverImage[0]}
+                                  src={comic.coverImage}
                                   alt={comic.title}
                                   className="w-auto h-24 object-cover"
                                 />

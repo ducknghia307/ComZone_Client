@@ -15,7 +15,7 @@ import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import { Grid } from "@mui/system";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers"; // Use this for version 5
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 interface Genre {
   id: string;
   name: string;
@@ -29,13 +29,13 @@ interface ComicFormData {
   quantity: string;
   description: string;
   publishedDate: Dayjs | null;
-  edition?: string; // New field for edition type
-  condition?: string; // New field for condition
-  page?: string; // New field for page count
+  edition?: string;
+  condition?: string;
+  page?: string;
 }
 
-
 interface ComicFormProps {
+  isSeries:boolean | null
   formData: ComicFormData;
   setFormData: React.Dispatch<React.SetStateAction<ComicFormData>>;
   genres: Genre[];
@@ -47,6 +47,7 @@ interface ComicFormProps {
   handleSubmit: (e: React.FormEvent) => Promise<void>;
 }
 const ComicForm: React.FC<ComicFormProps> = ({
+  isSeries,
   formData,
   setFormData,
   genres,
@@ -61,8 +62,17 @@ const ComicForm: React.FC<ComicFormProps> = ({
   useEffect(() => {
     console.log("Genres available in ComicForm:", genres);
   }, [genres]);
-  const editionOptions = ["REGULAR", "SPECIAL", "LIMITED"];
-  const conditionOptions = ["USED", "SEALED"];
+  const editionOptions = [
+    { label: "Bản thường", value: "REGULAR" },
+    { label: "Bản đặc biệt", value: "SPECIAL" },
+    { label: "Bản giới hạn", value: "LIMITED" },
+  ];
+
+  const conditionOptions = [
+    { label: "Đã sử dụng", value: "USED" },
+    { label: "Nguyên seal", value: "SEALED" },
+  ];
+
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -103,11 +113,11 @@ const ComicForm: React.FC<ComicFormProps> = ({
     <>
       <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
         <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-          {title} ({images.length}/4)
+          {title} ({images.length}/{isSeries ? 8 : 4})
         </Typography>
 
         <input
-          accept="image/*"
+          accept="image/*"  
           type="file"
           multiple
           onChange={(e) => handleFileChange(e, setImageState, maxImages)}
@@ -179,28 +189,49 @@ const ComicForm: React.FC<ComicFormProps> = ({
     </>
   );
 
-  return (
-    <div className="form-container">
-      <div className="create-comic-form">
-        <form onSubmit={handleSubmit}>
-          <div className="image-upload-section">
-            <div
-              className="image-upload"
-              onClick={() => coverImageInputRef.current?.click()}
-            >
-              <div className="image-upload-circle mb-8">
-                {coverImage ? (
-                  <img
-                    style={{ height: "160px", width: "130px" }}
-                    src={coverImage}
-                    alt="cover"
-                    className="uploaded-image"
-                  />
+    return (
+      <div className="form-container">
+        <div className="create-comic-form">
+          <form onSubmit={handleSubmit}>
+            <div className="">
+              <div
+                className="image-upload"
+                onClick={() => coverImageInputRef.current?.click()}
+              >
+                <div
+                  className={`${coverImage ? "" : "image-upload-circle"} mb-4`}
+                >
+                  {coverImage ? (
+                    <div
+                      style={{
+                        position: "relative",
+                        width: "150px",
+                        height: "150px",
+                      }}
+                    >
+                      <img
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                          borderRadius: "8px",
+                          border: "1px solid #DCDCDC",
+                        }}
+                        src={coverImage}
+                      alt="cover"
+                      className="uploaded-image"
+                    />
+                  </div>
                 ) : (
                   <CameraAltOutlinedIcon />
                 )}
               </div>
-              <Typography className="image-upload-text">Ảnh Bìa</Typography>
+              <Typography
+                style={{ marginBottom: "10px" }}
+                className="image-upload-text"
+              >
+                Ảnh Bìa
+              </Typography>
             </div>
             <input
               type="file"
@@ -213,7 +244,6 @@ const ComicForm: React.FC<ComicFormProps> = ({
           </div>
           <Typography
             sx={{
-              paddingBottom: "20px",
               color: "grey",
               textAlign: "center",
             }}
@@ -226,7 +256,7 @@ const ComicForm: React.FC<ComicFormProps> = ({
             "Ảnh Nội Dung",
             contentImages,
             setContentImages,
-            4
+            isSeries ? 8 : 4
           )}
 
           <Grid
@@ -254,7 +284,6 @@ const ComicForm: React.FC<ComicFormProps> = ({
                   setFormData({ ...formData, title: e.target.value })
                 }
                 variant="outlined"
-                className="text-field"
               />
             </Grid>
             <Grid size={6}>
@@ -276,7 +305,6 @@ const ComicForm: React.FC<ComicFormProps> = ({
                   setFormData({ ...formData, author: e.target.value })
                 }
                 variant="outlined"
-                className="text-field"
               />
             </Grid>
             <Grid size={6}>
@@ -294,6 +322,7 @@ const ComicForm: React.FC<ComicFormProps> = ({
                 options={genres}
                 getOptionLabel={(option) => option.name}
                 value={formData.genre}
+                filterSelectedOptions
                 onChange={handleGenreChange}
                 renderInput={(params) => (
                   <TextField
@@ -319,7 +348,7 @@ const ComicForm: React.FC<ComicFormProps> = ({
                 }
               />
             </Grid>
-            <Grid size={6}>
+            <Grid size={2}>
               <Typography
                 sx={{
                   paddingBottom: "10px",
@@ -339,77 +368,10 @@ const ComicForm: React.FC<ComicFormProps> = ({
                   setFormData({ ...formData, price: e.target.value })
                 }
                 variant="outlined"
-                className="text-field"
-              />
-            </Grid>
-            <Grid size={6}>
-              <Typography
-                sx={{
-                  paddingBottom: "10px",
-                  color: "#000",
-                  fontWeight: "bold",
-                }}
-              >
-                Số Lượng
-              </Typography>
-              <TextField
-                fullWidth
-                label="Số Lượng"
-                type="number"
-                name="quantity"
-                value={formData.quantity}
-                onChange={(e) =>
-                  setFormData({ ...formData, quantity: e.target.value })
-                }
-                variant="outlined"
-                className="text-field"
-              />
-            </Grid>
-            <Grid size={6}>
-              <Typography sx={{ paddingBottom: "10px", color: "#000", fontWeight: "bold" }}>
-               Phiên bản
-              </Typography>
-              <Autocomplete
-                options={editionOptions}
-                value={formData.edition || ""}
-                onChange={(event, newValue) => {
-                  setFormData({ ...formData, edition: newValue || "" });
-                }}
-                renderInput={(params) => <TextField {...params} label="Phiên bản" />}
               />
             </Grid>
 
-            {/* Condition Field using Autocomplete */}
-            <Grid size={6}>
-              <Typography sx={{ paddingBottom: "10px", color: "#000", fontWeight: "bold" }}>
-                Điều kiện
-              </Typography>
-              <Autocomplete
-                options={conditionOptions}
-                value={formData.condition || ""}
-                onChange={(event, newValue) => {
-                  setFormData({ ...formData, condition: newValue || "" });
-                }}
-                renderInput={(params) => <TextField {...params} label="Điều kiện" />}
-              />
-            </Grid>
-
-            {/* Page Count Field */}
-            <Grid size={6}>
-              <Typography sx={{ paddingBottom: "10px", color: "#000", fontWeight: "bold" }}>
-                Số trang
-              </Typography>
-              <TextField
-                fullWidth
-                label="Số trang"
-                type="number"
-                name="page"
-                value={formData.page || ""}
-                onChange={(e) => setFormData({ ...formData, page: e.target.value })}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid size={6}>
+            <Grid size={2}>
               <Typography
                 sx={{
                   paddingBottom: "10px",
@@ -432,8 +394,128 @@ const ComicForm: React.FC<ComicFormProps> = ({
                 </Grid>
               </LocalizationProvider>
             </Grid>
+                    
+{!isSeries ? (
+  <Grid size={2}>
+    <Typography
+      sx={{
+        paddingBottom: "10px",
+        color: "#000",
+        fontWeight: "bold",
+      }}
+    >
+      Số trang
+    </Typography>
+    <TextField
+      fullWidth
+      label="Số trang"
+      type="number"
+      name="page"
+      value={formData.page || ""}
+      onChange={(e) =>
+        setFormData({
+          ...formData,
+          page: e.target.value,
+          quantity: "", // Reset quantity if it's not a series
+        })
+      }
+      variant="outlined"
+    />
+  </Grid>
+) : (
+  <Grid size={2}>
+    <Typography
+      sx={{
+        paddingBottom: "10px",
+        color: "#000",
+        fontWeight: "bold",
+      }}
+    >
+      Số cuốn trong bộ
+    </Typography>
+    <TextField
+      fullWidth
+      label="Số Lượng"
+      type="number"
+      name="quantity"
+      value={formData.quantity || ""}
+      onChange={(e) =>
+        setFormData({
+          ...formData,
+          quantity: e.target.value,
+          page: "", // Reset page if it’s a series
+        })
+      }
+      variant="outlined"
+    />
+  </Grid>
+)}
+
 
             <Grid size={6}>
+              <Typography
+                sx={{
+                  paddingBottom: "10px",
+                  color: "#000",
+                  fontWeight: "bold",
+                }}
+              >
+                Phiên bản
+              </Typography>
+              <Autocomplete
+                options={editionOptions}
+                getOptionLabel={(option) => option.label}
+                value={
+                  editionOptions.find(
+                    (opt) => opt.value === formData.edition
+                  ) || null
+                }
+                onChange={(event, newValue) => {
+                  setFormData({
+                    ...formData,
+                    edition: newValue ? newValue.value : "",
+                  });
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Phiên bản" />
+                )}
+              />
+            </Grid>
+
+            {/* Condition Field using Autocomplete */}
+            <Grid size={6}>
+              <Typography
+                sx={{
+                  paddingBottom: "10px",
+                  color: "#000",
+                  fontWeight: "bold",
+                }}
+              >
+                Tình trạng
+              </Typography>
+              <Autocomplete
+                options={conditionOptions}
+                getOptionLabel={(option) => option.label}
+                value={
+                  conditionOptions.find(
+                    (opt) => opt.value === formData.condition
+                  ) || null
+                }
+                onChange={(event, newValue) => {
+                  setFormData({
+                    ...formData,
+                    condition: newValue ? newValue.value : "",
+                  });
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Tình trạng" />
+                )}
+              />
+            </Grid>
+
+            {/* Page Count Field */}
+
+            <Grid size={12}>
               <Typography
                 sx={{
                   paddingBottom: "10px",
@@ -454,24 +536,15 @@ const ComicForm: React.FC<ComicFormProps> = ({
                   setFormData({ ...formData, description: e.target.value })
                 }
                 variant="outlined"
-                className="text-field"
               />
             </Grid>
           </Grid>
 
-          <Button
-            type="submit"
-            sx={{
-              marginTop: "20px",
-              backgroundColor: "#1976d2",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "#115293",
-              },
-            }}
-          >
-            Lưu Truyện
-          </Button>
+          <div className="form-submit-section">
+            <Button type="submit" variant="contained" className="submit-button">
+              Tạo Truyện
+            </Button>
+          </div>
         </form>
       </div>
     </div>

@@ -18,7 +18,7 @@ export default function ComicsHorizontalMenu({
             >
               <div
                 className={`w-full h-64 bg-cover bg-center bg-no-repeat`}
-                style={{ backgroundImage: `url(${comics.coverImage[0]})` }}
+                style={{ backgroundImage: `url(${comics.coverImage})` }}
               />
               <p className="wrapTitle px-1 pt-2">{comics.title}</p>
               <p className="flex items-start gap-1 font-semibold text-xl p-2">

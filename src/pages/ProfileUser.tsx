@@ -1,163 +1,253 @@
-import React, { useState } from 'react';
-import Grid from '@mui/material/Grid2';
-import { Button, MenuItem, TextField, Typography } from '@mui/material';
+import React, { useState } from "react";
+import Grid from "@mui/material/Grid2";
+import { Button, MenuItem, TextField, Typography } from "@mui/material";
 import "../components/ui/ProfileUser.css";
+import { privateAxios } from "../middleware/axiosInstance";
+import { useAppSelector } from "../redux/hooks";
+import { UserInfo, Address } from "../common/base.interface";
+// import { LocalizationProvider } from '@mui/x-date-pickers';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import NewAddressForm from "../components/checkout/NewAddressForm";
 
 interface ProfileData {
-    email: string;
-    username: string;
-    phoneNumber: string;
-    gender: string;
-    address: string;
-    dateOfBirth: string;
-    avatar: string;
+  email: string;
+  username: string;
+  phoneNumber: string;
+  gender: string;
+  address: string;
+  dateOfBirth: string;
+  avatar: string;
 }
 
 const ProfileUser: React.FC = () => {
-    const [editing, setEditing] = useState(false);
-    const [newAvatar, setNewAvatar] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [newAvatar, setNewAvatar] = useState<string | null>(null);
 
-    const [profileData, setProfileData] = useState<ProfileData>({
-        email: 'maicttsel73328@fpt.edu.vn',
-        username: 'thanhmai27092003',
-        phoneNumber: '0947758903',
-        gender: 'Female',
-        address: 'LA',
-        dateOfBirth: '09/27/2003',
-        avatar: 'https://cdn-icons-png.flaticon.com/512/147/147144.png',
-    });
+  const [profileData, setProfileData] = useState<ProfileData>({
+    email: "",
+    name: "",
+    phone: "",
+    address: "",
+    avatar: "",
+  });
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) setNewAvatar(URL.createObjectURL(file));
-    };
+  const fetchUserAddress = async () => {
+    try {
+      const response = await privateAxios("/user-addresses/user");
 
-    const handleEditClick = () => setEditing(true);
-    const handleCancelClick = () => {
-        setEditing(false);
-        setNewAvatar(null);
-    };
+      const data = response.data;
+      console.log("address", data);
 
-    const handleConfirmClick = () => {
-        if (newAvatar) setProfileData({ ...profileData, avatar: newAvatar });
-        setEditing(false);
-    };
+      //   const sortedAddresses = data.sort((a: Address, b: Address) => {
+      //     return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
+      //   });
+      //   console.log(sortedAddresses);
 
-    return (
-        <div className="profile-container w-full">
-            <Typography 
-                sx={{ fontSize: '35px', fontWeight: 'bolder', textAlign: 'center', marginBottom: '20px' }} 
-                className="profile-title"
-            >
-                HỒ SƠ CỦA TÔI
-            </Typography>
+      //   setSelectedAddress(sortedAddresses[0] || null);
+      //   setAddresses(sortedAddresses);
+    } catch {
+      console.log("...");
+    }
+  };
 
-            <Grid container spacing={0} alignItems="center">
-                {/* Avatar Section */}
-                <Grid size={3}>
-                    <div className="profile-image">
-                        <img
-                            src={newAvatar || profileData.avatar}
-                            alt="avatar"
-                            className="avatar-image1"
-                            style={{ width: '100%', height: 'auto', borderRadius: '50%' }}
-                        />
-                        {editing && (
-                            <>
-                                <label htmlFor="avatar-upload" className="change-photo-label">
-                                    <Typography color="primary" className="change-photo-text">
-                                        Đổi ảnh đại diện
-                                    </Typography>
-                                </label>
-                                <input
-                                    id="avatar-upload"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                    style={{ display: 'none' }}
-                                />
-                            </>
-                        )}
-                    </div>
-                </Grid>
+  const fetchUserInfo = async () => {
+    if (accessToken) {
+      try {
+        const response = await privateAxios.get("users/profile");
+        const { email, name, phone, address, avatar } = response.data;
+        setUserInfo(response.data);
+        setProfileData({
+          email,
+          name,
+          phone,
+          address,
+          avatar,
+        });
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
+  };
 
-                {/* Form Section */}
-                <Grid size={9}>
-                    <form noValidate autoComplete="off" className="profile-form">
-                        {[
-                            { label: 'Email', name: 'email', disabled: true },
-                            { label: 'Username', name: 'username' },
-                            { label: 'Số Điện Thoại', name: 'phoneNumber' },
-                            { label: 'Địa Chỉ', name: 'address' },
-                            { label: 'Ngày Sinh', name: 'dateOfBirth' },
-                        ].map(({ label, name, disabled }) => (
-                            <div key={name} className="form-row">
-                                <Typography>{label}:</Typography>
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) setNewAvatar(URL.createObjectURL(file));
+  };
+
+  const handleEditClick = () => setEditing(true);
+
+  const handleCancelClick = () => {
+    setEditing(false);
+    setNewAvatar(null);
+  };
+
+  const handleConfirmClick = () => {
+    if (newAvatar) setProfileData({ ...profileData, avatar: newAvatar });
+    setEditing(false);
+  };
+
+  const handleAddressModalClose = () => {
+    setIsAddressModalOpen(false);
+    fetchUserInfo(); // Refresh user info after address update
+  };
+
+  const refreshAddresses = () => {
+    fetchUserInfo();
+  };
+
+  useEffect(() => {
+    fetchUserInfo();
+    fetchUserAddress();
+  }, [accessToken]);
+
+  return (
+    // <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <div className="profile-container w-full">
+      <Typography
+        sx={{
+          fontSize: "35px",
+          fontWeight: "bolder",
+          textAlign: "center",
+          marginBottom: "20px",
+        }}
+        className="profile-title"
+      >
+        HỒ SƠ CỦA TÔI
+      </Typography>
+
+      <Grid container spacing={0} alignItems="center">
+        <Grid size={3}>
+          <div className="profile-image">
+            <img
+              src={newAvatar || profileData.avatar}
+              alt="avatar"
+              className="avatar-image1"
+              style={{ width: "150px", height: "auto", borderRadius: "50%" }}
+            />
+            {editing && (
+              <>
+                <label htmlFor="avatar-upload" className="change-photo-label">
+                  <Typography color="primary" className="change-photo-text">
+                    Đổi ảnh đại diện
+                  </Typography>
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                />
+              </>
+            )}
+          </div>
+        </Grid>
+
+        <Grid size={9}>
+          <form noValidate autoComplete="off" className="profile-form">
+            {[
+              { label: "Email", name: "email", disabled: true },
+              { label: "Username", name: "name" },
+              { label: "Số Điện Thoại", name: "phone" },
+            ].map(({ label, name, disabled }) => (
+              <div key={name} className="form-row">
+                <Typography>{label}:</Typography>
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  name={name}
+                  value={(profileData as any)[name]}
+                  disabled={disabled}
+                  className="profile-field"
+                  size="small"
+                />
+              </div>
+            ))}
+            {/* <div className="form-row">
+                            <Typography>Địa Chỉ:</Typography>
+                            <div className="flex items-center gap-2">
                                 <TextField
                                     fullWidth
                                     margin="normal"
                                     variant="outlined"
-                                    name={name}
-                                    value={(profileData as any)[name]}
-                                    disabled={disabled}
+                                    value={profileData.address}
+                                    disabled
                                     className="profile-field"
                                     size="small"
                                 />
+                                <Button
+                                    variant="contained"
+                                    onClick={() => setIsAddressModalOpen(true)}
+                                    sx={{
+                                        fontSize: '14px',
+                                        backgroundColor: '#000',
+                                        color: '#fff',
+                                        height: '40px',
+                                        marginTop: '8px'
+                                    }}
+                                >
+                                    Cập nhật
+                                </Button>
                             </div>
-                        ))}
-                        <div className="form-row">
-                            <Typography>Giới Tính:</Typography>
-                            <TextField
-                                fullWidth
-                                margin="normal"
-                                select
-                                name="gender"
-                                variant="outlined"
-                                value={profileData.gender}
-                                className="profile-field"
-                                size="small"
-                            >
-                                <MenuItem value="Female">Female</MenuItem>
-                                <MenuItem value="Male">Male</MenuItem>
-                            </TextField>
-                        </div>
-                    </form>
-                </Grid>
-            </Grid>
+                        </div> */}
+          </form>
+        </Grid>
+      </Grid>
 
-            {/* Button Section */}
-            <div className="button-container">
-                {!editing ? (
-                    <Button
-                        variant="contained"
-                        onClick={handleEditClick}
-                        sx={{ fontSize: '20px', backgroundColor: '#000', color: '#fff' }}
-                    >
-                        Cập Nhật Hồ Sơ
-                    </Button>
-                ) : (
-                    <>
-                        <Button
-                            variant="contained"
-                            color="error"
-                            onClick={handleCancelClick}
-                            sx={{ fontSize: '20px', marginRight: '10px' }}
-                        >
-                            Hủy
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="success"
-                            onClick={handleConfirmClick}
-                            sx={{ fontSize: '20px' }}
-                        >
-                            Xác Nhận
-                        </Button>
-                    </>
-                )}
-            </div>
-        </div>
-    );
+      <div className="button-container">
+        {!editing ? (
+          <Button
+            variant="contained"
+            onClick={handleEditClick}
+            sx={{ fontSize: "20px", backgroundColor: "#000", color: "#fff" }}
+          >
+            Cập Nhật Hồ Sơ
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleCancelClick}
+              sx={{ fontSize: "20px", marginRight: "10px" }}
+            >
+              Hủy
+            </Button>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleConfirmClick}
+              sx={{ fontSize: "20px" }}
+            >
+              Xác Nhận
+            </Button>
+          </>
+        )}
+      </div>
+
+      <Modal
+        open={isAddressModalOpen}
+        onClose={handleAddressModalClose}
+        aria-labelledby="address-modal-title"
+      >
+        <Box sx={modalStyle}>
+          {userInfo && (
+            <NewAddressForm
+              userInfo={userInfo}
+              onClose={handleAddressModalClose}
+              refreshAddresses={refreshAddresses}
+            />
+          )}
+        </Box>
+      </Modal>
+    </div>
+    // </LocalizationProvider>
+  );
 };
 
 export default ProfileUser;

@@ -133,7 +133,7 @@ const ProfileUser: React.FC = () => {
             </Typography>
 
             <Grid container spacing={0} alignItems="center">
-                <Grid size={3}>
+                <Grid size={3} sx={{ display: 'flex', justifyContent: 'flex-end', pr: 0 }}>
                     <div className="profile-image">
                         <img
                             src={newAvatar || profileData.avatar}
@@ -163,37 +163,25 @@ const ProfileUser: React.FC = () => {
                 <Grid size={9}>
                     <form noValidate autoComplete="off" className="profile-form">
                         {[
-                            { label: 'Email', name: 'email', disabled: true },
-                            { label: 'Username', name: 'name' },
-                            { label: 'Số Điện Thoại', name: 'phone' },
-                        ].map(({ label, name, disabled }) => (
+                            { label: 'Email', name: 'email', value: profileData.email, disabled: true },
+                            { label: 'Username', name: 'name', value: profileData.name },
+                            { label: 'Số Điện Thoại', name: 'phone', value: profileData.phone },
+                        ].map(({ label, name, value, disabled }) => (
                             <div key={name} className="form-row">
                                 <Typography>{label}:</Typography>
                                 <TextField
                                     fullWidth
                                     margin="normal"
                                     variant="outlined"
-                                    value={profileData.address}
-                                    disabled
+                                    value={value}
+                                    onChange={(e) => setProfileData({ ...profileData, [name]: e.target.value })}
+                                    disabled={disabled}
                                     className="profile-field"
                                     size="small"
                                 />
-                                <Button
-                                    variant="contained"
-                                    onClick={() => setIsAddressModalOpen(true)}
-                                    sx={{
-                                        fontSize: '14px',
-                                        backgroundColor: '#000',
-                                        color: '#fff',
-                                        height: '40px',
-                                        marginTop: '8px'
-                                    }}
-                                >
-                                    Cập nhật
-                                </Button>
                             </div>
-
                         ))}
+
                         {/* <div className="form-row">
                             <Typography>Địa Chỉ:</Typography>
                             <div className="flex items-center gap-2">

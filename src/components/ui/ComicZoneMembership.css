@@ -1,0 +1,80 @@
+.membership-container {
+  position: relative;
+}
+
+/* Center align the header chip */
+.MuiChip-root[label="GÓI THÀNH VIÊN TẠI COMZONE"] {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  position: absolute !important;
+}
+
+/* Card hover effects */
+.membership-box {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.membership-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Premium plan styling */
+.premium-plan {
+  background: linear-gradient(135deg, #38419e 0%, #2c3377 100%) !important;
+  position: relative;
+}
+
+.premium-plan::before {
+  content: "🔥 HOT";
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #FF4081;
+  color: white;
+  padding: 5px 15px;
+  border-bottom-left-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.premium-plan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.1) 100%);
+  animation: shine 2s infinite;
+}
+
+/* Basic plan hover */
+.basic-plan:hover {
+  border-color: #38419e !important;
+}
+
+/* Shine effect */
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  50%, 100% { transform: translateX(100%); }
+}
+
+/* Try now text animation */
+.try-now-text {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Feature list items hover */
+.plan-features li {
+  transition: transform 0.2s ease;
+}
+
+.plan-features li:hover {
+  transform: translateX(5px);
+}
+

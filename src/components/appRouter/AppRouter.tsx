@@ -23,10 +23,7 @@ import ExchangeUser from "../../pages/ExchangeUser";
 import RegisterSeller from "../../pages/RegisterSeller";
 import { ConfigProvider } from "antd";
 import AllHotComics from "../../pages/HotComic";
-<<<<<<< HEAD
 import ComicZoneMembership from "../membership/ComicZoneMembership";
-=======
->>>>>>> 8c14da9 (fix)
 
 const AppRouter = () => {
   return (
@@ -62,7 +59,6 @@ const AppRouter = () => {
         <Route path="/registerSeller" element={<RegisterSeller />} />
 
         <Route path="/membership" element={<ComicZoneMembership />} />
-
       </Routes>
     </div>
   );

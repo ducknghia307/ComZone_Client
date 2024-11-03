@@ -102,39 +102,40 @@ const ProfileUser: React.FC = () => {
     setNewAvatar(null);
   };
 
-  const handleConfirmClick = () => {
-    if (newAvatar) setProfileData({ ...profileData, avatar: newAvatar });
-    setEditing(false);
+  const handleConfirmClick = async () => {
+    if (accessToken && (profileData.name || profileData.phone || newAvatar)) {
+      setLoading(true);
+
+      const updatedData = {
+        name: profileData.name,
+        phone: profileData.phone,
+        avatar: newAvatar || profileData.avatar,
+      };
+
+      try {
+        await privateAxios.patch("/users/profile", updatedData);
+        setProfileData({
+          ...profileData,
+          avatar: newAvatar || profileData.avatar,
+        });
+        setEditing(false);
+        console.log("Profile updated successfully.");
+      } catch (error) {
+        console.error("Error updating profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
-    const handleConfirmClick = async () => {
-        if (accessToken && (profileData.name || profileData.phone || newAvatar)) {
-            setLoading(true);
+  const handleAddressModalClose = () => {
+    setIsAddressModalOpen(false);
+    fetchUserInfo(); // Refresh user info after address update
+  };
 
-            const updatedData = {
-                name: profileData.name,
-                phone: profileData.phone,
-                avatar: newAvatar || profileData.avatar,
-            };
-
-            try {
-                await privateAxios.patch("/users/profile", updatedData);
-                setProfileData({ ...profileData, avatar: newAvatar || profileData.avatar });
-                setEditing(false);
-                console.log("Profile updated successfully.");
-            } catch (error) {
-                console.error("Error updating profile:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
-
-
-    const handleAddressModalClose = () => {
-        setIsAddressModalOpen(false);
-        fetchUserInfo(); // Refresh user info after address update
-    };
+  const refreshAddresses = () => {
+    fetchUserInfo();
+  };
 
   useEffect(() => {
     fetchUserInfo();
@@ -157,7 +158,10 @@ const ProfileUser: React.FC = () => {
       </Typography>
 
       <Grid container spacing={0} alignItems="center">
-        <Grid size={3}>
+        <Grid
+          size={3}
+          sx={{ display: "flex", justifyContent: "flex-end", pr: 0 }}
+        >
           <div className="profile-image">
             <img
               src={newAvatar || profileData.avatar}
@@ -184,68 +188,72 @@ const ProfileUser: React.FC = () => {
           </div>
         </Grid>
 
-                <Grid size={9}>
-                    <form noValidate autoComplete="off" className="profile-form">
-                        {[
-                            { label: 'Email', name: 'email', value: profileData.email, disabled: true },
-                            { label: 'Username', name: 'name', value: profileData.name, disabled: !editing },
-                            { label: 'Số Điện Thoại', name: 'phone', value: profileData.phone, disabled: !editing },
-                        ].map(({ label, name, value, disabled }) => (
-                            <div key={name} className="form-row">
-                                <Typography>{label}:</Typography>
-                                <TextField
-                                    fullWidth
-                                    margin="normal"
-                                    variant="outlined"
-                                    value={value}
-                                    onChange={(e) => setProfileData({ ...profileData, [name]: e.target.value })}
-                                    disabled={disabled}
-                                    className="profile-field"
-                                    size="small"
-                                />
-                            </div>
-                        ))}
-                    </form>
+        <Grid size={9}>
+          <form noValidate autoComplete="off" className="profile-form">
+            {[
+              {
+                label: "Email",
+                name: "email",
+                value: profileData.email,
+                disabled: true,
+              },
+              {
+                label: "Username",
+                name: "name",
+                value: profileData.name,
+                disabled: !editing,
+              },
+              {
+                label: "Số Điện Thoại",
+                name: "phone",
+                value: profileData.phone,
+                disabled: !editing,
+              },
+            ].map(({ label, name, value, disabled }) => (
+              <div key={name} className="form-row">
+                <Typography>{label}:</Typography>
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  value={value}
+                  onChange={(e) =>
+                    setProfileData({ ...profileData, [name]: e.target.value })
+                  }
+                  disabled={disabled}
+                  className="profile-field"
+                  size="small"
+                />
+              </div>
+            ))}
+          </form>
+        </Grid>
+      </Grid>
 
-                </Grid>
-            </Grid>
-
-            <div className="button-container">
-                {!editing ? (
-                    <Button
-                        variant="contained"
-                        onClick={handleEditClick}
-                        sx={{ fontSize: '20px', backgroundColor: '#000', color: '#fff' }}
-                    >
-                        Cập Nhật Hồ Sơ
-                    </Button>
-                ) : (
-                    <>
-                        <Button
-                            variant="contained"
-                            color="error"
-                            onClick={handleCancelClick}
-                            sx={{ fontSize: '20px', marginRight: '10px' }}
-                        >
-                            Hủy
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="success"
-                            onClick={handleConfirmClick}
-                            sx={{ fontSize: '20px' }}
-                        >
-                            Xác Nhận
-                        </Button>
-                    </>
-                )}
-            </div>
-
-
-            <Modal
-                open={isAddressModalOpen}
-                onClose={handleAddressModalClose}
-                aria-labelledby="address-modal-title"
+      <div className="button-container">
+        {!editing ? (
+          <Button
+            variant="contained"
+            onClick={handleEditClick}
+            sx={{ fontSize: "20px", backgroundColor: "#000", color: "#fff" }}
+          >
+            Cập Nhật Hồ Sơ
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleCancelClick}
+              sx={{ fontSize: "20px", marginRight: "10px" }}
+            >
+              Hủy
+            </Button>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleConfirmClick}
+              sx={{ fontSize: "20px" }}
             >
               Xác Nhận
             </Button>

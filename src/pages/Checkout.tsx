@@ -269,7 +269,9 @@ const Checkout = () => {
       setIsLoading(false);
     }
   };
-
+  useEffect(() => {
+    console.log("a", selectedAddress);
+  }, [selectedAddress]);
   return (
     <>
       {isLoading && <Loading />}

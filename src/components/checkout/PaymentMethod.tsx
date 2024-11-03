@@ -107,37 +107,29 @@ const PaymentMethod = ({
   };
 
   return (
-    <div className="w-full bg-white px-8 py-4 flex flex-col rounded-t-lg">
+    <div className="w-full bg-white px-8 py-4 flex flex-col rounded-lg">
       <h2 className="font-bold mb-4">PHƯƠNG THỨC THANH TOÁN</h2>
 
       {/* Option 1: Thanh Toán Bằng Ví Comzone */}
       <div
-        className={`w-full p-4 mb-4 rounded-lg border h-28 ${
+        className={`w-full px-10 py-4 mb-4 rounded-lg border h-28 ${
           selectedMethod === "wallet"
             ? "border-black border-2"
-            : "border-gray-300 hover:bg-gray-100 hover:border-black cursor-pointer"
+            : "border-gray-300 opacity-60 hover:opacity-100 hover:border-black cursor-pointer"
         } flex items-center justify-between duration-200`}
         onClick={() => setSelectedMethod("wallet")}
       >
         <div className="flex items-center">
-          <input
-            type="radio"
-            id="wallet"
-            name="payment"
-            checked={selectedMethod === "wallet"}
-            onChange={() => setSelectedMethod("wallet")}
-            className="mr-4"
-          />
           <div className="flex flex-col gap-1">
-            <div className="flex flex-row gap-1 items-center">
+            <div className="flex flex-row gap-2 items-center">
               <img
                 src="https://images-ext-1.discordapp.net/external/m1iq6Vi9sJIxPZYtk5n9CCfmi2A43Dbqt4RObJjKT7Y/https/cdn-icons-png.flaticon.com/512/6020/6020687.png?format=webp&quality=lossless&width=460&height=460"
                 alt=""
-                className="h-10 w-10"
+                className="w-[2em] h-[2em]"
               />
 
               <p className="font-bold">THANH TOÁN BẰNG VÍ COMZONE</p>
-              <span className="ml-2 py-1 px-2 bg-cyan-900 rounded-lg text-white text-xs">
+              <span className="ml-2 py-1 px-2 bg-cyan-900 rounded-lg text-white text-xs whitespace-nowrap hidden xl:inline">
                 Khuyên dùng
               </span>
             </div>
@@ -175,16 +167,20 @@ const PaymentMethod = ({
           </div>
         </div>
 
-        {/* Balance Error and Recharge Button */}
         <div
-          className={`text-right ${(!amount || balance >= amount) && "hidden"}`}
+          className={`flex flex-col xl:flex-row items-center justify-center xl:gap-2 text-right ${
+            (!amount || balance >= amount || selectedMethod === "cod") &&
+            "hidden"
+          }`}
         >
-          <p className="text-red-500 font-thin mb-1">Số dư hiện không đủ</p>
+          <p className="text-red-500 font-light text-xs">
+            Số dư hiện không đủ.
+          </p>
           <button
-            className="bg-cyan-600 text-white px-6 py-2 rounded-md hover:opacity-75"
+            className="text-sky-800 text-sm duration-200 hover:text-sky-600"
             onClick={showModal}
           >
-            NẠP TIỀN VÀO VÍ
+            Nạp thêm
           </button>
           <Modal
             // title="NẠP TIỀN VÀO VÍ"
@@ -308,27 +304,19 @@ const PaymentMethod = ({
 
       {/* Option 2: Thanh Toán Khi Nhận Hàng */}
       <div
-        className={`w-full p-4 rounded-lg border h-28 ${
+        className={`w-full px-10 py-4 rounded-lg border h-28 ${
           selectedMethod === "cod"
             ? "border-black border-2"
-            : "border-gray-300 hover:bg-gray-100 hover:border-black cursor-pointer"
+            : "border-gray-300 opacity-60 hover:opacity-100 hover:border-black cursor-pointer"
         } flex items-center duration-200`}
         onClick={() => setSelectedMethod("cod")}
       >
-        <input
-          type="radio"
-          id="cod"
-          name="payment"
-          checked={selectedMethod === "cod"}
-          onChange={() => setSelectedMethod("cod")}
-          className="mr-4"
-        />
         <div className="flex items-center">
           {/* Cash on Delivery Icon */}
           <img
             src="https://images-ext-1.discordapp.net/external/8HO1TdE688wNSIPu1fBpZhwFmNdyGN_T5DHPy_KFu5w/https/cdn-icons-png.flaticon.com/512/5163/5163782.png?format=webp&quality=lossless&width=576&height=576"
             alt=""
-            className="h-10 w-10"
+            className="w-[2em] h-[2em]"
           />
           <h4 className="font-bold ml-2">THANH TOÁN KHI NHẬN HÀNG</h4>
         </div>

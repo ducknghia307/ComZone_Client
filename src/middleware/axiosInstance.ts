@@ -32,7 +32,6 @@ privateAxios.interceptors.request.use(
     // Always get the latest state
     const state = store.getState();
     const accessToken = state.auth.accessToken;
-    console.log("Current accessToken before request:", accessToken); // Log the token
 
     if (accessToken) {
       config.headers["Authorization"] = "Bearer " + accessToken;
@@ -98,8 +97,6 @@ const getNewTokens = async (
         },
       }
     );
-
-    console.log("Response from getNewTokens:", response.data); // Log the data received
     return response.data; // Assuming the API returns { token }
   } catch (error) {
     console.error("Error refreshing tokens:", error.response?.data || error);

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
-import { Button, MenuItem, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography, Modal, Box } from "@mui/material";
 import "../components/ui/ProfileUser.css";
 import { privateAxios } from "../middleware/axiosInstance";
 import { useAppSelector } from "../redux/hooks";
@@ -11,31 +11,34 @@ import NewAddressForm from "../components/checkout/NewAddressForm";
 
 interface ProfileData {
   email: string;
-  username: string;
-  phoneNumber: string;
-  gender: string;
+  name: string;
+  phone: string;
   address: string;
-  dateOfBirth: string;
   avatar: string;
 }
 
 const modalStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '60%',
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-    maxHeight: '90vh',
-    overflowY: 'auto',
-    borderRadius: '8px'
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "60%",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  maxHeight: "90vh",
+  overflowY: "auto",
+  borderRadius: "8px",
 };
 
 const ProfileUser: React.FC = () => {
   const [editing, setEditing] = useState(false);
   const [newAvatar, setNewAvatar] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { accessToken } = useAppSelector((state) => state.auth);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo>();
 
   const [profileData, setProfileData] = useState<ProfileData>({
     email: "",

@@ -307,6 +307,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                         fontWeight: "bold",
                         fontSize: "16px",
                       }}
+                      onClick={() => openOrderDetailsModal(order)}
                     >
                       Xem Chi Tiết
                     </Button>

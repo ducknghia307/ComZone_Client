@@ -23,6 +23,8 @@ const Sidebar = () => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const fetchUserInfo = async () => {
     const response = await privateAxios("users/profile");
+    console.log("user info", response);
+    
     setUserInfo(response.data);
   };
   useEffect(() => {
@@ -33,13 +35,13 @@ const Sidebar = () => {
     <div>
       <div className="profile-section1">
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX1xth7Ez9iGvBnrxojtvXWMPYyLgLPgjnYg&s"
+          src={userInfo?.avatar}
           alt="avatar"
           className="avatar-image"
         />
         <div>
           <p className="username">{userInfo?.name}</p>
-          <a href="#" className="edit-profile">
+          <a href="/accountManagement/profile" className="edit-profile">
             <CreateOutlinedIcon />
             Sửa Hồ Sơ
           </a>

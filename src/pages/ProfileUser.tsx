@@ -107,14 +107,34 @@ const ProfileUser: React.FC = () => {
     setEditing(false);
   };
 
-  const handleAddressModalClose = () => {
-    setIsAddressModalOpen(false);
-    fetchUserInfo(); // Refresh user info after address update
-  };
+    const handleConfirmClick = async () => {
+        if (accessToken && (profileData.name || profileData.phone || newAvatar)) {
+            setLoading(true);
 
-  const refreshAddresses = () => {
-    fetchUserInfo();
-  };
+            const updatedData = {
+                name: profileData.name,
+                phone: profileData.phone,
+                avatar: newAvatar || profileData.avatar,
+            };
+
+            try {
+                await privateAxios.patch("/users/profile", updatedData);
+                setProfileData({ ...profileData, avatar: newAvatar || profileData.avatar });
+                setEditing(false);
+                console.log("Profile updated successfully.");
+            } catch (error) {
+                console.error("Error updating profile:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+
+    const handleAddressModalClose = () => {
+        setIsAddressModalOpen(false);
+        fetchUserInfo(); // Refresh user info after address update
+    };
 
   useEffect(() => {
     fetchUserInfo();
@@ -164,82 +184,68 @@ const ProfileUser: React.FC = () => {
           </div>
         </Grid>
 
-        <Grid size={9}>
-          <form noValidate autoComplete="off" className="profile-form">
-            {[
-              { label: "Email", name: "email", disabled: true },
-              { label: "Username", name: "name" },
-              { label: "Số Điện Thoại", name: "phone" },
-            ].map(({ label, name, disabled }) => (
-              <div key={name} className="form-row">
-                <Typography>{label}:</Typography>
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  name={name}
-                  value={(profileData as any)[name]}
-                  disabled={disabled}
-                  className="profile-field"
-                  size="small"
-                />
-              </div>
-            ))}
-            {/* <div className="form-row">
-                            <Typography>Địa Chỉ:</Typography>
-                            <div className="flex items-center gap-2">
+                <Grid size={9}>
+                    <form noValidate autoComplete="off" className="profile-form">
+                        {[
+                            { label: 'Email', name: 'email', value: profileData.email, disabled: true },
+                            { label: 'Username', name: 'name', value: profileData.name, disabled: !editing },
+                            { label: 'Số Điện Thoại', name: 'phone', value: profileData.phone, disabled: !editing },
+                        ].map(({ label, name, value, disabled }) => (
+                            <div key={name} className="form-row">
+                                <Typography>{label}:</Typography>
                                 <TextField
                                     fullWidth
                                     margin="normal"
                                     variant="outlined"
-                                    value={profileData.address}
-                                    disabled
+                                    value={value}
+                                    onChange={(e) => setProfileData({ ...profileData, [name]: e.target.value })}
+                                    disabled={disabled}
                                     className="profile-field"
                                     size="small"
                                 />
-                                <Button
-                                    variant="contained"
-                                    onClick={() => setIsAddressModalOpen(true)}
-                                    sx={{
-                                        fontSize: '14px',
-                                        backgroundColor: '#000',
-                                        color: '#fff',
-                                        height: '40px',
-                                        marginTop: '8px'
-                                    }}
-                                >
-                                    Cập nhật
-                                </Button>
                             </div>
-                        </div> */}
-          </form>
-        </Grid>
-      </Grid>
+                        ))}
+                    </form>
 
-      <div className="button-container">
-        {!editing ? (
-          <Button
-            variant="contained"
-            onClick={handleEditClick}
-            sx={{ fontSize: "20px", backgroundColor: "#000", color: "#fff" }}
-          >
-            Cập Nhật Hồ Sơ
-          </Button>
-        ) : (
-          <>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleCancelClick}
-              sx={{ fontSize: "20px", marginRight: "10px" }}
-            >
-              Hủy
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleConfirmClick}
-              sx={{ fontSize: "20px" }}
+                </Grid>
+            </Grid>
+
+            <div className="button-container">
+                {!editing ? (
+                    <Button
+                        variant="contained"
+                        onClick={handleEditClick}
+                        sx={{ fontSize: '20px', backgroundColor: '#000', color: '#fff' }}
+                    >
+                        Cập Nhật Hồ Sơ
+                    </Button>
+                ) : (
+                    <>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={handleCancelClick}
+                            sx={{ fontSize: '20px', marginRight: '10px' }}
+                        >
+                            Hủy
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={handleConfirmClick}
+                            sx={{ fontSize: '20px' }}
+                        >
+                            Xác Nhận
+                        </Button>
+                    </>
+                )}
+            </div>
+
+
+            <Modal
+                open={isAddressModalOpen}
+                onClose={handleAddressModalClose}
+                aria-labelledby="address-modal-title"
             >
               Xác Nhận
             </Button>

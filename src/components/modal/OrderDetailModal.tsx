@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Box, Typography, Button, Divider, IconButton } from '@mui/material';
+import { Modal, Box, Typography, Divider, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 interface OrderDetailsModalProps {

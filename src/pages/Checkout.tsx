@@ -6,20 +6,35 @@ import {
   Address,
   // BaseInterface,
   Comic,
+  SellerDetails,
   // UserInfo,
 } from "../common/base.interface";
-import CurrencySplitter from "../assistants/Spliter";
 import { privateAxios } from "../middleware/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal } from "antd";
-// import { privateAxios } from "../middleware/axiosInstance";
+import TotalSummary from "../components/checkout/TotalSummary";
+import Loading from "../components/loading/Loading";
+
 interface SellerGroup {
   sellerName: string;
   comics: { comic: Comic; quantity: number }[];
+  delivery?: {
+    cost: number;
+    estDeliveryTime: Date;
+  };
+  note?: string;
+}
+
+interface SellerGroupDetails {
+  sellerId: string;
+  deliveryFee: number;
+  estDeliveryTime: Date;
+  address?: Address;
 }
 
 const Checkout = () => {
   // const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userWalletBalance, setUserWalletBalance] = useState<number>(0);
   const [groupedSelectedComics, setGroupedSelectedComics] = useState<
     Record<string, SellerGroup>
@@ -27,6 +42,12 @@ const Checkout = () => {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<string>("wallet");
+  const [sellerDetailsGroup, setSellerDetailsGroup] = useState<
+    SellerDetails[] | []
+  >([]);
+  const [deliveryDetails, setDeliveryDetails] = useState<SellerGroupDetails[]>(
+    []
+  );
   const navigate = useNavigate();
   const [modal, contextHolder] = Modal.useModal();
   const countDown = () => {
@@ -35,7 +56,7 @@ const Checkout = () => {
     const instance = modal.success({
       title: "Đặt hàng thành công!",
       content: `Chuyển trang trong vòng ${secondsToGo} giây...`,
-      okText: "Go to Order Completion",
+      okText: "Chuyển ngay",
       onOk: () => {
         navigate("/order/complete");
       },
@@ -57,26 +78,67 @@ const Checkout = () => {
 
   const fetchUserInfo = async () => {
     try {
+      setIsLoading(true);
       const response = await privateAxios("/users/profile");
       const data = await response.data;
 
       // setUserInfo(data);
 
       setUserWalletBalance(Number(data.balance));
+      setIsLoading(false);
     } catch {
       console.log("...");
     }
   };
 
-  // const fetchDeliveryDetails = async () => {
-  //   try {
-  //     const response = await privateAxios.post('/orders/delivery-details', {
-  //       fromDistrict: selectedAddress?.district.id,
-  //             })
-  //   } catch (error) {
-  //     console.log("Error to post delivery details:", error);
-  //   }
-  // }
+  const fetchDeliveryDetails = async () => {
+    setIsLoading(true);
+
+    if (!selectedAddress) return;
+
+    setDeliveryDetails([]);
+    setSellerDetailsGroup([]);
+
+    await Promise.all(
+      Object.keys(groupedSelectedComics).map(async (sellerId) => {
+        const sellerDetails = await privateAxios.get(
+          `/seller-details/user/${sellerId}`
+        );
+
+        setSellerDetailsGroup((prev) => [...prev, sellerDetails.data]);
+
+        const sellerAddress = {
+          district: sellerDetails.data.district.id,
+          ward: sellerDetails.data.ward.id,
+        };
+
+        if (sellerDetails && selectedAddress)
+          await privateAxios
+            .post("/orders/delivery-details", {
+              fromDistrict: sellerAddress.district,
+              fromWard: sellerAddress.ward,
+              toDistrict: selectedAddress.district.id,
+              toWard: selectedAddress.ward.id,
+              comicsQuantity: groupedSelectedComics[sellerId].comics.length,
+            })
+            .then((res) => {
+              const newDeliveryDetails = {
+                sellerId: sellerId,
+                deliveryFee: parseInt(res.data.deliveryFee),
+                estDeliveryTime: res.data.estDeliveryTime,
+              };
+              setDeliveryDetails((prev) => [...prev, newDeliveryDetails]);
+            })
+            .catch((err) => console.log(err));
+      })
+    ).finally(() => {
+      setIsLoading(false);
+    });
+  };
+
+  useEffect(() => {
+    fetchDeliveryDetails();
+  }, [selectedAddress]);
 
   const comics = sessionStorage.getItem("selectedComics");
   useEffect(() => {
@@ -84,9 +146,7 @@ const Checkout = () => {
       setGroupedSelectedComics(JSON.parse(comics));
     }
     fetchUserInfo();
-    // fetchUserWallet();
   }, []);
-  console.log(groupedSelectedComics);
 
   const totalPrice = Object.values(groupedSelectedComics).reduce(
     (total, sellerGroup) => {
@@ -100,15 +160,23 @@ const Checkout = () => {
     },
     0
   );
+
+  const totalDeliveryPrice = deliveryDetails.reduce((total, delivery) => {
+    return total + delivery.deliveryFee;
+  }, 0);
+
   const totalQuantity = Object.values(groupedSelectedComics).reduce(
     (total, sellerGroup) =>
       total + sellerGroup.comics.reduce((sum) => sum + 1, 0),
     0
   );
+
   const handlePaymentMethodSelect = (method: string) => {
     setSelectedPaymentMethod(method);
   };
   const handleSubmit = async () => {
+    setIsLoading(true);
+
     console.log("Selected Comics by Seller:", groupedSelectedComics);
     console.log("Selected Address:", selectedAddress);
     console.log("Selected Payment Method:", selectedPaymentMethod);
@@ -117,17 +185,38 @@ const Checkout = () => {
       const orderedComicIds: string[] = [];
       for (const sellerId in groupedSelectedComics) {
         const sellerGroup = groupedSelectedComics[sellerId];
-        console.log(sellerGroup);
 
         const sellerTotalPrice = sellerGroup.comics.reduce(
           (total, { comic }) => total + Number(comic.price),
           0
         );
-        console.log("sellertotalprice:", sellerTotalPrice);
+        const sellerDeliveryPrice =
+          deliveryDetails.find((d) => d.sellerId === sellerId)?.deliveryFee ||
+          0;
+
+        const sellerDetails = sellerDetailsGroup.find(
+          (details) => details.user.id === sellerId
+        );
 
         const orderResponse = await privateAxios.post("/orders", {
-          totalPrice: Number(sellerTotalPrice),
+          totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
           paymentMethod: selectedPaymentMethod,
+          fromName: sellerGroup.sellerName,
+          fromPhone: sellerDetails?.verifiedPhone,
+          fromAddress: sellerDetails?.fullAddress,
+          fromProvinceName: sellerDetails?.province.name,
+          fromDistrictId: sellerDetails?.district.id,
+          fromDistrictName: sellerDetails?.district.name,
+          fromWardId: sellerDetails?.ward.id,
+          fromWardName: sellerDetails?.ward.name,
+          toName: selectedAddress?.fullName,
+          toPhone: selectedAddress?.phone,
+          toAddress: selectedAddress?.fullAddress,
+          toDistrictId: selectedAddress?.district.id,
+          toWardId: selectedAddress?.ward.id,
+          deliveryFee: sellerDeliveryPrice,
+          addressId: selectedAddress?.id,
+          note: "",
         });
 
         const orderId = orderResponse.data.id;
@@ -143,27 +232,21 @@ const Checkout = () => {
           await privateAxios.post("/order-items", orderItemPayload);
           orderedComicIds.push(comic.id);
         }
-        const resOrderDelivery = await privateAxios.post("/order-deliveries", {
-          orderId: orderId,
-          phone: selectedAddress?.phone,
-          province: selectedAddress?.province,
-          district: selectedAddress?.district,
-          ward: selectedAddress?.ward,
-          detailedAddress: selectedAddress?.detailedAddress,
-        });
-        console.log(resOrderDelivery.data);
 
-        const resTransactions = await privateAxios.post("/transactions", {
-          order: orderId,
-          amount: sellerTotalPrice,
-        });
-        console.log(resTransactions.data);
-        const resResult = await privateAxios.patch(
-          `/transactions/post/${resTransactions.data.id}`
-        );
-        console.log(resResult.data);
+        if (selectedPaymentMethod === "wallet") {
+          const resTransactions = await privateAxios.post("/transactions", {
+            order: orderId,
+            amount: sellerTotalPrice,
+          });
+          console.log(resTransactions.data);
+          const resResult = await privateAxios.patch(
+            `/transactions/post/${resTransactions.data.id}`
+          );
+          console.log(resResult.data);
+        }
       }
-      console.log("All orders successfully created!");
+
+      console.log("All orders are successfully created!");
       const storedCartData = localStorage.getItem("cart");
       if (storedCartData) {
         const parsedCartData = JSON.parse(storedCartData);
@@ -182,62 +265,54 @@ const Checkout = () => {
       } else {
         console.error("Error submitting order:", error);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
-  useEffect(() => {
-    console.log("a", selectedAddress);
-  }, [selectedAddress]);
+
   return (
     <>
-      <div className="w-full flex flex-col px-20 py-8 bg-neutral-100 REM">
+      {isLoading && <Loading />}
+      <div className="w-full flex flex-col items-center px-20 py-8 bg-neutral-100 REM">
         {comics ? (
-          <>
-            <DeliveryAddress
-              selectedAddress={selectedAddress}
-              setSelectedAddress={setSelectedAddress}
-            />
-            <OrderCheck
-              groupedSelectedComics={groupedSelectedComics}
-              // totalPrice={totalPrice}
-              // totalQuantity={totalQuantity}
-            />
-            {/* <DeliveryMethod /> */}
-            <PaymentMethod
-              onMethodSelect={handlePaymentMethodSelect}
-              amount={totalPrice}
-              balance={userWalletBalance}
-            />
-            <div className="flex flex-col items-center w-full bg-white rounded-b-lg">
-              <div className="flex flex-row items-center justify-end w-full py-4 gap-2 border-t-2 pr-8 border-dashed">
-                <h4 className="font-light">
-                  Tổng số tiền ({totalQuantity} truyện):
-                </h4>
-                <h4 className="font-semibold text-2xl text-cyan-900">
-                  {CurrencySplitter(totalPrice)}đ
-                </h4>
-              </div>
-              <div className="flex flex-row justify-between w-full px-8 items-center   py-4">
-                <div className="flex">
-                  <input type="checkbox" className="mr-2" />
-                  <span>
-                    Nhấn "Đặt hàng" đồng nghĩa với việc bạn đã đồng ý với{" "}
-                    <a href="#" className="text-blue-500">
-                      Điều khoản của ComZone
-                    </a>
-                  </span>
-                </div>
-                <button
-                  className="px-8 py-2 font-bold text-white bg-black rounded-md duration-200 hover:opacity-80"
-                  onClick={handleSubmit}
-                >
-                  Đặt hàng
-                </button>
-              </div>
+          <div className="min-w-[60em] max-w-[100em] flex items-start gap-4 relative">
+            <div className="w-full flex flex-col gap-4">
+              <DeliveryAddress
+                selectedAddress={selectedAddress}
+                setSelectedAddress={setSelectedAddress}
+              />
+              <OrderCheck
+                groupedSelectedComics={groupedSelectedComics}
+                deliveryDetails={deliveryDetails}
+                // totalPrice={totalPrice}
+                // totalQuantity={totalQuantity}
+              />
+              {/* <DeliveryMethod /> */}
+              <PaymentMethod
+                onMethodSelect={handlePaymentMethodSelect}
+                amount={totalPrice + totalDeliveryPrice}
+                balance={userWalletBalance}
+              />
             </div>
-          </>
+            <div className="grow min-w-[20em] max-w-[25em] top-4 sticky">
+              <TotalSummary
+                totalPrice={totalPrice}
+                totalDeliveryPrice={totalDeliveryPrice}
+                totalQuantity={totalQuantity}
+                handleSubmit={handleSubmit}
+                navigate={navigate}
+                isConfirmDisabled={
+                  selectedPaymentMethod === "wallet" &&
+                  userWalletBalance < totalPrice + totalDeliveryPrice
+                }
+              />
+            </div>
+          </div>
         ) : (
           <div className="w-full bg-white REM">
-            <h2>Vui lòng quay lại và chọn 1 sản phẩm trong giỏ hàng!</h2>
+            <h2>
+              Vui lòng quay lại và chọn ít nhất 1 sản phẩm trong giỏ hàng!
+            </h2>
             <Link to={"/cart"}>Quay lại</Link>
           </div>
         )}

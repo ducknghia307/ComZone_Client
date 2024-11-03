@@ -1,15 +1,62 @@
 import React from "react";
+import CurrencySplitter from "../../assistants/Spliter";
+import moment from "moment/min/moment-with-locales";
+import { Input } from "antd";
+moment.locale("vi");
 
-const DeliveryMethod = () => {
+const DeliveryMethod = ({
+  deliveryPrice,
+  estDeliveryTime,
+}: {
+  deliveryPrice: number;
+  estDeliveryTime: Date;
+}) => {
+  const formattedDate = () => {
+    const arr = moment(estDeliveryTime || new Date())
+      .format("LLLL")
+      .split(" ");
+
+    return (
+      arr[0].charAt(0).toUpperCase() +
+      arr[0].slice(1) +
+      " " +
+      arr[1] +
+      " ngày " +
+      arr[2] +
+      " " +
+      arr[3] +
+      " " +
+      arr[4] +
+      " " +
+      arr[5] +
+      " " +
+      arr[6]
+    );
+  };
+
   return (
-    <>
-      <div className="w-full bg-white pt-4 flex flex-col my-4 border-t-2 border-dashed">
-        <div className="grid grid-cols-3 gap-4 items-center">
-          <h2 className="font-bold">PHƯƠNG THỨC VẬN CHUYỂN</h2>
-          <div className="flex flex-row gap-2 items-center justify-end">
+    <div className="w-full flex items-start justify-center gap-2 border-t mt-2">
+      <div className="w-1/2 bg-white pt-4 flex flex-col gap-2 md:pr-8">
+        <p className="font-bold">GHI CHÚ</p>
+        <p className="font-light text-xs italic">
+          Gửi đến người bán những ghi chú cho đơn hàng của bạn.
+        </p>
+        <Input.TextArea
+          autoSize={{ minRows: 2, maxRows: 4 }}
+          placeholder="Ghi chú"
+          spellCheck={false}
+          className="text-xs font-light"
+        />
+      </div>
+
+      <div className="w-1/2 bg-white pt-4 flex flex-col gap-2">
+        <h2 className="font-bold">THÔNG TIN VẬN CHUYỂN</h2>
+
+        <div className="w-full flex items-center justify-between gap-2 font-light text-xs italic">
+          <div className="flex gap-2 items-center">
             <svg
-              width="30px"
-              height="30px"
+              width="24px"
+              height="24px"
               viewBox="0 0 64 64"
               xmlns="http://www.w3.org/2000/svg"
               strokeWidth="3"
@@ -42,12 +89,18 @@ const DeliveryMethod = () => {
                 strokeLinecap="round"
               />
             </svg>
-            <h2>3PL</h2>
+
+            <p>Dự kiến nhận hàng: </p>
           </div>
-          <h2 className="text-end">22,200đ</h2>
+          <p className="text-end">{formattedDate()}</p>
+        </div>
+
+        <div className="w-full flex items-center justify-between gap-2 text-sm">
+          <p>Phí giao hàng: </p>
+          <p>{CurrencySplitter(deliveryPrice || 10000)} đ</p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

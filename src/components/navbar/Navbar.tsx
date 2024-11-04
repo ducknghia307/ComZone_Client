@@ -26,7 +26,6 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useAppDispatch();
   const { accessToken } = useAppSelector((state) => state.auth);
-  console.log("accesstoken from navbav", accessToken);
   const [cartLength, setCartLength] = useState(0);
   const navigate = useNavigate();
   const toggleMenu = () => {
@@ -36,9 +35,6 @@ const Navbar = () => {
     const query = new URLSearchParams(window.location.search);
     const accessToken = query.get("accessToken");
     const refreshToken = query.get("refreshToken");
-
-    console.log("Access Token:", accessToken);
-    console.log("Refresh Token:", refreshToken);
 
     // Dispatch tokens to Redux if available
     if (accessToken && refreshToken) {
@@ -50,7 +46,7 @@ const Navbar = () => {
 
       setTimeout(() => {
         window.location.reload();
-      }, 100);
+      }, 500);
     }
     const updateCartLength = () => {
       const cartData = localStorage.getItem("cart");

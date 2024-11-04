@@ -119,7 +119,7 @@ const Auctions: React.FC = () => {
     useEffect(() => {
         const fetchComics = async () => {
           try {
-            const response = await publicAxios.get("/comics/status/available");
+            const response = await publicAxios.get("/auction");
             const data = response.data;
             const auctionComics = data.filter((comic: any) => comic.isAuction === true);
             setComics(auctionComics);

@@ -6,7 +6,8 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import StarIcon from "@mui/icons-material/Star";
 import { Link } from "react-router-dom";
-import { publicAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
+import { useAppSelector } from "../../redux/hooks";
 
 const responsive = {
   superLargeDesktop: {
@@ -27,7 +28,6 @@ const responsive = {
     items: 1,
   },
 };
-
 const CustomButtonGroup = ({
   next,
   previous,
@@ -35,7 +35,11 @@ const CustomButtonGroup = ({
 }: {
   next: () => void;
   previous: () => void;
-  carouselState: { currentSlide: number; totalItems: number; slidesToShow: number };
+  carouselState: {
+    currentSlide: number;
+    totalItems: number;
+    slidesToShow: number;
+  };
 }) => {
   const { currentSlide, totalItems, slidesToShow } = carouselState;
   const isFirstSlide = currentSlide === 0;
@@ -58,13 +62,19 @@ const CustomButtonGroup = ({
 };
 
 const HotComic: React.FC = () => {
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
+  console.log("..........", isLoggedIn);
   const [comics, setComics] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchComics = async () => {
       try {
-        const response = await publicAxios.get("/comics/status/available");
+        // Use the appropriate Axios instance based on the endpoint
+        const response = isLoggedIn
+          ? await privateAxios.get("/comics/except-seller/available") // For logged-in users
+          : await publicAxios.get("/comics/status/available"); // For guests
+
         setComics(response.data);
       } catch (error) {
         console.error("Error fetching comics:", error);
@@ -74,13 +84,11 @@ const HotComic: React.FC = () => {
     };
 
     fetchComics();
-  }, []);
-
+  }, [isLoggedIn]);
 
   const formatPrice = (price: number) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
-
 
   return (
     <div className="w-full py-8">
@@ -103,7 +111,17 @@ const HotComic: React.FC = () => {
         <div className="hot-comic-cards mt-4">
           <Carousel
             responsive={responsive}
-            customButtonGroup={<CustomButtonGroup next={() => { }} previous={() => { }} carouselState={{ currentSlide: 0, totalItems: 0, slidesToShow: 0 }} />}
+            customButtonGroup={
+              <CustomButtonGroup
+                next={() => {}}
+                previous={() => {}}
+                carouselState={{
+                  currentSlide: 0,
+                  totalItems: 0,
+                  slidesToShow: 0,
+                }}
+              />
+            }
             renderButtonGroupOutside={true}
           >
             {/* Render comics */}

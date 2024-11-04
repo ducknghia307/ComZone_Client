@@ -41,11 +41,13 @@ export function LoginUser(formValues: FormValues) {
 
       // Update loading state after successful login
       dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+      return true;
     } catch (error: any) {
       console.log(error);
 
       // Update error state
       dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+      return false
     }
   };
 }

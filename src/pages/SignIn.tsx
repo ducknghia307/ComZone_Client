@@ -10,6 +10,7 @@ const SignIn = () => {
   const { navigateUrl } = useAppSelector((state) => state.navigate);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   // const [showPassword, setShowPassword] = useState(false);
 
   const [emailRegister, setEmailRegister] = useState("");
@@ -27,9 +28,15 @@ const SignIn = () => {
       // Pass email and password as formValues to the LoginUser function
       const formValues = { email, password };
 
-      await dispatch(LoginUser(formValues));
+      const loginSuccessful = await dispatch(LoginUser(formValues));
 
-      window.location.href = navigateUrl ? `${navigateUrl}` : "/";
+      if (loginSuccessful) {
+        // Only navigate if login was successful
+        window.location.href = navigateUrl ? `${navigateUrl}` : "/";
+      } else {
+        // Handle login failure (this case may depend on how you handle responses)
+        setErrorMessage("Invalid email or password. Please try again.");
+      }
     } catch (error) {
       console.error("Error logging in:", error);
       setEmail("");
@@ -92,12 +99,16 @@ const SignIn = () => {
               </div>
             </div>
 
-            <div className="flex justify-end items-center mb-6">
+            <div className="flex justify-end items-center mb-3">
               <Link to={"/forgot"} className="text-sm">
                 Quên Mật Khẩu?
               </Link>
             </div>
-
+            {errorMessage && (
+              <p className="text-red-500 text-sm text-center mb-1">
+                {errorMessage}
+              </p>
+            )}
             <button
               type="submit"
               className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition duration-300"

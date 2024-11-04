@@ -32,8 +32,6 @@ privateAxios.interceptors.request.use(
     // Always get the latest state
     const state = store.getState();
     const accessToken = state.auth.accessToken;
-    console.log("Current accessToken before request:", accessToken); // Log the token
-
     if (accessToken) {
       config.headers["Authorization"] = "Bearer " + accessToken;
     }
@@ -46,15 +44,11 @@ privateAxios.interceptors.request.use(
 // Response interceptor for privateAxios
 privateAxios.interceptors.response.use(
   async (response) => {
-    console.log("Response received:", response);
     return response;
   },
   async (error) => {
     const state = store.getState();
     const oldRefreshToken = state.auth.refreshToken;
-
-    console.log("Error occurred:", error);
-    console.log("refresh:", oldRefreshToken);
 
     if (error.response?.status === 401 && oldRefreshToken) {
       console.log("401 Unauthorized error occurred");

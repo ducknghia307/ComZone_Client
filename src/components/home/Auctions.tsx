@@ -93,6 +93,7 @@ const Auctions: React.FC = () => {
             const response = await publicAxios.get("/auction");
             const data = response.data;
             const auctionComics = data.filter((comic: any) => comic.isAuction === true);
+            console.log('.......',auctionComics)
             setComics(auctionComics);
           } catch (error) {
             console.error("Error fetching comics:", error);
@@ -146,7 +147,7 @@ const Auctions: React.FC = () => {
                                 />
                                 <Button
                                     className="detail-button"
-                                    onClick={() => handleDetailClick(comic.id)}
+                                    onClick={() => handleDetailClick(comic.comics.id)}
                                     variant="contained"
                                 >
                                     Xem Chi Tiết

@@ -1,219 +1,210 @@
 import React, { useState, useEffect } from "react";
-import { Checkbox, FormControlLabel, FormGroup, Collapse } from "@mui/material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import "../ui/Sidebar.css";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Collapse,
+  CircularProgress,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { useAppSelector } from "../../redux/hooks";
 import { useLocation } from "react-router-dom";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
+import "../ui/Sidebar.css";
 
-const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange, onConditionFilterChange }) => {
-    const location = useLocation();
-    const [isGenreOpen, setIsGenreOpen] = useState(true);
-    const [isConditionOpen, setIsConditionOpen] = useState(true);
-    const [isAuthorOpen, setIsAuthorOpen] = useState(true);
-    const [comics, setComics] = useState([]);
-    const [genres, setGenres] = useState([]);
-    const [authors, setAuthors] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedGenres, setSelectedGenres] = useState([]);
-    const [selectedAuthors, setSelectedAuthors] = useState([]);
-    const [selectedConditions, setSelectedConditions] = useState([]);
+const conditions = ["SEALED", "USED"];
 
-    useEffect(() => {
-        fetch('http://localhost:3000/genres')
-            .then((response) => response.json())
-            .then((genreData) => {
+const Sidebar = ({
+  onGenreFilterChange,
+  onAuthorFilterChange,
+  onConditionFilterChange,
+}) => {
+  const [isGenreOpen, setIsGenreOpen] = useState(true);
+  const [isConditionOpen, setIsConditionOpen] = useState(true);
+  const [isAuthorOpen, setIsAuthorOpen] = useState(true);
+  const [genres, setGenres] = useState([]);
+  const [authors, setAuthors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  const [selectedAuthors, setSelectedAuthors] = useState([]);
+  const [selectedConditions, setSelectedConditions] = useState([]);
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
+  const location = useLocation();
 
-                // Extract genres from the comic object
-                const genresData = genreData.genres || []; // Ensure genres is an array
+  const shouldShowConditionSection = ["/genres", "/auctions"].includes(
+    location.pathname
+  );
 
-                // Log the genre names directly
-                const genreNames = genresData.map((genre) => genre.name);
-                console.log("Genre Names:", genreNames); // Log genre names
+  useEffect(() => {
+    const fetchGenresAndAuthors = async () => {
+      setLoading(true);
+      try {
+        const genreResponse = await publicAxios("/genres");
+        setGenres(genreResponse.data);
 
-                // Create a map of genre IDs to genre names if needed, otherwise just use genresData
-                const genresMap = genresData.reduce((map, genre) => {
-                    map[genre.id] = genre.name;
-                    return map;
-                }, {});
+        const comicsResponse = isLoggedIn
+          ? await privateAxios.get("/comics/except-seller/available")
+          : await publicAxios.get("/comics/status/available");
 
-                // Update the comic to include genre names
-                const updatedComic = {
-                    ...genreData,
-                    genreNames: genreNames, // Use the mapped genre names
-                };
-
-                console.log("Updated Comic with Genres:", updatedComic);
-
-                setGenres(genreData);
-
-                setLoading(false);
-
-                // Fetch authors from /comics API status available
-                fetch('http://localhost:3000/comics/status/available')
-                    .then((response) => response.json())
-                    .then((comicsData) => {
-                        console.log("Comics Data:", comicsData);
-                        // Extract unique authors from the comics data
-                        const authorsData = [...new Set(comicsData.map(comic => comic.author))];
-                        setAuthors(authorsData);
-                        setLoading(false);
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching authors:", error);
-                        setLoading(false);
-                    });
-            })
-            .catch((error) => {
-                console.error("Error fetching data:", error);
-                setLoading(false);
-            });
-    }, []);
-    console.log(genres);
-
-    const toggleGenre = () => setIsGenreOpen(!isGenreOpen);
-    const toggleCondition = () => setIsConditionOpen(!isConditionOpen);
-    const toggleAuthor = () => setIsAuthorOpen(!isAuthorOpen);
-
-    const handleGenreChange = (event) => {
-        const genre = event.target.name;
-        const isChecked = event.target.checked;
-        let updatedSelectedGenres;
-
-        if (isChecked) {
-            updatedSelectedGenres = [...selectedGenres, genre];
-        } else {
-            updatedSelectedGenres = selectedGenres.filter((g) => g !== genre);
-        }
-        setSelectedGenres(updatedSelectedGenres);
-        if (typeof onGenreFilterChange === "function") {
-            onGenreFilterChange(updatedSelectedGenres);
-        }
+        const comicsData = comicsResponse.data;
+        const authorsData = [
+          ...new Set(comicsData.map((comic) => comic.author)),
+        ];
+        setAuthors(authorsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleAuthorChange = (event) => {
-        const author = event.target.name;
-        const isChecked = event.target.checked;
-        let updatedSelectedAuthors;
+    fetchGenresAndAuthors();
+  }, [isLoggedIn]);
 
-        if (isChecked) {
-            updatedSelectedAuthors = [...selectedAuthors, author];
-        } else {
-            updatedSelectedAuthors = selectedAuthors.filter((a) => a !== author);
-        }
-        setSelectedAuthors(updatedSelectedAuthors);
-        if (typeof onAuthorFilterChange === "function") {
-            onAuthorFilterChange(updatedSelectedAuthors);
-        }
-    };
+  const toggleGenre = () => setIsGenreOpen(!isGenreOpen);
+  const toggleCondition = () => setIsConditionOpen(!isConditionOpen);
+  const toggleAuthor = () => setIsAuthorOpen(!isAuthorOpen);
 
-    const shouldShowConditionSection = ["/genres", "/auctions"].includes(location.pathname);
+  const handleGenreChange = (event) => {
+    const genre = event.target.name;
+    const isChecked = event.target.checked;
+    const updatedSelectedGenres = isChecked
+      ? [...selectedGenres, genre]
+      : selectedGenres.filter((g) => g !== genre);
 
-    const handleConditionChange = (event) => {
-        const condition = event.target.name;
-        const isChecked = event.target.checked;
-        const updatedSelectedConditions = isChecked
-            ? [...selectedConditions, condition]
-            : selectedConditions.filter((c) => c !== condition);
+    setSelectedGenres(updatedSelectedGenres);
+    if (typeof onGenreFilterChange === "function") {
+      onGenreFilterChange(updatedSelectedGenres);
+    }
+  };
 
-        setSelectedConditions(updatedSelectedConditions);
-        onConditionFilterChange(updatedSelectedConditions);
-    };
+  const handleAuthorChange = (event) => {
+    const author = event.target.name;
+    const isChecked = event.target.checked;
+    const updatedSelectedAuthors = isChecked
+      ? [...selectedAuthors, author]
+      : selectedAuthors.filter((a) => a !== author);
 
-    return (
-        <div className="sidebar">
-            <div className="sidebar-header">
-                <h2>Khám phá truyện</h2>
-                <div className="line-header"></div>
-            </div>
+    setSelectedAuthors(updatedSelectedAuthors);
+    if (typeof onAuthorFilterChange === "function") {
+      onAuthorFilterChange(updatedSelectedAuthors);
+    }
+  };
 
-            {/* Thể loại truyện tranh */}
-            <div className="genre-section">
-                <div className="header flex justify-between items-center cursor-pointer" onClick={toggleGenre}>
-                    <h3 className="text-lg font-bold">Thể loại truyện tranh</h3>
-                    {isGenreOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </div>
-                <Collapse in={isGenreOpen}>
-                    <div className="genre-list mt-4">
-                        <FormGroup>
-                            {genres.map((genre) => (
-                                <FormControlLabel
-                                    key={genre.id}  
-                                    control={<Checkbox name={genre.name} onChange={handleGenreChange} />} 
-                                    label={genre.name} 
-                                />
-                            ))}
-                        </FormGroup>
-                    </div>
-                </Collapse>
-            </div>
+  const handleConditionChange = (event) => {
+    const condition = event.target.name;
+    const isChecked = event.target.checked;
+    const updatedSelectedConditions = isChecked
+      ? [...selectedConditions, condition]
+      : selectedConditions.filter((c) => c !== condition);
 
-            {/* Tình trạng truyện */}
-            {/* <div className="condition-section mt-6">
-                <div className="header flex justify-between items-center cursor-pointer" onClick={toggleCondition}>
-                    <h3 className="text-lg font-bold">Tình trạng truyện</h3>
-                    {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </div>
-                <Collapse in={isConditionOpen}>
-                    <div className="condition-list mt-4">
-                        <FormGroup>
-                            {conditions.map((condition, index) => (
-                                <FormControlLabel
-                                    key={index}
-                                    control={<Checkbox name={condition} />}
-                                    label={condition}
-                                />
-                            ))}
-                        </FormGroup>
-                    </div>
-                </Collapse>
-            </div> */}
+    setSelectedConditions(updatedSelectedConditions);
+    if (typeof onConditionFilterChange === "function") {
+      onConditionFilterChange(updatedSelectedConditions);
+    }
+  };
 
-            {/* Hiển thị "Tình trạng truyện" khi ở các route /genres hoặc /auctions */}
-            {shouldShowConditionSection && (
-                <div className="condition-section mt-6">
-                    <div className="header flex justify-between items-center cursor-pointer" onClick={toggleCondition}>
-                        <h3 className="text-lg font-bold">Tình trạng truyện</h3>
-                        {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                    </div>
-                    <Collapse in={isConditionOpen}>
-                        <div className="condition-list mt-4">
-                            <FormGroup>
-                                <FormControlLabel
-                                    control={<Checkbox name="SEALED" onChange={handleConditionChange} />}
-                                    label="Nguyên Seal"
-                                />
-                                <FormControlLabel
-                                    control={<Checkbox name="USED" onChange={handleConditionChange} />}
-                                    label="Đã Qua Sử Dụng"
-                                />
-                            </FormGroup>
-                        </div>
-                    </Collapse>
-                </div>
-            )}
+  return (
+    <div className="sidebar">
+      <div className="sidebar-header">
+        <h2>Khám phá truyện</h2>
+        <div className="line-header"></div>
+      </div>
 
-            {/* Tác Giả */}
-            <div className="author-section mt-6">
-                <div className="header flex justify-between items-center cursor-pointer" onClick={toggleAuthor}>
-                    <h3 className="text-lg font-bold">Tác Giả</h3>
-                    {isAuthorOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </div>
-                <Collapse in={isAuthorOpen}>
-                    <div className="author-list mt-4">
-                        <FormGroup>
-                            {authors.map((author, index) => (
-                                <FormControlLabel
-                                    key={index}  // Using index for now since authors might not have unique IDs
-                                    control={<Checkbox name={author} onChange={handleAuthorChange}/>}
-                                    label={author}
-                                />
-                            ))}
-                        </FormGroup>
-                    </div>
-                </Collapse>
-            </div>
+      {loading ? (
+        <div className="loading-spinner">
+          <CircularProgress />
         </div>
-    );
+      ) : (
+        <>
+          {/* Genre Section */}
+          <div className="genre-section">
+            <div
+              className="header flex justify-between items-center cursor-pointer"
+              onClick={toggleGenre}
+            >
+              <h3 className="text-lg font-bold">Thể loại truyện tranh</h3>
+              {isGenreOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </div>
+            <Collapse in={isGenreOpen}>
+              <FormGroup className="mt-4">
+                {genres.map((genre) => (
+                  <FormControlLabel
+                    key={genre.id}
+                    control={
+                      <Checkbox
+                        name={genre.name}
+                        onChange={handleGenreChange}
+                      />
+                    }
+                    label={genre.name}
+                  />
+                ))}
+              </FormGroup>
+            </Collapse>
+          </div>
+
+          {/* Condition Section (conditional display) */}
+          {shouldShowConditionSection && (
+            <div className="condition-section mt-6">
+              <div
+                className="header flex justify-between items-center cursor-pointer"
+                onClick={toggleCondition}
+              >
+                <h3 className="text-lg font-bold">Tình trạng truyện</h3>
+                {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </div>
+              <Collapse in={isConditionOpen}>
+                <FormGroup className="mt-4">
+                  {conditions.map((condition) => (
+                    <FormControlLabel
+                      key={condition}
+                      control={
+                        <Checkbox
+                          name={condition}
+                          onChange={handleConditionChange}
+                        />
+                      }
+                      label={
+                        condition === "SEALED"
+                          ? "Nguyên Seal"
+                          : "Đã Qua Sử Dụng"
+                      }
+                    />
+                  ))}
+                </FormGroup>
+              </Collapse>
+            </div>
+          )}
+
+          {/* Author Section */}
+          <div className="author-section mt-6">
+            <div
+              className="header flex justify-between items-center cursor-pointer"
+              onClick={toggleAuthor}
+            >
+              <h3 className="text-lg font-bold">Tác Giả</h3>
+              {isAuthorOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </div>
+            <Collapse in={isAuthorOpen}>
+              <FormGroup className="mt-4">
+                {authors.map((author, index) => (
+                  <FormControlLabel
+                    key={index} // Using index as a key due to lack of unique ID
+                    control={
+                      <Checkbox name={author} onChange={handleAuthorChange} />
+                    }
+                    label={author}
+                  />
+                ))}
+              </FormGroup>
+            </Collapse>
+          </div>
+        </>
+      )}
+    </div>
+  );
 };
 
 export default Sidebar;

@@ -89,21 +89,17 @@ const Auctions: React.FC = () => {
 
     useEffect(() => {
         const fetchComics = async () => {
-            try {
-                const response = await publicAxios.get("/comics/status/auction");
-                const data = response.data;
-
-                // Filter comics where status is AUCTION 
-                const auctionComics = data.filter(
-                    (comic: any) => comic.status === "AUCTION"
-                );
-
-                setComics(auctionComics);
-            } catch (error) {
-                console.error("Error fetching comics:", error);
-            } finally {
-                setLoading(false);
-            }
+          try {
+            const response = await publicAxios.get("/auction");
+            const data = response.data;
+            const auctionComics = data.filter((comic: any) => comic.isAuction === true);
+            console.log('.......',auctionComics)
+            setComics(auctionComics);
+          } catch (error) {
+            console.error("Error fetching comics:", error);
+          } finally {
+            setLoading(false);
+          }
         };
 
         fetchComics();
@@ -151,7 +147,7 @@ const Auctions: React.FC = () => {
                                 />
                                 <Button
                                     className="detail-button"
-                                    onClick={() => handleDetailClick(comic.id)}
+                                    onClick={() => handleDetailClick(comic.comics.id)}
                                     variant="contained"
                                 >
                                     Xem Chi Tiết

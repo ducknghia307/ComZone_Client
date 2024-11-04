@@ -5,40 +5,46 @@ import { Link, useLocation } from "react-router-dom";
 import Countdown from "react-countdown";
 import { Button, Chip } from "@mui/material";
 import { Comic } from "../../common/base.interface";
-import { publicAxios } from "../../middleware/axiosInstance";
-import ChangeCircleOutlinedIcon from '@mui/icons-material/ChangeCircleOutlined';
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
+import { useAppSelector } from "../../redux/hooks";
+import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 
 interface GenresProps {
   filteredGenres: string[];
   filteredAuthors: string[];
 }
 
-const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filteredConditions }) => {
+const Genres: React.FC<GenresProps> = ({
+  filteredGenres,
+  filteredAuthors,
+  filteredConditions,
+}) => {
   const [comics, setComics] = useState<Comic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [sortOrder, setSortOrder] = useState("asc");
   const location = useLocation();
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
 
   const params = new URLSearchParams(location.search);
-  const searchQuery = params.get('query');
+  const searchQuery = params.get("query");
 
   const renderer = ({ days, hours, minutes, seconds }: any) => {
     return (
       <div className="countdown">
         <div className="time-box">
-          <span className="time1">{days.toString().padStart(2, '0')}</span>
+          <span className="time1">{days.toString().padStart(2, "0")}</span>
           <span className="label">Ngày</span>
         </div>
         <div className="time-box">
-          <span className="time1">{hours.toString().padStart(2, '0')}</span>
+          <span className="time1">{hours.toString().padStart(2, "0")}</span>
           <span className="label">Giờ</span>
         </div>
         <div className="time-box">
-          <span className="time1">{minutes.toString().padStart(2, '0')}</span>
+          <span className="time1">{minutes.toString().padStart(2, "0")}</span>
           <span className="label">Phút</span>
         </div>
         <div className="time-box">
-          <span className="time1">{seconds.toString().padStart(2, '0')}</span>
+          <span className="time1">{seconds.toString().padStart(2, "0")}</span>
           <span className="label">Giây</span>
         </div>
       </div>
@@ -48,10 +54,12 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
   useEffect(() => {
     const fetchComics = async () => {
       try {
-        const availableComics = await publicAxios.get<Comic[]>("/comics/status/available");
-        const auctionComics = await publicAxios.get<Comic[]>("/comics/status/auction");
+        const response = isLoggedIn
+          ? await privateAxios.get("/comics/except-seller/available") // For logged-in users
+          : await publicAxios.get("/comics/status/available"); // For guests
+        // const auctionComics = await publicAxios.get<Comic[]>("/auction");
 
-        setComics([...availableComics.data, ...auctionComics.data]);
+        setComics(response.data);
       } catch (error) {
         console.error("Error fetching comics:", error);
       } finally {
@@ -62,38 +70,44 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
     fetchComics();
   }, []);
 
-
-  const filteredComics = comics
-    .filter((comic) => {
-      if (searchQuery) {
-        // Nếu có searchQuery, tìm kiếm trong cả AVAILABLE và AUCTION comics
-        return comic.title.toLowerCase().includes(searchQuery.toLowerCase());
-      } else {
-        // Nếu không có searchQuery, chỉ áp dụng bộ lọc cho AVAILABLE comics
-        if (comic.status === "AVAILABLE") {
-          const genreMatch =
-            filteredGenres.length > 0
-              ? comic.genres && comic.genres.some((genre) => filteredGenres.includes(genre.name))
-              : true;
-          const authorMatch =
-            filteredAuthors.length > 0 ? filteredAuthors.includes(comic.author) : true;
-          const conditionMatch =
-            filteredConditions.length > 0 ? filteredConditions.includes(comic.condition) : true;
-          return genreMatch && authorMatch && conditionMatch;
-        }
-        return false;
+  const filteredComics = comics.filter((comic) => {
+    if (searchQuery) {
+      // Nếu có searchQuery, tìm kiếm trong cả AVAILABLE và AUCTION comics
+      return comic.title.toLowerCase().includes(searchQuery.toLowerCase());
+    } else {
+      // Nếu không có searchQuery, chỉ áp dụng bộ lọc cho AVAILABLE comics
+      if (comic.status === "AVAILABLE") {
+        const genreMatch =
+          filteredGenres.length > 0
+            ? comic.genres &&
+              comic.genres.some((genre) => filteredGenres.includes(genre.name))
+            : true;
+        const authorMatch =
+          filteredAuthors.length > 0
+            ? filteredAuthors.includes(comic.author)
+            : true;
+        const conditionMatch =
+          filteredConditions.length > 0
+            ? filteredConditions.includes(comic.condition)
+            : true;
+        return genreMatch && authorMatch && conditionMatch;
       }
-    });
+      return false;
+    }
+  });
 
   const sortedComics = [...filteredComics].sort((a, b) =>
     sortOrder === "asc" ? a.price - b.price : b.price - a.price
   );
 
-  const auctionComics = sortedComics.filter((comic) => comic.status === "AUCTION");
-  const nonAuctionComics = sortedComics.filter((comic) => comic.status !== "AUCTION");
+  const auctionComics = sortedComics.filter(
+    (comic) => comic.status === "AUCTION"
+  );
+  const nonAuctionComics = sortedComics.filter(
+    (comic) => comic.status !== "AUCTION"
+  );
   console.log("truyện đấu giá", auctionComics);
   console.log("truyện không đấu giá", nonAuctionComics);
-
 
   const formatPrice = (price: number) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
@@ -102,7 +116,6 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortOrder(e.target.value === "Giá cao đến thấp" ? "desc" : "asc");
   };
-
 
   return (
     <div className="mb-10">
@@ -113,11 +126,16 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
           {/* Tất Cả Thể Loại */}
           <div className="all-genres-section flex justify-between items-center">
             <h2 className="text-2xl font-bold">
-              {searchQuery ? `Kết quả tìm kiếm cho: "${searchQuery}"` : "Tất cả thể loại"}
+              {searchQuery
+                ? `Kết quả tìm kiếm cho: "${searchQuery}"`
+                : "Tất cả thể loại"}
             </h2>
             <div className="flex items-center">
               <span className="mr-2">Sắp xếp: </span>
-              <select className="border rounded p-1" onChange={handleSortChange}>
+              <select
+                className="border rounded p-1"
+                onChange={handleSortChange}
+              >
                 <option>Giá thấp đến cao</option>
                 <option>Giá cao đến thấp</option>
               </select>
@@ -133,11 +151,11 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
                   color="primary"
                   variant="outlined"
                   sx={{
-                    fontSize: '20px',
-                    padding: '20px 16px',
+                    fontSize: "20px",
+                    padding: "20px 16px",
                     marginBottom: 2,
-                    borderRadius: '20px',
-                    marginLeft: '20px',
+                    borderRadius: "20px",
+                    marginLeft: "20px",
                   }}
                 />
                 <div className="all-genres-cards">
@@ -166,7 +184,9 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
                       </div>
                     ))
                   ) : (
-                    <p className="no-auction-comics">Không có comics đấu giá nào phù hợp</p>
+                    <p className="no-auction-comics">
+                      Không có comics đấu giá nào phù hợp
+                    </p>
                   )}
                 </div>
               </div>
@@ -178,11 +198,11 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
                   color="secondary"
                   variant="outlined"
                   sx={{
-                    fontSize: '20px',
-                    padding: '20px 16px',
+                    fontSize: "20px",
+                    padding: "20px 16px",
                     marginBottom: 2,
-                    borderRadius: '20px',
-                    marginLeft: '20px',
+                    borderRadius: "20px",
+                    marginLeft: "20px",
                   }}
                 />
                 <div className="all-genres-cards">
@@ -202,7 +222,9 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
                       </div>
                     ))
                   ) : (
-                    <p className="no-regular-comics">Không có comics thông thường nào phù hợp</p>
+                    <p className="no-regular-comics">
+                      Không có comics thông thường nào phù hợp
+                    </p>
                   )}
                 </div>
               </div>
@@ -226,7 +248,7 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
                           {[...Array(5)].map((_, index) => (
                             <StarIcon
                               key={index}
-                              style={{ width: '20px', color: '#ffc107' }}
+                              style={{ width: "20px", color: "#ffc107" }}
                             />
                           ))}
                         </p>
@@ -245,7 +267,6 @@ const Genres: React.FC<GenresProps> = ({ filteredGenres, filteredAuthors, filter
       )}
     </div>
   );
-
 };
 
 export default Genres;

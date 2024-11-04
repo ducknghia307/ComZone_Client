@@ -5,8 +5,9 @@ import "../ui/AllGenres.css";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Link } from "react-router-dom";
-import { publicAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
+import { useAppSelector } from "../../redux/hooks";
 
 const responsive = {
   superLargeDesktop: {
@@ -35,7 +36,11 @@ const CustomButtonGroup = ({
 }: {
   next: () => void;
   previous: () => void;
-  carouselState: { currentSlide: number; totalItems: number; slidesToShow: number };
+  carouselState: {
+    currentSlide: number;
+    totalItems: number;
+    slidesToShow: number;
+  };
 }) => {
   const { currentSlide, totalItems, slidesToShow } = carouselState;
   const isFirstSlide = currentSlide === 0;
@@ -60,7 +65,7 @@ const CustomButtonGroup = ({
 const AllGenres: React.FC = () => {
   const [comics, setComics] = useState<Comic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   // const token = sessionStorage.getItem("accessToken");
 
   // useEffect(() => {
@@ -90,7 +95,10 @@ const AllGenres: React.FC = () => {
   useEffect(() => {
     const fetchComics = async () => {
       try {
-        const response = await publicAxios.get<Comic[]>("/comics/status/available");
+        const response = isLoggedIn
+          ? await privateAxios.get("/comics/except-seller/available") // For logged-in users
+          : await publicAxios.get("/comics/status/available"); // For guests
+
         setComics(response.data);
       } catch (error) {
         console.error("Error fetching comics:", error);
@@ -127,7 +135,17 @@ const AllGenres: React.FC = () => {
         <div className="hot-comic-cards mt-4">
           <Carousel
             responsive={responsive}
-            customButtonGroup={<CustomButtonGroup next={() => {}} previous={() => {}} carouselState={{ currentSlide: 0, totalItems: 0, slidesToShow: 0 }} />}
+            customButtonGroup={
+              <CustomButtonGroup
+                next={() => {}}
+                previous={() => {}}
+                carouselState={{
+                  currentSlide: 0,
+                  totalItems: 0,
+                  slidesToShow: 0,
+                }}
+              />
+            }
             renderButtonGroupOutside={true}
           >
             {/* Render comics */}

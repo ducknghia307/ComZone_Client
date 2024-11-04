@@ -5,17 +5,20 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import "../ui/Sidebar.css";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { useAppSelector } from "../../redux/hooks";
+import { useLocation } from "react-router-dom";
 
-const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange }) => {
-  const [isGenreOpen, setIsGenreOpen] = useState(true);
-  const [isConditionOpen, setIsConditionOpen] = useState(true);
-  const [isAuthorOpen, setIsAuthorOpen] = useState(true);
-  const [genres, setGenres] = useState([]);
-  const [authors, setAuthors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedGenres, setSelectedGenres] = useState([]);
-  const [selectedAuthors, setSelectedAuthors] = useState([]);
-  const { isLoggedIn } = useAppSelector((state) => state.auth);
+const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange,onConditionFilterChange }) => {
+    const [isGenreOpen, setIsGenreOpen] = useState(true);
+    const [isConditionOpen, setIsConditionOpen] = useState(true);
+    const [isAuthorOpen, setIsAuthorOpen] = useState(true);
+    const [comics, setComics] = useState([]);
+    const [genres, setGenres] = useState([]);
+    const [authors, setAuthors] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedGenres, setSelectedGenres] = useState([]);
+    const [selectedAuthors, setSelectedAuthors] = useState([]);
+    const [selectedConditions, setSelectedConditions] = useState([]);
+    const { isLoggedIn } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchGenresAndAuthors = async () => {
@@ -74,11 +77,29 @@ const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange }) => {
       ? [...selectedAuthors, author]
       : selectedAuthors.filter((a) => a !== author);
 
-    setSelectedAuthors(updatedSelectedAuthors);
-    if (typeof onAuthorFilterChange === "function") {
-      onAuthorFilterChange(updatedSelectedAuthors);
-    }
-  };
+        if (isChecked) {
+            updatedSelectedAuthors = [...selectedAuthors, author];
+        } else {
+            updatedSelectedAuthors = selectedAuthors.filter((a) => a !== author);
+        }
+        setSelectedAuthors(updatedSelectedAuthors);
+        if (typeof onAuthorFilterChange === "function") {
+            onAuthorFilterChange(updatedSelectedAuthors);
+        }
+    };
+
+    const shouldShowConditionSection = ["/genres", "/auctions"].includes(location.pathname);
+
+    const handleConditionChange = (event) => {
+        const condition = event.target.name;
+        const isChecked = event.target.checked;
+        const updatedSelectedConditions = isChecked
+            ? [...selectedConditions, condition]
+            : selectedConditions.filter((c) => c !== condition);
+
+        setSelectedConditions(updatedSelectedConditions);
+        onConditionFilterChange(updatedSelectedConditions);
+    };
 
   return (
     <div className="sidebar">
@@ -113,30 +134,50 @@ const Sidebar = ({ onGenreFilterChange, onAuthorFilterChange }) => {
         </Collapse>
       </div>
 
-      {/* Tình trạng truyện */}
-      <div className="condition-section mt-6">
-        <div
-          className="header flex justify-between items-center cursor-pointer"
-          onClick={toggleCondition}
-        >
-          <h3 className="text-lg font-bold">Tình trạng truyện</h3>
-          {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </div>
-        <Collapse in={isConditionOpen}>
-          <div className="condition-list mt-4">
-            <FormGroup>
-              {/* Example conditions (replace with actual data) */}
-              {/* {conditions.map((condition, index) => (
+            {/* Tình trạng truyện */}
+            {/* <div className="condition-section mt-6">
+                <div className="header flex justify-between items-center cursor-pointer" onClick={toggleCondition}>
+                    <h3 className="text-lg font-bold">Tình trạng truyện</h3>
+                    {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </div>
+                <Collapse in={isConditionOpen}>
+                    <div className="condition-list mt-4">
+                        <FormGroup>
+                            {conditions.map((condition, index) => (
                                 <FormControlLabel
                                     key={index}
                                     control={<Checkbox name={condition} />}
                                     label={condition}
                                 />
-                            ))} */}
-            </FormGroup>
-          </div>
-        </Collapse>
-      </div>
+                            ))}
+                        </FormGroup>
+                    </div>
+                </Collapse>
+            </div> */}
+
+            {/* Hiển thị "Tình trạng truyện" khi ở các route /genres hoặc /auctions */}
+            {shouldShowConditionSection && (
+                <div className="condition-section mt-6">
+                    <div className="header flex justify-between items-center cursor-pointer" onClick={toggleCondition}>
+                        <h3 className="text-lg font-bold">Tình trạng truyện</h3>
+                        {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </div>
+                    <Collapse in={isConditionOpen}>
+                        <div className="condition-list mt-4">
+                            <FormGroup>
+                                <FormControlLabel
+                                    control={<Checkbox name="SEALED" onChange={handleConditionChange} />}
+                                    label="Nguyên Seal"
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox name="USED" onChange={handleConditionChange} />}
+                                    label="Đã Qua Sử Dụng"
+                                />
+                            </FormGroup>
+                        </div>
+                    </Collapse>
+                </div>
+            )}
 
       {/* Tác Giả */}
       <div className="author-section mt-6">

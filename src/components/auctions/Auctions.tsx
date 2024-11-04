@@ -1,34 +1,35 @@
 import React, { useEffect, useState } from "react";
 import "../ui/AuctionSidebar.css";
 import Countdown from "react-countdown";
-import { Button } from "@mui/material";
+import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { publicAxios } from "../../middleware/axiosInstance";
+import ChangeCircleOutlinedIcon from '@mui/icons-material/ChangeCircleOutlined';
 
-const renderer = ({ days, hours, minutes, seconds } : any) => {
+const renderer = ({ days, hours, minutes, seconds }: any) => {
     return (
         <div className="countdown">
             <div className="time-box">
-                <span className="time">{days.toString().padStart(2, '0')}</span>
+                <span className="time1">{days.toString().padStart(2, '0')}</span>
                 <span className="label">Ngày</span>
             </div>
             <div className="time-box">
-                <span className="time">{hours.toString().padStart(2, '0')}</span>
+                <span className="time1">{hours.toString().padStart(2, '0')}</span>
                 <span className="label">Giờ</span>
             </div>
             <div className="time-box">
-                <span className="time">{minutes.toString().padStart(2, '0')}</span>
+                <span className="time1">{minutes.toString().padStart(2, '0')}</span>
                 <span className="label">Phút</span>
             </div>
             <div className="time-box">
-                <span className="time">{seconds.toString().padStart(2, '0')}</span>
+                <span className="time1">{seconds.toString().padStart(2, '0')}</span>
                 <span className="label">Giây</span>
             </div>
         </div>
     );
 };
 
-const AllAuctions = ({ filteredGenres, filteredAuthors }: any) => {
+const AllAuctions = ({ filteredGenres, filteredAuthors, filteredConditions  }: any) => {
 
     const navigate = useNavigate();
     const [ongoingComics, setOngoingComics] = useState<any[]>([]);
@@ -66,10 +67,11 @@ const AllAuctions = ({ filteredGenres, filteredAuthors }: any) => {
 
     // Lọc comics dựa trên query từ URL
     // const filteredComics = comics.filter((comic) => {
-    //     const genreMatch = filteredGenres.length > 0 ? comic.genres && comic.genres.some((genre:any) => filteredGenres.includes(genre.name)) : true;
+    //     const genreMatch = filteredGenres.length > 0 ? comic.genres && comic.genres.some((genre: any) => filteredGenres.includes(genre.name)) : true;
     //     const authorMatch = filteredAuthors.length > 0 ? filteredAuthors.includes(comic.author) : true;
     //     const titleMatch = searchQuery ? comic.title.toLowerCase().includes(searchQuery.toLowerCase()) : true;
-    //     return genreMatch && authorMatch && titleMatch;
+    //     const conditionMatch = filteredConditions.length > 0 ? filteredConditions.includes(comic.condition) : true;
+    //     return genreMatch && authorMatch && titleMatch && conditionMatch;
     // });
 
     if (loading) return <p>Loading auctions...</p>;
@@ -93,8 +95,12 @@ const AllAuctions = ({ filteredGenres, filteredAuthors }: any) => {
                                 alt={comic.comics.title}
                                 className=" object-cover mx-auto"
                             />
-                            <p className="title">{comic.comics.title}</p>
-                            <p className="condition">{comic.comics.condition}</p>
+                            <p className="title">{comic.title}</p>
+                            <Chip
+                                label={comic.condition}
+                                icon={<ChangeCircleOutlinedIcon />}
+                                size="medium"
+                            />
                             <p className="endtime">KẾT THÚC TRONG</p>
                             <Countdown
                                 date={Date.now() + 100000000}
@@ -126,7 +132,11 @@ const AllAuctions = ({ filteredGenres, filteredAuthors }: any) => {
                                 className=" object-cover mx-auto"
                             />
                             <p className="title">{comic.title}</p>
-                            <p className="condition">{comic.condition}</p>
+                            <Chip
+                                label={comic.condition}
+                                icon={<ChangeCircleOutlinedIcon />}
+                                size="medium"
+                            />
                             <p className="endtime">KẾT THÚC TRONG</p>
                             <Countdown
                                 date={Date.now() + 100000000}

@@ -292,7 +292,9 @@ const UserWallet = () => {
                 </Typography>
                 <Typography variant="h6" sx={{ color: "#FF8A00" }}>
                   {isVisible
-                    ? `${CurrencySplitter(userInfo?.nonWithdrawableAmount)} đ`
+                    ? `${CurrencySplitter(
+                        userInfo?.balance - userInfo?.nonWithdrawableAmount
+                      )} đ`
                     : "****** đ"}
                 </Typography>
                 <IconButton onClick={() => setIsVisible(!isVisible)}>

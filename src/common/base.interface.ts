@@ -95,7 +95,7 @@ export interface Comic {
   title: string;
   author: string;
   description: string;
-  coverImage: string[];
+  coverImage: string;
   condition: "SEALED" | "USED";
   edition: "REGULAR" | "SPECIAL" | "LIMITED";
   page: number | null;
@@ -110,8 +110,23 @@ export interface Comic {
   onSaleSince?: Date;
 }
 
-//role
-export interface Role {
-  id: number;
-  role_name: string;
+export interface SellerDetails extends BaseInterface {
+  user: UserInfo;
+  verifiedPhone: string;
+  soldCount: number;
+  followerCount: number;
+  province: {
+    id: number;
+    name: string;
+  };
+  district: {
+    id: number;
+    name: string;
+  };
+  ward: {
+    id: string;
+    name: string;
+  };
+  detailedAddress: string;
+  fullAddress: string;
 }

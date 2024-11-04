@@ -4,7 +4,6 @@ import "react-multi-carousel/lib/styles.css";
 import "../ui/AllGenres.css";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import StarIcon from "@mui/icons-material/Star";
 import { Link } from "react-router-dom";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
@@ -161,7 +160,7 @@ const AllGenres: React.FC = () => {
                   <p className="price">{formatPrice(comic.price)}</p>
                   <p className="author">{comic.author.toUpperCase()}</p>
                   <p className="title">{comic.title}</p>
-                  <div className="rating-sold-comic">
+                  {/* <div className="rating-sold-comic">
                     <p className="rating">
                       {[...Array(5)].map((_, index) => (
                         <StarIcon
@@ -172,7 +171,7 @@ const AllGenres: React.FC = () => {
                     </p>
                     <div className="divider"></div>
                     <p className="sold-info">Đã bán 123</p>
-                  </div>
+                  </div> */}
                 </Link>
               </div>
             ))}

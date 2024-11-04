@@ -8,6 +8,7 @@ const AllAuctions = () => {
 
     const [filteredGenres, setFilteredGenres] = useState([]);
     const [filteredAuthors, setFilteredAuthors] = useState([]);
+    const [filteredConditions, setFilteredConditions] = useState([]);
 
     const handleGenreFilterChange = (selectedGenres) => {
         setFilteredGenres(selectedGenres);
@@ -17,14 +18,18 @@ const AllAuctions = () => {
         setFilteredAuthors(selectedAuthors);
     };
 
+    const handleConditionFilterChange = (selectedCondition) => {
+        setFilteredConditions(selectedCondition);
+    };
+
     return (
         <div className="homepage w-full overflow-x-hidden px-4">
             <Grid container spacing={0}>
                 <Grid size={2}>
-                    <Sidebar onGenreFilterChange={handleGenreFilterChange} onAuthorFilterChange={handleAuthorFilterChange}/>
+                    <Sidebar onGenreFilterChange={handleGenreFilterChange} onAuthorFilterChange={handleAuthorFilterChange} onConditionFilterChange={handleConditionFilterChange}/>
                 </Grid>
                 <Grid size={10}>
-                    <Auctions filteredGenres={filteredGenres} filteredAuthors={filteredAuthors}/>
+                    <Auctions filteredGenres={filteredGenres} filteredAuthors={filteredAuthors} filteredConditions={filteredConditions}/>
                 </Grid>
 
             </Grid>

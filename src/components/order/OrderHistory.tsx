@@ -288,7 +288,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                 padding: "0px 20px 20px 20px",
               }}
             >
-              {order.status === "delivered" ? (
+              {order.status === "DELIVERED" ? (
                 <>
                   <div
                     style={{
@@ -296,6 +296,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                       display: "flex",
                       justifyContent: "flex-start",
                       gap: "10px",
+                      // paddingLeft:'10px'
                     }}
                   >
                     <Button
@@ -306,6 +307,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                         fontWeight: "bold",
                         fontSize: "16px",
                       }}
+                      onClick={() => openOrderDetailsModal(order)}
                     >
                       Xem Chi Tiết
                     </Button>
@@ -316,7 +318,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                       flex: "1 1 auto",
                       display: "flex",
                       justifyContent: "flex-end",
-                      gap: "10px",
+                      gap: "20px",
                     }}
                   >
                     <Button

@@ -4,6 +4,7 @@ import NewAddressForm from "./NewAddressForm";
 import { Address, UserInfo } from "../../common/base.interface";
 import AddressList from "./AddressList";
 import { privateAxios } from "../../middleware/axiosInstance";
+import PhoneSplitter from "../../assistants/PhoneSplitter";
 interface DeliveryAddressProps {
   selectedAddress: Address | null;
   setSelectedAddress: (address: Address | null) => void;
@@ -16,7 +17,6 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [newAddress, setNewAddress] = useState(false);
   const [handleModal, setHandleModal] = useState<boolean>();
   const showModal = () => {
@@ -78,7 +78,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   }, []);
 
   return (
-    <div className="w-full bg-white px-8 py-4 rounded-lg mb-4">
+    <div className="w-full bg-white px-8 py-4 rounded-lg">
       <div className="flex flex-row justify-between w-full">
         <h2 className="font-bold">THÔNG TIN NHẬN HÀNG</h2>
         <div
@@ -174,7 +174,9 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
               <div className="flex flex-row gap-3">
                 <h3 className="font-semibold">{selectedAddress?.fullName}</h3>
                 <h3>|</h3>
-                <h3 className="font-light">{selectedAddress?.phone}</h3>
+                <h3 className="font-light">
+                  {PhoneSplitter(selectedAddress?.phone)}
+                </h3>
               </div>
             </div>
             <div className="flex flex-row gap-5 mt-2 items-center">
@@ -201,12 +203,14 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
                 />
               </svg>
               <div className="flex flex-row gap-1">
-                <h3 className="font-light">{selectedAddress?.fullAddress},</h3>
+                <h3 className="font-light">{selectedAddress?.fullAddress}</h3>
               </div>
             </div>
           </>
         ) : (
-          "Vui lòng thêm địa chỉ giao hàng"
+          <p className="text-xs font-light text-red-500">
+            Vui lòng thêm địa chỉ giao hàng
+          </p>
         )}
       </div>
     </div>

@@ -92,8 +92,6 @@ const getNewTokens = async (
         },
       }
     );
-
-    console.log("Response from getNewTokens:", response.data); // Log the data received
     return response.data; // Assuming the API returns { token }
   } catch (error) {
     console.error("Error refreshing tokens:", error.response?.data || error);

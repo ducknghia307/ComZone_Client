@@ -49,12 +49,7 @@ export default function ComicsImages({
   return (
     <div className="w-full bg-white flex flex-col items-center justify-center rounded-xl py-2 drop-shadow-md top-4 sticky">
       <div className="w-2/3 p-2 flex justify-center">
-        <img
-          src={currentImage}
-          alt=""
-          className="object-cover h-96 border"
-          data-addtocart
-        />
+        <img src={currentImage} alt="" className="object-cover h-96 border" />
       </div>
       <div className="flex justify-between items-center w-full px-4 ">
         <Button
@@ -69,7 +64,7 @@ export default function ComicsImages({
           ref={carouselRef}
           responsive={responsive}
           infinite={false}
-          className="w-full relative "
+          className="w-full relative"
           renderButtonGroupOutside={true}
           customButtonGroup={<div />}
         >
@@ -77,14 +72,18 @@ export default function ComicsImages({
             <button
               key={img}
               className=" flex items-center w-full justify-center py-2"
-              onClick={() => setCurrentImage(img)}
+              onClick={() => {
+                console.log({ img });
+                console.log({ imageList });
+                setCurrentImage(img);
+              }}
             >
               <img
                 src={img}
                 alt=""
-                className={`object-cover max-w-[5em] max-h-[5em] border ${
-                  currentImage.match(img) ? "border-black" : ""
-                } p-1 ${!currentImage.match(img) ? "hover:opacity-80" : ""}`}
+                className={`object-cover max-w-[5em] max-h-[5em] p-1 border rounded-sm 
+                  ${currentImage === img ? "border-black" : "hover:opacity-80"}
+                 `}
               />
             </button>
           ))}

@@ -22,7 +22,7 @@ export default function ComicsDescription({
       <div
         className={`font-light text-xs ${
           isShowingLess ? "max-h-40 overflow-y-hidden" : "max-h-fit"
-        } transition-[max-height] ease-in-out duration-1000`}
+        }`}
       >
         {descriptionLines?.map((paragraph: string, index: number) => {
           return (

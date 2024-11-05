@@ -76,7 +76,7 @@ const ComicAuction = () => {
                     {comic.title}
                 </Typography>
                 <div className="condition-tag">
-                    {comic.condition}
+                {comic.condition === 'SEALED' ? 'Nguyên Seal' : 'Đã Qua Sử Dụng'}
                 </div>
             </div>
 

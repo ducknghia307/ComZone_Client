@@ -130,7 +130,7 @@ const Auctions: React.FC = () => {
                         {comics.map((comic, index) => (
                             <div className="auction-card" key={index}>
                                 <img
-                                    src={comic.coverImage?.[0] || "/default-cover.jpg"}
+                                    src={comic.coverImage}
                                     // alt={comic.title}
                                     className=" object-cover mx-auto"
                                 />

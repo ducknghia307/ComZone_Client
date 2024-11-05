@@ -128,9 +128,9 @@ const Auctions: React.FC = () => {
                 <div className="line"></div>
             </div>
 
-            {loading ? (
-                <p>Loading comics...</p>
-            ) : (
+  const handleDetailClick = (auctionId: string) => {
+    navigate(`/auctiondetail/${auctionId}`);
+  };
 
                 <div className="hot-comic-cards mt-4">
                     <Carousel
@@ -171,6 +171,54 @@ const Auctions: React.FC = () => {
         </div>
     );
 
+      {loading ? (
+        <p>Loading comics...</p>
+      ) : (
+        <div className="hot-comic-cards mt-4">
+          <Carousel
+            responsive={responsive}
+            customButtonGroup={
+              <CustomButtonGroup
+                next={() => {}}
+                previous={() => {}}
+                carouselState={{
+                  currentSlide: 0,
+                  totalItems: 0,
+                  slidesToShow: 0,
+                }}
+              />
+            }
+            renderButtonGroupOutside={true}
+          >
+            {comics.map((comic, index) => (
+              <div className="auction-card" key={index}>
+                <img
+                  src={comic.coverImage?.[0] || "/default-cover.jpg"}
+                  // alt={comic.title}
+                  className=" object-cover mx-auto"
+                />
+                <p className="title">{comic.title}</p>
+                <Chip
+                  label={comic.condition}
+                  icon={<ChangeCircleOutlinedIcon />}
+                  size="medium"
+                />
+                <p className="endtime">KẾT THÚC TRONG</p>
+                <Countdown date={Date.now() + 100000000} renderer={renderer} />
+                <Button
+                  className="detail-button"
+                  onClick={() => handleDetailClick(comic.comics.id)}
+                  variant="contained"
+                >
+                  Xem Chi Tiết
+                </Button>
+              </div>
+            ))}
+          </Carousel>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Auctions;

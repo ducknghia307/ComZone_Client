@@ -171,7 +171,23 @@ const SellerManagement = () => {
     }
 
     if (comics.length === 0) {
-      return <Typography>No comics found.</Typography>;
+      return (
+        <Typography>
+          <Button
+            variant="contained"
+            sx={{
+              borderRadius: "20px",
+              backgroundColor: "#D9D9D9",
+              color: "#000",
+            }}
+            startIcon={<AddIcon />}
+            component={Link}
+            to="/sellermanagement/createcomic"
+          >
+            Thêm truyện đầu tiên
+          </Button>
+        </Typography>
+      );
     }
 
     switch (selectedMenuItem) {

@@ -49,9 +49,9 @@
 }
 
 /* Basic plan hover */
-.basic-plan:hover {
+/* .basic-plan:hover {
   border-color: #38419e !important;
-}
+} */
 
 /* Shine effect */
 @keyframes shine {
@@ -70,11 +70,11 @@
 }
 
 /* Feature list items hover */
-.plan-features li {
+/* .plan-features li {
   transition: transform 0.2s ease;
 }
 
 .plan-features li:hover {
   transform: translateX(5px);
-}
+} */
 

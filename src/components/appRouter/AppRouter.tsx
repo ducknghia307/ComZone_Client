@@ -12,7 +12,7 @@ import SignUp from "../../pages/SignUp";
 import ForgotPassword from "../../pages/ForgotPassword";
 import SellerManagement from "../../pages/SellerManagement";
 import CreateComic from "../../pages/CreateComic";
-import Blogs from "../../pages/Blogs";
+import ExchangeNewsFeed from "../../pages/ExchangeNewsFeed";
 import SellerEditComicDetail from "../comic/SellerEditComicDetail";
 import OrderComplete from "../../pages/OrderComplete";
 import OrderUser from "../../pages/OrderUser";
@@ -24,6 +24,7 @@ import RegisterSeller from "../../pages/RegisterSeller";
 import { ConfigProvider } from "antd";
 import AllHotComics from "../../pages/HotComic";
 import ComicZoneMembership from "../membership/ComicZoneMembership";
+import NotFound from "../notFound/NotFound";
 
 const AppRouter = () => {
   return (
@@ -48,7 +49,7 @@ const AppRouter = () => {
           element={<SellerEditComicDetail />}
         />
         <Route path="/search" element={<Genres />} />
-        <Route path="/blog" element={<Blogs />} />
+        <Route path="/exchange" element={<ExchangeNewsFeed />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/signin" element={<SignIn />} />
@@ -59,6 +60,8 @@ const AppRouter = () => {
         <Route path="/registerSeller" element={<RegisterSeller />} />
 
         <Route path="/membership" element={<ComicZoneMembership />} />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

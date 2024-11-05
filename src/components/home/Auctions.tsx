@@ -85,21 +85,28 @@ const renderer = ({ days, hours, minutes, seconds }: any) => {
 const Auctions: React.FC = () => {
     const navigate = useNavigate();
     const [comics, setComics] = useState<any[]>([]);
+    const [ongoingComics, setOngoingComics] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchComics = async () => {
-          try {
-            const response = await publicAxios.get("/auction");
-            const data = response.data;
-            const auctionComics = data.filter((comic: any) => comic.isAuction === true);
-            console.log('.......',auctionComics)
-            setComics(auctionComics);
-          } catch (error) {
-            console.error("Error fetching comics:", error);
-          } finally {
-            setLoading(false);
-          }
+            try {
+                const response = await publicAxios.get("/auction");
+                const data = response.data;
+                console.log("Available Comics:", data);
+
+                const auctionComics = data.filter(
+                    (auction: any) => auction.status === "ONGOING"
+                );
+                console.log("Auction Comics:", auctionComics);
+
+                setOngoingComics(auctionComics);
+                console.log("ongoingComics", ongoingComics);
+            } catch (error) {
+                console.error("Error fetching comics:", error);
+            } finally {
+                setLoading(false);
+            }
         };
 
         fetchComics();
@@ -113,7 +120,7 @@ const Auctions: React.FC = () => {
         <div className="w-full py-8">
             <div className="section-title text-2xl font-bold">
                 <div className="line"></div>
-                <h2 className="title">{comics.length} sản phẩm đang được đấu giá</h2>
+                <h2 className="title">{ongoingComics.length} sản phẩm đang được đấu giá</h2>
                 <div className="line"></div>
             </div>
 
@@ -127,16 +134,16 @@ const Auctions: React.FC = () => {
                         customButtonGroup={<CustomButtonGroup next={() => { }} previous={() => { }} carouselState={{ currentSlide: 0, totalItems: 0, slidesToShow: 0 }} />}
                         renderButtonGroupOutside={true}
                     >
-                        {comics.map((comic, index) => (
+                        {ongoingComics.map((comic, index) => (
                             <div className="auction-card" key={index}>
                                 <img
-                                    src={comic.coverImage}
+                                    src={comic.comics.coverImage}
                                     // alt={comic.title}
                                     className=" object-cover mx-auto"
                                 />
                                 <p className="title">{comic.title}</p>
                                 <Chip
-                                    label={comic.condition}
+                                    label={comic.comics.condition}
                                     icon={<ChangeCircleOutlinedIcon />}
                                     size="medium"
                                 />
@@ -147,7 +154,7 @@ const Auctions: React.FC = () => {
                                 />
                                 <Button
                                     className="detail-button"
-                                    onClick={() => handleDetailClick(comic.comics.id)}
+                                    onClick={() => handleDetailClick(comic.id)}
                                     variant="contained"
                                 >
                                     Xem Chi Tiết

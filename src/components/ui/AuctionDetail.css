@@ -40,12 +40,14 @@
 .comic-images {
     display: flex;
     justify-content: center;
+    width: 100%;
+    height:100%
 }
 
 .main-comic-image {
     width: 480px;
     height: 600px;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .small-images {

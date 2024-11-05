@@ -384,11 +384,11 @@ const Navbar = () => {
               </Link>
               <Link
                 className={`text-black px-6 hover:text-black ${
-                  location.pathname === "/blog" ? "font-bold" : ""
+                  location.pathname === "/exchange" ? "font-bold" : ""
                 }`}
-                to="/blog"
+                to="/exchange"
               >
-                <li>BLOG TRAO ĐỔI</li>
+                <li>TRAO ĐỔI TRUYỆN</li>
               </Link>
             </div>
           )}
@@ -475,12 +475,12 @@ const Navbar = () => {
               </Link>
               <Link
                 className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
-                  location.pathname === "/blog" ? "font-bold" : ""
+                  location.pathname === "/exchange" ? "font-bold" : ""
                 }`}
-                to="/blog"
+                to="/exchange"
                 onClick={toggleMenu}
               >
-                BLOG TRAO ĐỔI
+                TRAO ĐỔI TRUYỆN
               </Link>
               <Link
                 className={

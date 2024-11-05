@@ -87,26 +87,31 @@ const renderer = ({ days, hours, minutes, seconds }: any) => {
 };
 
 const Auctions: React.FC = () => {
-  const navigate = useNavigate();
-  const [comics, setComics] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const [comics, setComics] = useState<any[]>([]);
+    const [ongoingComics, setOngoingComics] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchComics = async () => {
-      try {
-        const response = await publicAxios.get("/auction");
-        const data = response.data;
-        const auctionComics = data.filter(
-          (comic: any) => comic.isAuction === true
-        );
-        console.log(".......", auctionComics);
-        setComics(auctionComics);
-      } catch (error) {
-        console.error("Error fetching comics:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+        const fetchComics = async () => {
+            try {
+                const response = await publicAxios.get("/auction");
+                const data = response.data;
+                console.log("Available Comics:", data);
+
+                const auctionComics = data.filter(
+                    (auction: any) => auction.status === "ONGOING"
+                );
+                console.log("Auction Comics:", auctionComics);
+
+                setOngoingComics(auctionComics);
+                console.log("ongoingComics", ongoingComics);
+            } catch (error) {
+                console.error("Error fetching comics:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
     fetchComics();
   }, []);
@@ -115,62 +120,57 @@ const Auctions: React.FC = () => {
     navigate(`/auctiondetail/${auctionId}`);
   };
 
-  return (
-    <div className="w-full py-8">
-      <div className="section-title text-2xl font-bold">
-        <div className="line"></div>
-        <h2 className="title">{comics.length} sản phẩm đang được đấu giá</h2>
-        <div className="line"></div>
-      </div>
+    return (
+        <div className="w-full py-8">
+            <div className="section-title text-2xl font-bold">
+                <div className="line"></div>
+                <h2 className="title">{ongoingComics.length} sản phẩm đang được đấu giá</h2>
+                <div className="line"></div>
+            </div>
 
-      {loading ? (
-        <p>Loading comics...</p>
-      ) : (
-        <div className="hot-comic-cards mt-4">
-          <Carousel
-            responsive={responsive}
-            customButtonGroup={
-              <CustomButtonGroup
-                next={() => {}}
-                previous={() => {}}
-                carouselState={{
-                  currentSlide: 0,
-                  totalItems: 0,
-                  slidesToShow: 0,
-                }}
-              />
-            }
-            renderButtonGroupOutside={true}
-          >
-            {comics.map((comic, index) => (
-              <div className="auction-card" key={index}>
-                <img
-                  src={comic.coverImage?.[0] || "/default-cover.jpg"}
-                  // alt={comic.title}
-                  className=" object-cover mx-auto"
-                />
-                <p className="title">{comic.title}</p>
-                <Chip
-                  label={comic.condition}
-                  icon={<ChangeCircleOutlinedIcon />}
-                  size="medium"
-                />
-                <p className="endtime">KẾT THÚC TRONG</p>
-                <Countdown date={Date.now() + 100000000} renderer={renderer} />
-                <Button
-                  className="detail-button"
-                  onClick={() => handleDetailClick(comic.comics.id)}
-                  variant="contained"
-                >
-                  Xem Chi Tiết
-                </Button>
-              </div>
-            ))}
-          </Carousel>
+            {loading ? (
+                <p>Loading comics...</p>
+            ) : (
+
+                <div className="hot-comic-cards mt-4">
+                    <Carousel
+                        responsive={responsive}
+                        customButtonGroup={<CustomButtonGroup next={() => { }} previous={() => { }} carouselState={{ currentSlide: 0, totalItems: 0, slidesToShow: 0 }} />}
+                        renderButtonGroupOutside={true}
+                    >
+                        {ongoingComics.map((comic, index) => (
+                            <div className="auction-card" key={index}>
+                                <img
+                                    src={comic.comics.coverImage}
+                                    // alt={comic.title}
+                                    className=" object-cover mx-auto"
+                                />
+                                <p className="title">{comic.title}</p>
+                                <Chip
+                                    label={comic.comics.condition}
+                                    icon={<ChangeCircleOutlinedIcon />}
+                                    size="medium"
+                                />
+                                <p className="endtime">KẾT THÚC TRONG</p>
+                                <Countdown
+                                    date={Date.now() + 100000000}
+                                    renderer={renderer}
+                                />
+                                <Button
+                                    className="detail-button"
+                                    onClick={() => handleDetailClick(comic.id)}
+                                    variant="contained"
+                                >
+                                    Xem Chi Tiết
+                                </Button>
+                            </div>
+                        ))}
+                    </Carousel>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
+
 };
 
 export default Auctions;

@@ -33,7 +33,7 @@ const SellerManagement = () => {
   useEffect(() => {
     // Gọi API để lấy danh sách comics và genres
     Promise.all([
-      privateAxios.get("/comics/seller").then((response) => response.data),
+      privateAxios.get("/comics").then((response) => response.data),
       privateAxios.get("/genres").then((response) => response.data),
     ])
       .then(([comicsData, genresData]) => {

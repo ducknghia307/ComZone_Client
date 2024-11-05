@@ -73,7 +73,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     switch (status) {
       case "PENDING":
         return "#f28144";
-      case "PACKING":
+      case "PACKAGING":
         return "#fc65fc";
       case "DELIVERING":
         return "#28bacf";
@@ -92,7 +92,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     switch (status) {
       case "PENDING":
         return "Chờ xử lí";
-      case "PACKING":
+      case "PACKAGING":
         return "Đang đóng gói";
       case "DELIVERING":
         return "Đang giao hàng";
@@ -137,7 +137,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         {[
           "all",
           "PENDING",
-          "PACKING",
+          "PACKAGING",
           "DELIVERING",
           "DELIVERED",
           "COMPLETED",

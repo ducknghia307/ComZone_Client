@@ -106,7 +106,7 @@ const Sidebar = ({
   };
 
   return (
-    <div className="sidebar">
+    <div className="sidebar REM">
       <div className="sidebar-header">
         <h2>Khám phá truyện</h2>
         <div className="line-header"></div>
@@ -119,7 +119,7 @@ const Sidebar = ({
       ) : (
         <>
           {/* Genre Section */}
-          <div className="genre-section">
+          <div className="genre-section REM">
             <div
               className="header flex justify-between items-center cursor-pointer"
               onClick={toggleGenre}
@@ -138,7 +138,7 @@ const Sidebar = ({
                         onChange={handleGenreChange}
                       />
                     }
-                    label={genre.name}
+                    label={<p className="REM">{genre.name}</p>}
                   />
                 ))}
               </FormGroup>

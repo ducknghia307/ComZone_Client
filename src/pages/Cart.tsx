@@ -263,7 +263,8 @@ const Cart = () => {
                             <tr
                               key={comic.id}
                               className={`border-b ${
-                                comic.status === "UNAVAILABLE"
+                                comic.status === "UNAVAILABLE" ||
+                                comic.status === "SOLD"
                                   ? "opacity-30 "
                                   : ""
                               }`}
@@ -276,7 +277,10 @@ const Cart = () => {
                                   onChange={() =>
                                     handleCheckboxChange(comic.id)
                                   }
-                                  disabled={comic.status === "UNAVAILABLE"}
+                                  disabled={
+                                    comic.status === "UNAVAILABLE" ||
+                                    comic.status === "SOLD"
+                                  }
                                 />
                                 <img
                                   src={comic.coverImage}
@@ -300,7 +304,8 @@ const Cart = () => {
                                       {comic.title}
                                     </Link>
                                   </Tooltip>
-                                  {comic.status === "UNAVAILABLE" && (
+                                  {(comic.status === "UNAVAILABLE" ||
+                                    comic.status === "SOLD") && (
                                     <span className="text-xs text-red-500">
                                       Truyện này hiện không còn trên hệ thống
                                       chúng tôi
@@ -309,7 +314,8 @@ const Cart = () => {
                                 </div>
                               </td>
                               <td className="text-red-500 font-semibold text-center">
-                                {comic.status === "AVAILABLE"
+                                {comic.status === "AVAILABLE" ||
+                                comic.status === "SOLD"
                                   ? CurrencySplitter(comic.price)
                                   : "N/A"}{" "}
                                 đ

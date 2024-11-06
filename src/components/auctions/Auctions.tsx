@@ -79,7 +79,27 @@ const AllAuctions = ({
   //     return genreMatch && authorMatch && titleMatch && conditionMatch;
   // });
 
-  if (loading) return <Loading />;
+
+
+
+  const filteredComics = ongoingComics.filter((comic) => {
+    const genreMatch =
+      filteredGenres.length === 0 || 
+      (comic.comics.genres && comic.comics.genres.some((genre) => filteredGenres.includes(genre.name)));
+
+    const authorMatch = 
+      filteredAuthors.length === 0 || 
+      filteredAuthors.includes(comic.comics.author);
+
+    const conditionMatch = 
+      filteredConditions.length === 0 || 
+      filteredConditions.includes(comic.comics.condition);
+
+    return genreMatch && authorMatch && conditionMatch;
+  });
+
+   if (loading) return <Loading />;
+
 
   return (
     <div className="mb-10 REM">
@@ -92,8 +112,8 @@ const AllAuctions = ({
       </div>
 
       <div className="auction-cards mt-4">
-        {ongoingComics.length > 0 ? (
-          ongoingComics.map((comic) => (
+        {filteredComics.length > 0 ? (
+          filteredComics.map((comic) => (
             <div className="auction-card" key={comic.id}>
               <img
                 src={comic.comics.coverImage}

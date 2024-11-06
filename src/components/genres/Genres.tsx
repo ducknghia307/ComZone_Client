@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import StarIcon from "@mui/icons-material/Star";
 import "../ui/GenreSidebar.css";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Countdown from "react-countdown";
 import { Button, Chip } from "@mui/material";
 import { Comic } from "../../common/base.interface";
@@ -13,6 +13,7 @@ import Loading from "../loading/Loading";
 interface GenresProps {
   filteredGenres: string[];
   filteredAuthors: string[];
+  filteredConditions: string[];
 }
 
 const Genres: React.FC<GenresProps> = ({
@@ -21,10 +22,12 @@ const Genres: React.FC<GenresProps> = ({
   filteredConditions,
 }) => {
   const [comics, setComics] = useState<Comic[]>([]);
+  const [auctionComics, setAuctionComics] = useState<Comic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [sortOrder, setSortOrder] = useState("asc");
   const location = useLocation();
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+  const navigate = useNavigate();
 
   const params = new URLSearchParams(location.search);
   const searchQuery = params.get("query");
@@ -58,9 +61,14 @@ const Genres: React.FC<GenresProps> = ({
         const response = isLoggedIn
           ? await privateAxios.get("/comics/except-seller/available") // For logged-in users
           : await publicAxios.get("/comics/status/available"); // For guests
-        // const auctionComics = await publicAxios.get<Comic[]>("/auction");
+        const auctionComics = await publicAxios.get<Comic[]>("/auction");
 
         setComics(response.data);
+        console.log("comics", response.data);
+
+        setAuctionComics(auctionComics.data);
+        console.log("auction comics", auctionComics.data);
+
       } catch (error) {
         console.error("Error fetching comics:", error);
       } finally {
@@ -71,44 +79,91 @@ const Genres: React.FC<GenresProps> = ({
     fetchComics();
   }, []);
 
-  const filteredComics = comics.filter((comic) => {
-    if (searchQuery) {
-      // Nếu có searchQuery, tìm kiếm trong cả AVAILABLE và AUCTION comics
-      return comic.title.toLowerCase().includes(searchQuery.toLowerCase());
-    } else {
-      // Nếu không có searchQuery, chỉ áp dụng bộ lọc cho AVAILABLE comics
-      if (comic.status === "AVAILABLE") {
-        const genreMatch =
-          filteredGenres.length > 0
-            ? comic.genres &&
-              comic.genres.some((genre) => filteredGenres.includes(genre.name))
-            : true;
-        const authorMatch =
-          filteredAuthors.length > 0
-            ? filteredAuthors.includes(comic.author)
-            : true;
-        const conditionMatch =
-          filteredConditions.length > 0
-            ? filteredConditions.includes(comic.condition)
-            : true;
-        return genreMatch && authorMatch && conditionMatch;
-      }
-      return false;
-    }
-  });
+  // const filteredRegularComics = comics.filter((comic) => {
+  //   if (searchQuery) {
+  //     return comic.title.toLowerCase().includes(searchQuery.toLowerCase());
+  //   } else if (comic.status === "AVAILABLE") {
+  //     const genreMatch = filteredGenres.length > 0
+  //       ? comic.genres && comic.genres.some((genre) => filteredGenres.includes(genre.name))
+  //       : true;
+  //     const authorMatch = filteredAuthors.length > 0
+  //       ? filteredAuthors.includes(comic.author)
+  //       : true;
+  //     const conditionMatch = filteredConditions.length > 0
+  //       ? filteredConditions.includes(comic.condition)
+  //       : true;
 
-  const sortedComics = [...filteredComics].sort((a, b) =>
+  //     return genreMatch && authorMatch && conditionMatch;
+  //   }
+  //   return false;
+  // });
+
+  // const filteredAuctionComics = auctionComics.filter((comic) => {
+  //   return searchQuery
+  //     ? comic.comics.title.toLowerCase().includes(searchQuery.toLowerCase())
+  //     : true;
+  // });
+
+  const filterRegularComics = (comic: Comic) => {
+    const matchesSearchQuery = searchQuery
+      ? comic.title.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+
+    const genreMatch = filteredGenres.length > 0
+      ? comic.genres && comic.genres.some((genre) => filteredGenres.includes(genre.name))
+      : true;
+    const authorMatch = filteredAuthors.length > 0
+      ? filteredAuthors.includes(comic.author)
+      : true;
+    const conditionMatch = filteredConditions.length > 0
+      ? filteredConditions.includes(comic.condition)
+      : true;
+
+    return matchesSearchQuery && genreMatch && authorMatch && conditionMatch;
+  };
+
+  const filterAuctionComics = (comic: Comic) => {
+    const matchesSearchQuery = searchQuery
+      ? comic.comics.title.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+
+    const genreMatch = filteredGenres.length > 0
+      ? comic.comics.genres && comic.comics.genres.some((genre) => filteredGenres.includes(genre.name))
+      : true;
+    const authorMatch = filteredAuthors.length > 0
+      ? filteredAuthors.includes(comic.comics.author)
+      : true;
+    const conditionMatch = filteredConditions.length > 0
+      ? filteredConditions.includes(comic.comics.condition)
+      : true;
+
+    return matchesSearchQuery && genreMatch && authorMatch && conditionMatch;
+  };
+
+  // Apply the filter to each list separately
+  const filteredRegularComics = comics.filter((comic) => filterRegularComics(comic));
+  const filteredAuctionComics = auctionComics.filter((comic) => filterAuctionComics(comic));
+
+
+  const sortedComics = [...filteredRegularComics].sort((a, b) =>
     sortOrder === "asc" ? a.price - b.price : b.price - a.price
   );
 
-  const auctionComics = sortedComics.filter(
-    (comic) => comic.status === "AUCTION"
+  const sortedRegularComics = [...filteredRegularComics].sort((a, b) =>
+    sortOrder === "asc" ? a.price - b.price : b.price - a.price
   );
+
+  const sortedAuctionComics = [...filteredAuctionComics].sort((a, b) =>
+    sortOrder === "asc" ? a.price - b.price : b.price - a.price
+  );
+
+
+  // const auctionComics = sortedComics.filter(
+  //   (comic) => comic.status === "AUCTION"
+  // );
   const nonAuctionComics = sortedComics.filter(
     (comic) => comic.status !== "AUCTION"
   );
-  console.log("truyện đấu giá", auctionComics);
-  console.log("truyện không đấu giá", nonAuctionComics);
 
   const formatPrice = (price: number) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
@@ -116,6 +171,10 @@ const Genres: React.FC<GenresProps> = ({
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortOrder(e.target.value === "Giá cao đến thấp" ? "desc" : "asc");
+  };
+
+  const handleDetailClick = (comicId: string) => {
+    navigate(`/auctiondetail/${comicId}`); // Điều hướng với ID comic
   };
 
   return (
@@ -160,17 +219,17 @@ const Genres: React.FC<GenresProps> = ({
                   }}
                 />
                 <div className="all-genres-cards">
-                  {auctionComics.length > 0 ? (
-                    auctionComics.map((comic) => (
+                  {sortedAuctionComics.length > 0 ? (
+                    sortedAuctionComics.map((comic) => (
                       <div className="auction-card" key={comic.id}>
                         <img
-                          src={comic.coverImage?.[0] || "/default-cover.jpg"}
-                          alt={comic.title}
+                          src={comic.comics.coverImage}
+                          alt={comic.comics.title}
                           className=" object-cover mx-auto"
                         />
-                        <p className="title">{comic.title}</p>
+                        <p className="title">{comic.comics.title}</p>
                         <Chip
-                          label={comic.condition}
+                          label={comic.comics.condition}
                           icon={<ChangeCircleOutlinedIcon />}
                           size="medium"
                         />
@@ -179,7 +238,7 @@ const Genres: React.FC<GenresProps> = ({
                           date={Date.now() + 100000000}
                           renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained">
+                        <Button className="detail-button" variant="contained" onClick={() => handleDetailClick(comic.id)}>
                           Xem Chi Tiết
                         </Button>
                       </div>
@@ -193,7 +252,7 @@ const Genres: React.FC<GenresProps> = ({
               </div>
 
               {/* Non-Auction Comics Section */}
-              <div className="regular-comics-section mt-8">
+              <div className="regular-comics-section mt-2">
                 <Chip
                   label="Comics Thông Thường"
                   color="secondary"
@@ -207,8 +266,8 @@ const Genres: React.FC<GenresProps> = ({
                   }}
                 />
                 <div className="all-genres-cards">
-                  {nonAuctionComics.length > 0 ? (
-                    nonAuctionComics.map((comic) => (
+                  {sortedRegularComics.length > 0 ? (
+                    sortedRegularComics.map((comic) => (
                       <div className="hot-comic-card" key={comic.id}>
                         <Link to={`/detail/${comic.id}`}>
                           <img

@@ -73,7 +73,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     switch (status) {
       case "PENDING":
         return "#f28144";
-      case "PACKING":
+      case "PACKAGING":
         return "#fc65fc";
       case "DELIVERING":
         return "#28bacf";
@@ -81,7 +81,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         return "#32CD32";
       case "COMPLETED":
         return "#228B22";
-      case "CANCELLED":
+      case "CANCELED":
         return "#FF4500";
       default:
         return "#000";
@@ -92,7 +92,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     switch (status) {
       case "PENDING":
         return "Chờ xử lí";
-      case "PACKING":
+      case "PACKAGING":
         return "Đang đóng gói";
       case "DELIVERING":
         return "Đang giao hàng";
@@ -100,7 +100,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         return "Đã giao thành công";
       case "COMPLETED":
         return "Hoàn tất";
-      case "CANCELLED":
+      case "CANCELED":
         return "Bị hủy";
       default:
         return "Tất cả";
@@ -137,11 +137,11 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         {[
           "all",
           "PENDING",
-          "PACKING",
+          "PACKAGING",
           "DELIVERING",
           "DELIVERED",
           "COMPLETED",
-          "CANCELLED",
+          "CANCELED",
         ].map((status) => (
           <span
             key={status}

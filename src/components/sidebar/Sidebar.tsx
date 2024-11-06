@@ -12,6 +12,7 @@ import { useAppSelector } from "../../redux/hooks";
 import { useLocation } from "react-router-dom";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import "../ui/Sidebar.css";
+import { Genre } from "../../common/base.interface";
 
 const conditions = ["SEALED", "USED"];
 
@@ -23,7 +24,7 @@ const Sidebar = ({
   const [isGenreOpen, setIsGenreOpen] = useState(true);
   const [isConditionOpen, setIsConditionOpen] = useState(true);
   const [isAuthorOpen, setIsAuthorOpen] = useState(true);
-  const [genres, setGenres] = useState([]);
+  const [genres, setGenres] = useState<Genre[]>([]);
   const [authors, setAuthors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -106,7 +107,7 @@ const Sidebar = ({
   };
 
   return (
-    <div className="sidebar">
+    <div className="sidebar REM">
       <div className="sidebar-header">
         <h2>Khám phá truyện</h2>
         <div className="line-header"></div>
@@ -119,7 +120,7 @@ const Sidebar = ({
       ) : (
         <>
           {/* Genre Section */}
-          <div className="genre-section">
+          <div className="genre-section REM">
             <div
               className="header flex justify-between items-center cursor-pointer"
               onClick={toggleGenre}
@@ -138,7 +139,7 @@ const Sidebar = ({
                         onChange={handleGenreChange}
                       />
                     }
-                    label={genre.name}
+                    label={<p className="REM text-nowrap">{genre.name}</p>}
                   />
                 ))}
               </FormGroup>
@@ -167,9 +168,11 @@ const Sidebar = ({
                         />
                       }
                       label={
-                        condition === "SEALED"
-                          ? "Nguyên Seal"
-                          : "Đã Qua Sử Dụng"
+                        <p className="REM">
+                          {condition === "SEALED"
+                            ? "Nguyên Seal"
+                            : "Đã Qua Sử Dụng"}
+                        </p>
                       }
                     />
                   ))}
@@ -195,7 +198,7 @@ const Sidebar = ({
                     control={
                       <Checkbox name={author} onChange={handleAuthorChange} />
                     }
-                    label={author}
+                    label={<p className="REM">{author}</p>}
                   />
                 ))}
               </FormGroup>

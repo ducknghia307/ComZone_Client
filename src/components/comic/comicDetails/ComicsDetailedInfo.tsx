@@ -19,7 +19,7 @@ export default function ComicsDetailedInfo({
         <div className="w-1/2">
           {genres?.map((genre: string, index: number) => {
             return (
-              <span className="text-sky-800">
+              <span key={index} className="text-sky-800">
                 {genre}
                 {index < genres.length - 1 && ", "}
               </span>

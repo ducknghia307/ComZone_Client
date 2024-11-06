@@ -1,6 +1,7 @@
 import InfiniteScroll from "react-infinite-scroll-component";
 import CurrencySplitter from "../../../assistants/Spliter";
 import { Comic } from "../../../common/base.interface";
+import { useNavigate } from "react-router-dom";
 
 export default function RecommendedComicsList({
   comicsList,
@@ -11,6 +12,7 @@ export default function RecommendedComicsList({
   fetchMoreData: () => void;
   hasMore: boolean;
 }) {
+  const navigate = useNavigate();
   return (
     <div className="w-full flex flex-col gap-2 bg-white px-4 py-4 rounded-xl drop-shadow-md">
       <p className="text-sm pb-2">Có thể bạn sẽ thích</p>
@@ -27,7 +29,8 @@ export default function RecommendedComicsList({
             return (
               <div
                 key={comics.id}
-                className="min-w-40 w-1/2 flex flex-col justify-start items-start border border-gray-300 rounded-lg overflow-hidden"
+                className="min-w-40 w-1/2 flex flex-col justify-start items-start border border-gray-300 rounded-lg overflow-hidden hover:cursor-pointer"
+                onClick={() => navigate(`/detail/${comics.id}`)}
               >
                 <div
                   className="w-full h-64 bg-cover bg-center bg-no-repeat"

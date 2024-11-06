@@ -27,9 +27,11 @@ export default function ComicsDetailTemp() {
     Comic[] | []
   >([]);
   const [hasMore, setHasMore] = useState(true);
-  const accessToken = useAppSelector((state) => state.auth.accessToken);
+  // const accessToken = useAppSelector((state) => state.auth.accessToken);
   const dispatch = useAppDispatch();
+  const [userInfo, setUserInfo] = useState<UserInfo>();
   // const [recommendedList, setRecommendedList] = useState<Comic[] | []>([]);
+  const [isInCart, setIsInCart] = useState<boolean>(false);
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const { id } = useParams();
@@ -53,32 +55,51 @@ export default function ComicsDetailTemp() {
       })
       .catch((err) => console.log(err));
   };
-  const comics = currentComics;
+  const fetchUserInfo = async () => {
+    try {
+      const res = await privateAxios("/users/profile");
+      setUserInfo(res.data);
+    } catch (error) {
+      console.log("Error to fetch user information:", error);
+    }
+  };
+  const checkIsInCart = () => {
+    const cartKey = "cart";
+    const userId = userInfo?.id;
+
+    if (userId) {
+      const allCarts = JSON.parse(localStorage.getItem(cartKey) || "{}");
+      const userCart = allCarts[userId] || [];
+
+      const exists = userCart.some((comic: Comic) => comic.id === id);
+      setIsInCart(exists);
+    }
+  };
 
   const handleAddToCart = async () => {
     const cartKey = "cart";
-    if (accessToken) {
+    const userId = userInfo?.id;
+
+    if (userId) {
       try {
-        const currentCart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+        const allCarts = JSON.parse(localStorage.getItem(cartKey) || "{}");
 
-        const existingComicIndex = currentCart.findIndex(
-          (item: { comics: Comic }) => item.comics.id === id
-        );
+        if (!allCarts[userId]) {
+          allCarts[userId] = [];
+        }
 
-        if (existingComicIndex >= 0) {
+        const exists = allCarts[userId].some((comic: Comic) => comic.id === id);
+
+        if (exists) {
           messageApi.warning({
             key: "a",
             type: "info",
             content: "Truyện này đã được thêm vào giỏ hàng.",
           });
         } else {
-          currentCart.push({ comics });
-          localStorage.setItem(cartKey, JSON.stringify(currentCart));
+          allCarts[userId].push(currentComics);
+          localStorage.setItem(cartKey, JSON.stringify(allCarts));
 
-          // setOpen(true);
-          // setTimeout(() => {
-          //   setOpen(false);
-          // }, 2000);
           console.log("Item added to cart:", id);
           window.dispatchEvent(new Event("cartUpdated"));
         }
@@ -96,9 +117,14 @@ export default function ComicsDetailTemp() {
   };
 
   useEffect(() => {
+    fetchUserInfo();
     fetchCurrentComics();
   }, [id]);
-
+  useEffect(() => {
+    if (userInfo) {
+      checkIsInCart(); // Check if the comic is in the cart
+    }
+  }, [userInfo, id]);
   return (
     <>
       {contextHolder}
@@ -133,6 +159,7 @@ export default function ComicsDetailTemp() {
               <ComicsBillingSection
                 currentComics={currentComics}
                 handleAddToCart={handleAddToCart}
+                isInCart={isInCart}
               />
             </div>
           </div>

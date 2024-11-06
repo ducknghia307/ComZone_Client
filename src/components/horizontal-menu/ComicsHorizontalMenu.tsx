@@ -6,6 +6,7 @@ import "react-multi-carousel/lib/styles.css";
 import { Comic } from "../../common/base.interface";
 import "./style.css";
 import CurrencySplitter from "../../assistants/Spliter";
+import { useNavigate } from "react-router-dom";
 
 const responsive = {
   superLargeDesktop: {
@@ -45,7 +46,7 @@ export default function ComicsHorizontalMenu({
       carouselRef.current.previous();
     }
   };
-
+  const navigate = useNavigate();
   return (
     <div className="w-full relative">
       <Button
@@ -63,7 +64,8 @@ export default function ComicsHorizontalMenu({
         {comicsList.map((comics: Comic) => (
           <div
             key={comics.id}
-            className="min-w-40 w-1/2 flex flex-col justify-start items-start border border-gray-300 rounded-lg overflow-hidden ml-2"
+            className="min-w-40 w-1/2 flex flex-col justify-start items-start border border-gray-300 rounded-lg overflow-hidden ml-2 hover:cursor-pointer"
+            onClick={() => navigate(`/detail/${comics.id}`)}
           >
             <div
               className={`w-full h-64 bg-cover bg-center bg-no-repeat`}

@@ -15,6 +15,10 @@ function App() {
             dotSize: 10,
             dotCurrentSize: 16,
           },
+          Checkbox: {
+            colorPrimary: "#000000",
+            colorPrimaryHover: "#000000",
+          },
         },
         token: {
           fontFamily: "REM",

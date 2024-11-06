@@ -36,12 +36,10 @@ const Navbar = () => {
     const accessToken = query.get("accessToken");
     const refreshToken = query.get("refreshToken");
 
-    // Dispatch tokens to Redux if available
     if (accessToken && refreshToken) {
       dispatch(authSlice.actions.login({ accessToken, refreshToken }));
       console.log("Dispatched tokens to Redux");
 
-      // Clear the query params from the URL without reloading the page
       window.history.replaceState(null, "", window.location.pathname);
 
       setTimeout(() => {
@@ -50,20 +48,25 @@ const Navbar = () => {
     }
     const updateCartLength = () => {
       const cartData = localStorage.getItem("cart");
-      const parsedCartData = cartData ? JSON.parse(cartData) : [];
-      setCartLength(parsedCartData.length);
+      const parsedCartData = cartData ? JSON.parse(cartData) : {};
+
+      const userId = userInfo?.id;
+
+      if (userId && parsedCartData[userId]) {
+        setCartLength(parsedCartData[userId].length);
+      } else {
+        setCartLength(0);
+      }
     };
 
-    // Initial load
     updateCartLength();
 
-    // Listen to local storage changes
     window.addEventListener("cartUpdated", updateCartLength);
 
     return () => {
       window.removeEventListener("cartUpdated", updateCartLength);
     };
-  }, []);
+  }, [userInfo]);
 
   const fetchUserInfo = async () => {
     if (accessToken) {
@@ -191,21 +194,11 @@ const Navbar = () => {
                         // to={"/profile"}
                         className="flex flex-row gap-1 items-center cursor-pointer duration-200 hover:opacity-50"
                       >
-                        <svg
-                          width="25px"
-                          height="25px"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
-                            stroke="#000000"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
+                        <img
+                          src={userInfo.avatar || ""}
+                          alt={userInfo.name}
+                          className="h-10 w-10 rounded-full"
+                        />
                         {userInfo.name}
                       </li>
                     </Dropdown>

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, notification, Popconfirm, Select } from "antd";
+import {
+  Button,
+  Checkbox,
+  message,
+  notification,
+  Popconfirm,
+  Select,
+} from "antd";
 import axios from "axios";
 import type { PopconfirmProps } from "antd";
 import {
@@ -227,7 +234,7 @@ const EditAddress: React.FC<{
       refreshAddresses();
       setTimeout(() => {
         onCancel();
-      }, 2000);
+      }, 500);
       return;
     } catch (error) {
       console.error("Error updating address:", error);
@@ -252,7 +259,9 @@ const EditAddress: React.FC<{
         description: "Đã xóa địa chỉ này.",
       });
       refreshAddresses();
-      onCancel();
+      setTimeout(() => {
+        onCancel();
+      }, 500);
     } catch (error) {
       console.error("Error deleting address:", error);
       notification.error({
@@ -398,13 +407,13 @@ const EditAddress: React.FC<{
             </span>
           )}
         </div>
-        <div className="flex flex-row w-full justify-between items-center mt-8">
+        <div className="flex flex-row w-full justify-between items-center mt-8 ">
           {!address.isDefault ? (
-            <div className="container items-center flex gap-3">
-              <input
-                type="checkbox"
-                onChange={() => setSetAsDefault(!setAsDefault)}
-              />
+            <div
+              className="container items-center flex gap-3 cursor-pointer "
+              onClick={() => setSetAsDefault(!setAsDefault)}
+            >
+              <Checkbox checked={setAsDefault} />
               <h3 className="text-base">Đặt làm mặc định</h3>
             </div>
           ) : (

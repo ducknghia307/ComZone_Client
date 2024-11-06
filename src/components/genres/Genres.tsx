@@ -8,6 +8,7 @@ import { Comic } from "../../common/base.interface";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { useAppSelector } from "../../redux/hooks";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
+import Loading from "../loading/Loading";
 
 interface GenresProps {
   filteredGenres: string[];
@@ -179,11 +180,11 @@ const Genres: React.FC<GenresProps> = ({
   return (
     <div className="mb-10">
       {loading ? (
-        <div className="loading-indicator">Đang tải dữ liệu...</div>
+        <Loading />
       ) : (
         <>
           {/* Tất Cả Thể Loại */}
-          <div className="all-genres-section flex justify-between items-center">
+          <div className="all-genres-section flex justify-between items-center REM">
             <h2 className="text-2xl font-bold">
               {searchQuery
                 ? `Kết quả tìm kiếm cho: "${searchQuery}"`
@@ -289,7 +290,7 @@ const Genres: React.FC<GenresProps> = ({
               </div>
             </>
           ) : (
-            <div className="all-genres-cards mt-4">
+            <div className="all-genres-cards mt-4 REM">
               {sortedComics.length > 0 ? (
                 sortedComics.map((comic) => (
                   <div className="hot-comic-card" key={comic.id}>

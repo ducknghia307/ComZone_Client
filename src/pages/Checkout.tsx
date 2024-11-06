@@ -88,8 +88,6 @@ const Checkout = () => {
       setUserWalletBalance(Number(data.balance));
     } catch {
       setIsLoading(false);
-    } catch {
-      console.log("...");
     }
   };
 

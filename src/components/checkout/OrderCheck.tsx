@@ -1,7 +1,7 @@
 import React from "react";
 import CurrencySplitter from "../../assistants/Spliter";
 import DeliveryMethod from "./DeliveryMethod";
-import { Address, Comic, SellerDetails } from "../../common/base.interface";
+import { Address, Comic } from "../../common/base.interface";
 
 interface SellerGroup {
   sellerName: string;
@@ -22,16 +22,19 @@ interface SellerGroupDetails {
 interface OrderCheckProps {
   groupedSelectedComics: Record<string, SellerGroup>;
   deliveryDetails: SellerGroupDetails[];
-  // totalPrice: number;
-  // totalQuantity: number;
+  notes: Record<string, string>;
+  setNotes: (notes: Record<string, string>) => void;
 }
 
 const OrderCheck: React.FC<OrderCheckProps> = ({
   groupedSelectedComics,
   deliveryDetails,
-  // totalPrice,
-  // totalQuantity,
+  notes,
+  setNotes,
 }) => {
+  const handleNoteChange = (sellerId: string, note: string) => {
+    setNotes({ ...notes, [sellerId]: note });
+  };
   console.log({ deliveryDetails });
   return (
     <div className="w-full flex flex-col gap-2">
@@ -49,6 +52,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
             (acc, { comic }) => acc + Number(comic.price),
             0
           ) + deliveryFee;
+        // const orderNote = notes[sellerId] || "";
         return (
           <div key={sellerId} className="bg-white w-full px-8 py-4 rounded-lg">
             <div className="w-full flex items-center gap-8 border-b pb-2 mb-4">
@@ -158,6 +162,8 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
             <DeliveryMethod
               deliveryPrice={deliveryFee}
               estDeliveryTime={estDeliveryTime}
+              note={notes[sellerId] || ""}
+              onNoteChange={(note) => handleNoteChange(sellerId, note)}
             />
             <div className="flex flex-row items-center justify-end w-full py-2 gap-2">
               <h4 className="font-extralight">Tổng tiền:</h4>

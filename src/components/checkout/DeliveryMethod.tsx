@@ -7,9 +7,13 @@ moment.locale("vi");
 const DeliveryMethod = ({
   deliveryPrice,
   estDeliveryTime,
+  note,
+  onNoteChange,
 }: {
   deliveryPrice: number;
   estDeliveryTime: Date;
+  note: string;
+  onNoteChange: (note: string) => void;
 }) => {
   const formattedDate = () => {
     const arr = moment(estDeliveryTime || new Date())
@@ -46,6 +50,8 @@ const DeliveryMethod = ({
           placeholder="Ghi chú"
           spellCheck={false}
           className="text-xs font-light"
+          value={note}
+          onChange={(e) => onNoteChange(e.target.value)}
         />
       </div>
 

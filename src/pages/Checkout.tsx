@@ -7,6 +7,7 @@ import {
   // BaseInterface,
   Comic,
   SellerDetails,
+  UserInfo,
   // UserInfo,
 } from "../common/base.interface";
 import { privateAxios } from "../middleware/axiosInstance";
@@ -33,7 +34,7 @@ interface SellerGroupDetails {
 }
 
 const Checkout = () => {
-  // const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [userInfo, setUserInfo] = useState<UserInfo>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userWalletBalance, setUserWalletBalance] = useState<number>(0);
   const [groupedSelectedComics, setGroupedSelectedComics] = useState<
@@ -48,6 +49,7 @@ const Checkout = () => {
   const [deliveryDetails, setDeliveryDetails] = useState<SellerGroupDetails[]>(
     []
   );
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const [modal, contextHolder] = Modal.useModal();
   const countDown = () => {
@@ -82,11 +84,11 @@ const Checkout = () => {
       const response = await privateAxios("/users/profile");
       const data = await response.data;
 
-      // setUserInfo(data);
+      setUserInfo(data);
 
       setUserWalletBalance(Number(data.balance));
-      setIsLoading(false);
     } catch {
+      setIsLoading(false);
       console.log("...");
     }
   };
@@ -96,8 +98,8 @@ const Checkout = () => {
 
     if (!selectedAddress) return;
 
-    setDeliveryDetails([]);
-    setSellerDetailsGroup([]);
+    const tempDeliveryDetails: SellerGroupDetails[] = [];
+    const tempSellerDetailsGroup: SellerDetails[] = [];
 
     await Promise.all(
       Object.keys(groupedSelectedComics).map(async (sellerId) => {
@@ -105,7 +107,7 @@ const Checkout = () => {
           `/seller-details/user/${sellerId}`
         );
 
-        setSellerDetailsGroup((prev) => [...prev, sellerDetails.data]);
+        tempSellerDetailsGroup.push(sellerDetails.data);
 
         const sellerAddress = {
           district: sellerDetails.data.district.id,
@@ -127,12 +129,14 @@ const Checkout = () => {
                 deliveryFee: parseInt(res.data.deliveryFee),
                 estDeliveryTime: res.data.estDeliveryTime,
               };
-              setDeliveryDetails((prev) => [...prev, newDeliveryDetails]);
+              tempDeliveryDetails.push(newDeliveryDetails);
             })
             .catch((err) => console.log(err));
       })
     ).finally(() => {
       setIsLoading(false);
+      setDeliveryDetails(tempDeliveryDetails);
+      setSellerDetailsGroup(tempSellerDetailsGroup);
     });
   };
 
@@ -160,7 +164,6 @@ const Checkout = () => {
     },
     0
   );
-
   const totalDeliveryPrice = deliveryDetails.reduce((total, delivery) => {
     return total + delivery.deliveryFee;
   }, 0);
@@ -216,7 +219,7 @@ const Checkout = () => {
           toWardId: selectedAddress?.ward.id,
           deliveryFee: sellerDeliveryPrice,
           addressId: selectedAddress?.id,
-          note: "",
+          note: notes[sellerId] || "",
         });
 
         const orderId = orderResponse.data.id;
@@ -250,12 +253,19 @@ const Checkout = () => {
       const storedCartData = localStorage.getItem("cart");
       if (storedCartData) {
         const parsedCartData = JSON.parse(storedCartData);
-        const updatedCartData = parsedCartData.filter(
-          (item: any) => !orderedComicIds.includes(item.comics.id)
-        );
-        localStorage.setItem("cart", JSON.stringify(updatedCartData));
-      }
+        const userId = userInfo?.id;
+        console.log(userId);
 
+        if (userId && parsedCartData[userId]) {
+          parsedCartData[userId] = parsedCartData[userId].filter(
+            (item: any) => !orderedComicIds.includes(item.id)
+          );
+
+          localStorage.setItem("cart", JSON.stringify(parsedCartData));
+        } else {
+          console.error("User cart not found or user ID is missing.");
+        }
+      }
       sessionStorage.removeItem("selectedComics");
       countDown();
       // navigate("/order/complete");
@@ -286,6 +296,8 @@ const Checkout = () => {
               <OrderCheck
                 groupedSelectedComics={groupedSelectedComics}
                 deliveryDetails={deliveryDetails}
+                notes={notes}
+                setNotes={setNotes}
                 // totalPrice={totalPrice}
                 // totalQuantity={totalQuantity}
               />

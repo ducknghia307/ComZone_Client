@@ -75,6 +75,26 @@ export default function ComicsDetailTemp() {
       setIsInCart(exists);
     }
   };
+  const handleBuyNow = async () => {
+    if (!currentComics) {
+      console.error("No comic selected.");
+      return;
+    }
+
+    console.log("Comic:", currentComics);
+
+    sessionStorage.setItem(
+      "selectedComics",
+      JSON.stringify({
+        [currentComics.sellerId?.id]: {
+          sellerName: currentComics.sellerId?.name,
+          comics: [{ comic: currentComics, quantity: 1 }],
+        },
+      })
+    );
+
+    navigate("/checkout");
+  };
 
   const handleAddToCart = async () => {
     const cartKey = "cart";
@@ -159,6 +179,7 @@ export default function ComicsDetailTemp() {
               <ComicsBillingSection
                 currentComics={currentComics}
                 handleAddToCart={handleAddToCart}
+                handleBuyNow={handleBuyNow}
                 isInCart={isInCart}
               />
             </div>

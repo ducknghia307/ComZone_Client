@@ -5,12 +5,14 @@ import CurrencySplitter from "../../../assistants/Spliter";
 interface ComicsBillingSectionProps {
   currentComics: Comic | undefined;
   handleAddToCart: () => void;
+  handleBuyNow: () => void;
   isInCart: boolean;
 }
 
 export default function ComicsBillingSection({
   currentComics,
   handleAddToCart,
+  handleBuyNow,
   isInCart,
 }: ComicsBillingSectionProps) {
   const [addedToCart, toggleAddedToCart] = useState<boolean>(isInCart);
@@ -34,7 +36,10 @@ export default function ComicsBillingSection({
       </div>
 
       <div className="w-full flex flex-col gap-2">
-        <button className="w-full px-4 py-2 bg-red-500 rounded-md text-white text-[1.2em] duration-200 hover:bg-red-600">
+        <button
+          className="w-full px-4 py-2 bg-red-500 rounded-md text-white text-[1.2em] duration-200 hover:bg-red-600"
+          onClick={() => handleBuyNow()}
+        >
           MUA NGAY
         </button>
         <button

@@ -8,14 +8,19 @@ import PhoneSplitter from "../../assistants/PhoneSplitter";
 interface DeliveryAddressProps {
   selectedAddress: Address | null;
   setSelectedAddress: (address: Address | null) => void;
+  addresses: Address[];
+  setAddresses: (list: Address[]) => void;
+  fetchUserAddress: () => void;
 }
 
 const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   selectedAddress,
   setSelectedAddress,
+  addresses,
+  setAddresses,
+  fetchUserAddress,
 }) => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
-  const [addresses, setAddresses] = useState<Address[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAddress, setNewAddress] = useState(false);
   const [handleModal, setHandleModal] = useState<boolean>();
@@ -34,33 +39,14 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
       const response = await privateAxios("/users/profile");
       const data = await response.data;
       console.log(data);
-
       setUserInfo(data);
-      fetchUserAddress();
     } catch {
       console.log("...");
     }
   };
 
-  const fetchUserAddress = async () => {
-    try {
-      const response = await privateAxios("/user-addresses/user");
-
-      const data = response.data;
-
-      const sortedAddresses = data.sort((a: Address, b: Address) => {
-        return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
-      });
-      console.log(sortedAddresses);
-
-      setSelectedAddress(sortedAddresses[0] || null);
-      setAddresses(sortedAddresses);
-    } catch {
-      console.log("...");
-    }
-  };
-  const refreshAddresses = async () => {
-    await fetchUserAddress();
+  const refreshAddresses = () => {
+    fetchUserAddress();
   };
   const handleSetSelectedAddress = (addressId: string) => {
     const address = addresses.find((addr) => addr.id === addressId) || null;

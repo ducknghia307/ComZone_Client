@@ -139,15 +139,15 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                       <h4 className="font-medium">{comic.title}</h4>
                     </td>
                     <td className="max-w-[12rem] ">
-                      <h4 className="text-end font-extralight">
+                      <h4 className="text-end font-light">
                         {CurrencySplitter(comic.price)}đ
                       </h4>
                     </td>
                     <td className="max-w-[12rem] ">
-                      <h4 className="text-end font-extralight">x1</h4>
+                      <h4 className="text-end font-light">x1</h4>
                     </td>
                     <td className="max-w-[12rem] ">
-                      <h4 className="text-end font-extralight">
+                      <h4 className="text-end font-light">
                         {CurrencySplitter(comic.price)}đ
                       </h4>
                     </td>

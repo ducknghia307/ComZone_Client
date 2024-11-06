@@ -1,4 +1,4 @@
-import { notification, Select } from "antd";
+import { Checkbox, notification, Select, Spin } from "antd";
 import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import "./antdCSS.css";
@@ -12,6 +12,7 @@ import {
 } from "../../common/base.interface";
 import { Province } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
+import { LoadingOutlined } from "@ant-design/icons";
 
 interface UserComponentProps {
   userInfo: UserInfo;
@@ -44,7 +45,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
   const [detailAddressError, setDetailAddressError] = useState<string | null>(
     null
   );
-
+  const [isLoading, setIsLoading] = useState(false);
   const [api, contextHolder] = notification.useNotification();
   type NotificationType = "success" | "info" | "warning" | "error";
   const openNotificationWithIcon = (
@@ -155,28 +156,28 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
     }
 
     if (!phone || !/^\d{10,11}$/.test(phone)) {
-      setPhoneError("Phone number must be 10 digits.");
+      setPhoneError("Số điện thoại phải đủ 10 số.");
       isValid = false;
     } else {
       setPhoneError(null);
     }
 
     if (!selectProvince) {
-      setProvinceError("Please choose a province.");
+      setProvinceError("Vui lòng chọn tỉnh/thành phố.");
       isValid = false;
     } else {
       setProvinceError(null);
     }
 
     if (!selectDistrict) {
-      setDistrictError("Please choose a district.");
+      setDistrictError("Vui lòng chọn quận/huyện.");
       isValid = false;
     } else {
       setDistrictError(null);
     }
 
     if (!selectWard) {
-      setWardError("Please choose a ward.");
+      setWardError("Vui lòng chọn phường/xã.");
       isValid = false;
     } else {
       setWardError(null);
@@ -184,7 +185,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
 
     if (!detailAddress || detailAddress.trim().length < 1) {
       setDetailAddressError(
-        "Please fill in the detailed address with more than one space."
+        "Vui lòng chọn nhập địa chỉ cụ thể (số nhà, tên đường)."
       );
       isValid = false;
     } else {
@@ -202,20 +203,22 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
       detailedAddress: detailAddress,
       isDefault,
     };
-    console.log(addressData);
+
+    setIsLoading(true);
 
     try {
       const response = await privateAxios.post("/user-addresses", addressData);
-      console.log("Address saved successfully:", response.data);
+      console.log(response);
+
       openNotificationWithIcon(
         "success",
         "Thành công",
         "Bạn đã thêm địa chỉ mới thành công."
       );
+      refreshAddresses();
       setTimeout(() => {
-        refreshAddresses();
         onClose();
-      }, 1000);
+      }, 500);
     } catch (error) {
       if (error instanceof AxiosError) {
         const statusCode = error.response?.status;
@@ -232,14 +235,15 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
             "Bạn đã có 3 địa chỉ. Nếu muốn thêm hãy xóa 1 địa chỉ."
           );
         } else {
-          console.error("Error saving address:", error);
           openNotificationWithIcon(
             "error",
-            "Error",
-            "Failed to save the address."
+            "Lỗi",
+            "Lỗi khi lưu địa chỉ của bạn."
           );
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -375,25 +379,34 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
             </span>
           )}
         </div>
-        <div className="container items-center flex mt-8 gap-3">
-          <input type="checkbox" onChange={() => setIsDefault(!isDefault)} />
-          <h3 className="text-base">Đặt làm mặc định</h3>
-        </div>
-        <div className="flex flex-row justify-end w-full">
-          <button
-            key="Cancel"
-            className="px-6 py-2 font-bold rounded-2xl bg-gray-400 text-white mr-4"
-            onClick={onClose}
+        <div className="flex flex-row w-full justify-between items-center mt-8 ">
+          <div
+            className="container items-center flex  gap-3 cursor-pointer"
+            onClick={() => setIsDefault(!isDefault)}
           >
-            HỦY
-          </button>
-          <button
-            key="Accept"
-            className="px-6 py-2 font-bold rounded-2xl bg-black text-white"
-            onClick={handleSubmit}
-          >
-            XÁC NHẬN
-          </button>
+            <Checkbox checked={isDefault} />
+            <h3 className="text-base">Đặt làm mặc định</h3>
+          </div>
+          <div className="flex flex-row justify-end w-full">
+            <button
+              key="Cancel"
+              className="px-6 py-2 font-bold rounded-2xl bg-gray-400 text-white mr-4"
+              onClick={onClose}
+            >
+              HỦY
+            </button>
+            <button
+              key="Accept"
+              className="px-6 py-2 font-bold rounded-2xl bg-black text-white"
+              onClick={handleSubmit}
+            >
+              {isLoading ? (
+                <Spin indicator={<LoadingOutlined spin />} />
+              ) : (
+                "XÁC NHẬN"
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </>

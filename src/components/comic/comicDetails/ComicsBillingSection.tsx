@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Comic } from "../../../common/base.interface";
 import CurrencySplitter from "../../../assistants/Spliter";
 
 interface ComicsBillingSectionProps {
   currentComics: Comic | undefined;
   handleAddToCart: () => void;
+  isInCart: boolean;
 }
 
 export default function ComicsBillingSection({
   currentComics,
   handleAddToCart,
+  isInCart,
 }: ComicsBillingSectionProps) {
-  const [addedToCart, toggleAddedToCart] = useState<boolean>(false);
-
+  const [addedToCart, toggleAddedToCart] = useState<boolean>(isInCart);
+  useEffect(() => {
+    toggleAddedToCart(isInCart);
+  }, [isInCart]);
   return (
     <div>
       <div className="w-full flex flex-col gap-2 py-4">

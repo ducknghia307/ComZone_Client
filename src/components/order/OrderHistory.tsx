@@ -81,7 +81,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         return "#32CD32";
       case "COMPLETED":
         return "#228B22";
-      case "CANCELLED":
+      case "CANCELED":
         return "#FF4500";
       default:
         return "#000";
@@ -100,7 +100,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         return "Đã giao thành công";
       case "COMPLETED":
         return "Hoàn tất";
-      case "CANCELLED":
+      case "CANCELED":
         return "Bị hủy";
       default:
         return "Tất cả";
@@ -141,7 +141,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           "DELIVERING",
           "DELIVERED",
           "COMPLETED",
-          "CANCELLED",
+          "CANCELED",
         ].map((status) => (
           <span
             key={status}

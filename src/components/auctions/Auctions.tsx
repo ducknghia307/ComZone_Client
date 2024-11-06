@@ -5,6 +5,7 @@ import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
+import Loading from "../loading/Loading";
 
 const renderer = ({ days, hours, minutes, seconds }: any) => {
   return (
@@ -78,10 +79,10 @@ const AllAuctions = ({
   //     return genreMatch && authorMatch && titleMatch && conditionMatch;
   // });
 
-  if (loading) return <p>Loading auctions...</p>;
+  if (loading) return <Loading />;
 
   return (
-    <div className="mb-10">
+    <div className="mb-10 REM">
       <div className="auction-section flex justify-between items-center">
         <h2 className="text-2xl font-bold">Các Cuộc Đấu Giá Ở ComZone</h2>
       </div>

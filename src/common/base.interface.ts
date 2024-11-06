@@ -71,6 +71,7 @@ export interface GetAddressCode {
 }
 
 export interface Genre {
+  id: string;
   name: string;
 }
 

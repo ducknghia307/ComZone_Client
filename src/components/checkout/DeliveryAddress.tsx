@@ -59,8 +59,8 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
       console.log("...");
     }
   };
-  const refreshAddresses = () => {
-    fetchUserAddress();
+  const refreshAddresses = async () => {
+    await fetchUserAddress();
   };
   const handleSetSelectedAddress = (addressId: string) => {
     const address = addresses.find((addr) => addr.id === addressId) || null;

@@ -12,7 +12,7 @@ export default function ComicsMainInfo({
   useEffect(() => {
     moment.locale("vi");
     setCountTime(moment(currentComics?.onSaleSince).fromNow());
-    console.log("first: ", moment.locales());
+    // console.log("first: ", moment.locales());
   }, [currentComics]);
 
   return (
@@ -79,7 +79,7 @@ export default function ComicsMainInfo({
       </div>
 
       <p className="font-semibold text-[2em] pt-4 flex items-start gap-1">
-        {currentComics?.price ? CurrencySplitter(currentComics?.price!) : ""}
+        {currentComics?.price ? CurrencySplitter(currentComics?.price) : ""}
         <span className="font-light text-[0.5em] underline">đ</span>
       </p>
     </div>

@@ -1,12 +1,13 @@
 import { Select, Tooltip } from "antd";
 import { useState } from "react";
+import { Comic } from "../../common/base.interface";
 
 export default function RequestedComicsSection({
   list,
   ref2,
   index,
 }: {
-  list: { name: string; image: string }[];
+  list: Comic[];
   ref2: any;
   index: number;
 }) {
@@ -23,6 +24,19 @@ export default function RequestedComicsSection({
       ? setCurrentComics(currentComics + 1)
       : setCurrentComics(0);
   };
+
+  const getEdition = (comics: Comic) => {
+    return comics.edition === "REGULAR"
+      ? "Bản thường"
+      : comics.edition === "SPECIAL"
+      ? "Bản đặc biệt"
+      : "Bản giới hạn";
+  };
+
+  const getCondition = (comics: Comic) => {
+    return comics.condition === "SEALED" ? "Nguyên seal" : "Đã qua sử dụng";
+  };
+
   return (
     <div
       ref={index === 0 ? ref2 : null}
@@ -65,10 +79,10 @@ export default function RequestedComicsSection({
               label: (
                 <span className="flex items-center justify-start gap-1 text-[0.7em]">
                   <span
-                    className="min-w-8 h-8 rounded-full bg-no-repeat bg-cover bg-center"
-                    style={{ backgroundImage: `url(${comics.image})` }}
+                    className="min-w-8 h-8 rounded-full bg-no-repeat bg-cover bg-center border"
+                    style={{ backgroundImage: `url(${comics.coverImage})` }}
                   />
-                  {comics.name}
+                  {comics.title}
                 </span>
               ),
             };
@@ -83,24 +97,35 @@ export default function RequestedComicsSection({
 
       <div className="w-full flex justify-center">
         <span
-          className="w-3/4 h-[20em] rounded-lg bg-no-repeat bg-cover bg-center"
-          style={{ backgroundImage: `url(${list[currentComics].image})` }}
+          className="w-3/4 min-h-[25em] rounded-lg bg-no-repeat bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${
+              list[currentComics].coverImage
+                ? list[currentComics].coverImage
+                : "https://firebasestorage.googleapis.com/v0/b/comzone-69b8f.appspot.com/o/files%2F1730889581834?alt=media&token=31581f5d-e5a8-4c85-b671-7a41eb063ef1"
+            })`,
+          }}
         />
       </div>
 
-      <Tooltip title={list[currentComics].name}>
+      <Tooltip title={list[currentComics].title}>
         <p className="font-semibold text-center pt-2 min-h-[3.5rem] line-clamp-2">
-          {list[currentComics].name}
+          {list[currentComics].title}
         </p>
       </Tooltip>
 
       <div className="w-full flex flex-col items-start justify-start gap-1 text-[0.7em] font-light py-2">
         <p>
-          Phiên bản: <span className="font-semibold">Bản giới hạn</span>
+          Phiên bản:{" "}
+          <span className="font-semibold">
+            {getEdition(list[currentComics])}
+          </span>
         </p>
         <p>
           Tình trạng tối thiểu:{" "}
-          <span className="font-semibold">Đã qua sử dụng</span>
+          <span className="font-semibold">
+            {getCondition(list[currentComics])}
+          </span>
         </p>
       </div>
     </div>

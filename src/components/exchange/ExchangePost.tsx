@@ -2,91 +2,17 @@ import { useState } from "react";
 import SingleOfferedComics from "./SingleOfferedComics";
 import RequestedComicsSection from "./RequestedComicsSection";
 import styles from "./style.module.css";
+import { Exchange } from "../../common/interfaces/exchange.interface";
 
 export default function ExchangePost({
+  exchange,
   refs,
   index,
 }: {
+  exchange: Exchange;
   refs: any[];
   index: number;
 }) {
-  const samples = [
-    {
-      name: "The Incredible Hulk",
-      image:
-        "https://m.media-amazon.com/images/I/71NAM2u0vSL._AC_UF1000,1000_QL80_.jpg",
-      preview: [
-        "https://i.ebayimg.com/images/g/6NcAAOSwpbFis5Pn/s-l400.jpg",
-        "https://cdn.marvel.com/content/1x/marvread2020001014_col.jpg",
-        "https://external-preview.redd.it/8FZF_qB2K69JikYe4_51gmeLbr6cqWeyFP58vofznZk.jpg?auto=webp&s=d7df093e31b0928af7393c2e655751d85eb0ee0e",
-        "https://i0.wp.com/www.comicon.com/wp-content/uploads/2017/04/Spider-Man_Digest_1-674x1024.jpg?resize=660%2C1003",
-      ],
-    },
-    {
-      name: "Doctor Strange #1",
-      image:
-        "https://i.etsystatic.com/22143117/r/il/6e3642/3719333822/il_fullxfull.3719333822_bm60.jpg",
-    },
-    {
-      name: "Doctor Strange #2",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVagle8MiW0fLw9lNu7AvoxGIJcwWTfpRccg&s",
-    },
-    {
-      name: "Doctor Strange #3",
-      image:
-        "https://assets.comic-odyssey.com/products/covers/000/003/991/original/open-uri20171124-23-12pxyt0?1511531812",
-    },
-    {
-      name: "Winter Soldier: The Ultimate Civilization Bản đặc biệt",
-      image:
-        "https://cdn.marvel.com/u/prod/marvel/i/mg/d/20/4f26f05e79cff/clean.jpg",
-    },
-    {
-      name: "Winter Soldier #1",
-      image:
-        "https://cdn.marvel.com/u/prod/marvel/i/mg/f/30/56bb9b8c01dce/clean.jpg",
-    },
-    {
-      name: "Winter Soldier #1",
-      image:
-        "https://cdn.marvel.com/u/prod/marvel/i/mg/f/30/56bb9b8c01dce/clean.jpg",
-    },
-    {
-      name: "Winter Soldier #1",
-      image:
-        "https://cdn.marvel.com/u/prod/marvel/i/mg/f/30/56bb9b8c01dce/clean.jpg",
-    },
-    {
-      name: "Winter Soldier #1",
-      image:
-        "https://cdn.marvel.com/u/prod/marvel/i/mg/f/30/56bb9b8c01dce/clean.jpg",
-    },
-    {
-      name: "Winter Soldier #1",
-      image:
-        "https://cdn.marvel.com/u/prod/marvel/i/mg/f/30/56bb9b8c01dce/clean.jpg",
-    },
-  ];
-
-  const samples2 = [
-    {
-      name: "One Piece 1000th Volume Limited Edition One Piece 1000th Volume Limited Edition One Piece 1000th Volume Limited Edition",
-      image:
-        "https://japan-forward.com/wp-content/uploads/2021/09/ONE-PIECE-Volume-100-Calligraphy-%C2%A9-Eiichiro-Oda-Shueisha.jpg",
-    },
-    {
-      name: "One Piece 1111th Volume of 5000: Romance Dawn",
-      image:
-        "https://preview.redd.it/rare-one-piece-volume-1-romance-dawn-limited-edition-1111-v0-xdltws7bwyua1.png?width=1080&crop=smart&auto=webp&s=d54e14469f0dc702ef871875ae48cb2252280026",
-    },
-    {
-      name: "One Piece Wano Arc: Special",
-      image:
-        "https://i.pinimg.com/736x/d2/dd/f5/d2ddf51c34df889832d6d4c6af28d5d1.jpg",
-    },
-  ];
-
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
 
   const handleSelect = (value: number) => {
@@ -98,12 +24,16 @@ export default function ExchangePost({
       <div className="grow flex flex-col min-w-[30em] py-4">
         <div className="w-full flex items-center gap-4">
           <img
-            src="https://img.freepik.com/free-photo/androgynous-avatar-non-binary-queer-person_23-2151100270.jpg"
+            src={exchange.requestUser.avatar || ""}
             className="w-[4em] rounded-full"
           />
-          <p className="font-semibold text-lg">Công Trừ</p>
+          <p className="font-semibold text-lg">{exchange.requestUser.name}</p>
           <p className="font-light text-[0.7em] italic">3 giờ trước</p>
-          <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500 text-white">
+          <span
+            className={`${
+              exchange.requestUser.role !== "SELLER" && "hidden"
+            } flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500 text-white`}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -117,23 +47,18 @@ export default function ExchangePost({
           </span>
         </div>
 
-        <div className="pl-2 py-2">
-          <p>
-            Cần tìm gấp manga One Piece bản giới hạn để sưu tầm!!!
-            <br />
-            Mình cần trao đổi bộ truyện Marvel giới hạn của mình để sưu tầm
-            truyện One Piece bản giới hạn. Ai có thì đổi cho mình nha, có bù giá
-            nhé!
-          </p>
-        </div>
+        <p className="pl-2 py-2">{exchange.postContent}</p>
 
         <div
           ref={index === 0 ? refs[0] : null}
-          className="w-full border border-gray-300 rounded-lg relative overflow-hidden"
+          className={`${
+            exchange.userOfferedComics?.length === 0 && "hidden"
+          } w-full border border-gray-300 rounded-lg relative overflow-hidden mt-4`}
         >
           <div className="w-full bg-[rgba(0,0,0,0.03)] border-b border-gray-300 py-2 top-0 sticky">
             <p className="px-4 font-light">
-              Danh sách truyện <span className="font-semibold">Công Trừ</span>{" "}
+              Danh sách truyện{" "}
+              <span className="font-semibold">{exchange.requestUser.name}</span>{" "}
               đang sẵn có để trao đổi:
             </p>
           </div>
@@ -141,19 +66,23 @@ export default function ExchangePost({
           <div
             className={`w-full flex flex-wrap gap-x-[2%] gap-y-2 p-2 max-h-[25em] relative overflow-y-auto ${styles.exchange}`}
           >
-            {samples.map((value, index) => {
-              return (
-                <SingleOfferedComics
-                  comics={value}
-                  index={index}
-                  currentlySelected={currentlySelected}
-                  handleSelect={handleSelect}
-                />
-              );
-            })}
+            {exchange.userOfferedComics &&
+              exchange.userOfferedComics.map((comics, index) => {
+                return (
+                  <SingleOfferedComics
+                    comics={comics}
+                    index={index}
+                    currentlySelected={currentlySelected}
+                    handleSelect={handleSelect}
+                    length={exchange.userOfferedComics?.length || 0}
+                  />
+                );
+              })}
             <button
               className={`${
-                samples.length < 21 && "hidden"
+                exchange.userOfferedComics &&
+                exchange.userOfferedComics.length < 21 &&
+                "hidden"
               } mx-auto my-2 py-2 hover:underline`}
             >
               Xem thêm trong trang cá nhân
@@ -162,8 +91,12 @@ export default function ExchangePost({
         </div>
       </div>
 
-      <div className="basis-1/3 min-w-[20em] flex flex-col justify-start gap-8 px-2 py-4 pl-8 border-l ml-8">
-        <RequestedComicsSection list={samples2} ref2={refs[1]} index={index} />
+      <div className="basis-1/3 min-w-[25em] max-w-[25em] flex flex-col justify-start gap-8 px-2 py-4 pl-8 border-l ml-8">
+        <RequestedComicsSection
+          list={exchange.requestComics}
+          ref2={refs[1]}
+          index={index}
+        />
         <button
           ref={index === 0 ? refs[2] : null}
           className="flex items-center justify-center gap-2 border border-gray-400 py-2 rounded-lg"

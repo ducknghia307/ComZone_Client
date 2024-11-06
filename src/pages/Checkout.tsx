@@ -40,12 +40,14 @@ const Checkout = () => {
   const [groupedSelectedComics, setGroupedSelectedComics] = useState<
     Record<string, SellerGroup>
   >({});
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<string>("wallet");
   const [sellerDetailsGroup, setSellerDetailsGroup] = useState<
     SellerDetails[] | []
   >([]);
+  const [totalDeliveryPrice, setTotalDeliveryPrice] = useState<number>(0);
   const [deliveryDetails, setDeliveryDetails] = useState<SellerGroupDetails[]>(
     []
   );
@@ -83,66 +85,31 @@ const Checkout = () => {
       setIsLoading(true);
       const response = await privateAxios("/users/profile");
       const data = await response.data;
-
-      setUserInfo(data);
-
       setUserWalletBalance(Number(data.balance));
     } catch {
       setIsLoading(false);
+    } catch {
       console.log("...");
     }
   };
 
-  const fetchDeliveryDetails = async () => {
-    setIsLoading(true);
+  const fetchUserAddress = async () => {
+    try {
+      const response = await privateAxios("/user-addresses/user");
 
-    if (!selectedAddress) return;
+      const data = response.data;
 
-    const tempDeliveryDetails: SellerGroupDetails[] = [];
-    const tempSellerDetailsGroup: SellerDetails[] = [];
+      const sortedAddresses = data.sort((a: Address, b: Address) => {
+        return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
+      });
+      console.log(sortedAddresses);
 
-    await Promise.all(
-      Object.keys(groupedSelectedComics).map(async (sellerId) => {
-        const sellerDetails = await privateAxios.get(
-          `/seller-details/user/${sellerId}`
-        );
-
-        tempSellerDetailsGroup.push(sellerDetails.data);
-
-        const sellerAddress = {
-          district: sellerDetails.data.district.id,
-          ward: sellerDetails.data.ward.id,
-        };
-
-        if (sellerDetails && selectedAddress)
-          await privateAxios
-            .post("/orders/delivery-details", {
-              fromDistrict: sellerAddress.district,
-              fromWard: sellerAddress.ward,
-              toDistrict: selectedAddress.district.id,
-              toWard: selectedAddress.ward.id,
-              comicsQuantity: groupedSelectedComics[sellerId].comics.length,
-            })
-            .then((res) => {
-              const newDeliveryDetails = {
-                sellerId: sellerId,
-                deliveryFee: parseInt(res.data.deliveryFee),
-                estDeliveryTime: res.data.estDeliveryTime,
-              };
-              tempDeliveryDetails.push(newDeliveryDetails);
-            })
-            .catch((err) => console.log(err));
-      })
-    ).finally(() => {
-      setIsLoading(false);
-      setDeliveryDetails(tempDeliveryDetails);
-      setSellerDetailsGroup(tempSellerDetailsGroup);
-    });
+      setSelectedAddress(sortedAddresses[0] || null);
+      setAddresses(sortedAddresses);
+    } catch {
+      console.log("...");
+    }
   };
-
-  useEffect(() => {
-    fetchDeliveryDetails();
-  }, [selectedAddress]);
 
   const comics = sessionStorage.getItem("selectedComics");
   useEffect(() => {
@@ -150,7 +117,66 @@ const Checkout = () => {
       setGroupedSelectedComics(JSON.parse(comics));
     }
     fetchUserInfo();
+    fetchUserAddress();
   }, []);
+
+  const fetchDeliveryDetails = async () => {
+    setIsLoading(true);
+    setDeliveryDetails([]);
+    setSellerDetailsGroup([]);
+    setTotalDeliveryPrice(0);
+
+    if (!selectedAddress) {
+      setIsLoading(false);
+      return;
+    } else {
+      await Promise.all(
+        Object.keys(groupedSelectedComics).map(async (sellerId) => {
+          const sellerDetails = await privateAxios.get(
+            `/seller-details/user/${sellerId}`
+          );
+
+          setSellerDetailsGroup((prev) => [...prev, sellerDetails.data]);
+
+          const sellerAddress = {
+            district: sellerDetails.data.district.id,
+            ward: sellerDetails.data.ward.id,
+          };
+
+          console.log("first: ", groupedSelectedComics[sellerId].comics.length);
+          if (sellerDetails && selectedAddress)
+            await privateAxios
+              .post("/orders/delivery-details", {
+                fromDistrict: sellerAddress.district,
+                fromWard: sellerAddress.ward,
+                toDistrict: selectedAddress.district.id,
+                toWard: selectedAddress.ward.id,
+                comicsQuantity: groupedSelectedComics[sellerId].comics.length,
+              })
+              .then((res) => {
+                const newDeliveryDetails = {
+                  sellerId: sellerId,
+                  deliveryFee: parseInt(res.data.deliveryFee),
+                  estDeliveryTime: res.data.estDeliveryTime,
+                };
+                setDeliveryDetails((prev) => [...prev, newDeliveryDetails]);
+                setTotalDeliveryPrice(
+                  (prev) => prev + newDeliveryDetails.deliveryFee
+                );
+              })
+              .catch((err) => console.log(err));
+        })
+      )
+        .catch((err) => console.log(err))
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  };
+
+  useEffect(() => {
+    fetchDeliveryDetails();
+  }, [selectedAddress]);
 
   const totalPrice = Object.values(groupedSelectedComics).reduce(
     (total, sellerGroup) => {
@@ -164,9 +190,6 @@ const Checkout = () => {
     },
     0
   );
-  const totalDeliveryPrice = deliveryDetails.reduce((total, delivery) => {
-    return total + delivery.deliveryFee;
-  }, 0);
 
   const totalQuantity = Object.values(groupedSelectedComics).reduce(
     (total, sellerGroup) =>
@@ -292,6 +315,9 @@ const Checkout = () => {
               <DeliveryAddress
                 selectedAddress={selectedAddress}
                 setSelectedAddress={setSelectedAddress}
+                addresses={addresses}
+                setAddresses={setAddresses}
+                fetchUserAddress={fetchUserAddress}
               />
               <OrderCheck
                 groupedSelectedComics={groupedSelectedComics}

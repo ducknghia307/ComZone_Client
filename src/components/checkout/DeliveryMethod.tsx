@@ -103,7 +103,7 @@ const DeliveryMethod = ({
 
         <div className="w-full flex items-center justify-between gap-2 text-sm">
           <p>Phí giao hàng: </p>
-          <p>{CurrencySplitter(deliveryPrice || 10000)} đ</p>
+          <p>{CurrencySplitter(deliveryPrice || 0)} đ</p>
         </div>
       </div>
     </div>

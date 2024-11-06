@@ -19,3 +19,13 @@
 .exchange::-webkit-scrollbar-thumb:hover {
   background: #333;
 }
+
+.subscriptionTitle {
+  background-color: #2f8d46;
+  background-image: url("https://img.freepik.com/premium-photo/abstract-pui21-background-wallpaper_792836-123079.jpg?semt=ais_hybrid");
+  background-repeat: repeat;
+  background-position: center;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}

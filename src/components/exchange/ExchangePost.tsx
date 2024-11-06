@@ -70,6 +70,7 @@ export default function ExchangePost({
               exchange.userOfferedComics.map((comics, index) => {
                 return (
                   <SingleOfferedComics
+                    key={index}
                     comics={comics}
                     index={index}
                     currentlySelected={currentlySelected}

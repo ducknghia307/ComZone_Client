@@ -21,6 +21,8 @@ import IconButton from "@mui/material/IconButton";
 import { privateAxios } from "../../middleware/axiosInstance";
 import AuctionManagement from "../auctions/AuctionManagement";
 import DeliveryManagement from "../delivery/DeliveryManagement";
+import OrderManagement from "../../order/OrderManagement";
+import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 
 const SellerManagement = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
@@ -268,6 +270,8 @@ const SellerManagement = () => {
             </div>
           </div>
         );
+      case "order":
+        return <OrderManagement />;
       case "auction":
         return <AuctionManagement />;
       case "delivery":
@@ -294,6 +298,13 @@ const SellerManagement = () => {
                 <ImportContactsRoundedIcon /> Quản Lý Truyện
               </li>
               <li
+                className={selectedMenuItem === "order" ? "active" : ""}
+                onClick={() => handleMenuItemClick("order")}
+                style={{whiteSpace: "nowrap"}}
+              >
+                <InventoryOutlinedIcon /> Quản Lý Đơn Hàng
+              </li>
+              <li
                 className={selectedMenuItem === "auction" ? "active" : ""}
                 onClick={() => handleMenuItemClick("auction")}
               >
@@ -302,6 +313,7 @@ const SellerManagement = () => {
               <li
                 className={selectedMenuItem === "delivery" ? "active" : ""}
                 onClick={() => handleMenuItemClick("delivery")}
+                style={{whiteSpace: "nowrap"}}
               >
                 <DeliveryDiningOutlinedIcon /> Thông Tin Giao Hàng
               </li>

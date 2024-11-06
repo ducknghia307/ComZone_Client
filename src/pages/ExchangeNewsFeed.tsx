@@ -125,6 +125,8 @@ export default function ExchangeNewsFeed() {
     await privateAxios
       .get("exchanges/available")
       .then((res) => {
+        console.log("exchange list:", res.data);
+
         setExchangeList(res.data);
       })
       .catch((err) => console.log(err))
@@ -174,6 +176,7 @@ export default function ExchangeNewsFeed() {
             {exchangeList.map((exchange, index: number) => {
               return (
                 <ExchangePost
+                  key={index}
                   exchange={exchange}
                   refs={[ref1, ref2, ref3]}
                   index={index}

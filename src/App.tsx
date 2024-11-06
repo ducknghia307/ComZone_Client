@@ -19,6 +19,17 @@ function App() {
             colorPrimary: "#000000",
             colorPrimaryHover: "#000000",
           },
+          Radio: {
+            colorPrimary: "#000000",
+          },
+          Select: {
+            hoverBorderColor: "#ccc",
+            colorPrimary: "#ccc",
+          },
+          Input: {
+            activeBorderColor: "#000",
+            colorPrimaryHover: "#ccc",
+          },
         },
         token: {
           fontFamily: "REM",

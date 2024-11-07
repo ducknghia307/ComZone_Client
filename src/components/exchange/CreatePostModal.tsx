@@ -2,7 +2,9 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Modal } from "antd";
 import NewExchangeForm from "./NewExchangeForm";
 import TextArea from "antd/es/input/TextArea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ComicListToExchange from "./ComicListToExchange";
+import { ExchangeElement } from "../../common/interfaces/exchange-post.interface";
 
 export default function CreatePostModal({
   openCreatePost,
@@ -12,6 +14,13 @@ export default function CreatePostModal({
   setOpenCreatePost: (open: boolean) => void;
 }) {
   const [postContent, setPostContent] = useState("");
+  const [comicList, setComicList] = useState<ExchangeElement[]>([]);
+  useEffect(() => {
+    const storedComics = JSON.parse(
+      sessionStorage.getItem("newComicData") || "[]"
+    );
+    setComicList(storedComics);
+  }, [openCreatePost]);
   return (
     <Modal
       open={openCreatePost}
@@ -25,7 +34,8 @@ export default function CreatePostModal({
       <h2 className="text-xl font-medium my-4">
         ĐĂNG BÀI YÊU CẦU TRAO ĐỔI TRUYỆN
       </h2>
-      <NewExchangeForm />
+      <ComicListToExchange comicList={comicList} />
+      <NewExchangeForm setComicList={setComicList} />
       <TextArea
         value={postContent}
         onChange={(e) => setPostContent(e.target.value)}

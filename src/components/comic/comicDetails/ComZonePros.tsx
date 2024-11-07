@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function ComZonePros() {
   return (
     <div className="w-full flex flex-col gap-2 bg-white px-4 py-4 rounded-xl drop-shadow-md">

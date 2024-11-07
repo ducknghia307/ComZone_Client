@@ -2,21 +2,30 @@ import ExchangePost from "../components/exchange/ExchangePost";
 import { Button, Tour } from "antd";
 import type { TourProps } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { privateAxios } from "../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../middleware/axiosInstance";
 import { Exchange } from "../common/interfaces/exchange.interface";
 import Loading from "../components/loading/Loading";
 import ExchangeSearchBar from "../components/exchange/ExchangeSearchBar";
 import CreatePostModal from "../components/exchange/CreatePostModal";
 import SubscriptionModal from "../components/exchange/SubscriptionModal";
 import "../components/ui/Exchange.css";
+import { useAppSelector } from "../redux/hooks";
+import { useSearchParams } from "react-router-dom";
+import ExchangeNotFound from "../components/exchange/ExchangeNotFound";
 
 export default function ExchangeNewsFeed() {
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const [isLoading, setIsLoading] = useState(false);
   const [beginTour, setBeginTour] = useState(false);
   const [exchangeList, setExchangeList] = useState<Exchange[]>([]);
   const [findByOfferMode, setFindByOfferMode] = useState<boolean>(false);
   const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
   const [openSubscription, setOpenSubscription] = useState<boolean>(false);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchKey, setSearchKey] = useState<string>(
+    searchParams.get("search") || ""
+  );
 
   const ref1 = useRef(null);
   const ref2 = useRef(null);
@@ -43,7 +52,7 @@ export default function ExchangeNewsFeed() {
         ),
         style: {
           marginInlineStart: "0px",
-          padding: "0px",
+          padding: "0px 8px",
         },
       },
     },
@@ -67,7 +76,7 @@ export default function ExchangeNewsFeed() {
         ),
         style: {
           marginInlineStart: "0px",
-          padding: "0px",
+          padding: "0px 8px",
         },
       },
       prevButtonProps: {
@@ -75,7 +84,7 @@ export default function ExchangeNewsFeed() {
         style: {
           marginInlineStart: "0px",
           marginRight: "4px",
-          padding: "0px",
+          padding: "0px 8px",
         },
       },
     },
@@ -99,7 +108,7 @@ export default function ExchangeNewsFeed() {
         ),
         style: {
           marginInlineStart: "0px",
-          padding: "0px",
+          padding: "0px 8px",
         },
       },
       prevButtonProps: {
@@ -107,7 +116,7 @@ export default function ExchangeNewsFeed() {
         style: {
           marginInlineStart: "0px",
           marginRight: "4px",
-          padding: "0px",
+          padding: "0px 8px",
         },
       },
     },
@@ -115,15 +124,45 @@ export default function ExchangeNewsFeed() {
 
   const fetchExchangeNewsFeed = async () => {
     setIsLoading(true);
-    await privateAxios
-      .get("exchanges/available")
-      .then((res) => {
-        console.log("exchange list:", res.data);
-
-        setExchangeList(res.data);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setIsLoading(false));
+    try {
+      if (searchParams.get("search")) {
+        setExchangeList(
+          isLoggedIn
+            ? await privateAxios
+                .get(`exchanges/search/logged`, {
+                  params: {
+                    key: searchKey,
+                  },
+                })
+                .then((res) => {
+                  return res.data.data;
+                })
+            : await publicAxios
+                .get(`exchanges/search`, {
+                  params: {
+                    key: searchKey,
+                  },
+                })
+                .then((res) => {
+                  return res.data.data;
+                })
+        );
+      } else
+        setExchangeList(
+          isLoggedIn
+            ? await privateAxios
+                .get(`exchanges/available/logged`)
+                .then((res) => {
+                  return res.data;
+                })
+            : await publicAxios.get(`exchanges/available`).then((res) => {
+                return res.data;
+              })
+        );
+    } catch (err) {
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -142,6 +181,19 @@ export default function ExchangeNewsFeed() {
     setOpenCreatePost(true);
   };
 
+  const handleSearch = async () => {
+    if (searchKey.length > 0) {
+      console.log(searchKey);
+      setSearchParams({ search: searchKey });
+      fetchExchangeNewsFeed();
+    }
+  };
+
+  useEffect(() => {
+    setSearchKey(searchParams.get("search") || "");
+    fetchExchangeNewsFeed();
+  }, [searchParams]);
+
   return (
     <div className="w-full flex justify-center bg-[rgba(0,0,0,0.03)]">
       {isLoading && <Loading />}
@@ -152,6 +204,9 @@ export default function ExchangeNewsFeed() {
             findByOfferMode={findByOfferMode}
             setFindByOfferMode={setFindByOfferMode}
             handleOpenCreatePost={handleOpenCreatePost}
+            searchKey={searchKey}
+            setSearchKey={setSearchKey}
+            handleSearch={handleSearch}
           />
 
           <SubscriptionModal
@@ -166,16 +221,23 @@ export default function ExchangeNewsFeed() {
           />
 
           <div className="w-full flex flex-col justify-center gap-8 py-4">
-            {exchangeList.map((exchange, index: number) => {
-              return (
-                <ExchangePost
-                  key={index}
-                  exchange={exchange}
-                  refs={[ref1, ref2, ref3]}
-                  index={index}
-                />
-              );
-            })}
+            {exchangeList && exchangeList.length > 0 ? (
+              exchangeList.map((exchange, index: number) => {
+                return (
+                  <ExchangePost
+                    key={index}
+                    exchange={exchange}
+                    refs={[ref1, ref2, ref3]}
+                    index={index}
+                  />
+                );
+              })
+            ) : (
+              <ExchangeNotFound
+                searchParams={searchParams}
+                isLoading={isLoading}
+              />
+            )}
           </div>
         </div>
       </div>

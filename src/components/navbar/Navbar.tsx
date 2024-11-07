@@ -9,6 +9,7 @@ import { LogoutUser } from "../../redux/features/auth/authActionCreators";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { Role, UserInfo } from "../../common/base.interface";
 import {
+  BookOutlined,
   ControlOutlined,
   LogoutOutlined,
   ShopOutlined,
@@ -101,7 +102,7 @@ const Navbar = () => {
       key: "1",
       label: (
         <Link to={"/accountManagement/profile"} className="REM text-base ">
-          Trang cá nhân
+          Hồ sơ của tôi
         </Link>
       ),
       icon: <UserOutlined style={{ fontSize: 18 }} />,
@@ -111,6 +112,18 @@ const Navbar = () => {
     },
     {
       key: "2",
+      label: (
+        <Link to={"/profile/recentActivities"} className="REM text-base ">
+          Trang cá nhân
+        </Link>
+      ),
+      icon: <BookOutlined style={{ fontSize: 18 }} />,
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "3",
       label: (
         <Link to={"/accountManagement/profile"} className="REM text-base ">
           Quản lí tài khoản
@@ -122,7 +135,7 @@ const Navbar = () => {
       type: "divider",
     },
     {
-      key: "3",
+      key: "4",
       label: (
         <Link
           to={
@@ -141,7 +154,7 @@ const Navbar = () => {
       type: "divider",
     },
     {
-      key: "4",
+      key: "5",
       label: (
         <div className="REM text-base " onClick={handleLogout}>
           Đăng xuất

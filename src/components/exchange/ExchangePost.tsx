@@ -3,6 +3,9 @@ import SingleOfferedComics from "./SingleOfferedComics";
 import RequestedComicsSection from "./RequestedComicsSection";
 import styles from "./style.module.css";
 import { Exchange } from "../../common/interfaces/exchange.interface";
+import moment from "moment/min/moment-with-locales";
+
+moment.locale("vi");
 
 export default function ExchangePost({
   exchange,
@@ -27,8 +30,12 @@ export default function ExchangePost({
             src={exchange.requestUser.avatar || ""}
             className="w-[4em] rounded-full"
           />
-          <p className="font-semibold text-lg">{exchange.requestUser.name}</p>
-          <p className="font-light text-[0.7em] italic">3 giờ trước</p>
+          <div className="flex flex-col items-start gap-1">
+            <p className="font-semibold text-lg">{exchange.requestUser.name}</p>
+            <p className="font-light text-[0.7em] italic">
+              {moment(exchange.createdAt).fromNow()}
+            </p>
+          </div>
           <span
             className={`${
               exchange.requestUser.role !== "SELLER" && "hidden"
@@ -111,7 +118,8 @@ export default function ExchangePost({
             <path d="M10 3H14C18.4183 3 22 6.58172 22 11C22 15.4183 18.4183 19 14 19V22.5C9 20.5 2 17.5 2 11C2 6.58172 5.58172 3 10 3ZM12 17H14C17.3137 17 20 14.3137 20 11C20 7.68629 17.3137 5 14 5H10C6.68629 5 4 7.68629 4 11C4 14.61 6.46208 16.9656 12 19.4798V17Z"></path>
           </svg>
           <p>
-            Chat với <span className="font-semibold">Công Trừ</span>
+            Chat với{" "}
+            <span className="font-semibold">{exchange.requestUser.name}</span>
           </p>
         </button>
       </div>

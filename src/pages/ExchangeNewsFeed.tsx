@@ -41,7 +41,7 @@ export default function ExchangeNewsFeed() {
           </Button>
         ),
         style: {
-          marginInline: "0px",
+          marginInlineStart: "0px",
           padding: "0px",
         },
       },
@@ -65,18 +65,14 @@ export default function ExchangeNewsFeed() {
           </Button>
         ),
         style: {
-          marginInline: "0px",
+          marginInlineStart: "0px",
           padding: "0px",
         },
       },
       prevButtonProps: {
-        children: (
-          <Button size="small" className="px-2">
-            Quay lại
-          </Button>
-        ),
+        children: <Button size="small">Quay lại</Button>,
         style: {
-          marginInline: "0px",
+          marginInlineStart: "0px",
           marginRight: "4px",
           padding: "0px",
         },
@@ -101,18 +97,14 @@ export default function ExchangeNewsFeed() {
           </Button>
         ),
         style: {
-          marginInline: "0px",
+          marginInlineStart: "0px",
           padding: "0px",
         },
       },
       prevButtonProps: {
-        children: (
-          <Button size="small" className="px-2">
-            Quay lại
-          </Button>
-        ),
+        children: <Button size="small">Quay lại</Button>,
         style: {
-          marginInline: "0px",
+          marginInlineStart: "0px",
           marginRight: "4px",
           padding: "0px",
         },

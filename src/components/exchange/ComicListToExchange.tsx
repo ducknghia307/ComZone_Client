@@ -1,18 +1,33 @@
 import { useState } from "react";
 import { ExchangeElement } from "../../common/interfaces/exchange-post.interface";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { message, Popconfirm } from "antd";
+import EditComicToExchange from "./EditComicToExchange";
+import { UserInfo } from "../../common/base.interface";
 
 interface ComicListToExchangeProps {
   comicList: ExchangeElement[];
+  setComicList: React.Dispatch<React.SetStateAction<ExchangeElement[]>>;
+  userInfo: UserInfo;
 }
 
-const ComicListToExchange = ({ comicList }: ComicListToExchangeProps) => {
+const ComicListToExchange = ({
+  comicList,
+  setComicList,
+  userInfo,
+}: ComicListToExchangeProps) => {
   const [currentlySelected, setCurrentlySelected] = useState<number | null>(
     null
   );
-
+  const [showEdit, setShowEdit] = useState<boolean>(false);
   const handleSelect = (index: number) => {
-    setCurrentlySelected(index === currentlySelected ? null : index); // Toggle selection
+    setCurrentlySelected(index === currentlySelected ? null : index);
+    setShowEdit(index === currentlySelected ? false : true);
+  };
+  const handleDelete = (index: number) => {
+    const updatedComicList = comicList.filter((_, i) => i !== index);
+    setComicList(updatedComicList);
+    message.success("Comic deleted successfully!");
   };
   return (
     <div className="w-full flex flex-wrap gap-x-[2%] gap-y-2 p-2 max-h-[25em] relative overflow-y-auto">
@@ -23,9 +38,9 @@ const ComicListToExchange = ({ comicList }: ComicListToExchangeProps) => {
             className={`${
               currentlySelected === index
                 ? "basis-full"
-                : "basis-[49%] hover:bg-gray-100 hover:duration-200"
+                : "basis-[49%] cursor-default"
             } flex justify-between border border-gray-300 rounded-lg p-1 transition-all duration-300`}
-            onClick={() => handleSelect(index)}
+            // onClick={() => handleSelect(index)}
           >
             <div className="flex flex-row w-full items-center justify-between">
               <div className="flex items-center justify-start gap-4">
@@ -66,22 +81,27 @@ const ComicListToExchange = ({ comicList }: ComicListToExchangeProps) => {
                 </div>
               </div>
               <div className="flex flex-row items-center gap-3 px-4">
-                <EditOutlined />
-                <DeleteOutlined style={{ color: "#FA4032" }} />
+                <EditOutlined onClick={() => handleSelect(index)} />
+                <Popconfirm
+                  title="Delete the task"
+                  description="Are you sure to delete this task?"
+                  onConfirm={() => handleDelete(index)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <DeleteOutlined style={{ color: "#FA4032" }} />
+                </Popconfirm>
               </div>
             </div>
-
-            {/* {comics.previewChapter && currentlySelected === index && (
-            <div className="grid grid-cols-2 gap-x-1 gap-y-1 bg-black">
-              {comics.previewChapter.map((src, previewIndex) => (
-                <div
-                  key={previewIndex}
-                  className="w-16 h-16 bg-no-repeat bg-cover bg-center rounded-sm"
-                  style={{ backgroundImage: `url(${src})` }}
+            {currentlySelected === index && showEdit && (
+              <div className="transition-all duration-500">
+                <EditComicToExchange
+                  comicData={comics}
+                  setComicList={setComicList}
+                  userInfo={userInfo}
                 />
-              ))}
-            </div>
-          )} */}
+              </div>
+            )}
           </button>
         ))
       ) : (

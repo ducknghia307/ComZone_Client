@@ -5,20 +5,22 @@ import {
   RadioChangeEvent,
   Select,
 } from "antd";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CoverImagePlaceholder from "../../assets/comics-cover-placeholder.png";
 import { privateAxios } from "../../middleware/axiosInstance";
 import Loading from "../loading/Loading";
 import { UserInfo } from "../../common/base.interface";
 import { ExchangeElement } from "../../common/interfaces/exchange-post.interface";
-interface NewExchangeFormProps {
+
+interface EditComicToExchangeProps {
   userInfo: UserInfo;
-  comicList: number;
+  comicData: ExchangeElement; // This will be the comic data you want to edit
   setComicList: React.Dispatch<React.SetStateAction<ExchangeElement[]>>;
 }
-const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
+
+const EditComicToExchange: React.FC<EditComicToExchangeProps> = ({
   userInfo,
-  comicList,
+  comicData,
   setComicList,
 }) => {
   const [used, setUsed] = useState(1);
@@ -31,13 +33,25 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
-  const onUsedChange = (e: RadioChangeEvent) => setUsed(e.target.value);
-  const onQuantityChange = (e: RadioChangeEvent) => setQuantity(e.target.value);
   const [api, contextHolder] = notification.useNotification();
+
+  useEffect(() => {
+    // If comicData is passed, pre-fill the form
+    if (comicData) {
+      setTitle(comicData.title);
+      setAuthor(comicData.author);
+      setEdition(comicData.edition);
+      setUsed(comicData.condition === "USED" ? 1 : 2);
+      setQuantity(comicData.quantity > 1 ? 2 : 1);
+      setNumOfComics(comicData.quantity);
+      setImageUrl(comicData.coverImage);
+    }
+  }, [comicData]);
+
   const openNotification = () => {
     api.success({
       message: "Thành công",
-      description: "Thêm truyện để yêu cầu trao đổi truyện thành công!",
+      description: "Cập nhật truyện để yêu cầu trao đổi truyện thành công!",
     });
   };
 
@@ -49,7 +63,6 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       setImageFile(selectedFile);
-
       await uploadImage(selectedFile);
     }
   };
@@ -68,23 +81,48 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
     } catch (error) {
       console.error("Image upload failed:", error);
     } finally {
-      setIsUploading(false); // Stop loading indicator
+      setIsUploading(false);
     }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImageUrl("");
+  };
+
+  // Handle change for each input
+  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+  };
+
+  const handleChangeAuthor = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAuthor(e.target.value);
+  };
+
+  const handleChangeEdition = (value: string) => {
+    setEdition(value);
+  };
+
+  const handleChangeCondition = (e: RadioChangeEvent) => {
+    setUsed(e.target.value);
+  };
+
+  const handleChangeQuantity = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNumOfComics(Number(e.target.value));
   };
 
   const handleSubmit = () => {
     setIsUploading(true);
-    const comicData = {
+    const comicDataUpdated = {
       title,
       author,
       coverImage: imageUrl,
       edition,
       condition: used === 1 ? "USED" : "SEALED",
       quantity: quantity === 2 ? numOfComics : 1,
-      // numOfComics: quantity === 2 ? numOfComics : 1,
     };
 
-    console.log(comicData);
+    console.log(comicDataUpdated);
     const userId = userInfo.id;
 
     const existingData = JSON.parse(
@@ -95,7 +133,13 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
       existingData[userId] = [];
     }
 
-    existingData[userId].push(comicData);
+    // Replace old comic data with updated comic data
+    const index = existingData[userId].findIndex(
+      (item: ExchangeElement) => item.title === comicData.title
+    );
+    if (index !== -1) {
+      existingData[userId][index] = comicDataUpdated;
+    }
 
     sessionStorage.setItem("newComicData", JSON.stringify(existingData));
     setComicList(existingData[userId]);
@@ -108,14 +152,8 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
     setUsed(1);
     setQuantity(1);
     setNumOfComics(2);
-
     setNewComicRes(false);
     setIsUploading(false);
-  };
-
-  const handleRemoveImage = () => {
-    setImageFile(null);
-    setImageUrl("");
   };
 
   return (
@@ -141,7 +179,7 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
                     id="upload"
                     className="hidden"
                     onChange={handleFileChange}
-                    disabled={!!imageUrl} // Disable file input if an image is already uploaded
+                    disabled={!!imageUrl}
                   />
                 </div>
                 {imageUrl ? (
@@ -163,7 +201,7 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
                   placeholder="Tựa đề của truyện..."
                   className="py-2 border-b-2 px-2 w-[20em] border-black focus:!border-white"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={handleChangeTitle}
                 />
                 <div className="flex flex-row w-full gap-5">
                   <div className="w-1/2">
@@ -175,7 +213,7 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
                       type="text"
                       className="border border-gray-300 rounded-lg mt-2 p-2 min-w-[20em]"
                       value={author}
-                      onChange={(e) => setAuthor(e.target.value)}
+                      onChange={handleChangeAuthor}
                     />
                   </div>
                   <div className="w-1/2">
@@ -186,7 +224,7 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
                     <Select
                       size="large"
                       value={edition}
-                      onChange={(value) => setEdition(value)}
+                      onChange={handleChangeEdition}
                       style={{ width: 300, borderRadius: 9 }}
                       options={[
                         { value: "REGULAR", label: "Phiên bản thường" },
@@ -204,59 +242,36 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
                       <p className="text-red-500">*</p>
                     </div>
                     <div className="flex flex-row w-full mt-4">
-                      <Radio.Group value={used} onChange={onUsedChange}>
+                      <Radio.Group
+                        value={used}
+                        onChange={handleChangeCondition}
+                      >
                         <Radio value={1}>Đã qua sử dụng</Radio>
                         <Radio value={2}>Còn nguyên seal</Radio>
                       </Radio.Group>
                     </div>
                   </div>
                   <div className="flex flex-col w-1/2">
-                    <div className="flex flex-row">
-                      <h2 className="font-sm">Số lượng truyện:</h2>
+                    <div className="flex flex-row gap-1">
+                      <h2 className="font-sm">Số lượng:</h2>
                       <p className="text-red-500">*</p>
                     </div>
-                    <div className="flex flex-row w-full items-center mt-4">
-                      <Radio.Group value={quantity} onChange={onQuantityChange}>
-                        <Radio value={1}>Truyện lẻ</Radio>
-                        <Radio value={2}>Bộ truyện</Radio>
-                      </Radio.Group>
-                      {quantity === 2 && (
-                        <div className="flex flex-row items-center">
-                          <h2 className="font-sm">Số lượng:</h2>
-                          <p className="text-red-500 mr-2">*</p>
-                          <InputNumber
-                            min={2}
-                            max={30}
-                            value={numOfComics}
-                            onChange={(value) => setNumOfComics(value ?? 2)}
-                            className="w-12"
-                          />
-                        </div>
-                      )}
-                    </div>
+                    <input
+                      type="number"
+                      className="mt-2 w-24"
+                      value={numOfComics}
+                      onChange={handleChangeQuantity}
+                    />
                   </div>
                 </div>
+                <button
+                  className="w-full bg-primary py-3 text-white font-bold rounded-md mt-4"
+                  onClick={handleSubmit}
+                >
+                  Cập nhật
+                </button>
               </div>
             </div>
-            <div className="w-full flex justify-end py-2 px-14">
-              <button
-                className="px-14 py-2 font-bold border border-black rounded-lg hover:opacity-70 duration-200"
-                onClick={handleSubmit}
-              >
-                XONG
-              </button>
-            </div>
-          </div>
-        )}
-        {comicList < 4 && !newComicRes && (
-          <div className="w-full flex items-start">
-            <button
-              className="px-3 py-1 border-2 rounded-md flex items-center hover:opacity-70 duration-200 gap-2"
-              onClick={() => setNewComicRes(true)}
-            >
-              <p className="text-2xl font-light opacity-55">+</p>
-              <p className="text-base font-light opacity-55">Thêm</p>
-            </button>
           </div>
         )}
       </div>
@@ -264,4 +279,4 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
   );
 };
 
-export default NewExchangeForm;
+export default EditComicToExchange;

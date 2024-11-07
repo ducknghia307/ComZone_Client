@@ -8,11 +8,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import Grid from "@mui/material/Grid2";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import ImportContactsRoundedIcon from "@mui/icons-material/ImportContactsRounded";
-import TvOutlinedIcon from "@mui/icons-material/TvOutlined";
-import DeliveryDiningOutlinedIcon from "@mui/icons-material/DeliveryDiningOutlined";
 import "../ui/SellerCreateComic.css";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -22,7 +18,6 @@ import { privateAxios } from "../../middleware/axiosInstance";
 import AuctionManagement from "../auctions/AuctionManagement";
 import DeliveryManagement from "../delivery/DeliveryManagement";
 import OrderManagement from "../../order/OrderManagement";
-import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 
 const SellerManagement = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
@@ -54,7 +49,7 @@ const SellerManagement = () => {
   const handleMenuItemClick = (item) => {
     setSelectedMenuItem(item);
     if (item === "comic") {
-      navigate("/sellermanagement");
+      navigate("/sellermanagement/comic");
     }
   };
 
@@ -285,46 +280,12 @@ const SellerManagement = () => {
     }
   };
 
+  const currentUrl = window.location.pathname;
+  console.log('URL', currentUrl)
+
   return (
     <div className="seller-container">
-      <Grid container spacing={3}>
-        <Grid size={2} className="seller-menu">
-          <div className="menu-seller-section">
-            <ul>
-              <li
-                className={selectedMenuItem === "comic" ? "active" : ""}
-                onClick={() => handleMenuItemClick("comic")}
-              >
-                <ImportContactsRoundedIcon /> Quản Lý Truyện
-              </li>
-              <li
-                className={selectedMenuItem === "order" ? "active" : ""}
-                onClick={() => handleMenuItemClick("order")}
-                style={{whiteSpace: "nowrap"}}
-              >
-                <InventoryOutlinedIcon /> Quản Lý Đơn Hàng
-              </li>
-              <li
-                className={selectedMenuItem === "auction" ? "active" : ""}
-                onClick={() => handleMenuItemClick("auction")}
-              >
-                <TvOutlinedIcon /> Quản Lý Đấu Giá
-              </li>
-              <li
-                className={selectedMenuItem === "delivery" ? "active" : ""}
-                onClick={() => handleMenuItemClick("delivery")}
-                style={{whiteSpace: "nowrap"}}
-              >
-                <DeliveryDiningOutlinedIcon /> Thông Tin Giao Hàng
-              </li>
-            </ul>
-          </div>
-        </Grid>
-
-        <Grid size={10}>
-          <div style={{ padding: "20px" }}>{renderContent()}</div>
-        </Grid>
-      </Grid>
+      {renderContent()}
     </div>
   );
 };

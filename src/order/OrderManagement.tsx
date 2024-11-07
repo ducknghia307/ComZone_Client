@@ -65,6 +65,8 @@ const OrderManagement = () => {
                 return 'Đang đóng gói';
             case 'DELIVERING':
                 return 'Đang giao hàng';
+            case 'CANCELED':
+                return 'Đã hủy';
             default:
                 return status;
         }
@@ -108,11 +110,29 @@ const OrderManagement = () => {
                     fontWeight: 'bold',
                     display: 'inline-block',
                 };
+            case 'CANCELED':
+                return {
+                    color: '#e91e63',
+                    backgroundColor: '#fce4ec',
+                    borderRadius: '8px',
+                    padding: '8px 20px',
+                    fontWeight: 'bold',
+                    display: 'inline-block',
+                };
         }
     };
 
+    const handleStatusUpdate = (orderId: string, newStatus: string) => {
+        setOrders((prevOrders) =>
+            prevOrders.map((order) =>
+                order.id === orderId ? { ...order, status: newStatus } : order
+            )
+        );
+    };
+
+
     return (
-        <div style={{ width: '100%', overflow: 'hidden' }}>
+        <div className='seller-container' style={{ width: '100%', overflow: 'hidden', padding: '10px 10px 0 10px' }}>
             <Typography variant="h5" className="content-header">Quản Lý Đơn Hàng</Typography>
             <TableContainer component={Paper} className="order-table-container" sx={{ border: '1px solid black' }}>
                 <Table>
@@ -169,6 +189,8 @@ const OrderManagement = () => {
                     open={Boolean(selectedOrderId)}
                     onClose={closeOrderDetail}
                     orderId={selectedOrderId}
+                    onStatusUpdate={handleStatusUpdate}
+                    order={orders.find(order => order.id === selectedOrderId)}
                 />
             )}
         </div>

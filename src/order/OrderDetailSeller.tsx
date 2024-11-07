@@ -55,6 +55,11 @@ const StatusChip = styled('span')<{ status: string }>(({ theme, status }) => {
                     color: '#2196f3',
                     backgroundColor: '#e3f2fd',
                 };
+            case 'CANCELED':
+                return {
+                    color: '#e91e63',
+                    backgroundColor: '#fce4ec',
+                };
             default:
                 return {
                     color: theme.palette.info.main,
@@ -157,7 +162,7 @@ const InfoRow = ({ label, value, isPaid }: { label: string; value: string | numb
     );
 };
 
-const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId }) => {
+const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId, onStatusUpdate, order }) => {
     const [orderDetail, setOrderDetail] = useState<OrderDetailData | null>(null);
     const theme = useTheme();
     const [orders, setOrders] = useState<OrderDetailData[]>([]);
@@ -207,6 +212,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId 
                 return 'Đang đóng gói';
             case 'DELIVERING':
                 return 'Đang giao hàng';
+            case 'CANCELED':
+                return 'Đã hủy';
             default:
                 return status;
         }
@@ -225,15 +232,54 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId 
                         ? `/orders/status/start-packaging/${orderId}`
                         : `/orders/status/finish-packaging/${orderId}`;
 
-                await privateAxios.post(endpoint);
-                alert(`Trạng thái đơn hàng đã được cập nhật thành công.`);
-                // Cập nhật lại trạng thái đơn hàng sau khi thay đổi (nếu cần thiết)
+                const response = await privateAxios.post(endpoint);
+                let newStatus = actionType === "start" ? "PACKAGING" : "DELIVERING";
+
+                // Update order status if finish-packaging was successful
+                if (actionType === "finish" && response.status === 400) {
+                    alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
+
+                    // Cancel the order
+                    await privateAxios.patch("/orders/cancel", {
+                        orderId: orderId,
+                        cancelReason: "Đơn hàng gặp lỗi, cần hủy."
+                    });
+                    onStatusUpdate(orderId, "CANCELED"); // Update status to CANCELED
+
+                    alert("Đơn hàng đã được hủy thành công.");
+                } else {
+                    onStatusUpdate(orderId, newStatus); // Update status to PACKAGING or DELIVERING
+                    alert("Trạng thái đơn hàng đã được cập nhật thành công.");
+                }
             } catch (error) {
-                console.error("Error updating order status:", error);
-                alert("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.");
+                if (actionType === "finish" && error.response && error.response.status === 400) {
+                    alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
+
+                    try {
+                        await privateAxios.patch("/orders/cancel", {
+                            orderId: orderId,
+                            cancelReason: "Shipper bị thủng lốp."
+                        });
+                        onStatusUpdate(orderId, "CANCELED"); // Update status to CANCELED
+                        alert("Đơn hàng đã được hủy thành công.");
+                    } catch (cancelError) {
+                        console.error("Error cancelling the order:", cancelError);
+                        alert("Có lỗi xảy ra khi hủy đơn hàng.");
+                    }
+                } else {
+                    console.error("Error updating order status:", error);
+                    alert("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.");
+                }
             }
         }
     };
+
+    useEffect(() => {
+        if (order) {
+            setOrderDetail(order); // Update local state with the latest order details
+        }
+    }, [order]);
+
 
     if (!orderDetail) return null;
 
@@ -278,25 +324,50 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId 
                     </IconButton>
                 </Box>
 
-                <Box display="flex" gap={2} mt={2} flexDirection={'column'}>
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            color: theme.palette.text.secondary,
-                            fontWeight: 500
-                        }}
-                    >
-                        Ngày tạo đơn hàng: {new Date(orderDetail.createdAt).toLocaleString()}
-                    </Typography>
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            color: theme.palette.text.secondary,
-                            fontWeight: 500
-                        }}
-                    >
-                        Mã đơn hàng: {orderDetail.deliveryTrackingCode}
-                    </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: theme.palette.text.secondary,
+                                fontWeight: 500
+                            }}
+                        >
+                            Ngày tạo đơn hàng: {new Date(orderDetail.createdAt).toLocaleString()}
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: theme.palette.text.secondary,
+                                fontWeight: 500
+                            }}
+                        >
+                            Mã đơn hàng: {orderDetail.deliveryTrackingCode}
+                        </Typography>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px', alignItems: 'center' }}>
+                        {orderDetail.status === 'CANCELED' && (
+                            <Chip
+                                label={
+                                    <Box display="flex" alignItems="center">
+                                        <Typography component="span" fontWeight="bold" sx={{ marginRight: 0.5 }}>
+                                            Lý do hủy:
+                                        </Typography>
+                                        <Typography component="span">
+                                            {orderDetail.cancelReason}
+                                        </Typography>
+                                    </Box>
+                                }
+                                variant="outlined"
+                                sx={{
+                                    color: theme.palette.error.main,
+                                    borderColor: theme.palette.error.main,
+                                    fontWeight: 500
+                                }}
+                            />
+                        )}
+                    </div>
+
                 </Box>
             </DialogTitle>
 
@@ -402,8 +473,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId 
                                 </div>
 
                                 <Typography variant="body1" marginTop={'5px'}>
-                                    abcbdhbdshfbsjsfvbdjfvfb
-                                    {/* {orderDetail.note} */}
+                                    {orderDetail.note}
                                 </Typography>
                             </StyledPaper>
                         </Grid>
@@ -419,7 +489,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId 
                         Xác nhận đơn hàng
                     </Button>
                 )}
-                {(orderDetail.status === 'PENDING' || orderDetail.status === 'PACKAGING') && (
+                {(orderDetail.status === 'PACKAGING') && (
                     <Button
                         sx={{ backgroundColor: '#4A4A4A', color: '#fff', padding: '5px 20px', fontWeight: 'bold' }}
                         onClick={() => handleConfirmAction("finish")}

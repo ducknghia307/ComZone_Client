@@ -178,7 +178,7 @@ const SellerCreateComic: React.FC = () => {
         >
           <ArrowBackIcon
             sx={{ fontSize: "40px", cursor: "pointer" }}
-            onClick={() => navigate("/sellermanagement")}
+            onClick={() => navigate("/sellermanagement/comic")}
           />
           <Typography
             sx={{

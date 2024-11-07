@@ -128,7 +128,7 @@ const Navbar = () => {
           to={
             userInfo?.role === "MEMBER"
               ? "/registerSeller"
-              : "/sellerManagement"
+              : "/sellermanagement/comic"
           }
           className="REM text-base "
         >

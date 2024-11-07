@@ -136,6 +136,7 @@ export interface OrderDetailData {
       name: string;
       avatar: string;
   };
+  cancelReason: string;
 }
 
 export interface SellerDetails extends BaseInterface {

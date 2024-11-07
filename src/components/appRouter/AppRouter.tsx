@@ -21,6 +21,9 @@ import AuctionUser from "../../pages/AuctionUser";
 import WalletUser from "../../pages/WalletUser";
 import ExchangeUser from "../../pages/ExchangeUser";
 import RegisterSeller from "../../pages/RegisterSeller";
+import ComicManagementSeller from "../../pages/ComicManagementSeller";
+import OrderManagementSeller from "../../pages/OrderManagementSeller";
+import AuctionManagementSeller from "../../pages/AuctionManagementSeller";
 import { ConfigProvider } from "antd";
 import AllHotComics from "../../pages/HotComic";
 import ComicZoneMembership from "../membership/ComicZoneMembership";
@@ -44,6 +47,9 @@ const AppRouter = () => {
         <Route path="/accountmanagement/exchange" element={<ExchangeUser />} />
         <Route path="/sellermanagement" element={<SellerManagement />} />
         <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
+        <Route path="/sellermanagement/comic" element={<ComicManagementSeller />} />
+        <Route path="/sellermanagement/order" element={<OrderManagementSeller />} />
+        <Route path="/sellermanagement/auction" element={<AuctionManagementSeller />} />
         <Route
           path="/sellermanagement/edit/:id"
           element={<SellerEditComicDetail />}

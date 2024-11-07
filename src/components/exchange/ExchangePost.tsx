@@ -3,6 +3,10 @@ import SingleOfferedComics from "./SingleOfferedComics";
 import RequestedComicsSection from "./RequestedComicsSection";
 import styles from "./style.module.css";
 import { Exchange } from "../../common/interfaces/exchange.interface";
+import moment from "moment/min/moment-with-locales";
+import dateFormat from "../../assistants/date.format";
+
+moment.locale("vi");
 
 export default function ExchangePost({
   exchange,
@@ -19,16 +23,37 @@ export default function ExchangePost({
     if (currentlySelected === value) setCurrentlySelected(-1);
     else setCurrentlySelected(value);
   };
+
+  const checkTimeDisplay =
+    exchange.createdAt &&
+    moment(new Date()).unix() - moment(exchange.createdAt).unix() > 172800;
+
   return (
     <div className="w-full flex rounded-lg px-4 max-w-[100em] bg-white drop-shadow-md">
-      <div className="grow flex flex-col min-w-[30em] py-4">
+      <div className="grow flex flex-col min-w-[30em] px-2 py-4">
         <div className="w-full flex items-center gap-4">
           <img
-            src={exchange.requestUser.avatar || ""}
-            className="w-[4em] rounded-full"
+            src={
+              exchange.requestUser.avatar ||
+              "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+            }
+            className="w-[4em] h-[4em] rounded-full"
           />
-          <p className="font-semibold text-lg">{exchange.requestUser.name}</p>
-          <p className="font-light text-[0.7em] italic">3 giờ trước</p>
+          <div className="flex flex-col items-start gap-1">
+            <p className="font-semibold text-lg tracking-wide">
+              {exchange.requestUser.name}
+            </p>
+            <p className="font-light text-[0.7em] tracking-widest">
+              {checkTimeDisplay ? (
+                <span>
+                  {dateFormat(exchange.createdAt, "dd/mm/yy")} &#8226;{" "}
+                  {dateFormat(exchange.createdAt, "HH:MM")}
+                </span>
+              ) : (
+                moment(exchange.createdAt).fromNow()
+              )}
+            </p>
+          </div>
           <span
             className={`${
               exchange.requestUser.role !== "SELLER" && "hidden"
@@ -47,7 +72,7 @@ export default function ExchangePost({
           </span>
         </div>
 
-        <p className="pl-2 py-2">{exchange.postContent}</p>
+        <p className="pl-2 py-4">{exchange.postContent}</p>
 
         <div
           ref={index === 0 ? refs[0] : null}
@@ -112,7 +137,8 @@ export default function ExchangePost({
             <path d="M10 3H14C18.4183 3 22 6.58172 22 11C22 15.4183 18.4183 19 14 19V22.5C9 20.5 2 17.5 2 11C2 6.58172 5.58172 3 10 3ZM12 17H14C17.3137 17 20 14.3137 20 11C20 7.68629 17.3137 5 14 5H10C6.68629 5 4 7.68629 4 11C4 14.61 6.46208 16.9656 12 19.4798V17Z"></path>
           </svg>
           <p>
-            Chat với <span className="font-semibold">Công Trừ</span>
+            Chat với{" "}
+            <span className="font-semibold">{exchange.requestUser.name}</span>
           </p>
         </button>
       </div>

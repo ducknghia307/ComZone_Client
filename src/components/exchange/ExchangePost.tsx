@@ -4,6 +4,7 @@ import RequestedComicsSection from "./RequestedComicsSection";
 import styles from "./style.module.css";
 import { Exchange } from "../../common/interfaces/exchange.interface";
 import moment from "moment/min/moment-with-locales";
+import dateFormat from "../../assistants/date.format";
 
 moment.locale("vi");
 
@@ -22,18 +23,35 @@ export default function ExchangePost({
     if (currentlySelected === value) setCurrentlySelected(-1);
     else setCurrentlySelected(value);
   };
+
+  const checkTimeDisplay =
+    exchange.createdAt &&
+    moment(new Date()).unix() - moment(exchange.createdAt).unix() > 172800;
+
   return (
     <div className="w-full flex rounded-lg px-4 max-w-[100em] bg-white drop-shadow-md">
-      <div className="grow flex flex-col min-w-[30em] py-4">
+      <div className="grow flex flex-col min-w-[30em] px-2 py-4">
         <div className="w-full flex items-center gap-4">
           <img
-            src={exchange.requestUser.avatar || ""}
-            className="w-[4em] rounded-full"
+            src={
+              exchange.requestUser.avatar ||
+              "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+            }
+            className="w-[4em] h-[4em] rounded-full"
           />
           <div className="flex flex-col items-start gap-1">
-            <p className="font-semibold text-lg">{exchange.requestUser.name}</p>
-            <p className="font-light text-[0.7em] italic">
-              {moment(exchange.createdAt).fromNow()}
+            <p className="font-semibold text-lg tracking-wide">
+              {exchange.requestUser.name}
+            </p>
+            <p className="font-light text-[0.7em] tracking-widest">
+              {checkTimeDisplay ? (
+                <span>
+                  {dateFormat(exchange.createdAt, "dd/mm/yy")} &#8226;{" "}
+                  {dateFormat(exchange.createdAt, "HH:MM")}
+                </span>
+              ) : (
+                moment(exchange.createdAt).fromNow()
+              )}
             </p>
           </div>
           <span
@@ -54,7 +72,7 @@ export default function ExchangePost({
           </span>
         </div>
 
-        <p className="pl-2 py-2">{exchange.postContent}</p>
+        <p className="pl-2 py-4">{exchange.postContent}</p>
 
         <div
           ref={index === 0 ? refs[0] : null}

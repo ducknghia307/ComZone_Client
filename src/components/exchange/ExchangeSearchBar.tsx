@@ -52,7 +52,7 @@ export default function ExchangeSearchBar({
             className="text-black"
           />
           <p
-            className={`font-light ${
+            className={`font-medium ${
               findByOfferMode
                 ? "text-sky-700"
                 : "text-gray-600 group-hover:text-black"

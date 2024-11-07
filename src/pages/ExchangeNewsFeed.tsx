@@ -8,6 +8,7 @@ import Loading from "../components/loading/Loading";
 import ExchangeSearchBar from "../components/exchange/ExchangeSearchBar";
 import CreatePostModal from "../components/exchange/CreatePostModal";
 import SubscriptionModal from "../components/exchange/SubscriptionModal";
+import "../components/ui/Exchange.css";
 
 export default function ExchangeNewsFeed() {
   const [isLoading, setIsLoading] = useState(false);

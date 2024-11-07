@@ -40,7 +40,6 @@ export default function ComicsDetailTemp() {
     await privateAxios
       .get(`/comics/${id}`)
       .then(async (res) => {
-        console.log(res.data);
         setCurrentComics(res.data);
         setSeller(res.data.sellerId);
         const images = [res.data.coverImage, ...res.data.previewChapter];
@@ -76,12 +75,7 @@ export default function ComicsDetailTemp() {
     }
   };
   const handleBuyNow = async () => {
-    if (!currentComics) {
-      console.error("No comic selected.");
-      return;
-    }
-
-    console.log("Comic:", currentComics);
+    if (!currentComics) return;
 
     sessionStorage.setItem(
       "selectedComics",
@@ -120,7 +114,6 @@ export default function ComicsDetailTemp() {
           allCarts[userId].push(currentComics);
           localStorage.setItem(cartKey, JSON.stringify(allCarts));
 
-          console.log("Item added to cart:", id);
           window.dispatchEvent(new Event("cartUpdated"));
         }
       } catch (error) {
@@ -142,7 +135,7 @@ export default function ComicsDetailTemp() {
   }, [id]);
   useEffect(() => {
     if (userInfo) {
-      checkIsInCart(); // Check if the comic is in the cart
+      checkIsInCart();
     }
   }, [userInfo, id]);
   return (
@@ -152,15 +145,15 @@ export default function ComicsDetailTemp() {
         <div className="flex flex-col justify-start items-center gap-4 px-4 pt-4 pb-8 relative">
           <div className="w-full flex items-start justify-center gap-4 relative">
             <div className="w-2/3 max-w-[80em] flex flex-col justify-end gap-4 relative">
-              <div className="flex justify-end gap-4">
-                <div className="grow max-w-[30em] gap-2">
+              <div className="w-full flex justify-center gap-4">
+                <div className="grow min-w-[10em] max-w-[20em] gap-2">
                   <ComicsImages
                     currentImage={currentImage}
                     setCurrentImage={setCurrentImage}
                     imageList={imageList}
                   />
                 </div>
-                <div className="grow max-w-[40em] flex flex-col gap-2">
+                <div className="grow min-w-[20em] max-w-[45em] flex flex-col gap-2">
                   <ComicsMainInfo currentComics={currentComics} />
                   <ComZonePros />
                   <ComicsDetailedInfo currentComics={currentComics} />
@@ -174,7 +167,7 @@ export default function ComicsDetailTemp() {
                 />
               </div>
             </div>
-            <div className="w-[30%] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-4 sticky">
+            <div className="w-[25%] min-w-[20em] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-4 sticky">
               <ComicsSeller seller={seller} />
               <ComicsBillingSection
                 currentComics={currentComics}
@@ -191,14 +184,14 @@ export default function ComicsDetailTemp() {
               comicsListFromSeller={comicsListFromSeller}
             />
           </div>
-        </div>
 
-        <div className="w-full max-w-[122em] px-8">
-          <RecommendedComicsList
-            comicsList={comicsListFromSeller}
-            fetchMoreData={fetchCurrentComics}
-            hasMore={hasMore}
-          />
+          <div className="w-full max-w-[122em] px-8">
+            <RecommendedComicsList
+              comicsList={comicsListFromSeller}
+              fetchMoreData={fetchCurrentComics}
+              hasMore={hasMore}
+            />
+          </div>
         </div>
       </div>
     </>

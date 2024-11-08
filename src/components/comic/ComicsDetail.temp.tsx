@@ -15,8 +15,10 @@ import RecommendedComicsList from "./comicDetails/RecommendedComicsList";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { message } from "antd";
 import { callbackUrl } from "../../redux/features/navigate/navigateSlice";
+import ChatModal from "../../pages/ChatModal";
 
 export default function ComicsDetailTemp() {
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const [currentComics, setCurrentComics] = useState<Comic>();
   const [seller, setSeller] = useState<UserInfo>();
   const [imageList, setImageList] = useState<string[]>([]);
@@ -36,6 +38,9 @@ export default function ComicsDetailTemp() {
   const [messageApi, contextHolder] = message.useMessage();
   const { id } = useParams();
   // const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+
   const fetchCurrentComics = async () => {
     await privateAxios
       .get(`/comics/${id}`)
@@ -138,6 +143,27 @@ export default function ComicsDetailTemp() {
       checkIsInCart();
     }
   }, [userInfo, id]);
+
+  const handleOpenChat = async (comics: Comic) => {
+    if (!isLoggedIn) {
+      alert("Chưa đăng nhập!");
+      return;
+    } else {
+      setIsLoading(true);
+      await privateAxios
+        .post("chat-rooms", {
+          secondUser: comics.sellerId.id,
+          comics: comics.id,
+        })
+        .then((res) => {
+          sessionStorage.setItem("connectedChat", res.data.id);
+          setIsChatOpen(true);
+        })
+        .catch((err) => console.log(err))
+        .finally(() => setIsLoading(false));
+    }
+  };
+
   return (
     <>
       {contextHolder}
@@ -168,7 +194,11 @@ export default function ComicsDetailTemp() {
               </div>
             </div>
             <div className="w-[25%] min-w-[20em] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-4 sticky">
-              <ComicsSeller seller={seller} />
+              <ComicsSeller
+                seller={seller}
+                comics={currentComics}
+                handleOpenChat={handleOpenChat}
+              />
               <ComicsBillingSection
                 currentComics={currentComics}
                 handleAddToCart={handleAddToCart}
@@ -193,6 +223,8 @@ export default function ComicsDetailTemp() {
             />
           </div>
         </div>
+
+        <ChatModal isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} />
       </div>
     </>
   );

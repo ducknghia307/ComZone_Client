@@ -13,12 +13,14 @@ export interface UserInfo {
   is_verified: boolean;
   name: string;
   phone: string | null;
-  avatar: string | null;
+  avatar: string;
   refresh_token: string;
   role: string | null;
   updatedAt: string;
   balance: number;
   nonWithdrawableAmount: number;
+  last_active?: Date | null;
+  follower_count?: number;
 }
 
 //address
@@ -132,9 +134,9 @@ export interface OrderDetailData {
   status: string;
   note: string;
   user: {
-      email: string;
-      name: string;
-      avatar: string;
+    email: string;
+    name: string;
+    avatar: string;
   };
   cancelReason: string;
 }

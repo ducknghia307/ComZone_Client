@@ -12,10 +12,12 @@ export default function ExchangePost({
   exchange,
   refs,
   index,
+  handleOpenChat,
 }: {
   exchange: Exchange;
   refs: any[];
   index: number;
+  handleOpenChat: Function;
 }) {
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
 
@@ -43,14 +45,14 @@ export default function ExchangePost({
             <p className="font-semibold text-lg tracking-wide">
               {exchange.requestUser.name}
             </p>
-            <p className="font-light text-[0.7em] tracking-widest">
+            <p className="font-light text-[0.7em] tracking-wider">
               {checkTimeDisplay ? (
                 <span>
                   {dateFormat(exchange.createdAt, "dd/mm/yy")} &#8226;{" "}
                   {dateFormat(exchange.createdAt, "HH:MM")}
                 </span>
               ) : (
-                moment(exchange.createdAt).fromNow()
+                moment(exchange.createdAt).calendar()
               )}
             </p>
           </div>
@@ -117,7 +119,7 @@ export default function ExchangePost({
         </div>
       </div>
 
-      <div className="basis-1/3 min-w-[25em] max-w-[25em] flex flex-col justify-start gap-8 px-2 py-4 pl-8 border-l ml-8">
+      <div className="basis-1/3 min-w-[20em] max-w-[25em] flex flex-col justify-start gap-8 px-2 py-4 pl-8 border-l ml-8">
         <RequestedComicsSection
           list={exchange.requestComics}
           ref2={refs[1]}
@@ -125,6 +127,7 @@ export default function ExchangePost({
         />
         <button
           ref={index === 0 ? refs[2] : null}
+          onClick={() => handleOpenChat(exchange)}
           className="flex items-center justify-center gap-2 border border-gray-400 py-2 rounded-lg"
         >
           <svg

@@ -12,14 +12,14 @@ import "../components/ui/Exchange.css";
 import { useAppSelector } from "../redux/hooks";
 import { useSearchParams } from "react-router-dom";
 import ExchangeNotFound from "../components/exchange/ExchangeNotFound";
-import ExchangeChat from "./ExchangeChat";
+import ChatModal from "./ChatModal";
 
 export default function ExchangeNewsFeed() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const [isLoading, setIsLoading] = useState(false);
   const [beginTour, setBeginTour] = useState(false);
   const [exchangeList, setExchangeList] = useState<Exchange[]>([]);
-  const [findByOfferMode, setFindByOfferMode] = useState<boolean>(false);
+  const [findByOwnedMode, setFindByOwnedMode] = useState<boolean>(false);
   const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
   const [openSubscription, setOpenSubscription] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
@@ -128,27 +128,43 @@ export default function ExchangeNewsFeed() {
     setIsLoading(true);
     try {
       if (searchParams.get("search")) {
-        setExchangeList(
+        if (!findByOwnedMode) {
+          setExchangeList(
+            isLoggedIn
+              ? await privateAxios
+                  .get(`exchanges/search/logged`, {
+                    params: {
+                      key: searchKey,
+                    },
+                  })
+                  .then((res) => {
+                    return res.data.data;
+                  })
+              : await publicAxios
+                  .get(`exchanges/search`, {
+                    params: {
+                      key: searchKey,
+                    },
+                  })
+                  .then((res) => {
+                    return res.data.data;
+                  })
+          );
+        } else {
           isLoggedIn
-            ? await privateAxios
-                .get(`exchanges/search/logged`, {
-                  params: {
-                    key: searchKey,
-                  },
-                })
-                .then((res) => {
-                  return res.data.data;
-                })
-            : await publicAxios
-                .get(`exchanges/search`, {
-                  params: {
-                    key: searchKey,
-                  },
-                })
-                .then((res) => {
-                  return res.data.data;
-                })
-        );
+            ? setExchangeList(
+                await privateAxios
+                  .get(`exchanges/search/owned`, {
+                    params: {
+                      key: searchKey,
+                    },
+                  })
+                  .then((res) => {
+                    return res.data.data;
+                  })
+              )
+            : alert("Chưa đăng nhập!");
+        }
       } else
         setExchangeList(
           isLoggedIn
@@ -171,11 +187,23 @@ export default function ExchangeNewsFeed() {
     fetchExchangeNewsFeed();
   }, []);
 
-  const handleOpenCreatePost = () => {
-    //FETCH USER'S EXCHANGE SUBSCRIPTION
+  const handleOpenCreatePost = async () => {
+    const offeredList = await privateAxios
+      .get(`comics/exchange-offer`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
 
-    if (true) setOpenSubscription(true);
-    else setOpenCreatePost(true);
+    if (!offeredList || offeredList.length === 0) {
+      alert(
+        "Cần ít nhất 1 truyện dùng để trao đổi trước khi được đăng bài tìm trao đổi!"
+      );
+    } else {
+      //FETCH USER'S EXCHANGE SUBSCRIPTION
+      if (true) setOpenSubscription(true);
+      else setOpenCreatePost(true);
+    }
   };
 
   const handleSelectSubscription = () => {
@@ -185,8 +213,10 @@ export default function ExchangeNewsFeed() {
 
   const handleSearch = async () => {
     if (searchKey.length > 0) {
-      console.log(searchKey);
       setSearchParams({ search: searchKey });
+      fetchExchangeNewsFeed();
+    } else {
+      setSearchParams();
       fetchExchangeNewsFeed();
     }
   };
@@ -196,16 +226,36 @@ export default function ExchangeNewsFeed() {
     fetchExchangeNewsFeed();
   }, [searchParams]);
 
+  const handleOpenChat = async (exchange: Exchange) => {
+    if (!isLoggedIn) {
+      alert("Chưa đăng nhập!");
+      return;
+    } else {
+      setIsLoading(true);
+      await privateAxios
+        .post("chat-rooms", {
+          secondUser: exchange.requestUser.id,
+          exchange: exchange.id,
+        })
+        .then((res) => {
+          sessionStorage.setItem("connectedChat", res.data.id);
+          setIsChatOpen(true);
+        })
+        .catch((err) => console.log(err))
+        .finally(() => setIsLoading(false));
+    }
+  };
+
   return (
     <div className="w-full flex justify-center bg-[rgba(0,0,0,0.03)]">
       {isLoading && <Loading />}
       <div className="w-full md:w-3/4 flex items-center justify-center min-h-[80vh] px-8 pb-8 REM">
         <div className="w-full flex flex-col items-center justify-start gap-2 py-8">
-          <button onClick={() => setIsChatOpen(true)}>CHAT</button>
           <ExchangeSearchBar
+            isLoggedIn={isLoggedIn}
             setBeginTour={setBeginTour}
-            findByOfferMode={findByOfferMode}
-            setFindByOfferMode={setFindByOfferMode}
+            findByOwnedMode={findByOwnedMode}
+            setFindByOwnedMode={setFindByOwnedMode}
             handleOpenCreatePost={handleOpenCreatePost}
             searchKey={searchKey}
             setSearchKey={setSearchKey}
@@ -232,6 +282,7 @@ export default function ExchangeNewsFeed() {
                     exchange={exchange}
                     refs={[ref1, ref2, ref3]}
                     index={index}
+                    handleOpenChat={handleOpenChat}
                   />
                 );
               })
@@ -249,7 +300,7 @@ export default function ExchangeNewsFeed() {
         onClose={() => setBeginTour(false)}
         steps={steps}
       />
-      <ExchangeChat isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} />
+      <ChatModal isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} />
     </div>
   );
 }

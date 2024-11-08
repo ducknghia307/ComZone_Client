@@ -13,14 +13,14 @@ export interface UserInfo {
   is_verified: boolean;
   name: string;
   phone: string | null;
-  avatar: string | null;
+  avatar: string;
   refresh_token: string;
   role: string | null;
   updatedAt: string;
   balance: number;
   nonWithdrawableAmount: number;
-  lastActive?: Date | null;
-  followerCount?: number;
+  last_active?: Date | null;
+  follower_count?: number;
 }
 
 //address

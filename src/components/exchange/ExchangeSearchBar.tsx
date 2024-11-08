@@ -2,17 +2,19 @@ import { Switch, Tooltip } from "antd";
 import { useEffect } from "react";
 
 export default function ExchangeSearchBar({
+  isLoggedIn,
   setBeginTour,
-  findByOfferMode,
-  setFindByOfferMode,
+  findByOwnedMode,
+  setFindByOwnedMode,
   handleOpenCreatePost,
   searchKey,
   setSearchKey,
   handleSearch,
 }: {
+  isLoggedIn: boolean;
   setBeginTour: Function;
-  findByOfferMode: boolean;
-  setFindByOfferMode: Function;
+  findByOwnedMode: boolean;
+  setFindByOwnedMode: Function;
   handleOpenCreatePost: Function;
   searchKey: string;
   setSearchKey: Function;
@@ -30,7 +32,10 @@ export default function ExchangeSearchBar({
   return (
     <div className="w-full max-w-[100em] flex items-center justify-center gap-2">
       <button
-        onClick={() => handleOpenCreatePost()}
+        onClick={() => {
+          if (!isLoggedIn) alert("Chưa đăng nhập!");
+          else handleOpenCreatePost();
+        }}
         className="min-w-max flex items-center gap-1 px-4 py-2 rounded-lg bg-sky-600 text-white duration-200 hover:bg-sky-800"
       >
         <svg
@@ -66,21 +71,27 @@ export default function ExchangeSearchBar({
         </svg>
         <button
           id="search-button"
-          onClick={() => handleSearch()}
+          onClick={() => {
+            document.getElementById("exchange-search")?.blur();
+            handleSearch();
+          }}
           className="min-w-max whitespace-nowrap px-4 py-2 bg-black text-white rounded-md duration-200 hover:bg-gray-800"
         >
           Tìm kiếm
         </button>
         <div className="min-w-max flex items-center gap-2 px-2 py-2 group">
           <Switch
-            checked={findByOfferMode}
-            onChange={(checked) => setFindByOfferMode(checked)}
+            checked={findByOwnedMode}
+            onChange={(checked) => {
+              if (!isLoggedIn) alert("Chưa đăng nhập!");
+              else setFindByOwnedMode(checked);
+            }}
             size="small"
             className="text-black"
           />
           <p
             className={`font-medium ${
-              findByOfferMode
+              findByOwnedMode
                 ? "text-sky-700"
                 : "text-gray-600 group-hover:text-black"
             } `}

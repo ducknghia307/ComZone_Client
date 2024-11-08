@@ -6,6 +6,7 @@ import Countdown from "react-countdown";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import { useParams } from "react-router-dom";
 import { publicAxios } from "../../middleware/axiosInstance";
+import ComicsDescription from "../comic/comicDetails/ComicsDescription";
 
 // Countdown renderer function
 const renderer = ({
@@ -42,7 +43,6 @@ const ComicAuction = () => {
   const [mainImage, setMainImage] = useState<string>("");
   const [auctionData, setAuctionData] = useState<any>(null);
   const [previewChapter, setPreviewChapter] = useState<string[]>([]);
-  const [showFullDescription, setShowFullDescription] = useState(false);
   const [bidAmount, setBidAmount] = useState<string>("");
 
   useEffect(() => {
@@ -80,7 +80,12 @@ const ComicAuction = () => {
     <div className="auction-wrapper">
       <div className="title-container">
         <Typography
-          style={{ paddingLeft: "50px", fontSize: "25px", fontWeight: "bold" }}
+          style={{
+            paddingLeft: "50px",
+            fontSize: "23px",
+            fontWeight: "bold",
+            flex: "3",
+          }}
         >
           {comic.title}
         </Typography>
@@ -92,23 +97,21 @@ const ComicAuction = () => {
       <Grid container spacing={2} className="auction-container">
         <Grid size={7} className="comic-info">
           <div className="comic-images">
-            <img
-              className="main-comic-image"
-              src={mainImage}
-              alt="Main Comic Cover"
-            />
+            <div style={{ width: "400px", height: "600px" }}>
+              <img
+                className="main-comic-image"
+                src={mainImage}
+                alt="Main Comic Cover"
+              />
+            </div>
+
             <div className="small-images">
               {[comic.coverImage, ...previewChapter].map((img, index) => (
                 <img
                   key={index}
                   src={img}
                   alt={`Preview ${index + 1}`}
-                  style={{
-                    width: "100px",
-                    height: "120px",
-                    cursor: "pointer",
-                    objectFit: "contain",
-                  }}
+                  className="small-comic-image"
                   onClick={() => handleImageClick(img)}
                 />
               ))}
@@ -126,7 +129,7 @@ const ComicAuction = () => {
             <div className="current-price">
               <div className="current-price1">
                 <p>Giá hiện tại</p>
-                <h2>{auctionData?.reservePrice}₫</h2>
+                <h2>{auctionData.reservePrice.toLocaleString("vi-VN")}₫</h2>
               </div>
               <div className="current-price2">
                 <p>Lượt đấu giá</p>
@@ -136,12 +139,25 @@ const ComicAuction = () => {
           </div>
 
           <div className="shop-info">
-            <p>
-              <StoreOutlinedIcon /> {users?.name}
+            <p style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={
+                  users?.avatar ||
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxfSUXtB9oG6_7ZgV3gFLrqGdkv61wqYkVVw&s"
+                }
+                alt=""
+                className="w-[1.8em] h-[1.8em] rounded-full mr-2 "
+              />
+              <p className="font-semibold mr-2">{users?.name}</p>
+              <StoreOutlinedIcon />
             </p>
             <p style={{ fontSize: "18px", paddingTop: "10px" }}>
               Giá đấu tối thiểu tiếp theo:{" "}
-              {auctionData && auctionData.reservePrice + auctionData.priceStep}₫
+              {auctionData &&
+                (
+                  auctionData.reservePrice + auctionData.priceStep
+                ).toLocaleString("vi-VN")}
+              ₫
             </p>
             <div className="bid-row">
               <input
@@ -164,7 +180,7 @@ const ComicAuction = () => {
                 fontSize: "18px",
               }}
             >
-              Mua ngay với giá {(auctionData.maxPrice).toLocaleString('vi-VN')}₫
+              Mua ngay với giá {auctionData.maxPrice.toLocaleString("vi-VN")}₫
             </Button>
           </div>
 
@@ -178,25 +194,8 @@ const ComicAuction = () => {
           </div>
         </Grid>
 
-        <Typography
-          variant="body1"
-          style={{ paddingTop: "20px", color: "#1a73e8", fontWeight: "700" }}
-        >
-          Mô tả nội dung:
-        </Typography>
-        <div
-          style={{
-            maxHeight: showFullDescription ? "none" : "50px",
-            overflow: showFullDescription ? "visible" : "hidden",
-            transition: "max-height 0.3s ease",
-          }}
-        >
-          {comic.description}
-        </div>
-        <div style={{ width: "100%", textAlign: "center" }}>
-          <Button onClick={() => setShowFullDescription(!showFullDescription)}>
-            {showFullDescription ? "Ẩn bớt" : "Xem thêm"}
-          </Button>
+        <div className="mb-10 w-full">
+          <ComicsDescription currentComics={comic} fontSize="1rem" />
         </div>
       </Grid>
     </div>

@@ -129,7 +129,7 @@ const AuctionManagement = () => {
     );
 
     return (
-        <div style={{ width: '100%', overflow: 'hidden' }}>
+        <div className='seller-container' style={{ width: '100%', overflow: 'hidden' }}>
             <Typography variant="h5" className="content-header">Quản lí đấu giá</Typography>
             <Box sx={{ marginBottom: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

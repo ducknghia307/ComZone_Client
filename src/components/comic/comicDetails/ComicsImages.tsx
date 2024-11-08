@@ -56,14 +56,18 @@ export default function ComicsImages({
 
   return (
     <>
-      <div className="w-full bg-white flex flex-col items-center justify-center rounded-xl py-2 drop-shadow-md top-4 sticky max-w-[30rem] min-w-[20rem]">
+      <div className="w-full bg-white flex flex-col items-center justify-center rounded-xl py-2 drop-shadow-md top-4 sticky">
         <div
-          className="w-5/6 p-2 flex justify-center max-w-[25rem] cursor-pointer"
+          className="w-5/6 p-2 flex justify-center max-w-[20em] cursor-pointer"
           onClick={() => setIsModalOpen(true)}
         >
-          <img src={currentImage} alt="" className="object-cover h-96 border" />
+          <img
+            src={currentImage}
+            alt=""
+            className="w-full object-cover border min-h-[30em] max-h-[30em]"
+          />
         </div>
-        <div className="flex justify-between items-center w-full max-w-[25rem]">
+        <div className="flex justify-between items-center w-full max-w-[25rem] px-4">
           {imageList.length > 4 && (
             <Button
               onClick={handlePrev}

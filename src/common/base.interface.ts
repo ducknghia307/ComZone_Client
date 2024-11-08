@@ -111,6 +111,34 @@ export interface Comic {
   onSaleSince?: Date;
 }
 
+export interface OrderDetailData {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deliveryTrackingCode: string | null;
+  totalPrice: number;
+  paymentMethod: string;
+  fromName: string;
+  fromPhone: string;
+  fromAddress: string;
+  fromProvinceName: string;
+  fromDistrictName: string;
+  fromWardName: string;
+  toName: string;
+  toPhone: string;
+  toAddress: string;
+  deliveryFee: number;
+  isPaid: boolean;
+  status: string;
+  note: string;
+  user: {
+      email: string;
+      name: string;
+      avatar: string;
+  };
+  cancelReason: string;
+}
+
 export interface SellerDetails extends BaseInterface {
   user: UserInfo;
   verifiedPhone: string;

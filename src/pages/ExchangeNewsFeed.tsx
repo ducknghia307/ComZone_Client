@@ -1,12 +1,31 @@
 import ExchangePost from "../components/exchange/ExchangePost";
-import { Tour } from "antd";
+import { Button, Tour } from "antd";
 import type { TourProps } from "antd";
-import { useRef, useState } from "react";
-
-const samples = [1, 2, 3, 4, 5, 6];
+import { useEffect, useRef, useState } from "react";
+import { privateAxios, publicAxios } from "../middleware/axiosInstance";
+import { Exchange } from "../common/interfaces/exchange.interface";
+import Loading from "../components/loading/Loading";
+import ExchangeSearchBar from "../components/exchange/ExchangeSearchBar";
+import CreatePostModal from "../components/exchange/CreatePostModal";
+import SubscriptionModal from "../components/exchange/SubscriptionModal";
+import "../components/ui/Exchange.css";
+import { useAppSelector } from "../redux/hooks";
+import { useSearchParams } from "react-router-dom";
+import ExchangeNotFound from "../components/exchange/ExchangeNotFound";
 
 export default function ExchangeNewsFeed() {
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+  const [isLoading, setIsLoading] = useState(false);
   const [beginTour, setBeginTour] = useState(false);
+  const [exchangeList, setExchangeList] = useState<Exchange[]>([]);
+  const [findByOfferMode, setFindByOfferMode] = useState<boolean>(false);
+  const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
+  const [openSubscription, setOpenSubscription] = useState<boolean>(false);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchKey, setSearchKey] = useState<string>(
+    searchParams.get("search") || ""
+  );
 
   const ref1 = useRef(null);
   const ref2 = useRef(null);
@@ -25,6 +44,17 @@ export default function ExchangeNewsFeed() {
       ),
       placement: "rightTop",
       target: () => ref1.current,
+      nextButtonProps: {
+        children: (
+          <Button type="primary" size="small">
+            Tiếp theo
+          </Button>
+        ),
+        style: {
+          marginInlineStart: "0px",
+          padding: "0px 8px",
+        },
+      },
     },
     {
       title: "Truyện người đăng đang tìm kiếm.",
@@ -38,6 +68,25 @@ export default function ExchangeNewsFeed() {
       ),
       placement: "leftTop",
       target: () => ref2.current,
+      nextButtonProps: {
+        children: (
+          <Button type="primary" size="small">
+            Tiếp theo
+          </Button>
+        ),
+        style: {
+          marginInlineStart: "0px",
+          padding: "0px 8px",
+        },
+      },
+      prevButtonProps: {
+        children: <Button size="small">Quay lại</Button>,
+        style: {
+          marginInlineStart: "0px",
+          marginRight: "4px",
+          padding: "0px 8px",
+        },
+      },
     },
     {
       title: "Bắt đầu trao đổi.",
@@ -51,39 +100,144 @@ export default function ExchangeNewsFeed() {
       ),
       placement: "topLeft",
       target: () => ref3.current,
+      nextButtonProps: {
+        children: (
+          <Button type="primary" size="small">
+            Hoàn tất
+          </Button>
+        ),
+        style: {
+          marginInlineStart: "0px",
+          padding: "0px 8px",
+        },
+      },
+      prevButtonProps: {
+        children: <Button size="small">Quay lại</Button>,
+        style: {
+          marginInlineStart: "0px",
+          marginRight: "4px",
+          padding: "0px 8px",
+        },
+      },
     },
   ];
 
+  const fetchExchangeNewsFeed = async () => {
+    setIsLoading(true);
+    try {
+      if (searchParams.get("search")) {
+        setExchangeList(
+          isLoggedIn
+            ? await privateAxios
+                .get(`exchanges/search/logged`, {
+                  params: {
+                    key: searchKey,
+                  },
+                })
+                .then((res) => {
+                  return res.data.data;
+                })
+            : await publicAxios
+                .get(`exchanges/search`, {
+                  params: {
+                    key: searchKey,
+                  },
+                })
+                .then((res) => {
+                  return res.data.data;
+                })
+        );
+      } else
+        setExchangeList(
+          isLoggedIn
+            ? await privateAxios
+                .get(`exchanges/available/logged`)
+                .then((res) => {
+                  return res.data;
+                })
+            : await publicAxios.get(`exchanges/available`).then((res) => {
+                return res.data;
+              })
+        );
+    } catch (err) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchExchangeNewsFeed();
+  }, []);
+
+  const handleOpenCreatePost = () => {
+    //FETCH USER'S EXCHANGE SUBSCRIPTION
+
+    if (true) setOpenSubscription(true);
+    else setOpenCreatePost(true);
+  };
+
+  const handleSelectSubscription = () => {
+    setOpenSubscription(false);
+    setOpenCreatePost(true);
+  };
+
+  const handleSearch = async () => {
+    if (searchKey.length > 0) {
+      console.log(searchKey);
+      setSearchParams({ search: searchKey });
+      fetchExchangeNewsFeed();
+    }
+  };
+
+  useEffect(() => {
+    setSearchKey(searchParams.get("search") || "");
+    fetchExchangeNewsFeed();
+  }, [searchParams]);
+
   return (
     <div className="w-full flex justify-center bg-[rgba(0,0,0,0.03)]">
-      <div className="w-full md:w-3/4 flex justify-center min-h-[80vh] px-8 py-8 REM">
-        <div className="flex flex-col items-center justify-start gap-2 py-8">
-          <div className="w-full flex items-center justify-center gap-2">
-            <input
-              type="search"
-              placeholder="Thử tìm kiếm gì đó..."
-              className="w-full border-2 rounded-lg px-4 py-2"
-            />
-            <button
-              onClick={() => setBeginTour(true)}
-              className="border border-black p-2 rounded-full"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                fill="currentColor"
-              >
-                <path d="M5.76282 17H20V5H4V18.3851L5.76282 17ZM6.45455 19L2 22.5V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V18C22 18.5523 21.5523 19 21 19H6.45455ZM11 14H13V16H11V14ZM8.56731 8.81346C8.88637 7.20919 10.302 6 12 6C13.933 6 15.5 7.567 15.5 9.5C15.5 11.433 13.933 13 12 13H11V11H12C12.8284 11 13.5 10.3284 13.5 9.5C13.5 8.67157 12.8284 8 12 8C11.2723 8 10.6656 8.51823 10.5288 9.20577L8.56731 8.81346Z"></path>
-              </svg>
-            </button>
-          </div>
+      {isLoading && <Loading />}
+      <div className="w-full md:w-3/4 flex justify-center min-h-[80vh] px-8 pb-8 REM">
+        <div className="w-full flex flex-col items-center justify-start gap-2 py-8">
+          <ExchangeSearchBar
+            setBeginTour={setBeginTour}
+            findByOfferMode={findByOfferMode}
+            setFindByOfferMode={setFindByOfferMode}
+            handleOpenCreatePost={handleOpenCreatePost}
+            searchKey={searchKey}
+            setSearchKey={setSearchKey}
+            handleSearch={handleSearch}
+          />
+
+          <SubscriptionModal
+            openSubscription={openSubscription}
+            setOpenSubscription={setOpenSubscription}
+            handleSelectSubscription={handleSelectSubscription}
+          />
+
+          <CreatePostModal
+            openCreatePost={openCreatePost}
+            setOpenCreatePost={setOpenCreatePost}
+          />
 
           <div className="w-full flex flex-col justify-center gap-8 py-4">
-            {samples.map((value, index: number) => {
-              return <ExchangePost refs={[ref1, ref2, ref3]} index={index} />;
-            })}
+            {exchangeList && exchangeList.length > 0 ? (
+              exchangeList.map((exchange, index: number) => {
+                return (
+                  <ExchangePost
+                    key={index}
+                    exchange={exchange}
+                    refs={[ref1, ref2, ref3]}
+                    index={index}
+                  />
+                );
+              })
+            ) : (
+              <ExchangeNotFound
+                searchParams={searchParams}
+                isLoading={isLoading}
+              />
+            )}
           </div>
         </div>
       </div>

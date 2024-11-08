@@ -21,10 +21,14 @@ import AuctionUser from "../../pages/AuctionUser";
 import WalletUser from "../../pages/WalletUser";
 import ExchangeUser from "../../pages/ExchangeUser";
 import RegisterSeller from "../../pages/RegisterSeller";
+import ComicManagementSeller from "../../pages/ComicManagementSeller";
+import OrderManagementSeller from "../../pages/OrderManagementSeller";
+import AuctionManagementSeller from "../../pages/AuctionManagementSeller";
 import { ConfigProvider } from "antd";
 import AllHotComics from "../../pages/HotComic";
 import ComicZoneMembership from "../membership/ComicZoneMembership";
 import NotFound from "../notFound/NotFound";
+import CurrentUserRecentAct from "../../pages/CurrentUserRecentAct";
 
 const AppRouter = () => {
   return (
@@ -45,6 +49,18 @@ const AppRouter = () => {
         <Route path="/sellermanagement" element={<SellerManagement />} />
         <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
         <Route
+          path="/sellermanagement/comic"
+          element={<ComicManagementSeller />}
+        />
+        <Route
+          path="/sellermanagement/order"
+          element={<OrderManagementSeller />}
+        />
+        <Route
+          path="/sellermanagement/auction"
+          element={<AuctionManagementSeller />}
+        />
+        <Route
           path="/sellermanagement/edit/:id"
           element={<SellerEditComicDetail />}
         />
@@ -58,7 +74,10 @@ const AppRouter = () => {
         <Route path="/order/complete" element={<OrderComplete />} />
 
         <Route path="/registerSeller" element={<RegisterSeller />} />
-
+        <Route
+          path="/profile/recentActivities"
+          element={<CurrentUserRecentAct />}
+        />
         <Route path="/membership" element={<ComicZoneMembership />} />
 
         <Route path="*" element={<NotFound />} />

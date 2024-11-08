@@ -28,7 +28,7 @@ export default function ExchangeSearchBar({
   }, []);
 
   return (
-    <div className="w-full flex items-center justify-center gap-2">
+    <div className="w-full max-w-[100em] flex items-center justify-center gap-2">
       <button
         onClick={() => handleOpenCreatePost()}
         className="min-w-max flex items-center gap-1 px-4 py-2 rounded-lg bg-sky-600 text-white duration-200 hover:bg-sky-800"

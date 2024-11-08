@@ -19,6 +19,8 @@ export interface UserInfo {
   updatedAt: string;
   balance: number;
   nonWithdrawableAmount: number;
+  lastActive?: Date | null;
+  followerCount?: number;
 }
 
 //address
@@ -132,9 +134,9 @@ export interface OrderDetailData {
   status: string;
   note: string;
   user: {
-      email: string;
-      name: string;
-      avatar: string;
+    email: string;
+    name: string;
+    avatar: string;
   };
   cancelReason: string;
 }

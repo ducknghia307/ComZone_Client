@@ -117,7 +117,7 @@ export default function ExchangePost({
         </div>
       </div>
 
-      <div className="basis-1/3 min-w-[25em] max-w-[25em] flex flex-col justify-start gap-8 px-2 py-4 pl-8 border-l ml-8">
+      <div className="basis-1/3 min-w-max max-w-[25em] flex flex-col justify-start gap-8 px-2 py-4 pl-8 border-l ml-8">
         <RequestedComicsSection
           list={exchange.requestComics}
           ref2={refs[1]}

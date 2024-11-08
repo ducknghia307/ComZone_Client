@@ -12,6 +12,7 @@ import "../components/ui/Exchange.css";
 import { useAppSelector } from "../redux/hooks";
 import { useSearchParams } from "react-router-dom";
 import ExchangeNotFound from "../components/exchange/ExchangeNotFound";
+import ExchangeChat from "./ExchangeChat";
 
 export default function ExchangeNewsFeed() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
@@ -21,6 +22,7 @@ export default function ExchangeNewsFeed() {
   const [findByOfferMode, setFindByOfferMode] = useState<boolean>(false);
   const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
   const [openSubscription, setOpenSubscription] = useState<boolean>(false);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchKey, setSearchKey] = useState<string>(
@@ -197,8 +199,9 @@ export default function ExchangeNewsFeed() {
   return (
     <div className="w-full flex justify-center bg-[rgba(0,0,0,0.03)]">
       {isLoading && <Loading />}
-      <div className="w-full md:w-3/4 flex justify-center min-h-[80vh] px-8 pb-8 REM">
+      <div className="w-full md:w-3/4 flex items-center justify-center min-h-[80vh] px-8 pb-8 REM">
         <div className="w-full flex flex-col items-center justify-start gap-2 py-8">
+          <button onClick={() => setIsChatOpen(true)}>CHAT</button>
           <ExchangeSearchBar
             setBeginTour={setBeginTour}
             findByOfferMode={findByOfferMode}
@@ -220,7 +223,7 @@ export default function ExchangeNewsFeed() {
             setOpenCreatePost={setOpenCreatePost}
           />
 
-          <div className="w-full flex flex-col justify-center gap-8 py-4">
+          <div className="w-full min-w-[50em] flex flex-col items-center justify-center gap-8 py-4">
             {exchangeList && exchangeList.length > 0 ? (
               exchangeList.map((exchange, index: number) => {
                 return (
@@ -246,6 +249,7 @@ export default function ExchangeNewsFeed() {
         onClose={() => setBeginTour(false)}
         steps={steps}
       />
+      <ExchangeChat isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} />
     </div>
   );
 }

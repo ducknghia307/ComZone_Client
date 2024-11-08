@@ -97,7 +97,7 @@ export default function RequestedComicsSection({
 
       <div className="w-full flex justify-center">
         <span
-          className="w-3/4 min-h-[25em] rounded-lg bg-no-repeat bg-cover bg-center"
+          className="w-full xl:w-3/4 min-h-[25em] rounded-lg bg-no-repeat bg-cover bg-center"
           style={{
             backgroundImage: `url(${
               list[currentComics].coverImage

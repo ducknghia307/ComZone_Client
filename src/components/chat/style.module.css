@@ -1,0 +1,23 @@
+/* width */
+.chatHistory::-webkit-scrollbar {
+  width: 5px;
+  padding-left: 10px;
+}
+
+/* Track */
+.chatHistory::-webkit-scrollbar-track {
+  background: #fff;
+  padding: 5px;
+  margin-block: 8px;
+}
+
+/* Handle */
+.chatHistory::-webkit-scrollbar-thumb {
+  background: #777;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+.chatHistory::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}

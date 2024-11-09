@@ -139,6 +139,16 @@ export interface OrderDetailData {
     avatar: string;
   };
   cancelReason: string;
+  deliveryStatus: string;
+  items?: Array<{
+    comics: {
+        coverImage: string;
+        title: string;
+        author: string;
+        price: number;
+        volumeType: string;
+    };
+}>;
 }
 
 export interface SellerDetails extends BaseInterface {

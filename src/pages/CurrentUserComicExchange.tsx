@@ -78,6 +78,7 @@ const CurrentUserComicExchange = () => {
           isModalOpen={isModalOpen}
           handleCancel={handleCancel}
           userInfo={userInfo}
+          fetchComicExchangeOffer={fetchComicExchangeOffer}
         />
       )}
     </>

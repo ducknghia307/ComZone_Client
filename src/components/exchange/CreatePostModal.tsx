@@ -44,7 +44,7 @@ export default function CreatePostModal({
         postContent: postContent,
       };
 
-      const response = await privateAxios.post("/exchanges", payload);
+      const response = await privateAxios.post("/exchange-requests", payload);
       console.log(response.data);
 
       notification.success({

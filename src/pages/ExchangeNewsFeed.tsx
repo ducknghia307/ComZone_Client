@@ -3,7 +3,7 @@ import { Button, Tour } from "antd";
 import type { TourProps } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
-import { Exchange } from "../common/interfaces/exchange.interface";
+import { ExchangeRequest } from "../common/interfaces/exchange.interface";
 import Loading from "../components/loading/Loading";
 import ExchangeSearchBar from "../components/exchange/ExchangeSearchBar";
 import CreatePostModal from "../components/exchange/CreatePostModal";
@@ -18,7 +18,7 @@ export default function ExchangeNewsFeed() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const [isLoading, setIsLoading] = useState(false);
   const [beginTour, setBeginTour] = useState(false);
-  const [exchangeList, setExchangeList] = useState<Exchange[]>([]);
+  const [exchangeList, setExchangeList] = useState<ExchangeRequest[]>([]);
   const [findByOwnedMode, setFindByOwnedMode] = useState<boolean>(false);
   const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
   const [openSubscription, setOpenSubscription] = useState<boolean>(false);
@@ -132,7 +132,7 @@ export default function ExchangeNewsFeed() {
           setExchangeList(
             isLoggedIn
               ? await privateAxios
-                  .get(`exchanges/search/logged`, {
+                  .get(`exchange-requests/search/logged`, {
                     params: {
                       key: searchKey,
                     },
@@ -141,7 +141,7 @@ export default function ExchangeNewsFeed() {
                     return res.data.data;
                   })
               : await publicAxios
-                  .get(`exchanges/search`, {
+                  .get(`exchange-requests/search`, {
                     params: {
                       key: searchKey,
                     },
@@ -154,7 +154,7 @@ export default function ExchangeNewsFeed() {
           isLoggedIn
             ? setExchangeList(
                 await privateAxios
-                  .get(`exchanges/search/owned`, {
+                  .get(`exchange-requests/search/owned`, {
                     params: {
                       key: searchKey,
                     },
@@ -169,7 +169,7 @@ export default function ExchangeNewsFeed() {
         setExchangeList(
           isLoggedIn
             ? await privateAxios
-                .get(`exchanges/available/logged`)
+                .get(`exchange-requests/available/logged`)
                 .then((res) => {
                   return res.data;
                 })
@@ -189,7 +189,7 @@ export default function ExchangeNewsFeed() {
 
   const handleOpenCreatePost = async () => {
     const offeredList = await privateAxios
-      .get(`comics/exchange-offer`)
+      .get(`comics/exchange-offer/user`)
       .then((res) => {
         return res.data;
       })
@@ -226,7 +226,7 @@ export default function ExchangeNewsFeed() {
     fetchExchangeNewsFeed();
   }, [searchParams]);
 
-  const handleOpenChat = async (exchange: Exchange) => {
+  const handleOpenChat = async (exchange: ExchangeRequest) => {
     if (!isLoggedIn) {
       alert("Chưa đăng nhập!");
       return;
@@ -234,7 +234,7 @@ export default function ExchangeNewsFeed() {
       setIsLoading(true);
       await privateAxios
         .post("chat-rooms", {
-          secondUser: exchange.requestUser.id,
+          secondUser: exchange.user.id,
           exchange: exchange.id,
         })
         .then((res) => {

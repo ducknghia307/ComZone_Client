@@ -6,7 +6,9 @@ interface CountdownFlipNumbersProps {
   endTime: string | Date;
 }
 
-const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({ endTime }) => {
+const CountdownFlipNumbersHome: React.FC<CountdownFlipNumbersProps> = ({
+  endTime,
+}) => {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -120,4 +122,4 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({ endTime }) 
   );
 };
 
-export default CountdownFlipNumbers;
+export default CountdownFlipNumbersHome;

@@ -3,9 +3,10 @@ import "../ui/AuctionSidebar.css";
 import Countdown from "react-countdown";
 import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { publicAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import Loading from "../loading/Loading";
+import { useAppSelector } from "../../redux/hooks";
 
 const renderer = ({ days, hours, minutes, seconds }: any) => {
   return (
@@ -36,13 +37,16 @@ const AllAuctions = ({
   filteredConditions,
 }: any) => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [ongoingComics, setOngoingComics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchComics = async () => {
       try {
-        const response = await publicAxios.get("/auction");
+        const response = isLoggedIn
+          ? await privateAxios.get("/auction/exclude-user")
+          : await publicAxios.get("/auction");
         const data = response.data;
         console.log("Available Comics:", data);
 
@@ -79,27 +83,26 @@ const AllAuctions = ({
   //     return genreMatch && authorMatch && titleMatch && conditionMatch;
   // });
 
-
-
-
   const filteredComics = ongoingComics.filter((comic) => {
     const genreMatch =
-      filteredGenres.length === 0 || 
-      (comic.comics.genres && comic.comics.genres.some((genre) => filteredGenres.includes(genre.name)));
+      filteredGenres.length === 0 ||
+      (comic.comics.genres &&
+        comic.comics.genres.some((genre) =>
+          filteredGenres.includes(genre.name)
+        ));
 
-    const authorMatch = 
-      filteredAuthors.length === 0 || 
+    const authorMatch =
+      filteredAuthors.length === 0 ||
       filteredAuthors.includes(comic.comics.author);
 
-    const conditionMatch = 
-      filteredConditions.length === 0 || 
+    const conditionMatch =
+      filteredConditions.length === 0 ||
       filteredConditions.includes(comic.comics.condition);
 
     return genreMatch && authorMatch && conditionMatch;
   });
 
-   if (loading) return <Loading />;
-
+  if (loading) return <Loading />;
 
   return (
     <div className="mb-10 REM">
@@ -127,7 +130,7 @@ const AllAuctions = ({
                 size="medium"
               />
               <p className="endtime">KẾT THÚC TRONG</p>
-              <Countdown date={Date.now() + 100000000} renderer={renderer} />
+              <Countdown date={new Date(comic.endTime)} renderer={renderer} />
               <Button
                 className="detail-button"
                 onClick={() => handleDetailClick(comic.id)}

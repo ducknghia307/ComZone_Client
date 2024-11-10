@@ -7,8 +7,9 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Countdown from "react-countdown";
 import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { publicAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
+import { useAppSelector } from "../../redux/hooks";
 
 const responsive = {
   superLargeDesktop: {
@@ -88,14 +89,18 @@ const renderer = ({ days, hours, minutes, seconds }: any) => {
 
 const Auctions: React.FC = () => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [comics, setComics] = useState<any[]>([]);
   const [ongoingComics, setOngoingComics] = useState<any[]>([]);
+  console.log("ongoingComics", ongoingComics);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchComics = async () => {
       try {
-        const response = await publicAxios.get("/auction");
+        const response = isLoggedIn
+          ? await privateAxios.get("/auction/exclude-user")
+          : await publicAxios.get("/auction");
         const data = response.data;
         console.log("Available Comics:", data);
 
@@ -105,7 +110,6 @@ const Auctions: React.FC = () => {
         console.log("Auction Comics:", auctionComics);
 
         setOngoingComics(auctionComics);
-        console.log("ongoingComics", ongoingComics);
       } catch (error) {
         console.error("Error fetching comics:", error);
       } finally {
@@ -163,7 +167,7 @@ const Auctions: React.FC = () => {
                   size="medium"
                 />
                 <p className="endtime">KẾT THÚC TRONG</p>
-                <Countdown date={Date.now() + 100000000} renderer={renderer} />
+                <Countdown date={new Date(comic.endTime)} renderer={renderer} />
                 <Button
                   className="detail-button"
                   onClick={() => handleDetailClick(comic.id)}

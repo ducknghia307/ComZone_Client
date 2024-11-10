@@ -27,6 +27,21 @@ const SellerManagement = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const handleViewMore = (comic) => {
+    // Logic for viewing more details about the comic
+    console.log("View more details for", comic);
+  };
+
+  const handleSell = (comic) => {
+    // Logic for setting the comic for sale
+    console.log("Set comic for sale", comic);
+  };
+
+  const handleAuction = (comic) => {
+    // Logic for starting an auction for the comic
+    console.log("Start auction for", comic);
+  };
+
   useEffect(() => {
     // Gọi API để lấy danh sách comics và genres
     Promise.all([
@@ -111,7 +126,6 @@ const SellerManagement = () => {
       align: "center",
       renderCell: (params) => {
         const genres = params.row.genres;
-        console.log("Genres params:", genres);
         return <span>{getGenreNames(genres)}</span>;
       },
     },
@@ -131,6 +145,52 @@ const SellerManagement = () => {
       headerClassName: "custom-header",
       headerAlign: "center",
       align: "center",
+      renderCell: (params) => {
+        const statusMap: Record<string, string> = {
+          AVAILABLE: "Khả dụng",
+          UNAVAILABLE: "Không khả dụng",
+          SOLD: "Đã bán",
+          EXCHANGE: "Đổi",
+          AUCTION: "Đấu giá",
+        };
+
+        const status = statusMap[params.value] || "N/A";
+
+        // Check if the status is "Không khả dụng"
+        if (status === "Không khả dụng") {
+          return (
+            <div>
+              <div>
+                {/* <Button
+                  variant="outlined"
+                  color="primary"
+                  sx={{ marginRight: 1 }}
+                  onClick={() => handleViewMore(params.row)}
+                >
+                  Xem thêm
+                </Button> */}
+                <Button
+                  variant="contained"
+                  color="success"
+                  sx={{ marginRight: 1 }}
+                  onClick={() => handleSell(params.row)}
+                >
+                  Chọn bán
+                </Button>
+                <Button
+                  variant="contained"
+                  color="info"
+                  onClick={() => handleAuction(params.row)}
+                >
+                  Đấu giá
+                </Button>
+              </div>
+            </div>
+          );
+        }
+
+        return <span>{status}</span>;
+      },
     },
     {
       field: "actions",
@@ -281,13 +341,9 @@ const SellerManagement = () => {
   };
 
   const currentUrl = window.location.pathname;
-  console.log('URL', currentUrl)
+  console.log("URL", currentUrl);
 
-  return (
-    <div className="seller-container">
-      {renderContent()}
-    </div>
-  );
+  return <div className="seller-container">{renderContent()}</div>;
 };
 
 export default SellerManagement;

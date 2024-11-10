@@ -20,13 +20,13 @@ export const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
-    updateChatRoomList: (state, action: PayloadAction<ChatRoom[]>) => {
+    setChatRoomList: (state, action: PayloadAction<ChatRoom[]>) => {
       state.currentChatRoomList = action.payload;
     },
-    updateSelectedChatRoom: (state, action: PayloadAction<ChatRoom>) => {
+    setCurrentlySelectedRoom: (state, action: PayloadAction<ChatRoom>) => {
       state.currentlySelectedRoom = action.payload;
     },
-    updateMessageList: (state, action: PayloadAction<MessageGroup[]>) => {
+    setMessageList: (state, action: PayloadAction<MessageGroup[]>) => {
       state.currentMessageList = action.payload;
     },
     reset: (state) => {
@@ -38,7 +38,11 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { updateChatRoomList, updateSelectedChatRoom, updateMessageList } =
-  chatSlice.actions;
+export const {
+  setChatRoomList,
+  setCurrentlySelectedRoom,
+  setMessageList,
+  reset,
+} = chatSlice.actions;
 
 export default chatSlice.reducer;

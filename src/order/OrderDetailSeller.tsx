@@ -32,8 +32,14 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     }
 }));
 
-const StatusChip = styled('span')<{ status: string }>(({ theme, status }) => {
+const StatusChip = styled('span')<{ status: string; deliveryStatus?: string }>(({ theme, status, deliveryStatus }) => {
     const getStatusColor = () => {
+        if (status === 'PACKAGING' && deliveryStatus === 'ready_to_pick') {
+            return {
+                color: '#7c4af2',
+                backgroundColor: '#e0d4fc',
+            };
+        }
         switch (status) {
             case 'PENDING':
                 return {
@@ -88,34 +94,36 @@ interface OrderDetailProps {
     open: boolean;
     onClose: () => void;
     orderId: string;
+    onStatusUpdate: (orderId: string, newStatus: string, deliveryStatus?: string) => void; 
+    order: OrderDetailData | undefined;
 }
 
-const InfoSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => {
-    const theme = useTheme();
+// const InfoSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => {
+//     const theme = useTheme();
 
-    return (
-        <StyledPaper>
-            <Stack spacing={2}>
-                <Box display="flex" alignItems="center" gap={1}>
-                    <Box
-                        sx={{
-                            color: theme.palette.primary.main,
-                            backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                            padding: 1,
-                            borderRadius: '50%'
-                        }}
-                    >
-                        {icon}
-                    </Box>
-                    <Typography variant="h6" fontWeight={600} color="primary">
-                        {title}
-                    </Typography>
-                </Box>
-                <Box>{children}</Box>
-            </Stack>
-        </StyledPaper>
-    );
-};
+//     return (
+//         <StyledPaper>
+//             <Stack spacing={2}>
+//                 <Box display="flex" alignItems="center" gap={1}>
+//                     <Box
+//                         sx={{
+//                             color: theme.palette.primary.main,
+//                             backgroundColor: alpha(theme.palette.primary.main, 0.1),
+//                             padding: 1,
+//                             borderRadius: '50%'
+//                         }}
+//                     >
+//                         {icon}
+//                     </Box>
+//                     <Typography variant="h6" fontWeight={600} color="primary">
+//                         {title}
+//                     </Typography>
+//                 </Box>
+//                 <Box>{children}</Box>
+//             </Stack>
+//         </StyledPaper>
+//     );
+// };
 
 const InfoRow = ({ label, value, isPaid }: { label: string; value: string | number; isPaid?: boolean; }) => {
     const theme = useTheme();
@@ -202,7 +210,10 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
         }
     }, [open, orderId]);
 
-    const translateStatus = (status: string) => {
+    const translateStatus = (status: string, deliveryStatus?: string) => {
+        if (status === 'PACKAGING' && deliveryStatus === 'ready_to_pick') {
+            return 'Hoàn tất đóng gói';
+        }
         switch (status) {
             case 'PENDING':
                 return 'Đang chờ xử lý';
@@ -233,34 +244,41 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                         : `/orders/status/finish-packaging/${orderId}`;
 
                 const response = await privateAxios.post(endpoint);
-                let newStatus = actionType === "start" ? "PACKAGING" : "DELIVERING";
 
-                // Update order status if finish-packaging was successful
-                if (actionType === "finish" && response.status === 400) {
-                    alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
+                if (actionType === "start") {
+                    onStatusUpdate(orderId, "PACKAGING");
+                    setOrderDetail(prev => prev ? { ...prev, status: "PACKAGING" } : null);
+                } else if (actionType === "finish") {
+                    if (response.status === 400) {
+                        alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
 
-                    // Cancel the order
-                    await privateAxios.patch("/orders/cancel", {
-                        orderId: orderId,
-                        cancelReason: "Đơn hàng gặp lỗi, cần hủy."
-                    });
-                    onStatusUpdate(orderId, "CANCELED"); // Update status to CANCELED
-
-                    alert("Đơn hàng đã được hủy thành công.");
-                } else {
-                    onStatusUpdate(orderId, newStatus); // Update status to PACKAGING or DELIVERING
-                    alert("Trạng thái đơn hàng đã được cập nhật thành công.");
+                        await privateAxios.patch("/orders/cancel", {
+                            orderId: orderId,
+                            cancelReason: "Đơn hàng gặp lỗi, cần hủy."
+                        });
+                        onStatusUpdate(orderId, "CANCELED");
+                        setOrderDetail(prev => prev ? { ...prev, status: "CANCELED" } : null);
+                        alert("Đơn hàng đã được hủy thành công.");
+                    } else {
+                        onStatusUpdate(orderId, "PACKAGING", "ready_to_pick");
+                        setOrderDetail(prev => prev ? {
+                            ...prev,
+                            status: "PACKAGING",
+                            delivery_status: "ready_to_pick"
+                        } : null);
+                        alert("Trạng thái đơn hàng đã được cập nhật thành công.");
+                    }
                 }
-            } catch (error) {
-                if (actionType === "finish" && error.response && error.response.status === 400) {
+            } catch (error : any) {
+                if (actionType === "finish" && error.response?.status === 400) {
                     alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
-
                     try {
                         await privateAxios.patch("/orders/cancel", {
                             orderId: orderId,
-                            cancelReason: "Shipper bị thủng lốp."
+                            cancelReason: "Đơn hàng gặp lỗi, cần hủy."
                         });
-                        onStatusUpdate(orderId, "CANCELED"); // Update status to CANCELED
+                        onStatusUpdate(orderId, "CANCELED");
+                        setOrderDetail(prev => prev ? { ...prev, status: "CANCELED" } : null);
                         alert("Đơn hàng đã được hủy thành công.");
                     } catch (cancelError) {
                         console.error("Error cancelling the order:", cancelError);
@@ -295,8 +313,11 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                 }}
             >
                 <Box display="flex" justifyContent="space-between" alignItems="center" >
-                    <StatusChip status={orderDetail.status}>
-                        {translateStatus(orderDetail.status)}
+                <StatusChip 
+                        status={orderDetail.status} 
+                        deliveryStatus={orderDetail.deliveryStatus}
+                    >
+                        {translateStatus(orderDetail.status, orderDetail.deliveryStatus)}
                     </StatusChip>
                     <Typography
                         variant="h5"
@@ -489,7 +510,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                         Xác nhận đơn hàng
                     </Button>
                 )}
-                {(orderDetail.status === 'PACKAGING') && (
+                {(orderDetail.status === 'PACKAGING' && orderDetail.deliveryStatus !== 'ready_to_pick') && (
                     <Button
                         sx={{ backgroundColor: '#4A4A4A', color: '#fff', padding: '5px 20px', fontWeight: 'bold' }}
                         onClick={() => handleConfirmAction("finish")}

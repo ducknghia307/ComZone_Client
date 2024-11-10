@@ -55,7 +55,10 @@ const OrderManagement = () => {
         setSelectedOrderId(null);
     };
 
-    const translateStatus = (status: string) => {
+    const translateStatus = (status: string, deliveryStatus?: string) => {
+        if (status === 'PACKAGING' && deliveryStatus === 'ready_to_pick') {
+            return 'Hoàn tất đóng gói';
+        }
         switch (status) {
             case 'PENDING':
                 return 'Đang chờ xử lý';
@@ -72,12 +75,22 @@ const OrderManagement = () => {
         }
     };
 
-    const getStatusChipStyles = (status: string) => {
+    const getStatusChipStyles = (status: string, deliveryStatus?: string) => {
+        if (status === 'PACKAGING' && deliveryStatus === 'ready_to_pick') {
+            return {
+                color: '#7c4af2',
+                backgroundColor: '#e0d4fc',
+                borderRadius: '8px',
+                padding: '8px 20px',
+                fontWeight: 'bold',
+                display: 'inline-block',
+            };
+        }
         switch (status) {
             case 'PENDING':
                 return {
-                    color: '#ff9800',
-                    backgroundColor: '#fff3e0',
+                    color: '#f89b28',
+                    backgroundColor: '#fff2c9',
                     borderRadius: '8px',
                     padding: '8px 20px',
                     fontWeight: 'bold',
@@ -85,8 +98,8 @@ const OrderManagement = () => {
                 };
             case 'DELIVERED':
                 return {
-                    color: '#32CD32',
-                    backgroundColor: '#ccfccc',
+                    color: '#ffffff',
+                    backgroundColor: '#4CAF50',
                     borderRadius: '8px',
                     padding: '8px 20px',
                     fontWeight: 'bold',
@@ -103,8 +116,8 @@ const OrderManagement = () => {
                 };
             case 'DELIVERING':
                 return {
-                    color: '#2196f3',
-                    backgroundColor: '#e3f2fd',
+                    color: '#52a7bf',
+                    backgroundColor: '#daf4ff',
                     borderRadius: '8px',
                     padding: '8px 20px',
                     fontWeight: 'bold',
@@ -122,14 +135,19 @@ const OrderManagement = () => {
         }
     };
 
-    const handleStatusUpdate = (orderId: string, newStatus: string) => {
+    const handleStatusUpdate = (orderId: string, newStatus: string, deliveryStatus?: string) => {
         setOrders((prevOrders) =>
             prevOrders.map((order) =>
-                order.id === orderId ? { ...order, status: newStatus } : order
+                order.id === orderId
+                    ? {
+                        ...order,
+                        status: newStatus,
+                        deliveryStatus: deliveryStatus || order.deliveryStatus
+                    }
+                    : order
             )
         );
     };
-
 
     return (
         <div className='seller-container' style={{ width: '100%', overflow: 'hidden', padding: '10px 10px 0 10px' }}>
@@ -160,8 +178,8 @@ const OrderManagement = () => {
                                     {order.paymentMethod === 'WALLET' ? 'Ví Comzone' : order.paymentMethod}
                                 </TableCell>
                                 <TableCell align="center">
-                                    <span style={getStatusChipStyles(order.status)}>
-                                        {translateStatus(order.status)}
+                                    <span style={getStatusChipStyles(order.status, order.deliveryStatus)}>
+                                        {translateStatus(order.status, order.deliveryStatus)}
                                     </span>
                                 </TableCell>
                                 <TableCell align="center">

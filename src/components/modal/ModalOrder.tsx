@@ -40,17 +40,13 @@ const ModalOrder: React.FC<ModalOrderProps> = ({ open, onClose }) => {
         onClose();
     };
 
-    const handleBack = () => {
-        setOpenFeedback(false);
-    };
-
     const handleRemoveImage = (index: number) => {
         setImages(prevImages => prevImages.filter((_, i) => i !== index));
     };
 
     return (<>
 
-        <ModalFeedbackSeller open={openFeedback} onClose={handleCloseFeedback} onBack={handleBack} />
+        <ModalFeedbackSeller open={openFeedback} onClose={handleCloseFeedback} />
         <Dialog
             open={open}
             onClose={onClose}
@@ -102,7 +98,7 @@ const ModalOrder: React.FC<ModalOrderProps> = ({ open, onClose }) => {
                     <div style={{ display: 'flex', marginTop: '10px' }}>
                         <Typography sx={{ fontSize: '18px', fontWeight: 'bold', marginRight: '8px' }}>Ảnh truyện cụ thể</Typography>
                         <Typography sx={{ fontSize: '18px' }}>(tùy chọn): tối đa 5 ảnh</Typography>
-                    </div>                    
+                    </div>
                     <input
                         accept="image/*"
                         type="file"

@@ -29,6 +29,10 @@ import AllHotComics from "../../pages/HotComic";
 import ComicZoneMembership from "../membership/ComicZoneMembership";
 import NotFound from "../notFound/NotFound";
 import CurrentUserRecentAct from "../../pages/CurrentUserRecentAct";
+import CurrentUserHistoryExchange from "../../pages/CurrentUserHistoryExchange";
+import CurrentUserComicExchange from "../../pages/CurrentUserComicExchange";
+import CurrentUserPostExchange from "../../pages/CurrentUserPostExchange";
+import CurrentUserComicSelling from "../../pages/CurrentUserComicSelling";
 
 const AppRouter = () => {
   return (
@@ -77,6 +81,22 @@ const AppRouter = () => {
         <Route
           path="/profile/recentActivities"
           element={<CurrentUserRecentAct />}
+        />
+        <Route
+          path="/profile/historyExchange"
+          element={<CurrentUserHistoryExchange />}
+        />
+        <Route
+          path="/profile/comicExchange"
+          element={<CurrentUserComicExchange />}
+        />
+        <Route
+          path="/profile/postExchange"
+          element={<CurrentUserPostExchange />}
+        />
+        <Route
+          path="/profile/comicSelling"
+          element={<CurrentUserComicSelling />}
         />
         <Route path="/membership" element={<ComicZoneMembership />} />
 

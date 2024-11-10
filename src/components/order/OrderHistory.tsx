@@ -4,10 +4,11 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import "../ui/OrderHistory.css";
-import ModalOrder from "../modal/ModalOrder";
+// import ModalOrder from "../modal/ModalOrder";
 import { privateAxios } from "../../middleware/axiosInstance";
 import OrderDetailsModal from "../modal/OrderDetailModal";
 import { Comic } from "../../common/base.interface";
+import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
 
 interface Order {
   id: number;
@@ -30,6 +31,9 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [openModal, setOpenModal] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [selectedSellerName, setSelectedSellerName] = useState<string | null>(null);
+  const [selectedSellerId, setSelectedSellerId] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const [isOrderDetailsOpen, setOrderDetailsOpen] = useState(false);
   //   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
@@ -72,17 +76,65 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDING":
-        return "#f28144";
+        return {
+          color: '#f89b28',
+          backgroundColor: '#fff2c9',
+          borderRadius: '8px',
+          padding: '8px 20px',
+          fontWeight: 'bold',
+          display: 'inline-block',
+          fontFamily: "REM"
+        };
       case "PACKAGING":
-        return "#fc65fc";
+        return {
+          color: '#ff6b1c',
+          backgroundColor: '#ffe8db',
+          borderRadius: '8px',
+          padding: '8px 20px',
+          fontWeight: 'bold',
+          display: 'inline-block',
+          fontFamily: "REM"
+        };
       case "DELIVERING":
-        return "#28bacf";
+        return {
+          color: '#52a7bf',
+          backgroundColor: '#daf4ff',
+          borderRadius: '8px',
+          padding: '8px 20px',
+          fontWeight: 'bold',
+          display: 'inline-block',
+          fontFamily: "REM"
+        };
       case "DELIVERED":
-        return "#32CD32";
+        return {
+          color: '#ffffff',
+          backgroundColor: '#4CAF50',
+          borderRadius: '8px',
+          padding: '8px 20px',
+          fontWeight: 'bold',
+          display: 'inline-block',
+          fontFamily: "REM"
+        };
       case "COMPLETED":
-        return "#228B22";
+        return {
+          color: '#fef6c7',
+          backgroundColor: '#395f18',
+          borderRadius: '8px',
+          padding: '8px 20px',
+          fontWeight: 'bold',
+          display: 'inline-block',
+          fontFamily: "REM"
+        };
       case "CANCELED":
-        return "#FF4500";
+        return {
+          color: '#e91e63',
+          backgroundColor: '#fce4ec',
+          borderRadius: '8px',
+          padding: '8px 20px',
+          fontWeight: 'bold',
+          display: 'inline-block',
+          fontFamily: "REM"
+        };
       default:
         return "#000";
     }
@@ -107,12 +159,17 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     }
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (sellerName: string, sellerId: string, userId: string) => {
+    setSelectedSellerName(sellerName);
+    setSelectedSellerId(sellerId);
+    setSelectedUserId(userId);
     setOpenModal(true);
+
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setSelectedSellerName(null);
   };
 
   const openOrderDetailsModal = (order: Order) => {
@@ -145,10 +202,10 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         ].map((status) => (
           <span
             key={status}
-            className={`status-tab ${
-              selectedStatus === status ? "active" : ""
-            }`}
+            className={`status-tab REM ${selectedStatus === status ? "active" : ""
+              }`}
             onClick={() => setSelectedStatus(status)}
+            style={{ whiteSpace: "nowrap" }}
           >
             {getStatusText(status)}
           </span>
@@ -164,7 +221,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           placeholder="Tìm kiếm theo tên Shop, ID đơn hàng hoặc Tên Sản phẩm"
           InputProps={{
             disableUnderline: true,
-            sx: { "& fieldset": { border: "none" } },
+            sx: { "& fieldset": { border: "none", fontFamily: "REM" } },
           }}
         />
       </div>
@@ -183,17 +240,17 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           >
             <div className="status-content" style={{ padding: "10px 30px" }}>
               <div className="status-content-detail">
-                <StoreOutlinedIcon style={{ fontSize: 35 }} />
-                <Typography sx={{ fontSize: "20px" }}>
+                <StoreOutlinedIcon style={{ fontSize: 28 }} />
+                <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
                   {order.items[0].comics.sellerId.name || "N/A"}
                 </Typography>
                 <div style={{ marginLeft: "20px" }} className="chat-button">
                   <ChatOutlinedIcon />
-                  <Typography>Chat</Typography>
+                  <Typography sx={{ fontFamily: "REM" }}>Chat</Typography>
                 </div>
                 <div style={{ marginLeft: "10px" }} className="shop-button">
                   <StoreOutlinedIcon />
-                  <Typography>Xem Shop</Typography>
+                  <Typography sx={{ fontFamily: "REM" }}>Xem Shop</Typography>
                 </div>
               </div>
               <Typography
@@ -201,7 +258,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                   margin: "auto 0",
                   paddingRight: "20px",
                   color: getStatusColor(order.status),
-                  fontSize: "20px",
+                  fontSize: "16px",
                 }}
               >
                 {getStatusText(order.status)}
@@ -238,10 +295,10 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
 
                   {/* Tên và giá sản phẩm */}
                   <div>
-                    <Typography sx={{ fontSize: "20px", fontWeight: "bold" }}>
+                    <Typography sx={{ fontSize: "20px", fontWeight: "500", fontFamily: "REM" }}>
                       {item.comics.title}
                     </Typography>
-                    <Typography sx={{ fontSize: "18px" }}>x1</Typography>
+                    <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>x1</Typography>
                   </div>
 
                   <div
@@ -251,7 +308,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                       alignItems: "center",
                     }}
                   >
-                    <Typography sx={{ fontSize: "20px" }}>
+                    <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
                       {Number(item.comics.price).toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
@@ -272,8 +329,8 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                 alignItems: "center",
               }}
             >
-              <Typography sx={{ fontSize: "20px" }}>Thành tiền: </Typography>
-              <Typography sx={{ fontSize: "28px", color: "#f77157" }}>
+              <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>Thành tiền: </Typography>
+              <Typography sx={{ fontSize: "28px", color: "#f77157", fontFamily: "REM" }}>
                 {Number(order.totalPrice).toLocaleString("vi-VN", {
                   style: "currency",
                   currency: "VND",
@@ -306,6 +363,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                         border: "1px solid black",
                         fontWeight: "bold",
                         fontSize: "16px",
+                        fontFamily: "REM",
                       }}
                       onClick={() => openOrderDetailsModal(order)}
                     >
@@ -327,8 +385,9 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                         backgroundColor: "#00BFA6",
                         fontWeight: "bold",
                         fontSize: "16px",
+                        fontFamily: "REM",
                       }}
-                      onClick={handleOpenModal}
+                      onClick={() => handleOpenModal(order.items[0].comics.sellerId.name || "N/A", order.items[0].comics.sellerId.id, order.user.id)}
                     >
                       Đã Nhận Được Hàng
                     </Button>
@@ -338,6 +397,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                         backgroundColor: "#FFB74D",
                         fontWeight: "bold",
                         fontSize: "16px",
+                        fontFamily: "REM",
                       }}
                     >
                       Chưa Nhận Được Hàng
@@ -360,6 +420,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                       fontWeight: "bold",
                       fontSize: "16px",
                       padding: "5px 20px",
+                      fontFamily: "REM",
                     }}
                     onClick={() => openOrderDetailsModal(order)}
                   >
@@ -368,10 +429,6 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                 </div>
               )}
             </div>
-
-            {/* Modal đã nhận được hàng*/}
-            <ModalOrder open={openModal} onClose={handleCloseModal} />
-
             {/* Modal xem chi tiết*/}
             <OrderDetailsModal
               open={isOrderDetailsOpen}
@@ -380,6 +437,14 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
             />
           </div>
         ))}
+        {/* Modal đã nhận được hàng*/}
+        <ModalFeedbackSeller
+          open={openModal}
+          onClose={handleCloseModal}
+          sellerName={selectedSellerName}
+          sellerId={selectedSellerId} // Truyền sellerId
+          userId={selectedUserId}
+        />
       </div>
     </div>
   );

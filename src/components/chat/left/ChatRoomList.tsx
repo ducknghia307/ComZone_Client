@@ -5,11 +5,11 @@ import { Avatar } from "antd";
 
 export default function ChatRoomList({
   chatRoomList,
-  selectedChatRoom,
+  currentSelectedRoom,
   handleSelectChatRoom,
 }: {
   chatRoomList: ChatRoom[] | [];
-  selectedChatRoom: ChatRoom | null;
+  currentSelectedRoom: ChatRoom | null;
   handleSelectChatRoom: Function;
 }) {
   const [isDisplayedDefault, setIsDisplayedDefault] = useState<boolean>(true);
@@ -17,10 +17,10 @@ export default function ChatRoomList({
     <div
       className={`${
         isDisplayedDefault ? "w-[25em]" : "w-fit"
-      } pr-4 border-r border-gray-300 transition-all duration-300`}
+      }  border-r border-gray-300 transition-all duration-300 overflow-y-auto relative`}
     >
       <div
-        className={`flex items-center ${
+        className={`flex items-center sticky top-0 bg-white z-10 ${
           isDisplayedDefault ? "justify-between" : "justify-center pb-4"
         }`}
       >
@@ -70,7 +70,7 @@ export default function ChatRoomList({
         </button>
       </div>
 
-      <div className="w-full flex flex-col gap-1">
+      <div className="w-full flex flex-col justify-start gap-1">
         {chatRoomList.map((chatRoom: ChatRoom) => {
           const user = chatRoom.secondUser;
           return (
@@ -82,10 +82,10 @@ export default function ChatRoomList({
                   ? "justify-start pl-2 rounded-lg"
                   : "justify-center px-2 rounded-lg"
               } ${
-                selectedChatRoom?.id === chatRoom.id
+                currentSelectedRoom?.id === chatRoom.id
                   ? "bg-sky-50"
                   : "duration-200 hover:bg-gray-100"
-              } w-full h-20 flex items-center gap-4`}
+              } w-full min-h-20 max-h-32 flex items-center gap-4`}
             >
               <Avatar
                 src={user.avatar}
@@ -94,16 +94,18 @@ export default function ChatRoomList({
               <div
                 className={`${
                   !isDisplayedDefault && "hidden"
-                } flex flex-col items-start justify-center gap-1`}
+                } flex flex-col items-start justify-center text-start gap-1`}
               >
-                <p className="text-md font-semibold">{user.name}</p>
+                <p className="max-w-[10em] text-md font-semibold line-clamp-1">
+                  {user.name}
+                </p>
                 <span
                   className={`${
                     !chatRoom.lastMessage && "hidden"
                   } flex items-center gap-2 text-start font-light`}
                 >
                   <p
-                    className={`line-clamp-1 max-w-[14em] ${
+                    className={`line-clamp-1 max-w-[8em] break-words ${
                       !chatRoom.lastMessage?.isRead &&
                       !chatRoom.lastMessage?.mine &&
                       "font-semibold"

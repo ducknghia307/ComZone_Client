@@ -2,38 +2,17 @@ import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import "../ui/AuctionDetail.css";
 import { Button, Typography } from "@mui/material";
-import Countdown from "react-countdown";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import { useParams } from "react-router-dom";
 import { publicAxios } from "../../middleware/axiosInstance";
 import ComicsDescription from "../comic/comicDetails/ComicsDescription";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import socket from "../../services/socket";
+import { setAuctionData } from "../../redux/features/auction/auctionSlice";
+import CountdownFlipNumbers from "./CountDown";
+import CountUp from "react-countup";
 
 // Countdown renderer function
-const renderer = ({
-  days,
-  hours,
-  minutes,
-  seconds,
-}: Record<string, number>) => (
-  <div className="countdown">
-    <div className="time-box">
-      <span className="time">{days.toString().padStart(2, "0")}</span>
-      <span className="label1">Ngày</span>
-    </div>
-    <div className="time-box">
-      <span className="time">{hours.toString().padStart(2, "0")}</span>
-      <span className="label1">Giờ</span>
-    </div>
-    <div className="time-box">
-      <span className="time">{minutes.toString().padStart(2, "0")}</span>
-      <span className="label1">Phút</span>
-    </div>
-    <div className="time-box">
-      <span className="time">{seconds.toString().padStart(2, "0")}</span>
-      <span className="label1">Giây</span>
-    </div>
-  </div>
-);
 
 const ComicAuction = () => {
   const { id } = useParams<Record<string, string>>(); // Get ID from URL
@@ -41,21 +20,27 @@ const ComicAuction = () => {
   const [users, setUsers] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState<string>("");
-  const [auctionData, setAuctionData] = useState<any>(null);
+  const auctionData = useAppSelector((state: any) => state.auction.auctionData);
+  console.log("121", auctionData);
   const [previewChapter, setPreviewChapter] = useState<string[]>([]);
   const [bidAmount, setBidAmount] = useState<string>("");
+
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    console.log("Updated auctionData:", auctionData);
+  }, [auctionData]); // This will log auctionData every time it is updated
 
   useEffect(() => {
     const fetchComicDetails = async () => {
       try {
         const response = await publicAxios.get(`/auction/${id}`);
-        console.log(response.data);
+        console.log(":", response.data);
         const comicData = response.data.comics;
         setUsers(comicData.sellerId); // Assuming sellerId contains user details
         setComic(comicData);
         setMainImage(comicData.coverImage);
         setPreviewChapter(comicData.previewChapter || []);
-        setAuctionData(response.data);
+        dispatch(setAuctionData(response.data));
       } catch (error) {
         console.error("Error fetching comic details:", error);
       } finally {
@@ -65,6 +50,19 @@ const ComicAuction = () => {
     fetchComicDetails();
   }, [id]);
 
+  useEffect(() => {
+    socket.on("bidUpdate", (data: any) => {
+      // Update auction data with the new bid
+      console.log("123123", data.placeBid.auction);
+
+      dispatch(setAuctionData(data.placeBid.auction)); // Dispatch to Redux
+    });
+
+    // Cleanup listener on component unmount
+    return () => {
+      socket.off("bidUpdate");
+    };
+  }, [auctionData?.id, dispatch]);
   if (loading) return <p>Loading comic details...</p>;
   if (!comic) return <p>Comic not found.</p>;
 
@@ -73,7 +71,27 @@ const ComicAuction = () => {
   };
 
   const handleBidInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBidAmount(e.target.value);
+    setBidAmount(e.target.value); // Only update the bidAmount state
+  };
+
+  const handlePlaceBid = async () => {
+    console.log("123");
+    // Create bid payload
+    const bidPayload = {
+      auctionId: auctionData.id,
+      userId: users.id,
+      price: parseFloat(bidAmount),
+    };
+
+    // Emit bid data via socket
+    socket.emit("placeBid", bidPayload);
+
+    try {
+      // If the bid is successful, update the state and make the API request
+      // dispatch(placeBid({ current_bid: bidPayload.price }));
+    } catch (error) {
+      console.error("Error placing bid:", error);
+    }
   };
 
   return (
@@ -122,14 +140,24 @@ const ComicAuction = () => {
         <Grid size={5} className="auction-info">
           <div className="timer">
             <p>KẾT THÚC TRONG:</p>
-            <Countdown
-              date={new Date(comic.endDate).getTime()}
-              renderer={renderer}
+            <CountdownFlipNumbers
+              startTime={auctionData.startTime}
+              endTime={auctionData.endTime}
             />
+
             <div className="current-price">
               <div className="current-price1">
                 <p>Giá hiện tại</p>
-                <h2>{auctionData.reservePrice.toLocaleString("vi-VN")}₫</h2>
+                <CountUp
+                  start={
+                    auctionData.currentPrice - auctionData.currentPrice / 2
+                  } // Start from the previous price
+                  end={auctionData.currentPrice} // The current price to animate to
+                  duration={1} // Duration of the animation in seconds
+                  separator="." // Optional: Add thousands separator
+                  decimals={0} // Optional: Set the number of decimals
+                  suffix="₫" // Optional: Add a suffix (e.g., "₫")
+                />
               </div>
               <div className="current-price2">
                 <p>Lượt đấu giá</p>
@@ -155,7 +183,7 @@ const ComicAuction = () => {
               Giá đấu tối thiểu tiếp theo:{" "}
               {auctionData &&
                 (
-                  auctionData.reservePrice + auctionData.priceStep
+                  auctionData.currentPrice + auctionData.priceStep
                 ).toLocaleString("vi-VN")}
               ₫
             </p>
@@ -167,7 +195,11 @@ const ComicAuction = () => {
                 value={bidAmount}
                 onChange={handleBidInputChange}
               />
-              <Button variant="contained" className="bid-button">
+              <Button
+                variant="contained"
+                className="bid-button"
+                onClick={handlePlaceBid}
+              >
                 RA GIÁ
               </Button>
             </div>

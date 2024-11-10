@@ -5,6 +5,7 @@ import { persistReducer, persistStore, Persistor } from "redux-persist";
 import { encryptTransform } from "redux-persist-transform-encrypt";
 import autoMergeLevel2 from "redux-persist/es/stateReconciler/autoMergeLevel2";
 import navigateReducer from "./features/navigate/navigateSlice";
+import auctionReducer from "./features/auction/auctionSlice";
 
 // Encryption transformer for the auth slice only
 const rootPersistConfig = {
@@ -20,12 +21,13 @@ const rootPersistConfig = {
       },
     }),
   ],
-  whitelist: ["auth","navigate"], // Persist only the 'auth' slice
+  whitelist: ["auth", "navigate", "auction"], // Persist only the 'auth' slice
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
   navigate: navigateReducer, // Add other reducers here as needed
+  auction: auctionReducer,
 });
 
 // Typing for RootState and AppDispatch

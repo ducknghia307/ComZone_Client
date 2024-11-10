@@ -15,10 +15,8 @@ import RecommendedComicsList from "./comicDetails/RecommendedComicsList";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { message } from "antd";
 import { callbackUrl } from "../../redux/features/navigate/navigateSlice";
-import ChatModal from "../../pages/ChatModal";
 
 export default function ComicsDetailTemp() {
-  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const [currentComics, setCurrentComics] = useState<Comic>();
   const [seller, setSeller] = useState<UserInfo>();
   const [imageList, setImageList] = useState<string[]>([]);
@@ -29,22 +27,18 @@ export default function ComicsDetailTemp() {
     Comic[] | []
   >([]);
   const [hasMore, setHasMore] = useState(true);
-  // const accessToken = useAppSelector((state) => state.auth.accessToken);
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
   const dispatch = useAppDispatch();
-  const [userInfo, setUserInfo] = useState<UserInfo>();
   // const [recommendedList, setRecommendedList] = useState<Comic[] | []>([]);
-  const [isInCart, setIsInCart] = useState<boolean>(false);
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const { id } = useParams();
   // const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
-
   const fetchCurrentComics = async () => {
     await privateAxios
       .get(`/comics/${id}`)
       .then(async (res) => {
+        console.log(res.data);
         setCurrentComics(res.data);
         setSeller(res.data.sellerId);
         const images = [res.data.coverImage, ...res.data.previewChapter];
@@ -59,66 +53,32 @@ export default function ComicsDetailTemp() {
       })
       .catch((err) => console.log(err));
   };
-  const fetchUserInfo = async () => {
-    try {
-      const res = await privateAxios("/users/profile");
-      setUserInfo(res.data);
-    } catch (error) {
-      console.log("Error to fetch user information:", error);
-    }
-  };
-  const checkIsInCart = () => {
-    const cartKey = "cart";
-    const userId = userInfo?.id;
-
-    if (userId) {
-      const allCarts = JSON.parse(localStorage.getItem(cartKey) || "{}");
-      const userCart = allCarts[userId] || [];
-
-      const exists = userCart.some((comic: Comic) => comic.id === id);
-      setIsInCart(exists);
-    }
-  };
-  const handleBuyNow = async () => {
-    if (!currentComics) return;
-
-    sessionStorage.setItem(
-      "selectedComics",
-      JSON.stringify({
-        [currentComics.sellerId?.id]: {
-          sellerName: currentComics.sellerId?.name,
-          comics: [{ comic: currentComics, quantity: 1 }],
-        },
-      })
-    );
-
-    navigate("/checkout");
-  };
-
+  const comics = currentComics;
   const handleAddToCart = async () => {
     const cartKey = "cart";
-    const userId = userInfo?.id;
-
-    if (userId) {
+    if (accessToken) {
       try {
-        const allCarts = JSON.parse(localStorage.getItem(cartKey) || "{}");
+        const currentCart = JSON.parse(localStorage.getItem(cartKey) || "[]");
 
-        if (!allCarts[userId]) {
-          allCarts[userId] = [];
-        }
+        const existingComicIndex = currentCart.findIndex(
+          (item: { comics: Comic }) => item.comics.id === id
+        );
 
-        const exists = allCarts[userId].some((comic: Comic) => comic.id === id);
-
-        if (exists) {
+        if (existingComicIndex >= 0) {
           messageApi.warning({
             key: "a",
             type: "info",
             content: "Truyện này đã được thêm vào giỏ hàng.",
           });
         } else {
-          allCarts[userId].push(currentComics);
-          localStorage.setItem(cartKey, JSON.stringify(allCarts));
+          currentCart.push({ comics });
+          localStorage.setItem(cartKey, JSON.stringify(currentCart));
 
+          // setOpen(true);
+          // setTimeout(() => {
+          //   setOpen(false);
+          // }, 2000);
+          console.log("Item added to cart:", id);
           window.dispatchEvent(new Event("cartUpdated"));
         }
       } catch (error) {
@@ -135,34 +95,8 @@ export default function ComicsDetailTemp() {
   };
 
   useEffect(() => {
-    fetchUserInfo();
     fetchCurrentComics();
   }, [id]);
-  useEffect(() => {
-    if (userInfo) {
-      checkIsInCart();
-    }
-  }, [userInfo, id]);
-
-  const handleOpenChat = async (comics: Comic) => {
-    if (!isLoggedIn) {
-      alert("Chưa đăng nhập!");
-      return;
-    } else {
-      setIsLoading(true);
-      await privateAxios
-        .post("chat-rooms", {
-          secondUser: comics.sellerId.id,
-          comics: comics.id,
-        })
-        .then((res) => {
-          sessionStorage.setItem("connectedChat", res.data.id);
-          setIsChatOpen(true);
-        })
-        .catch((err) => console.log(err))
-        .finally(() => setIsLoading(false));
-    }
-  };
 
   return (
     <>
@@ -171,15 +105,15 @@ export default function ComicsDetailTemp() {
         <div className="flex flex-col justify-start items-center gap-4 px-4 pt-4 pb-8 relative">
           <div className="w-full flex items-start justify-center gap-4 relative">
             <div className="w-2/3 max-w-[80em] flex flex-col justify-end gap-4 relative">
-              <div className="w-full flex justify-center gap-4">
-                <div className="grow min-w-[10em] max-w-[20em] gap-2">
+              <div className="flex justify-end gap-4">
+                <div className="grow max-w-[30em] gap-2">
                   <ComicsImages
                     currentImage={currentImage}
                     setCurrentImage={setCurrentImage}
                     imageList={imageList}
-                  />
+                  />b
                 </div>
-                <div className="grow min-w-[20em] max-w-[45em] flex flex-col gap-2">
+                <div className="grow max-w-[40em] flex flex-col gap-2">
                   <ComicsMainInfo currentComics={currentComics} />
                   <ComZonePros />
                   <ComicsDetailedInfo currentComics={currentComics} />
@@ -193,17 +127,11 @@ export default function ComicsDetailTemp() {
                 />
               </div>
             </div>
-            <div className="w-[25%] min-w-[20em] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-4 sticky">
-              <ComicsSeller
-                seller={seller}
-                comics={currentComics}
-                handleOpenChat={handleOpenChat}
-              />
+            <div className="w-[30%] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-4 sticky">
+              <ComicsSeller seller={seller} />
               <ComicsBillingSection
                 currentComics={currentComics}
                 handleAddToCart={handleAddToCart}
-                handleBuyNow={handleBuyNow}
-                isInCart={isInCart}
               />
             </div>
           </div>
@@ -214,17 +142,15 @@ export default function ComicsDetailTemp() {
               comicsListFromSeller={comicsListFromSeller}
             />
           </div>
-
-          <div className="w-full max-w-[122em] px-8">
-            <RecommendedComicsList
-              comicsList={comicsListFromSeller}
-              fetchMoreData={fetchCurrentComics}
-              hasMore={hasMore}
-            />
-          </div>
         </div>
 
-        <ChatModal isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} />
+        <div className="w-full max-w-[122em] px-8">
+          <RecommendedComicsList
+            comicsList={comicsListFromSeller}
+            fetchMoreData={fetchCurrentComics}
+            hasMore={hasMore}
+          />
+        </div>
       </div>
     </>
   );

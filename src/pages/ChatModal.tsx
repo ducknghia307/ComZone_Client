@@ -3,10 +3,17 @@ import { Modal } from "antd";
 import ChatRoomList from "../components/chat/left/ChatRoomList";
 import { useEffect, useRef, useState } from "react";
 import { ChatRoom } from "../common/interfaces/chat-room.interface";
-import { useAppSelector } from "../redux/hooks";
-import { privateAxios } from "../middleware/axiosInstance";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import ChatSection from "../components/chat/middle/ChatSection";
-import { MessageGroup } from "../common/interfaces/message.interface";
+import {
+  getChatRoomList,
+  getMessageList,
+  updateChatRoomIsRead,
+  updateSelectedChatRoom,
+} from "../redux/features/chat/chatActionCreators";
+import { chatSlice } from "../redux/features/chat/chatSlice";
+
+const socket = io("http://localhost:3001");
 
 export default function ChatModal({
   isChatOpen,
@@ -17,79 +24,66 @@ export default function ChatModal({
 }) {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const accessToken = useAppSelector((state) => state.auth.accessToken);
-  const [chatRoomList, setChatRoomList] = useState<ChatRoom[] | []>([]);
-  const [selectedChatRoom, setSelectedChatRoom] = useState<ChatRoom | null>(
-    null
-  );
-  const [messagesList, setMessagesList] = useState<MessageGroup[]>([]);
+  const dispatch = useAppDispatch();
+
+  const { currentChatRoomList, currentlySelectedRoom, currentMessageList } =
+    useAppSelector((state) => state.chat);
+
   const [messageInput, setMessageInput] = useState<string>("");
 
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
 
-  const socket = io("http://localhost:3001");
-
   useEffect(() => {
-    socket.on("new-message", (newMessage) => {
-      fetchUserChatRooms();
-      if (newMessage.chatRoom === selectedChatRoom?.id) {
-        fetchMessages(newMessage.chatRoom);
+    socket.on("new-message", async (newMessage) => {
+      await dispatch(getChatRoomList());
+      console.log("NEWMESS CHATROOM: ", newMessage.chatRoom);
+      console.log("CURRENT ID: ", currentlySelectedRoom?.id);
+      if (
+        currentlySelectedRoom &&
+        newMessage.chatRoom === currentlySelectedRoom.id
+      ) {
+        await dispatch(getMessageList(newMessage.chatRoom));
       }
     });
   }, []);
 
-  const fetchUserChatRooms = async () => {
-    await privateAxios
-      .get("/chat-rooms/user")
-      .then((res) => {
-        setChatRoomList(res.data);
-      })
-      .catch((err) => console.log(err));
-  };
+  const fetchChat = async () => {
+    await dispatch(getChatRoomList());
+    await dispatch(updateSelectedChatRoom(currentChatRoomList));
+    if (currentlySelectedRoom)
+      await dispatch(getMessageList(currentlySelectedRoom.id));
 
-  const fetchMessages = async (chatRoomId: string) => {
-    await privateAxios
-      .get(`chat-messages/chat-room/${chatRoomId}`)
-      .then((res) => {
-        setMessagesList(res.data);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  useEffect(() => {
-    fetchUserChatRooms();
-  }, [isChatOpen]);
-
-  useEffect(() => {
-    if (!selectedChatRoom && chatRoomList.length > 0) {
-      setSelectedChatRoom(chatRoomList[0]);
-      fetchMessages(chatRoomList[0].id);
-      updateIsRead(chatRoomList[0].id);
-    }
-
-    if (sessionStorage.getItem("connectedChat") && chatRoomList.length > 0) {
-      const foundChatRoom = chatRoomList.find(
+    if (
+      sessionStorage.getItem("connectedChat") &&
+      currentChatRoomList.length > 0
+    ) {
+      const foundChatRoom = currentChatRoomList.find(
         (room) => room.id === sessionStorage.getItem("connectedChat")
       );
 
       if (foundChatRoom) {
-        setSelectedChatRoom(foundChatRoom);
-        fetchMessages(foundChatRoom.id);
-        updateIsRead(foundChatRoom.id);
+        await dispatch(
+          updateSelectedChatRoom(currentChatRoomList, foundChatRoom)
+        );
       }
 
       sessionStorage.removeItem("connectedChat");
     }
-  }, [chatRoomList]);
+  };
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    fetchChat();
+  }, []);
+
+  const handleSendMessage = async () => {
     if (!isLoggedIn) {
       alert("Chưa đăng nhập!");
       return;
     } else {
-      if (selectedChatRoom && messageInput && messageInput.length > 0) {
+      if (currentlySelectedRoom && messageInput && messageInput.length > 0) {
         socket.emit("send-new-message", {
           token: accessToken,
-          chatRoom: selectedChatRoom.id,
+          chatRoom: currentlySelectedRoom.id,
           content: messageInput,
         });
 
@@ -99,32 +93,23 @@ export default function ChatModal({
   };
 
   const updateIsRead = async (chatRoomId: string) => {
-    if (isLoggedIn && selectedChatRoom)
-      await privateAxios
-        .patch(`chat-messages/chat-room/is-read/${chatRoomId}`)
-        .then(() => {
-          fetchUserChatRooms();
-        })
-        .catch((err) => console.log(err));
+    if (isLoggedIn && currentlySelectedRoom)
+      await dispatch(updateChatRoomIsRead(chatRoomId));
   };
 
   const handleSelectChatRoom = async (chatRoom: ChatRoom) => {
-    if (chatRoom !== selectedChatRoom) {
-      setSelectedChatRoom(chatRoom);
-      fetchMessages(chatRoom.id);
-      updateIsRead(chatRoom.id);
-    }
+    await dispatch(updateSelectedChatRoom(currentChatRoomList, chatRoom));
+    await dispatch(getMessageList(chatRoom.id));
+    await dispatch(updateChatRoomIsRead(chatRoom.id));
   };
 
   useEffect(() => {
     if (lastMessageRef.current)
       lastMessageRef.current!.scrollIntoView({ behavior: "instant" });
-  }, [messagesList]);
+  }, [currentMessageList]);
 
   const handleModalClose = () => {
-    setSelectedChatRoom(null);
-    setChatRoomList([]);
-    setMessagesList([]);
+    dispatch(chatSlice.actions.reset);
     setIsChatOpen(false);
   };
 
@@ -142,13 +127,13 @@ export default function ChatModal({
     >
       <div className="h-[90vh] xl:max-h-[1000px] flex items-stretch">
         <ChatRoomList
-          chatRoomList={chatRoomList}
-          selectedChatRoom={selectedChatRoom}
+          chatRoomList={currentChatRoomList}
+          currentSelectedRoom={currentlySelectedRoom}
           handleSelectChatRoom={handleSelectChatRoom}
         />
         <ChatSection
-          chatRoom={selectedChatRoom}
-          messagesList={messagesList}
+          chatRoom={currentlySelectedRoom}
+          messagesList={currentMessageList}
           handleSendMessage={handleSendMessage}
           messageInput={messageInput}
           setMessageInput={setMessageInput}

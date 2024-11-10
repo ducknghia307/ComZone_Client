@@ -42,6 +42,7 @@ export default function ChatSection({
           setMessageInput={setMessageInput}
         />
       </div>
+
       <div className="basis-1/3 flex items-stretch px-2">
         {chatRoom && chatRoom.comics && (
           <ComicsSectionInChat comics={chatRoom.comics} />

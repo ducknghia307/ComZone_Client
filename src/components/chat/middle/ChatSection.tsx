@@ -29,7 +29,7 @@ export default function ChatSection({
         onClick={() => {
           if (chatRoom) updateIsRead(chatRoom.id);
         }}
-        className={`basis-2/3 flex flex-col items-stretch justify-between gap-4 pb-4 border-r border-gray-300`}
+        className={`basis-2/3 flex flex-col items-stretch justify-between gap-2 pb-4 border-r border-gray-300`}
       >
         <ChatSectionHeader chatRoom={chatRoom} />
         <ChatMessageHistory

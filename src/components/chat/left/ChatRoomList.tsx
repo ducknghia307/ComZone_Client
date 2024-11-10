@@ -105,7 +105,7 @@ export default function ChatRoomList({
                   } flex items-center gap-2 text-start font-light`}
                 >
                   <p
-                    className={`line-clamp-1 max-w-[14em] ${
+                    className={`line-clamp-1 max-w-[8em] break-words ${
                       !chatRoom.lastMessage?.isRead &&
                       !chatRoom.lastMessage?.mine &&
                       "font-semibold"

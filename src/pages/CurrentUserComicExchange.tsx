@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import UserInformation from "../components/Profile/UserInformation";
 import { privateAxios } from "../middleware/axiosInstance";
-import { UserInfo } from "../common/base.interface";
+import { Comic, UserInfo } from "../common/base.interface";
 import ProfileTab from "../components/Profile/ProfileTab";
 import Loading from "../components/loading/Loading";
 import NewComicOfferModal from "../components/Profile/ComicOffer/NewComicOfferModal";
+import ComicExchangeOfferList from "../components/Profile/ComicOffer/ComicExchangeOfferList";
 
 const CurrentUserComicExchange = () => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [currentUrl, setCurrentUrl] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
-
+  const [comicExchangeOffer, setComicExchangeOffer] = useState<Comic[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = () => {
@@ -20,7 +21,17 @@ const CurrentUserComicExchange = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-
+  const fetchComicExchangeOffer = async () => {
+    try {
+      setIsLoading(true);
+      const res = await privateAxios("/comics/exchange-offer/user");
+      setComicExchangeOffer(res.data);
+    } catch (error) {
+      console.log("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const fetchUserInfo = async () => {
     try {
       setIsLoading(true);
@@ -35,6 +46,7 @@ const CurrentUserComicExchange = () => {
   useEffect(() => {
     fetchUserInfo();
     setCurrentUrl(window.location.pathname);
+    fetchComicExchangeOffer();
   }, []);
 
   return (
@@ -58,6 +70,7 @@ const CurrentUserComicExchange = () => {
               <p>Thêm truyện</p>
             </button>
           </div>
+          <ComicExchangeOfferList comicExchangeOffer={comicExchangeOffer} />
         </div>
       </div>
       {userInfo && (
@@ -65,6 +78,7 @@ const CurrentUserComicExchange = () => {
           isModalOpen={isModalOpen}
           handleCancel={handleCancel}
           userInfo={userInfo}
+          fetchComicExchangeOffer={fetchComicExchangeOffer}
         />
       )}
     </>

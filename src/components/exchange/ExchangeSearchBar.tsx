@@ -1,4 +1,4 @@
-import { Switch, Tooltip } from "antd";
+import { notification, Switch, Tooltip } from "antd";
 import { useEffect } from "react";
 
 export default function ExchangeSearchBar({
@@ -33,7 +33,10 @@ export default function ExchangeSearchBar({
     <div className="w-full max-w-[100em] flex items-center justify-center gap-2">
       <button
         onClick={() => {
-          if (!isLoggedIn) alert("Chưa đăng nhập!");
+          if (!isLoggedIn)
+            notification.error({
+              message: "Bạn cần đăng nhập để thực hiện đăng bài",
+            });
           else handleOpenCreatePost();
         }}
         className="min-w-max flex items-center gap-1 px-4 py-2 rounded-lg bg-sky-600 text-white duration-200 hover:bg-sky-800"

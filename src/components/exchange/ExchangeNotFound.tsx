@@ -5,7 +5,7 @@ export default function ExchangeNotFound({
   searchParams,
   isLoading,
 }: {
-  searchParams: any;
+  searchParams: URLSearchParams;
   isLoading: boolean;
 }) {
   return (
@@ -27,7 +27,11 @@ export default function ExchangeNotFound({
       <div className="flex flex-col items-center justify-center gap-4 text-center text-gray-700">
         <p className="text-[5em] font-bold">MẤT TÍCH</p>
         <span className="flex flex-col items-center justify-center gap-4">
-          <p className="text-2xl font-bold">
+          <p
+            className={`${
+              !searchParams.get("search") && "hidden"
+            } text-2xl font-bold`}
+          >
             Không tìm thấy kết quả cho "{searchParams.get("search")}".
           </p>
           <p className="font-light italic hidden md:block">

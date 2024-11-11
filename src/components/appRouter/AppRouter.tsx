@@ -33,6 +33,13 @@ import CurrentUserHistoryExchange from "../../pages/CurrentUserHistoryExchange";
 import CurrentUserComicExchange from "../../pages/CurrentUserComicExchange";
 import CurrentUserPostExchange from "../../pages/CurrentUserPostExchange";
 import CurrentUserComicSelling from "../../pages/CurrentUserComicSelling";
+import ModComics from "../../pages/ModComics";
+import ModUsers from "../../pages/ModUsers";
+import ModOrders from "../../pages/ModOrders";
+import ModAuctions from "../../pages/ModAuctions";
+import ModExchanges from "../../pages/ModExchanges";
+import ModDeposits from "../../pages/ModDeposits";
+import ModFeedbacks from "../../pages/ModFeedbacks";
 
 const AppRouter = () => {
   return (
@@ -101,6 +108,14 @@ const AppRouter = () => {
         <Route path="/membership" element={<ComicZoneMembership />} />
 
         <Route path="*" element={<NotFound />} />
+
+        <Route path="/mod/comics" element={<ModComics />} />
+        <Route path="/mod/users" element={<ModUsers />} />
+        <Route path="/mod/orders" element={<ModOrders />} />
+        <Route path="/mod/auctions" element={<ModAuctions />} />
+        <Route path="/mod/exchanges" element={<ModExchanges />} />
+        <Route path="/mod/deposits" element={<ModDeposits />} />
+        <Route path="/mod/feedbacks" element={<ModFeedbacks />} />
       </Routes>
     </div>
   );

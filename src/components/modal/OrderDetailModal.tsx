@@ -116,7 +116,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                     width: 800,
                     maxHeight: '80vh',
                     bgcolor: 'background.paper',
-                    boxShadow: '24',
+                    boxShadow: 'none',
                     p: 4,
                     borderRadius: '8px',
                     display: 'flex',

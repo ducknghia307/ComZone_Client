@@ -172,7 +172,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                     </Button>
                 </div>
                 {/* Upload Button */}
-                <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+                <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
                     <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>Hình ảnh (tối đa 4):</Typography>
                     <input
                         accept="image/*"
@@ -202,9 +202,9 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                     </label>
                 </div>
                 {/* Image Preview Section */}
-                <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '20px' }}>
                     {images.map((image, index) => (
-                        <div key={index} style={{ position: 'relative' }}>
+                        <div key={index} style={{ position: 'relative', marginTop: '20px' }}>
                             <img
                                 src={URL.createObjectURL(image)}
                                 alt={`uploaded-preview-${index}`}

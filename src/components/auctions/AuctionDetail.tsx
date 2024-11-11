@@ -140,7 +140,10 @@ const ComicAuction = () => {
         <Grid size={5} className="auction-info">
           <div className="timer">
             <p>KẾT THÚC TRONG:</p>
-            <CountdownFlipNumbers endTime={auctionData.endTime} />
+            <CountdownFlipNumbers
+              auctionId={auctionData.id}
+              endTime={auctionData.endTime}
+            />
 
             <div className="current-price">
               <div className="current-price1">

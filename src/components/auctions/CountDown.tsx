@@ -2,17 +2,35 @@ import React, { useState, useEffect } from "react";
 import FlipNumbers from "react-flip-numbers";
 import "../../components/ui/CountDown.css";
 import Grid from "@mui/material/Grid2";
+import axios from "axios";
+import { publicAxios } from "../../middleware/axiosInstance";
+
 interface CountdownFlipNumbersProps {
   endTime: string | Date;
+  auctionId: string; // Pass auctionId for the API call
 }
 
-const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({ endTime }) => {
+const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
+  endTime,
+  auctionId,
+}) => {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
   });
+
+  const declareWinner = async () => {
+    try {
+      const response = await publicAxios.get(
+        `/auction/declare-winner/${auctionId}`
+      );
+      console.log("Winner Declared:", response.data);
+    } catch (error) {
+      console.error("Error declaring winner:", error);
+    }
+  };
 
   useEffect(() => {
     // Ensure endTime is in valid timestamp format (milliseconds)
@@ -22,11 +40,10 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({ endTime }) 
       const now = Date.now();
       const timeRemaining = endTimestamp - now; // Calculate remaining time
 
-      console.log(":::::::::", timeRemaining); // Check timeRemaining in the console
-
       if (timeRemaining <= 0) {
         clearInterval(timer);
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        declareWinner(); // Call declareWinner when countdown ends
         return;
       }
 
@@ -44,7 +61,7 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({ endTime }) 
 
     const timer = setInterval(updateTimeLeft, 1000);
     return () => clearInterval(timer); // Cleanup the interval on unmount
-  }, [endTime]); // endTime as dependency
+  }, [endTime, auctionId]); // auctionId is added as a dependency to ensure the latest auctionId is used
 
   return (
     <Grid className="countdown">

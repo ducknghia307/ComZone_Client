@@ -154,6 +154,7 @@ export default function ExchangeNewsFeed() {
             return res.data;
           })
         );
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
     } catch (err) {
     } finally {
       dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));

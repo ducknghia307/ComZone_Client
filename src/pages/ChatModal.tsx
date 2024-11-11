@@ -35,8 +35,6 @@ export default function ChatModal({
   useEffect(() => {
     dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
     socket.on("connection", () => {
-      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
-
       socket.on("new-message", async (newMessage: Message) => {
         await fetchChatRoomList();
         if (
@@ -47,6 +45,7 @@ export default function ChatModal({
         }
       });
     });
+    dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
   }, []);
 
   const fetchChatRoomList = async () => {

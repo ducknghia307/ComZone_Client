@@ -56,48 +56,21 @@ export function LoginUser(formValues: FormValues) {
 export function LogoutUser() {
   return async (dispatch: AppDispatch) => {
     // Update loading state
-    dispatch(
-      authSlice.actions.updateIsLoading({ isLoading: true, error: false })
-    );
 
     try {
       // Make API call
       await privateAxios.post("/auth/logout");
 
       // Reset state after logout
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
       dispatch(revertAll());
-
       // Update loading state after successful logout
-      dispatch(
-        authSlice.actions.updateIsLoading({ isLoading: false, error: false })
-      );
     } catch (error: any) {
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
       const err = error as ErrorResponse;
       console.log(err);
 
       // Update error state
-      dispatch(
-        authSlice.actions.updateIsLoading({ isLoading: false, error: true })
-      );
     }
   };
 }
-// Google login action in authActionCreators.ts
-// export const loginWithGoogle = ()=>{
-
-//     try {
-//       const response =  publicAxios.get("/auth/google/callback");
-//       const { id, accessToken, refreshToken } = response.data;
-//       console.log(';;;;;;;;;;;;;',response)
-
-//       // Save tokens in Redux
-//       dispatch(authSlice.actions.login({ id, accessToken, refreshToken }));
-
-//       return response.data;
-//     } catch (error) {
-//       console.error("Google login error:", error);
-//       throw error;
-//     }
-
-// );
-// }

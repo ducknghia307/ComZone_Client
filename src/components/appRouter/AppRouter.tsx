@@ -20,11 +20,9 @@ import Profile from "../../pages/Profile";
 import AuctionUser from "../../pages/AuctionUser";
 import WalletUser from "../../pages/WalletUser";
 import ExchangeUser from "../../pages/ExchangeUser";
-import RegisterSeller from "../../pages/RegisterSeller";
 import ComicManagementSeller from "../../pages/ComicManagementSeller";
 import OrderManagementSeller from "../../pages/OrderManagementSeller";
 import AuctionManagementSeller from "../../pages/AuctionManagementSeller";
-import { ConfigProvider } from "antd";
 import AllHotComics from "../../pages/HotComic";
 import ComicZoneMembership from "../membership/ComicZoneMembership";
 import NotFound from "../notFound/NotFound";
@@ -84,7 +82,6 @@ const AppRouter = () => {
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/order/complete" element={<OrderComplete />} />
 
-        <Route path="/registerSeller" element={<RegisterSeller />} />
         <Route
           path="/profile/recentActivities"
           element={<CurrentUserRecentAct />}

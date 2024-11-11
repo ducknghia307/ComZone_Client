@@ -47,74 +47,107 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({ endTime }) 
   }, [endTime]); // endTime as dependency
 
   return (
-    <Grid className="countdown">
+    <Grid className="countdown" sx={{ gap: '15px' }}>
       <div className="time-box">
         <div
           className="flip-wrapper"
-          style={{ borderRadius: "5px", overflow: "hidden" }}
+          style={{
+            borderRadius: "5px",
+            overflow: "hidden",
+            width: "54px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#fff",
+          }}
         >
           <FlipNumbers
-            height={70}
-            width={40}
+            height={45}
+            width={16}
             play
             color="#000"
             background="#fff"
             numbers={timeLeft.days.toString().padStart(2, "0")}
-            numberStyle={{ fontSize: "50px" }} // Adjust font size here
+            numberStyle={{ fontSize: "22px", fontFamily: "REM", fontWeight: "500" }}
           />
         </div>
-        <span className="label1">Ngày</span>
+        <span className="label1" style={{ fontFamily: "REM", fontSize: '14px' }}>Ngày</span>
       </div>
+
       <div className="time-box">
         <div
           className="flip-wrapper"
-          style={{ borderRadius: "5px", overflow: "hidden" }}
+          style={{
+            borderRadius: "5px",
+            overflow: "hidden",
+            width: "54px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#fff"
+          }}
         >
           <FlipNumbers
-            height={70}
-            width={40}
+            height={45}
+            width={16}
             play
             color="#000"
             background="#fff"
             numbers={timeLeft.hours.toString().padStart(2, "0")}
-            numberStyle={{ fontSize: "50px" }}
+            numberStyle={{ fontSize: "22px", fontFamily: "REM", fontWeight: "500" }}
           />
         </div>
-        <span className="label1">Giờ</span>
+        <span className="label1" style={{ fontFamily: "REM", fontSize: "14px", }}>Giờ</span>
       </div>
       <div className="time-box">
         <div
           className="flip-wrapper"
-          style={{ borderRadius: "5px", overflow: "hidden" }}
+          style={{
+            borderRadius: "5px",
+            overflow: "hidden",
+            width: "54px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#fff"
+          }}
         >
           <FlipNumbers
-            height={70}
-            width={40}
+            height={45}
+            width={16}
             play
             color="#000"
             background="#fff"
             numbers={timeLeft.minutes.toString().padStart(2, "0")}
-            numberStyle={{ fontSize: "50px" }}
+            numberStyle={{ fontSize: "22px", fontFamily: "REM", fontWeight: "500" }}
           />
         </div>
-        <span className="label1">Phút</span>
+        <span className="label1" style={{ fontFamily: "REM", fontSize: "14px", }}>Phút</span>
       </div>
       <div className="time-box">
         <div
           className="flip-wrapper"
-          style={{ borderRadius: "5px", overflow: "hidden" }}
+          style={{
+            borderRadius: "5px",
+            overflow: "hidden",
+            width: "54px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#fff"
+          }}
         >
           <FlipNumbers
-            height={70}
-            width={40}
+            height={45}
+            width={16}
             play
             color="#000"
             background="#fff"
             numbers={timeLeft.seconds.toString().padStart(2, "0")}
-            numberStyle={{ fontSize: "50px" }}
+            numberStyle={{ fontSize: "22px", fontFamily: "REM", fontWeight: "500" }}
           />
         </div>
-        <span className="label1">Giây</span>
+        <span className="label1" style={{ fontFamily: "REM", fontSize: "14px", }}>Giây</span>
       </div>
     </Grid>
   );

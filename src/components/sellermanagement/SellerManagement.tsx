@@ -17,7 +17,14 @@ import IconButton from "@mui/material/IconButton";
 import { privateAxios } from "../../middleware/axiosInstance";
 import AuctionManagement from "../auctions/AuctionManagement";
 import DeliveryManagement from "../delivery/DeliveryManagement";
+import GavelIcon from "@mui/icons-material/Gavel";
 import OrderManagement from "../../order/OrderManagement";
+import AddBusinessIcon from "@mui/icons-material/AddBusiness";
+import { Modal } from "antd"; // For confirmation modal
+import { CheckOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import AuctionModal from "../comic/sellerManagement/AuctionModal";
+
+const { confirm } = Modal;
 
 const SellerManagement = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
@@ -25,21 +32,64 @@ const SellerManagement = () => {
   const [comics, setComics] = useState([]);
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedComic, setSelectedComic] = useState(null); // State to store the selected comic for auction modal
+  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
   const navigate = useNavigate();
+
+  const handleAuction = (comic) => {
+    setSelectedComic(comic); // Set the selected comic
+    setIsModalVisible(true); // Show the modal
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false); // Close the modal
+  };
+
+  const handleModalSuccess = () => {
+    setIsModalVisible(false); // Close the modal
+    setComics((prevComics) =>
+      prevComics.map((prevComic) =>
+        prevComic.id === selectedComic.id
+          ? { ...prevComic, status: "AUCTION" }
+          : prevComic
+      )
+    );
+  };
 
   const handleViewMore = (comic) => {
     // Logic for viewing more details about the comic
     console.log("View more details for", comic);
   };
 
-  const handleSell = (comic) => {
-    // Logic for setting the comic for sale
-    console.log("Set comic for sale", comic);
-  };
-
-  const handleAuction = (comic) => {
-    // Logic for starting an auction for the comic
-    console.log("Start auction for", comic);
+  const handleSell = (comic: Comic) => {
+    // Show a confirmation modal before selling
+    confirm({
+      title: "Xác nhận bán sản phẩm?",
+      icon: <CheckCircleOutlined style={{ color: "green" }} />,
+      content: `Bạn có chắc chắn muốn bán truyện "${comic.title}" không?`,
+      onOk() {
+        // Update the comic status to "AVAILABLE"
+        privateAxios
+          .patch(`comics/${comic.id}/status`, { status: "AVAILABLE" })
+          .then(() => {
+            console.log(`Truyện "${comic.title}" đã được đưa vào bán`);
+            // Update the comic list after selling
+            setComics((prevComics) =>
+              prevComics.map((prevComic) =>
+                prevComic.id === comic.id
+                  ? { ...prevComic, status: "AVAILABLE" }
+                  : prevComic
+              )
+            );
+          })
+          .catch((error) => {
+            console.error("Lỗi khi đưa truyện vào bán:", error);
+          });
+      },
+      onCancel() {
+        console.log("Không bán truyện.");
+      },
+    });
   };
 
   useEffect(() => {
@@ -110,12 +160,16 @@ const SellerManagement = () => {
     },
     {
       field: "price",
-      headerName: "Giá (đ)",
+      headerName: "Giá",
       flex: 0.5,
       headerClassName: "custom-header",
       headerAlign: "center",
       align: "center",
       sortComparator: (v1, v2) => Number(v1) - Number(v2),
+      renderCell: (params) => {
+        const formattedPrice = Number(params.value).toLocaleString("vi-VN");
+        return <span>{formattedPrice}₫</span>; // Display the formatted price with "đ"
+      },
     },
     {
       field: "genreIds",
@@ -147,7 +201,7 @@ const SellerManagement = () => {
       align: "center",
       renderCell: (params) => {
         const statusMap: Record<string, string> = {
-          AVAILABLE: "Khả dụng",
+          AVAILABLE: "Đang bán",
           UNAVAILABLE: "Không khả dụng",
           SOLD: "Đã bán",
           EXCHANGE: "Đổi",
@@ -169,21 +223,24 @@ const SellerManagement = () => {
                 >
                   Xem thêm
                 </Button> */}
-                <Button
-                  variant="contained"
+                <IconButton
+                  aria-label="edit"
                   color="success"
-                  sx={{ marginRight: 1 }}
-                  onClick={() => handleSell(params.row)}
-                >
-                  Chọn bán
-                </Button>
-                <Button
-                  variant="contained"
-                  color="info"
                   onClick={() => handleAuction(params.row)}
                 >
-                  Đấu giá
-                </Button>
+                  <GavelIcon
+                    sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
+                  />
+                </IconButton>
+                <IconButton
+                  aria-label="edit"
+                  color="success"
+                  onClick={() => handleSell(params.row)}
+                >
+                  <AddBusinessIcon
+                    sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
+                  />
+                </IconButton>
               </div>
             </div>
           );
@@ -194,7 +251,7 @@ const SellerManagement = () => {
     },
     {
       field: "actions",
-      headerName: "Xem/Xóa",
+      headerName: "Sửa/Xóa",
       flex: 1,
       headerClassName: "custom-header",
       headerAlign: "center",
@@ -291,7 +348,6 @@ const SellerManagement = () => {
                 />
               </div>
             </Box>
-
             <div style={{ height: "auto", width: "100%" }}>
               <DataGrid
                 rows={comics}
@@ -323,6 +379,13 @@ const SellerManagement = () => {
                 }}
               />
             </div>
+            <AuctionModal
+              open={isModalVisible} // Replace 'visible' with 'open'
+              comic={selectedComic} // Passing the selected comic as a prop
+              onCancel={handleModalCancel} // Event handler for closing the modal
+              onSuccess={handleModalSuccess} // Event handler for successful auction creation
+            />
+            ;
           </div>
         );
       case "order":

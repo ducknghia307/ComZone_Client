@@ -44,6 +44,7 @@ const EditComicDetail = () => {
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [contentImages, setContentImages] = useState<string[]>([]);
   const [isSeries, setIsSeries] = useState(false);
+  console.log(":", isSeries);
   const [removedImages, setRemovedImages] = useState<string[]>([]);
   const [formData, setFormData] = useState<EditComicFormData>({
     title: "",
@@ -57,6 +58,7 @@ const EditComicDetail = () => {
     condition: "",
     page: "",
   });
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const availableGenres = genres.filter(
@@ -298,9 +300,6 @@ const EditComicDetail = () => {
         setPreviousCoverImage(comic.coverImage);
         setContentImages(comic.previewChapter || []);
         setPreviousContentImages(comic.previewChapter);
-        if (parseInt(formData.quantity) > 1) {
-          setIsSeries(true);
-        }
       } catch (error) {
         console.error("Error fetching comic:", error);
         setError("Failed to fetch comic details.");
@@ -311,6 +310,15 @@ const EditComicDetail = () => {
 
     fetchComicData();
   }, [id]);
+
+  useEffect(() => {
+    // Set `isSeries` based on the `formData.quantity` value
+    if (formData?.quantity && parseInt(formData.quantity) > 1) {
+      setIsSeries(true);
+    } else {
+      setIsSeries(false);
+    }
+  }, [formData]);
 
   const renderImageUploadSection = (
     title: string,

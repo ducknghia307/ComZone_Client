@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { message, Steps } from "antd";
-import SellerInfomation from "../components/RegisterSeller/SellerInfomation";
-import DeliveryMethod from "../components/RegisterSeller/DeliveryMethod";
-import { privateAxios } from "../middleware/axiosInstance";
-import { UserInfo } from "../common/base.interface";
-import RegisterSellerSuccess from "../components/RegisterSeller/RegisterSellerSuccess";
+import SellerInfomation from "./SellerInfomation";
+import DeliveryMethod from "./DeliveryMethod";
+import { privateAxios } from "../../middleware/axiosInstance";
+import { UserInfo } from "../../common/base.interface";
+import RegisterSellerSuccess from "./RegisterSellerSuccess";
 import { useNavigate } from "react-router-dom";
 
 const RegisterSeller: React.FC = () => {
@@ -38,7 +38,11 @@ const RegisterSeller: React.FC = () => {
   };
 
   const handleSendOtp = () => {
-    setOtpSent(true);
+    if (phone) {
+      setOtpSent(true);
+    } else {
+      message.warning("Bạn cần nhập số điện thoại để gửi mã xác thực OTP!");
+    }
   };
 
   const next = () => {
@@ -144,39 +148,44 @@ const RegisterSeller: React.FC = () => {
   };
 
   return (
-    <div className="w-full px-32 py-16">
-      <Steps
-        current={current}
-        items={items}
-        labelPlacement="vertical"
-        progressDot
-      />
+    <div className="w-full px-2 py-4">
+      <div className="flex w-full items-center justify-center">
+        <Steps
+          current={current}
+          items={items}
+          labelPlacement="vertical"
+          progressDot
+          className="w-2/3"
+        />
+      </div>
       <div className="w-full">{steps[current].content}</div>
-      <div className="mt-6 flex flex-row items-center w-full h-10">
-        {current < steps.length - 1 && (
-          <button
-            className="px-4 py-2 rounded-lg bg-black text-white duration-200 hover:opacity-70"
-            onClick={next}
-          >
-            Tiếp theo
-          </button>
-        )}
-        {current === steps.length - 1 && (
-          <button
-            className="px-4 py-2 rounded-lg bg-black text-white duration-200 hover:opacity-70"
-            onClick={handleFinish} // Call handleFinish when "Hoàn thành" is clicked
-          >
-            Hoàn thành
-          </button>
-        )}
-        {current > 0 && (
-          <button
-            className="px-4 py-2 rounded-lg bg-white text-black duration-200 hover:opacity-70 border border-black ml-4"
-            onClick={prev}
-          >
-            Quay lại
-          </button>
-        )}
+      <div className="flex w-full items-center justify-center">
+        <div className="mt-6 flex flex-row items-center justify-end w-full h-10">
+          {current < steps.length - 1 && (
+            <button
+              className="px-4 py-2 rounded-lg bg-black text-white duration-200 hover:opacity-70"
+              onClick={next}
+            >
+              Tiếp theo
+            </button>
+          )}
+          {current === steps.length - 1 && (
+            <button
+              className="px-4 py-2 rounded-lg bg-black text-white duration-200 hover:opacity-70"
+              onClick={handleFinish} // Call handleFinish when "Hoàn thành" is clicked
+            >
+              Hoàn thành
+            </button>
+          )}
+          {current > 0 && (
+            <button
+              className="px-4 py-2 rounded-lg bg-white text-black duration-200 hover:opacity-70 border border-black ml-4"
+              onClick={prev}
+            >
+              Quay lại
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

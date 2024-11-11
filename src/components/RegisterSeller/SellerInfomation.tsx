@@ -55,7 +55,7 @@ const SellerInfomation: React.FC<SellerInfomationProps> = ({
         <h2>Vui lòng đăng nhập</h2>
       ) : (
         <div className="w-full px-16 py-8 flex flex-col items-center justify-center">
-          <div className="w-1/2 flex flex-col">
+          <div className="w-2/3 flex flex-col">
             <h2>Tên người bán</h2>
             <input
               className="p-2 border rounded-lg w-full mt-2"
@@ -64,7 +64,7 @@ const SellerInfomation: React.FC<SellerInfomationProps> = ({
               onChange={(e) => setLocalName(e.target.value)}
             />
           </div>
-          <div className="w-1/2 flex flex-col mt-4">
+          <div className="w-2/3 flex flex-col mt-4">
             <h2>Email</h2>
             <input
               className="p-2 border rounded-lg w-full mt-2"
@@ -73,7 +73,7 @@ const SellerInfomation: React.FC<SellerInfomationProps> = ({
               onChange={(e) => setLocalEmail(e.target.value)}
             />
           </div>
-          <div className="w-1/2 flex flex-col mt-4">
+          <div className="w-2/3 flex flex-col mt-4">
             <h2>Số điện thoại</h2>
             <div className="relative w-full">
               <input
@@ -92,7 +92,7 @@ const SellerInfomation: React.FC<SellerInfomationProps> = ({
             </div>
           </div>
           {otpSent && (
-            <div className="w-1/2 flex flex-col mt-4">
+            <div className="w-2/3 flex flex-col mt-4">
               <h2>OTP</h2>
               <Input.OTP length={6} onChange={(e) => setOtp(e)} value={otp} />
             </div>

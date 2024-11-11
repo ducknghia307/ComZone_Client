@@ -44,13 +44,6 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
       try {
         const response = await privateAxios.get("/orders/user");
         const ordersData = response.data;
-
-        // Lọc đơn hàng có order_type là NON_AUCTION
-        // const nonAuctionOrders = ordersData.filter(
-        //   (order: any) => order.order_type === "NON_AUCTION"
-        // );
-        // console.log(nonAuctionOrders);
-
         // Fetch items for each order
         const ordersWithItems = await Promise.all(
           ordersData.map(async (order: any) => {
@@ -77,63 +70,27 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     switch (status) {
       case "PENDING":
         return {
-          color: '#f89b28',
-          backgroundColor: '#fff2c9',
-          borderRadius: '8px',
-          padding: '8px 20px',
-          fontWeight: 'bold',
-          display: 'inline-block',
-          fontFamily: "REM"
+          color: '#f89b28', backgroundColor: '#fff2c9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
         };
       case "PACKAGING":
         return {
-          color: '#ff6b1c',
-          backgroundColor: '#ffe8db',
-          borderRadius: '8px',
-          padding: '8px 20px',
-          fontWeight: 'bold',
-          display: 'inline-block',
-          fontFamily: "REM"
+          color: '#ff6b1c', backgroundColor: '#ffe8db', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
         };
       case "DELIVERING":
         return {
-          color: '#52a7bf',
-          backgroundColor: '#daf4ff',
-          borderRadius: '8px',
-          padding: '8px 20px',
-          fontWeight: 'bold',
-          display: 'inline-block',
-          fontFamily: "REM"
+          color: '#52a7bf', backgroundColor: '#daf4ff', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
         };
       case "DELIVERED":
         return {
-          color: '#ffffff',
-          backgroundColor: '#4CAF50',
-          borderRadius: '8px',
-          padding: '8px 20px',
-          fontWeight: 'bold',
-          display: 'inline-block',
-          fontFamily: "REM"
+          color: '#ffffff', backgroundColor: '#4CAF50', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
         };
       case "COMPLETED":
         return {
-          color: '#fef6c7',
-          backgroundColor: '#395f18',
-          borderRadius: '8px',
-          padding: '8px 20px',
-          fontWeight: 'bold',
-          display: 'inline-block',
-          fontFamily: "REM"
+          color: '#fef6c7', backgroundColor: '#395f18', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
         };
       case "CANCELED":
         return {
-          color: '#e91e63',
-          backgroundColor: '#fce4ec',
-          borderRadius: '8px',
-          padding: '8px 20px',
-          fontWeight: 'bold',
-          display: 'inline-block',
-          fontFamily: "REM"
+          color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
         };
       default:
         return "#000";

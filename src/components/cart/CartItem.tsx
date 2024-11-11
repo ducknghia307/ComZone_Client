@@ -45,7 +45,7 @@ const CartItem: React.FC<CartItemProps> = ({
       <div className="font-medium text-red-500">
         {CurrencySplitter(price)} đ
       </div>
-      <button className="ml-4 text-gray-500 hover:text-red-500">
+      <button className="ml-4 text-gray-500 hover:text-red-500 z-30">
         <svg
           width="24px"
           height="24px"

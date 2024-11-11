@@ -1,5 +1,5 @@
 import ExchangePost from "../components/exchange/ExchangePost";
-import { Button, Tour } from "antd";
+import { Button, message, notification, Tour } from "antd";
 import type { TourProps } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
@@ -196,9 +196,12 @@ export default function ExchangeNewsFeed() {
       .catch((err) => console.log(err));
 
     if (!offeredList || offeredList.length === 0) {
-      alert(
-        "Cần ít nhất 1 truyện dùng để trao đổi trước khi được đăng bài tìm trao đổi!"
-      );
+      message.warning({
+        key: "a",
+        duration: 2,
+        content:
+          "Cần ít nhất 1 truyện dùng để trao đổi trước khi được đăng bài tìm trao đổi!",
+      });
     } else {
       //FETCH USER'S EXCHANGE SUBSCRIPTION
       if (true) setOpenSubscription(true);

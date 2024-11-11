@@ -50,7 +50,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
         fetchOrdersWithItems();
     }, []);
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const selectedFiles = Array.from(e.target.files);
 
@@ -59,64 +59,52 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                 return;
             }
 
-            const updatedImages = [...images, ...selectedFiles];
-            setImages(updatedImages);
-
-            const formData = new FormData();
-            updatedImages.forEach((file) => {
-                formData.append("images", file);
-            });
-
-            try {
-                const response = await privateAxios.post("/file/upload/multiple-images", formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                });
-
-                // Access the imageUrls array from the response
-                const imageUrls = response.data.imageUrls;
-                setUploadedImageUrls(imageUrls);
-                console.log("imageUrls", imageUrls);
-
-                alert("Hình ảnh đã được tải lên thành công!");
-            } catch (error) {
-                console.error("Error uploading images:", error);
-                alert("Có lỗi xảy ra khi tải lên hình ảnh.");
-            }
+            // Set selected images in state without uploading yet
+            setImages([...images, ...selectedFiles]); // CHANGED: Only set images in state here, without uploading
         }
     };
 
-
     const handleRemoveImage = (index: number) => {
         const updatedImages = images.filter((_, i) => i !== index);
-        const updatedUrls = uploadedImageUrls.filter((_, i) => i !== index);
         setImages(updatedImages);
-        setUploadedImageUrls(updatedUrls);
-        console.log("updatedUrls", updatedUrls);
-        console.log("updatedImages", updatedImages);
-
     };
 
     const handleSubmitFeedback = async () => {
-        if (!ratingValue || !commentText.trim() || uploadedImageUrls.length === 0) {
+        if (!ratingValue || !commentText.trim() || images.length === 0) {
             alert("Vui lòng nhập đầy đủ thông tin đánh giá và tải lên ít nhất một hình ảnh.");
             return;
         }
 
-        const payload = {
-            user: userId,
-            seller: sellerId,
-            rating: ratingValue,
-            comment: commentText,
-            attachedImages: uploadedImageUrls
-        };
+        // UPLOAD IMAGES ONLY WHEN SUBMITTING FEEDBACK
+        const formData = new FormData();
+        images.forEach((file) => {
+            formData.append("images", file);
+        });
 
         try {
+            const imageUploadResponse = await privateAxios.post("/file/upload/multiple-images", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            const imageUrls = imageUploadResponse.data.imageUrls;
+            setUploadedImageUrls(imageUrls); // Update state with uploaded image URLs
+
+            // Prepare the feedback payload
+            const payload = {
+                user: userId,
+                seller: sellerId,
+                rating: ratingValue,
+                comment: commentText,
+                attachedImages: imageUrls // Include uploaded image URLs in the payload
+            };
+
             await privateAxios.post('/seller-feedback', payload);
             alert("Đánh giá đã được gửi thành công!");
+            console.log(payload);
+            
             onClose();
-            console.log(payload)
         } catch (error) {
             console.error("Error submitting feedback:", error);
             alert("Có lỗi xảy ra khi gửi đánh giá.");
@@ -171,8 +159,8 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                         {sellerName}
                     </Button>
                 </div>
-                {/* Upload Button */}
-                <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+                
+                <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
                     <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>Hình ảnh (tối đa 4):</Typography>
                     <input
                         accept="image/*"
@@ -201,10 +189,10 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                         </Button>
                     </label>
                 </div>
-                {/* Image Preview Section */}
-                <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap', marginBottom: '20px' }}>
+
+                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '20px' }}>
                     {images.map((image, index) => (
-                        <div key={index} style={{ position: 'relative' }}>
+                        <div key={index} style={{ position: 'relative', marginTop: '20px' }}>
                             <img
                                 src={URL.createObjectURL(image)}
                                 alt={`uploaded-preview-${index}`}
@@ -233,7 +221,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                         </div>
                     ))}
                 </div>
-                {/* Rating Component */}
+
                 <div style={{ display: 'flex', gap: '10px', marginTop: '0px', alignItems: 'center' }}>
                     <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Đánh giá:</Typography>
                     <Rating
@@ -244,7 +232,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                         }}
                     />
                 </div>
-                {/* Text Field for Feedback */}
+
                 <TextField
                     fullWidth
                     multiline
@@ -255,7 +243,6 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                     sx={{ marginTop: '20px', marginBottom: '20px', borderRadius: '8px' }}
                 />
 
-                {/* Submit Button */}
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
                     <Button
                         variant="contained"

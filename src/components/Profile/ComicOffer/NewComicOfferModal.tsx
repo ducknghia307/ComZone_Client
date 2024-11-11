@@ -11,12 +11,14 @@ interface NewComicOfferModalProps {
   isModalOpen: boolean;
   handleCancel: () => void;
   userInfo: UserInfo;
+  fetchComicExchangeOffer: () => void;
 }
 
 const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
   isModalOpen,
   handleCancel,
   userInfo,
+  fetchComicExchangeOffer,
 }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -147,6 +149,7 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
       handleCancel();
       sessionStorage.removeItem("coverImages");
       sessionStorage.removeItem("previewChapterImages");
+      fetchComicExchangeOffer();
     } catch (error) {
       api.error({
         message: "Lỗi",
@@ -168,7 +171,7 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
     if (storedPreviewImages) {
       setPreviewChapterImages(JSON.parse(storedPreviewImages));
     }
-  }, []);
+  }, [userInfo]);
 
   return (
     <>
@@ -320,7 +323,7 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
             <TextArea
               value={postContent}
               onChange={(e) => setPostContent(e.target.value)}
-              placeholder="Hãy viết gì đó ở đây..."
+              placeholder="Mô tả nội dung của truyện"
               autoSize={{ minRows: 3, maxRows: 5 }}
               className="mt-4 p-3"
             />

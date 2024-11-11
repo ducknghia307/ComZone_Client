@@ -4,7 +4,7 @@ import styles from "./style.module.css";
 import { ExchangeRequest } from "../../common/interfaces/exchange-request.interface";
 import moment from "moment/min/moment-with-locales";
 import dateFormat from "../../assistants/date.format";
-import SelectOfferComicsModal from "../chat/right/SelectOfferComicsModal";
+import SelectOfferComicsModal from "./SelectOfferComicsModal";
 
 moment.locale("vi");
 

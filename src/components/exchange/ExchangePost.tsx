@@ -15,13 +15,15 @@ export default function ExchangePost({
   isLoading,
   isSelectModalOpen,
   setIsSelectModalOpen,
+  currentUserId,
 }: {
   exchangeRequest: ExchangeRequest;
   refs: any[];
   index: number;
   isLoading: boolean;
-  isSelectModalOpen: boolean;
+  isSelectModalOpen: string;
   setIsSelectModalOpen: Function;
+  currentUserId: string;
 }) {
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
 
@@ -83,10 +85,14 @@ export default function ExchangePost({
             </span>
           </div>
 
-          <div>
+          <div
+            className={`${
+              currentUserId === exchangeRequest.user.id && "hidden"
+            }`}
+          >
             <button
               ref={index == 0 ? refs[2] : null}
-              onClick={() => {}}
+              onClick={() => setIsSelectModalOpen(exchangeRequest.id)}
               className="min-w-max p-2 bg-sky-700 text-white rounded-lg"
             >
               Bắt đầu trao đổi

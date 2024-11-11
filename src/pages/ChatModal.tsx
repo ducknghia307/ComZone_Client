@@ -20,7 +20,7 @@ export default function ChatModal({
   isChatOpen: boolean;
   setIsChatOpen: Function;
 }) {
-  const { isLoggedIn, accessToken, isLoading } = useAppSelector(
+  const { isLoggedIn, accessToken, isLoading, userId } = useAppSelector(
     (state) => state.auth
   );
   const dispatch = useAppDispatch();

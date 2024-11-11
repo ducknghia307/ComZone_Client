@@ -4,8 +4,6 @@ import { useEffect } from "react";
 export default function ExchangeSearchBar({
   isLoggedIn,
   setBeginTour,
-  findByOwnedMode,
-  setFindByOwnedMode,
   handleOpenCreatePost,
   searchKey,
   setSearchKey,
@@ -13,8 +11,6 @@ export default function ExchangeSearchBar({
 }: {
   isLoggedIn: boolean;
   setBeginTour: Function;
-  findByOwnedMode: boolean;
-  setFindByOwnedMode: Function;
   handleOpenCreatePost: Function;
   searchKey: string;
   setSearchKey: Function;
@@ -82,26 +78,6 @@ export default function ExchangeSearchBar({
         >
           Tìm kiếm
         </button>
-        <div className="min-w-max flex items-center gap-2 px-2 py-2 group">
-          <Switch
-            checked={findByOwnedMode}
-            onChange={(checked) => {
-              if (!isLoggedIn) alert("Chưa đăng nhập!");
-              else setFindByOwnedMode(checked);
-            }}
-            size="small"
-            className="text-black"
-          />
-          <p
-            className={`font-medium ${
-              findByOwnedMode
-                ? "text-sky-700"
-                : "text-gray-600 group-hover:text-black"
-            } `}
-          >
-            Tìm theo truyện đang có
-          </p>
-        </div>
       </div>
       <Tooltip title="Hướng dẫn">
         <button

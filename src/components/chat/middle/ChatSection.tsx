@@ -14,6 +14,8 @@ export default function ChatSection({
   setMessageInput,
   updateIsRead,
   lastMessageRef,
+  isLoading,
+  fetchChatRoomList,
 }: {
   chatRoom: ChatRoom | null;
   messagesList: MessageGroup[];
@@ -22,6 +24,8 @@ export default function ChatSection({
   setMessageInput: Function;
   updateIsRead: Function;
   lastMessageRef: any;
+  isLoading: boolean;
+  fetchChatRoomList: Function;
 }) {
   return (
     <div className="w-full flex items-stretch">
@@ -47,8 +51,12 @@ export default function ChatSection({
         {chatRoom && chatRoom.comics && (
           <ComicsSectionInChat comics={chatRoom.comics} />
         )}
-        {chatRoom && chatRoom.exchange && (
-          <ExchangeSectionInChat exchange={chatRoom.exchange} />
+        {chatRoom && chatRoom.exchangeRequest && (
+          <ExchangeSectionInChat
+            isLoading={isLoading}
+            chatRoom={chatRoom}
+            fetchChatRoomList={fetchChatRoomList}
+          />
         )}
       </div>
     </div>

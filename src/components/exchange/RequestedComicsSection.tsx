@@ -44,7 +44,9 @@ export default function RequestedComicsSection({
     >
       <button
         onClick={handlePrev}
-        className="absolute flex items-center justify-center left-0 z-10 top-1/2 translate-y-[-50%] p-2 bg-white rounded-full border border-gray-600"
+        className={`${
+          list.length === 1 && "hidden"
+        } absolute flex items-center justify-center left-0 z-10 top-1/2 translate-y-[-50%] p-2 bg-white rounded-full border border-gray-600`}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +60,9 @@ export default function RequestedComicsSection({
       </button>
       <button
         onClick={handleNext}
-        className="absolute flex items-center justify-center right-0 z-10 top-1/2 translate-y-[-50%] p-2 bg-white rounded-full border border-gray-600"
+        className={`${
+          list.length === 1 && "hidden"
+        } absolute flex items-center justify-center right-0 z-10 top-1/2 translate-y-[-50%] p-2 bg-white rounded-full border border-gray-600`}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

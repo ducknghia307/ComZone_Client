@@ -1,6 +1,6 @@
 .auction-wrapper {
-  border: 1px solid #787878;
-  margin: 50px 300px;
+  border: 1px solid #ccc;
+  margin: 50px 200px;
   background-color: #f5f5f5;
   font-size: 50px;
 }
@@ -9,13 +9,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #0167ff;
-  color: white;
+  background-color: #fff;
+  color: #000;
   font-weight: bold;
 }
 
 .condition-tag {
-  background-color: #000;
+  background-color: #333;
   padding: 15px 30px;
   color: #fff;
   font-size: 25px;
@@ -23,14 +23,30 @@
   font-weight: 500;
   flex: 2;
 }
+.condition-tag1 {
+  position: absolute;
+  top: 15px;
+  left: -20px;
+  background-color: #ff4081; /* Pink background */
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 15px;
+  transform: rotate(-45deg);
+  transform-origin: left top;
+  border-radius: 3px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
 
 .auction-container {
-  padding: 50px 50px 0px 50px;
+  padding: 30px 30px 0px 30px;
 }
 
 .comic-info {
   background-color: #fff;
-  padding: 30px 30px;
+  padding: 30px 50px;
   /* align-items: center; */
   display: flex;
   justify-content: center;
@@ -52,8 +68,9 @@
   height: 100%;
   object-fit: cover;
   margin-right: 100px;
-  border: 12px #bfbfbf solid;
-  border-radius: 5px;
+  /* border: 12px #bfbfbf solid; */
+  /* border-radius: 5px; */
+  position: relative;
 }
 
 .small-images {
@@ -72,20 +89,15 @@
   height: 150px;
   cursor: pointer;
   object-fit: cover;
-  border: 5px #bfbfbf solid;
+  border: 2px #bfbfbf solid;
 }
 
 .auction-info .timer {
   background-color: #333;
   color: white;
   text-align: center;
-  padding-bottom: 30px;
+  padding-bottom: 20px;
   padding-top: 30px;
-}
-
-.timer p {
-  font-size: 18px;
-  /* padding-top: 30px; */
 }
 
 .countdown {
@@ -120,8 +132,8 @@
 }
 
 .shop-info {
-  margin-top: 20px;
-  padding: 0 30px;
+  /* margin-top: 20px; */
+  padding: 10px 30px;
 }
 
 .shop-info p {
@@ -133,7 +145,7 @@
   align-items: center;
   margin-top: 10px;
   width: 100%;
-  padding-bottom: 10px;
+  /* padding-bottom: 10px; */
 }
 
 .bid-row .bid-input {
@@ -159,7 +171,7 @@
 }
 
 .publisher {
-  margin-top: 30px;
+  margin-top: 20px;
   font-size: 16px;
   padding: 0 30px 30px 30px;
 }

@@ -1,4 +1,4 @@
-import { Modal, notification } from "antd";
+import { message, Modal, notification } from "antd";
 import NewExchangeForm from "./NewExchangeForm";
 import TextArea from "antd/es/input/TextArea";
 import { useEffect, useState } from "react";
@@ -27,6 +27,24 @@ export default function CreatePostModal({
       console.log("Error:", error);
     }
   };
+
+  const handleDelete = (index: number) => {
+    const updatedComicList = comicList.filter((_, i) => i !== index);
+    setComicList(updatedComicList);
+
+    if (userInfo) {
+      const storedComics = JSON.parse(
+        sessionStorage.getItem("newComicData") || "{}"
+      );
+      const userComics = storedComics[userInfo.id] || [];
+      const newUserComics = userComics.filter((_: any, i: any) => i !== index);
+      storedComics[userInfo.id] = newUserComics;
+      sessionStorage.setItem("newComicData", JSON.stringify(storedComics));
+    }
+
+    message.success("Comic deleted successfully!");
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
@@ -103,6 +121,7 @@ export default function CreatePostModal({
             comicList={comicList}
             setComicList={setComicList}
             userInfo={userInfo}
+            handleDelete={handleDelete}
           />
         )}
         {userInfo && (

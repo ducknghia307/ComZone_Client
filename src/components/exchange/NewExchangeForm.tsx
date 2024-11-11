@@ -68,7 +68,7 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
     } catch (error) {
       console.error("Image upload failed:", error);
     } finally {
-      setIsUploading(false); // Stop loading indicator
+      setIsUploading(false);
     }
   };
 
@@ -81,7 +81,6 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
       edition,
       condition: used === 1 ? "USED" : "SEALED",
       quantity: quantity === 2 ? numOfComics : 1,
-      // numOfComics: quantity === 2 ? numOfComics : 1,
     };
 
     console.log(comicData);
@@ -141,7 +140,7 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
                     id="upload"
                     className="hidden"
                     onChange={handleFileChange}
-                    disabled={!!imageUrl} // Disable file input if an image is already uploaded
+                    disabled={!!imageUrl}
                   />
                 </div>
                 {imageUrl ? (
@@ -248,7 +247,7 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
             </div>
           </div>
         )}
-        {comicList < 4 && !newComicRes && (
+        {!newComicRes && (
           <div className="w-full flex items-start">
             <button
               className="px-3 py-1 border-2 rounded-md flex items-center hover:opacity-70 duration-200 gap-2"

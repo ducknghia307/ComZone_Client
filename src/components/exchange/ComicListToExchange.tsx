@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ExchangeElement } from "../../common/interfaces/exchange-post.interface";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { message, Popconfirm } from "antd";
+import { Popconfirm } from "antd";
 import EditComicToExchange from "./EditComicToExchange";
 import { UserInfo } from "../../common/base.interface";
 
@@ -9,12 +9,14 @@ interface ComicListToExchangeProps {
   comicList: ExchangeElement[];
   setComicList: React.Dispatch<React.SetStateAction<ExchangeElement[]>>;
   userInfo: UserInfo;
+  handleDelete: (index: number) => void;
 }
 
 const ComicListToExchange = ({
   comicList,
   setComicList,
   userInfo,
+  handleDelete,
 }: ComicListToExchangeProps) => {
   const [currentlySelected, setCurrentlySelected] = useState<number | null>(
     null
@@ -23,11 +25,6 @@ const ComicListToExchange = ({
   const handleSelect = (index: number) => {
     setCurrentlySelected(index === currentlySelected ? null : index);
     setShowEdit(index === currentlySelected ? false : true);
-  };
-  const handleDelete = (index: number) => {
-    const updatedComicList = comicList.filter((_, i) => i !== index);
-    setComicList(updatedComicList);
-    message.success("Comic deleted successfully!");
   };
   return (
     <div className="w-full flex flex-wrap gap-x-[2%] gap-y-2 p-2 max-h-[25em] relative overflow-y-auto">
@@ -40,7 +37,6 @@ const ComicListToExchange = ({
                 ? "basis-full"
                 : "basis-[49%] cursor-default"
             } flex justify-between border border-gray-300 rounded-lg p-1 transition-all duration-300`}
-            // onClick={() => handleSelect(index)}
           >
             <div className="flex flex-row w-full items-center justify-between">
               <div className="flex items-center justify-start gap-4">

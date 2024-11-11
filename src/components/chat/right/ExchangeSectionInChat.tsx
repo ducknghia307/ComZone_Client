@@ -2,7 +2,7 @@ import type { CollapseProps } from "antd";
 import { Collapse } from "antd";
 import { Comic } from "../../../common/base.interface";
 import { useState } from "react";
-import SelectOfferComicsModal from "./SelectOfferComicsModal";
+import SelectOfferComicsModal from "../../exchange/SelectOfferComicsModal";
 import { ChatRoom } from "../../../common/interfaces/chat-room.interface";
 import { privateAxios } from "../../../middleware/axiosInstance";
 
@@ -152,14 +152,6 @@ export default function ExchangeSectionInChat({
           </button>
         </div>
       </div>
-
-      <SelectOfferComicsModal
-        exchangeRequestId={exchangeRequest?.id || ""}
-        isSelectModalOpen={isSelectModalOpen}
-        setIsSelectModalOpen={setIsSelectModalOpen}
-        isLoading={isLoading}
-        fetchChatRoomList={fetchChatRoomList}
-      />
     </div>
   );
 }

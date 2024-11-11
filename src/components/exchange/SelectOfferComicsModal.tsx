@@ -1,15 +1,14 @@
-import { Modal, notification, Select, Switch, Tooltip } from "antd";
+import { Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
-import { privateAxios } from "../../../middleware/axiosInstance";
-import { Comic } from "../../../common/base.interface";
-import { ExchangeRequest } from "../../../common/interfaces/exchange-request.interface";
-import ActionConfirm from "../../actionConfirm/ActionConfirm";
+import { privateAxios } from "../../middleware/axiosInstance";
+import { Comic } from "../../common/base.interface";
+import { ExchangeRequest } from "../../common/interfaces/exchange-request.interface";
+import ActionConfirm from "../actionConfirm/ActionConfirm";
 
 export default function SelectOfferComicsModal({
   exchangeRequest,
   isSelectModalOpen,
   setIsSelectModalOpen,
-  isLoading,
 }: {
   exchangeRequest: ExchangeRequest;
   isSelectModalOpen: string;

@@ -29,11 +29,12 @@ const Navbar = () => {
   };
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
+    const userId = query.get("userId");
     const accessToken = query.get("accessToken");
     const refreshToken = query.get("refreshToken");
 
     if (accessToken && refreshToken) {
-      dispatch(authSlice.actions.login({ accessToken, refreshToken }));
+      dispatch(authSlice.actions.login({ accessToken, refreshToken, userId }));
       console.log("Dispatched tokens to Redux");
 
       window.history.replaceState(null, "", window.location.pathname);

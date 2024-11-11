@@ -7,6 +7,7 @@ const initialState = {
   refreshToken: "",
   isLoading: false,
   accessToken: "",
+  userId: "",
 };
 
 // Auth slice to manage authentication state
@@ -21,12 +22,11 @@ export const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.isLoggedIn = true;
-      console.log('33333333333333333333',action.payload.accessToken)
+      state.userId = action.payload.userId;
     },
     saveNewTokens(state, action) {
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
-      console.log("111111111111111111111111111", action.payload.accessToken);
     },
   },
   extraReducers: (builder) => {

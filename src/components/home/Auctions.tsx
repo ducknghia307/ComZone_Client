@@ -158,7 +158,7 @@ const Auctions: React.FC = () => {
                 <img
                   src={comic.comics.coverImage}
                   // alt={comic.title}
-                  className=" object-cover mx-auto"
+                  className=" object-fill mx-auto"
                 />
                 <p className="title">{comic.title}</p>
                 <Chip

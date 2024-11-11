@@ -36,6 +36,7 @@ export function LoginUser(formValues: FormValues) {
           isLoggedIn: true,
           accessToken: response.data.accessToken,
           refreshToken: response.data.refreshToken,
+          userId: response.data.id,
         })
       );
 
@@ -47,7 +48,7 @@ export function LoginUser(formValues: FormValues) {
 
       // Update error state
       dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
-      return false
+      return false;
     }
   };
 }
@@ -84,7 +85,6 @@ export function LogoutUser() {
 // Google login action in authActionCreators.ts
 // export const loginWithGoogle = ()=>{
 
-
 //     try {
 //       const response =  publicAxios.get("/auth/google/callback");
 //       const { id, accessToken, refreshToken } = response.data;
@@ -98,6 +98,6 @@ export function LogoutUser() {
 //       console.error("Google login error:", error);
 //       throw error;
 //     }
-  
+
 // );
 // }

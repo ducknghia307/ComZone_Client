@@ -1,6 +1,8 @@
 import React from 'react';
-import { Modal, Box, Typography, Divider, IconButton, SxProps, Theme } from '@mui/material';
+import { Modal, Box, Typography, Divider, IconButton, SxProps, Theme, Chip, Stack, useTheme, alpha, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, styled } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import Grid from '@mui/material/Grid2';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
 interface OrderDetailsModalProps {
     open: boolean;
@@ -15,69 +17,27 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
         switch (status) {
             case "PENDING":
                 return {
-                    color: '#f89b28',
-                    backgroundColor: '#fff2c9',
-                    borderRadius: '8px',
-                    padding: '4px 12px',
-                    fontWeight: 'bold',
-                    display: 'inline-block',
-                    fontFamily: "REM",
-                    fontSize: '16px'
+                    color: '#f89b28', backgroundColor: '#fff2c9', borderRadius: '8px', padding: '4px 12px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM", fontSize: '16px'
                 };
             case "PACKAGING":
                 return {
-                    color: '#ff6b1c',
-                    backgroundColor: '#ffe8db',
-                    borderRadius: '8px',
-                    padding: '4px 12px',
-                    fontWeight: 'bold',
-                    display: 'inline-block',
-                    fontFamily: "REM",
-                    fontSize: '16px'
+                    color: '#ff6b1c', backgroundColor: '#ffe8db', borderRadius: '8px', padding: '4px 12px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM", fontSize: '16px'
                 };
             case "DELIVERING":
                 return {
-                    color: '#52a7bf',
-                    backgroundColor: '#daf4ff',
-                    borderRadius: '8px',
-                    padding: '4px 12px',
-                    fontWeight: 'bold',
-                    display: 'inline-block',
-                    fontFamily: "REM",
-                    fontSize: '16px'
+                    color: '#52a7bf', backgroundColor: '#daf4ff', borderRadius: '8px', padding: '4px 12px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM", fontSize: '16px'
                 };
             case "DELIVERED":
                 return {
-                    color: '#ffffff',
-                    backgroundColor: '#4CAF50',
-                    borderRadius: '8px',
-                    padding: '4px 12px',
-                    fontWeight: 'bold',
-                    display: 'inline-block',
-                    fontFamily: "REM",
-                    fontSize: '16px'
+                    color: '#ffffff', backgroundColor: '#4CAF50', borderRadius: '8px', padding: '4px 12px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM", fontSize: '16px'
                 };
             case "COMPLETED":
                 return {
-                    color: '#fef6c7',
-                    backgroundColor: '#395f18',
-                    borderRadius: '8px',
-                    padding: '4px 12px',
-                    fontWeight: 'bold',
-                    display: 'inline-block',
-                    fontFamily: "REM",
-                    fontSize: '16px'
+                    color: '#fef6c7', backgroundColor: '#395f18', borderRadius: '8px', padding: '4px 12px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM", fontSize: '16px'
                 };
             case "CANCELED":
                 return {
-                    color: '#e91e63',
-                    backgroundColor: '#fce4ec',
-                    borderRadius: '8px',
-                    padding: '4px 12px',
-                    fontWeight: 'bold',
-                    display: 'inline-block',
-                    fontFamily: "REM",
-                    fontSize: '16px'
+                    color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '4px 12px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM", fontSize: '16px'
                 };
             default:
                 return {};
@@ -86,22 +46,72 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
 
     const getStatusText = (status: string) => {
         switch (status) {
-            case "PENDING":
-                return "Chờ xử lí";
-            case "PACKAGING":
-                return "Đang đóng gói";
-            case "DELIVERING":
-                return "Đang giao hàng";
-            case "DELIVERED":
-                return "Đã giao thành công";
-            case "COMPLETED":
-                return "Hoàn tất";
-            case "CANCELED":
-                return "Bị hủy";
-            default:
-                return "Tất cả";
+            case "PENDING": return "Chờ xử lí";
+            case "PACKAGING": return "Đang đóng gói";
+            case "DELIVERING": return "Đang giao hàng";
+            case "DELIVERED": return "Đã giao thành công";
+            case "COMPLETED": return "Hoàn tất";
+            case "CANCELED": return "Bị hủy";
+            default: return "Tất cả";
         }
     };
+
+    const InfoRow = ({ label, value, isPaid }: { label: string; value: string | number; isPaid?: boolean; }) => {
+        const theme = useTheme();
+
+        return (
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                py={1}
+                px={3}
+                sx={{
+                    '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.light, 0.05),
+                        borderRadius: 1
+                    }
+                }}
+            >
+                <Typography
+                    color="text.secondary"
+                    variant="body2"
+                    sx={{
+                        whiteSpace: 'nowrap', fontWeight: 'bold', color: '#000', fontSize: '16px', fontFamily: "REM"
+                    }}
+                >
+                    {label}
+                </Typography>
+                <Typography
+                    variant="body1"
+                    sx={{
+                        paddingLeft: 2,
+                        color: isPaid !== undefined
+                            ? (isPaid ? '#32CD32' : '#ff9800')
+                            : '#000',
+                        whiteSpace: 'normal',
+                        wordWrap: 'break-word',
+                        fontFamily: "REM"
+                    }}
+
+                >
+                    {value}
+                </Typography>
+            </Box>
+        );
+    };
+
+    const StyledPaper = styled(Paper)(({ theme }) => ({
+        padding: theme.spacing(3),
+        backgroundColor: theme.palette.background.paper,
+        borderRadius: theme.spacing(2),
+        transition: 'transform 0.2s, box-shadow 0.2s',
+        '&:hover': {
+            // transform: 'translateY(-2px)',
+            boxShadow: theme.shadows[4]
+        }
+    }));
+
 
     return (
         <Modal open={open} onClose={onClose} BackdropProps={{
@@ -113,8 +123,8 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: 800,
-                    maxHeight: '80vh',
+                    width: 1000,
+                    maxHeight: '90vh',
                     bgcolor: 'background.paper',
                     boxShadow: 'none',
                     p: 4,
@@ -138,64 +148,125 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                         <CloseIcon />
                     </IconButton>
                 </Box>
-
-                <Box
-                    sx={{
-                        flex: 1,
-                        overflowY: 'auto',
-                        pr: 2,
-                        pt: 3
-                    }}
-                >
-                    {order.items.map((item: any, index: number) => (
-                        <React.Fragment key={index}>
-                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
-                                {/* Comic Image */}
-                                <img
-                                    src={item.comics.coverImage || 'https://via.placeholder.com/150'}
-                                    alt={item.comics.title}
-                                    style={{
-                                        width: '100px',
-                                        height: '140px',
-                                        objectFit: 'cover',
-                                        marginRight: '15px',
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '0px', color: 'rgba(0, 0, 0, 0.4)' }}>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                fontFamily: 'REM'
+                            }}
+                        >
+                            Ngày tạo đơn hàng: {new Date(order.createdAt).toLocaleString()}
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                fontFamily: 'REM'
+                            }}
+                        >
+                            Mã đơn hàng: {order.deliveryTrackingCode}
+                        </Typography>
+                    </div>
+                </Box>
+                <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                    <Grid size={12} sx={{ borderTop: `1px solid rgba(0, 0, 0, 0.12)`, paddingTop: '10px', paddingBottom: '10px' }}>
+                        <Stack divider={<Divider />} spacing={2} direction="row" justifyContent="space-between" padding={'10px 20px'}>
+                            <Box display="flex" flexDirection="column" flex={1} gap={1}>
+                                <Chip
+                                    label="Thông tin người bán"
+                                    sx={{
+                                        fontSize: '18px',
+                                        fontWeight: 'bold',
+                                        backgroundColor: '#fff',
+                                        color: '#000',
+                                        padding: '18px 25px',
+                                        fontFamily: "REM",
+                                        border: '2px solid black',
                                     }}
                                 />
+                                <InfoRow label="Họ tên" value={order.fromName} />
+                                <InfoRow label="Số điện thoại" value={order.fromPhone} />
+                                <InfoRow label="Địa chỉ" value={order.fromAddress} />
+                            </Box>
 
-                                {/* Comic Information */}
-                                <div style={{ flex: 1 }}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontFamily: "REM" }}>
-                                        {item.comics.title}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontFamily: "REM" }}>
-                                        <strong>Tác giả:</strong> {item.comics.author || 'N/A'}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontFamily: "REM" }}>
-                                        <strong>Mô tả:</strong> {item.comics.description ? item.comics.description.slice(0, 100) + (item.comics.description.length > 100 ? '...' : '') : 'No description available'}
-                                    </Typography>
+                            <Divider orientation="vertical" flexItem />
 
-                                </div>
+                            <Box display="flex" flexDirection="column" flex={1} gap={1}>
+                                <Chip
+                                    label="Thông tin thanh toán"
+                                    sx={{
+                                        fontSize: '18px', fontWeight: 'bold', backgroundColor: '#fff', color: '#000', padding: '18px 25px', fontFamily: "REM", border: '2px solid black',
+                                    }}
+                                />
+                                {/* <InfoRow label="Tổng tiền" value={`${order.totalPrice.toLocaleString()} đ`} />
+                                <InfoRow label="Phí vận chuyển" value={`${order.deliveryFee.toLocaleString()} đ`} /> */}
+                                <InfoRow label="Phương thức thanh toán" value={order.paymentMethod === 'WALLET' ? 'Ví Comzone' : order.paymentMethod} />
+                                <InfoRow
+                                    label="Trạng thái thanh toán"
+                                    value={order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
+                                    isPaid={order.isPaid}
+                                />
+                            </Box>
+                        </Stack>
 
-                                {/* Price and Quantity */}
-                                <div style={{ textAlign: 'right', paddingLeft: '40px' }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 'bold', fontFamily: "REM" }}>
-                                        {Number(item.comics.price).toLocaleString('vi-VN', {
-                                            style: 'currency',
-                                            currency: 'VND',
-                                        })}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontFamily: "REM" }}>
-                                        SL: x1
-                                    </Typography>
-                                </div>
+                        <Grid size={12} sx={{ paddingLeft: '20px', paddingRight: '20px', borderTop: `1px solid rgba(0, 0, 0, 0.12)`, paddingTop: '20px' }}>
+                            <Chip
+                                label="Thông tin sản phẩm"
+                                sx={{
+                                    fontSize: '18px', fontWeight: 'bold', backgroundColor: '#fff', color: '#000', padding: '18px 25px', fontFamily: "REM", border: '2px solid black', marginBottom: '20px'
+                                }}
+                            />
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow sx={{ backgroundColor: 'rgba(0,0,0,0.05)' }}>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: "REM" }}>Ảnh truyện</TableCell>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: "REM" }}>Tên truyện</TableCell>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: "REM" }}>Tác giả</TableCell>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: "REM" }}>Giá (đ)</TableCell>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: "REM" }}>Tập/Bộ</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+
+                                    <TableBody>
+                                        {order.items.map((item: any, index: number) => (
+                                            <TableRow key={index}>
+                                                <TableCell>
+                                                    <img
+                                                        src={item.comics.coverImage}
+                                                        alt={item.comics.title}
+                                                        style={{ width: 50, height: 'auto', margin: 'auto' }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell sx={{ fontFamily: "REM" }}>{item.comics.title}</TableCell>
+                                                <TableCell sx={{ fontFamily: "REM" }}>{item.comics.author || 'N/A'}</TableCell>
+                                                <TableCell sx={{ fontFamily: "REM" }}>{item.comics.price.toLocaleString()} đ</TableCell>
+                                                <TableCell sx={{ fontFamily: "REM" }}>{item.comics.quantity > 1 ? 'Bộ truyện' : 'Tập Truyện'}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Grid>
+                    </Grid>
+                    <Grid size={12} sx={{ paddingLeft: '20px', paddingRight: '20px', paddingTop: '10px', paddingBottom: '10px' }}>
+                        {/* {orderDetail.note && ( */}
+                        <StyledPaper sx={{ padding: '16px', backgroundColor: 'rgba(0, 0, 0, 0.05)', borderRadius: '8px' }}>
+                            <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                                <EditOutlinedIcon sx={{ fontSize: '16px' }} />
+                                <Typography fontSize='16px' fontWeight="bold" fontFamily="REM">
+                                    Ghi chú từ người mua:
+                                </Typography>
                             </div>
-                            {index < order.items.length - 1 && <Divider sx={{ my: 2 }} />}
-                        </React.Fragment>
-                    ))}
+
+                            <Typography variant="body1" marginTop={'5px'} fontFamily="REM">
+                                {order.note}
+                            </Typography>
+                        </StyledPaper>
+                    </Grid>
                 </Box>
 
                 <Divider sx={{ my: 2 }} />
-
                 <Box
                     sx={{
                         display: 'flex',
@@ -208,9 +279,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                     <div style={{
                         display: "flex", gap: "10px", backgroundColor: "#fff", alignItems: "center", marginLeft: 'auto',
                     }}>
-                        <Typography sx={{ fontSize: "14px", fontFamily: "REM", color: "text.secondary" }}>Phí vận chuyển: </Typography>
-                        <Typography sx={{ fontSize: "14px", color: "text.secondary", fontFamily: "REM" }}>
-                            {Number(order.totalPrice).toLocaleString("vi-VN", {
+                        <Typography sx={{ fontSize: "15px", fontFamily: "REM", color: "text.secondary" }}>Phí vận chuyển: </Typography>
+                        <Typography sx={{ fontSize: "15px", color: "text.secondary", fontFamily: "REM" }}>
+                            {Number(order.deliveryFee).toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
                             })}
@@ -228,6 +299,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                         </Typography>
                     </div>
                 </Box>
+
             </Box>
         </Modal>
     );

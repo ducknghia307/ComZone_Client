@@ -1,9 +1,9 @@
 import ExchangePost from "../components/exchange/ExchangePost";
-import { Button, message, notification, Tour } from "antd";
+import { Button, message, Tour } from "antd";
 import type { TourProps } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
-import { ExchangeRequest } from "../common/interfaces/exchange.interface";
+import { ExchangeRequest } from "../common/interfaces/exchange-request.interface";
 import Loading from "../components/loading/Loading";
 import ExchangeSearchBar from "../components/exchange/ExchangeSearchBar";
 import CreatePostModal from "../components/exchange/CreatePostModal";
@@ -13,15 +13,16 @@ import { useAppSelector } from "../redux/hooks";
 import { useSearchParams } from "react-router-dom";
 import ExchangeNotFound from "../components/exchange/ExchangeNotFound";
 import ChatModal from "./ChatModal";
+import EmptyExchangeList from "../components/exchange/EmptyExchangeList";
 
 export default function ExchangeNewsFeed() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const [isLoading, setIsLoading] = useState(false);
   const [beginTour, setBeginTour] = useState(false);
   const [exchangeList, setExchangeList] = useState<ExchangeRequest[]>([]);
-  const [findByOwnedMode, setFindByOwnedMode] = useState<boolean>(false);
   const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
   const [openSubscription, setOpenSubscription] = useState<boolean>(false);
+  const [isSelectModalOpen, setIsSelectModalOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,8 +36,9 @@ export default function ExchangeNewsFeed() {
 
   const steps: TourProps["steps"] = [
     {
-      title: "Tìm kiếm truyện cho chính mình.",
-      description: "Bắt đầu với việc tìm những truyện bạn muốn đổi lấy.",
+      title: "Truyện người khác cần.",
+      description:
+        "Bắt đầu với việc xem thử bạn có truyện người khác cần hay không.",
       cover: (
         <img
           alt="select_tour"
@@ -59,8 +61,9 @@ export default function ExchangeNewsFeed() {
       },
     },
     {
-      title: "Truyện người đăng đang tìm kiếm.",
-      description: "Xem qua những truyện người đăng đang tìm kiếm.",
+      title: "Xem truyện họ đang có.",
+      description:
+        "Bạn có thể xem danh sách những truyện người đăng đang có trong trang cá nhân của họ.",
       cover: (
         <img
           alt="select_tour"
@@ -92,7 +95,8 @@ export default function ExchangeNewsFeed() {
     },
     {
       title: "Bắt đầu trao đổi.",
-      description: "Bắt đầu trò chuyện để tiến hành trao đổi với nhau.",
+      description:
+        "Bắt đầu chọn truyện của bạn để gửi yêu cầu đến người muốn trao đổi, sau đó trò chuyện và xác nhận để hoàn tất.",
       cover: (
         <img
           alt="select_tour"
@@ -128,54 +132,22 @@ export default function ExchangeNewsFeed() {
     setIsLoading(true);
     try {
       if (searchParams.get("search")) {
-        if (!findByOwnedMode) {
-          setExchangeList(
-            isLoggedIn
-              ? await privateAxios
-                  .get(`exchange-requests/search/logged`, {
-                    params: {
-                      key: searchKey,
-                    },
-                  })
-                  .then((res) => {
-                    return res.data.data;
-                  })
-              : await publicAxios
-                  .get(`exchange-requests/search`, {
-                    params: {
-                      key: searchKey,
-                    },
-                  })
-                  .then((res) => {
-                    return res.data.data;
-                  })
-          );
-        } else {
-          isLoggedIn
-            ? setExchangeList(
-                await privateAxios
-                  .get(`exchange-requests/search/owned`, {
-                    params: {
-                      key: searchKey,
-                    },
-                  })
-                  .then((res) => {
-                    return res.data.data;
-                  })
-              )
-            : alert("Chưa đăng nhập!");
-        }
+        setExchangeList(
+          await publicAxios
+            .get(`exchange-requests/search`, {
+              params: {
+                key: searchKey,
+              },
+            })
+            .then((res) => {
+              return res.data.data;
+            })
+        );
       } else
         setExchangeList(
-          isLoggedIn
-            ? await privateAxios
-                .get(`exchange-requests/available/logged`)
-                .then((res) => {
-                  return res.data;
-                })
-            : await publicAxios.get(`exchanges/available`).then((res) => {
-                return res.data;
-              })
+          await publicAxios.get(`exchange-requests/available`).then((res) => {
+            return res.data;
+          })
         );
     } catch (err) {
     } finally {
@@ -198,7 +170,7 @@ export default function ExchangeNewsFeed() {
     if (!offeredList || offeredList.length === 0) {
       message.warning({
         key: "a",
-        duration: 2,
+        duration: 5,
         content:
           "Cần ít nhất 1 truyện dùng để trao đổi trước khi được đăng bài tìm trao đổi!",
       });
@@ -229,7 +201,7 @@ export default function ExchangeNewsFeed() {
     fetchExchangeNewsFeed();
   }, [searchParams]);
 
-  const handleOpenChat = async (exchange: ExchangeRequest) => {
+  const handleOpenChat = async (exchangeRequest: ExchangeRequest) => {
     if (!isLoggedIn) {
       alert("Chưa đăng nhập!");
       return;
@@ -237,8 +209,8 @@ export default function ExchangeNewsFeed() {
       setIsLoading(true);
       await privateAxios
         .post("chat-rooms", {
-          secondUser: exchange.user.id,
-          exchange: exchange.id,
+          secondUser: exchangeRequest.user.id,
+          exchangeRequest: exchangeRequest.id,
         })
         .then((res) => {
           sessionStorage.setItem("connectedChat", res.data.id);
@@ -252,13 +224,11 @@ export default function ExchangeNewsFeed() {
   return (
     <div className="w-full flex justify-center bg-[rgba(0,0,0,0.03)]">
       {isLoading && <Loading />}
-      <div className="w-full md:w-3/4 flex items-center justify-center min-h-[80vh] px-8 pb-8 REM">
+      <div className="w-full flex items-start justify-center min-h-[80vh] px-8 pb-8 REM border-4">
         <div className="w-full flex flex-col items-center justify-start gap-2 py-8">
           <ExchangeSearchBar
             isLoggedIn={isLoggedIn}
             setBeginTour={setBeginTour}
-            findByOwnedMode={findByOwnedMode}
-            setFindByOwnedMode={setFindByOwnedMode}
             handleOpenCreatePost={handleOpenCreatePost}
             searchKey={searchKey}
             setSearchKey={setSearchKey}
@@ -276,24 +246,28 @@ export default function ExchangeNewsFeed() {
             setOpenCreatePost={setOpenCreatePost}
           />
 
-          <div className="w-full min-w-[50em] flex flex-col items-center justify-center gap-8 py-4">
+          <div className="w-full grid grid-cols-[repeat(auto-fill,50em)] items-stretch justify-center gap-8 py-4">
             {exchangeList && exchangeList.length > 0 ? (
               exchangeList.map((exchange, index: number) => {
                 return (
                   <ExchangePost
                     key={index}
-                    exchange={exchange}
+                    exchangeRequest={exchange}
                     refs={[ref1, ref2, ref3]}
                     index={index}
-                    handleOpenChat={handleOpenChat}
+                    isLoading={isLoading}
+                    isSelectModalOpen={isSelectModalOpen}
+                    setIsSelectModalOpen={setIsSelectModalOpen}
                   />
                 );
               })
-            ) : (
+            ) : searchParams.get("search") ? (
               <ExchangeNotFound
                 searchParams={searchParams}
                 isLoading={isLoading}
               />
+            ) : (
+              <EmptyExchangeList isLoading={isLoading} />
             )}
           </div>
         </div>

@@ -54,6 +54,7 @@ export default function ChatModal({
       .get("chat-rooms/user")
       .then((res) => {
         const list = res.data;
+        console.log("CHATROOMS: ", list);
         dispatch(chatSlice.actions.setChatRoomList(list));
 
         if (!currentlySelectedRoom && list.length > 0) {
@@ -122,9 +123,6 @@ export default function ChatModal({
           content: messageInput,
           type: "TEXT",
         });
-
-        fetchMessageList(currentlySelectedRoom);
-
         setMessageInput("");
       }
     }
@@ -176,6 +174,8 @@ export default function ChatModal({
           setMessageInput={setMessageInput}
           updateIsRead={updateIsRead}
           lastMessageRef={lastMessageRef}
+          isLoading={isLoading}
+          fetchChatRoomList={fetchChatRoomList}
         />
       </div>
     </Modal>

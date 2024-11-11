@@ -1,22 +1,22 @@
 /* width */
-.exchange::-webkit-scrollbar {
+.exchangeRequest::-webkit-scrollbar {
   width: 5px;
 }
 
 /* Track */
-.exchange::-webkit-scrollbar-track {
+.exchangeRequest::-webkit-scrollbar-track {
   background: #fff;
   padding: 5px;
 }
 
 /* Handle */
-.exchange::-webkit-scrollbar-thumb {
+.exchangeRequest::-webkit-scrollbar-thumb {
   background: #777;
   border-radius: 5px;
 }
 
 /* Handle on hover */
-.exchange::-webkit-scrollbar-thumb:hover {
+.exchangeRequest::-webkit-scrollbar-thumb:hover {
   background: #333;
 }
 

@@ -16,6 +16,7 @@ export default function CreatePostModal({
   setOpenCreatePost: (open: boolean) => void;
 }) {
   const [postContent, setPostContent] = useState("");
+  const [postContentError, setPostContentError] = useState(false);
   const [comicList, setComicList] = useState<ExchangeElement[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [loading, setLoading] = useState(false);
@@ -46,6 +47,28 @@ export default function CreatePostModal({
   };
 
   const handleSubmit = async () => {
+    if (comicList.length === 0) {
+      notification.error({
+        message: "Lỗi",
+        description:
+          "Bạn cần thêm ít nhất thông tin về 1 cuốn truyện bạn muốn trao đổi.",
+        duration: 2,
+      });
+
+      return;
+    }
+    if (!postContent.trim()) {
+      setPostContentError(true);
+      notification.error({
+        message: "Lỗi",
+        description: "Bạn phải nhập nội dung bài đăng",
+        duration: 2,
+      });
+      return;
+    }
+    // if (!postContent.trim()) {
+    //   return;
+    // }
     setLoading(true);
     try {
       const requestedComics = comicList.map((comic) => ({
@@ -124,6 +147,11 @@ export default function CreatePostModal({
             handleDelete={handleDelete}
           />
         )}
+        {comicList.length === 0 && (
+          <p className="text-red-500 text-xs mt-1">
+            Bạn cần thêm ít nhất thông tin về 1 cuốn truyện bạn muốn trao đổi
+          </p>
+        )}
         {userInfo && (
           <NewExchangeForm
             comicList={comicList.length}
@@ -131,14 +159,25 @@ export default function CreatePostModal({
             userInfo={userInfo}
           />
         )}
-
+        <div className="flex flex-row gap-1 mt-4">
+          <h2>Nội dung bài viết:</h2>
+          <p className="text-red-500">*</p>
+        </div>
         <TextArea
           value={postContent}
-          onChange={(e) => setPostContent(e.target.value)}
+          onChange={(e) => {
+            setPostContent(e.target.value);
+            setPostContentError(false);
+          }}
           placeholder="Hãy viết gì đó ở đây..."
           autoSize={{ minRows: 3, maxRows: 5 }}
-          className="mt-4 p-3"
+          className="mt-2 p-3"
         />
+        {postContentError && (
+          <p className="text-red-500 text-xs mt-1">
+            Cần nhập nội dung bài đăng
+          </p>
+        )}
         <div className="w-full flex justify-end mt-4 flex-row gap-10">
           <button
             className="border-none font-semibold hover:opacity-70 duration-200"

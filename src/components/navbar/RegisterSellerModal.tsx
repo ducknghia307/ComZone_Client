@@ -14,7 +14,7 @@ const RegisterSellerModal: React.FC<OpenModal> = ({
   return (
     <>
       <Modal
-        title="Basic Modal"
+        title={<h2 className="text-xl">Đăng ký trở thành Người bán</h2>}
         open={isRegisterSellerModal}
         // onOk={handleOk}
         onCancel={() => setIsRegisterSellerModal(!isRegisterSellerModal)}

@@ -5,6 +5,9 @@ import { ExchangeRequest } from "../../common/interfaces/exchange-request.interf
 import moment from "moment/min/moment-with-locales";
 import dateFormat from "../../assistants/date.format";
 import SelectOfferComicsModal from "../chat/right/SelectOfferComicsModal";
+import { Modal } from "antd";
+import { privateAxios } from "../../middleware/axiosInstance";
+import { Comic } from "../../common/base.interface";
 
 moment.locale("vi");
 
@@ -26,17 +29,42 @@ export default function ExchangePost({
   currentUserId: string;
 }) {
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [comicExchangeOffer, setComicExchangeOffer] = useState<Comic[]>([]);
+  // const showModal = () => {
+  //   setIsModalOpen(true);
+  // };
 
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   const handleSelect = (value: number) => {
     if (currentlySelected === value) setCurrentlySelected(-1);
     else setCurrentlySelected(value);
   };
-
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+    fetchComicExchangeOffer();
+  };
   const checkTimeDisplay =
     exchangeRequest.createdAt &&
     moment(new Date()).unix() - moment(exchangeRequest.createdAt).unix() >
       172800;
 
+  const fetchComicExchangeOffer = async () => {
+    try {
+      const res = await privateAxios(
+        `/comics/exchange-offer/${exchangeRequest.user.id}`
+      );
+      setComicExchangeOffer(res.data);
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  };
   return (
     <div className="w-full flex rounded-lg px-4 max-w-[100em] bg-white drop-shadow-md">
       <div className="grow flex flex-col min-w-[30em] px-2 py-4">
@@ -90,13 +118,24 @@ export default function ExchangePost({
               currentUserId === exchangeRequest.user.id && "hidden"
             }`}
           >
-            <button
-              ref={index == 0 ? refs[2] : null}
-              onClick={() => setIsSelectModalOpen(exchangeRequest.id)}
-              className="min-w-max p-2 bg-sky-700 text-white rounded-lg"
-            >
-              Bắt đầu trao đổi
-            </button>
+            <div className="flex flex-row gap-4">
+              <button
+                className="border rounded-lg min-w-max p-2"
+                onClick={handleOpenModal}
+              >
+                Xem truyện của{" "}
+                <span className="font-semibold">
+                  {exchangeRequest.user.name}
+                </span>
+              </button>
+              <button
+                ref={index == 0 ? refs[2] : null}
+                onClick={() => setIsSelectModalOpen(exchangeRequest.id)}
+                className="min-w-max p-2 bg-sky-700 text-white rounded-lg"
+              >
+                Bắt đầu trao đổi
+              </button>
+            </div>
             <SelectOfferComicsModal
               exchangeRequest={exchangeRequest}
               isLoading={isLoading}
@@ -141,6 +180,47 @@ export default function ExchangePost({
           </div>
         </div>
       </div>
+      <Modal
+        title="Basic Modal"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+        width={1000}
+      >
+        <div
+          ref={index === 0 ? refs[0] : null}
+          className={`${
+            comicExchangeOffer.length === 0 && "hidden"
+          } w-full border border-gray-300 rounded-lg relative overflow-hidden mt-4`}
+        >
+          <div className="w-full bg-[rgba(0,0,0,0.03)] border-b border-gray-300 py-2 top-0 sticky">
+            <p className="px-4 font-light">
+              Danh sách truyện{" "}
+              <span className="font-semibold">{exchangeRequest.user.name}</span>{" "}
+              đang có:
+            </p>
+          </div>
+
+          <div
+            className={`w-full flex flex-wrap gap-x-[2%] gap-y-2 p-2 max-h-[25em] relative overflow-y-auto ${styles.exchangeRequest}`}
+          >
+            {comicExchangeOffer &&
+              comicExchangeOffer.map((comics, index) => {
+                return (
+                  <SingleOfferedComics
+                    key={index}
+                    comics={comics}
+                    index={index}
+                    currentlySelected={currentlySelected}
+                    handleSelect={handleSelect}
+                    length={comicExchangeOffer.length || 0}
+                  />
+                );
+              })}
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

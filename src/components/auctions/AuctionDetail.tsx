@@ -37,8 +37,8 @@ const ComicAuction = () => {
       const now = Date.now();
 
       if (now >= endTimestamp) {
-        setAuctionEnded(true); // Đấu giá đã kết thúc
-        setIsBidDisabled(true); // Vô hiệu hóa hành động đấu giá
+        setAuctionEnded(true); 
+        setIsBidDisabled(true); 
       }
     }
     setLoading(false)

@@ -6,7 +6,7 @@ moment.locale("vi");
 export default function ChatSectionHeader({
   chatRoom,
 }: {
-  chatRoom: ChatRoom | null;
+  chatRoom: ChatRoom | undefined;
 }) {
   return (
     <div className="w-full flex items-center justify-between gap-4 drop-shadow-xl px-4">

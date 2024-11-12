@@ -1,22 +1,22 @@
 import { useState } from "react";
-import { ChatRoom } from "../../../common/interfaces/chat-room.interface";
 import dateFormat from "../../../assistants/date.format";
 import { Avatar } from "antd";
+import { ChatGroup } from "../../../common/interfaces/chat-group.interface";
 
 export default function ChatRoomList({
-  chatRoomList,
+  chatList,
   currentSelectedRoom,
-  handleSelectChatRoom,
+  handleSelectChat,
 }: {
-  chatRoomList: ChatRoom[] | [];
-  currentSelectedRoom: ChatRoom | null;
-  handleSelectChatRoom: Function;
+  chatList: ChatGroup[] | [];
+  currentSelectedRoom: ChatGroup | undefined;
+  handleSelectChat: Function;
 }) {
   const [isDisplayedDefault, setIsDisplayedDefault] = useState<boolean>(true);
   return (
     <div
       className={`${
-        isDisplayedDefault ? "w-[25em]" : "w-fit"
+        isDisplayedDefault ? "basis-1/3" : "w-fit"
       }  border-r border-gray-300 transition-all duration-300 overflow-y-auto relative`}
     >
       <div
@@ -71,18 +71,18 @@ export default function ChatRoomList({
       </div>
 
       <div className="w-full flex flex-col justify-start gap-1">
-        {chatRoomList.map((chatRoom: ChatRoom) => {
-          const user = chatRoom.secondUser;
+        {chatList.map((chat: ChatGroup) => {
+          const user = chat.chatRoom.secondUser;
           return (
             <button
-              key={chatRoom.id}
-              onClick={() => handleSelectChatRoom(chatRoom)}
+              key={chat.id}
+              onClick={() => handleSelectChat(chat)}
               className={`${
                 isDisplayedDefault
                   ? "justify-start pl-2 rounded-lg"
                   : "justify-center px-2 rounded-lg"
               } ${
-                currentSelectedRoom?.id === chatRoom.id
+                currentSelectedRoom?.id === chat.id
                   ? "bg-sky-50"
                   : "duration-200 hover:bg-gray-100"
               } w-full min-h-20 max-h-32 flex items-center gap-4`}
@@ -101,22 +101,22 @@ export default function ChatRoomList({
                 </p>
                 <span
                   className={`${
-                    !chatRoom.lastMessage && "hidden"
+                    !chat.chatRoom.lastMessage && "hidden"
                   } flex items-center gap-2 text-start font-light`}
                 >
                   <p
                     className={`line-clamp-1 max-w-[8em] break-words ${
-                      !chatRoom.lastMessage?.isRead &&
-                      !chatRoom.lastMessage?.mine &&
+                      !chat.chatRoom.lastMessage?.isRead &&
+                      !chat.chatRoom.lastMessage?.mine &&
                       "font-semibold"
                     }`}
                   >
-                    {chatRoom.lastMessage?.mine && "Bạn: "}
-                    {chatRoom.lastMessage?.content}
+                    {chat.chatRoom.lastMessage?.mine && "Bạn: "}
+                    {chat.chatRoom.lastMessage?.content}
                   </p>
                   <p>&#8226;</p>
                   <p className="text-xs pr-2">
-                    {dateFormat(chatRoom.updatedAt, "HH:MM")}
+                    {dateFormat(chat.chatRoom.updatedAt, "HH:MM")}
                   </p>
                 </span>
               </div>

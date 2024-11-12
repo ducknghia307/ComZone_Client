@@ -11,6 +11,7 @@ import socket from "../../services/socket";
 import { setAuctionData } from "../../redux/features/auction/auctionSlice";
 import CountdownFlipNumbers from "./CountDown";
 import CountUp from "react-countup";
+import Loading from "../loading/Loading";
 
 // Countdown renderer function
 
@@ -21,9 +22,27 @@ const ComicAuction = () => {
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState<string>("");
   const auctionData = useAppSelector((state: any) => state.auction.auctionData);
-  console.log("121", auctionData);
   const [previewChapter, setPreviewChapter] = useState<string[]>([]);
   const [bidAmount, setBidAmount] = useState<string>("");
+  const [auctionEnded, setAuctionEnded] = useState(false);
+  const [isBidDisabled, setIsBidDisabled] = useState(false);
+
+  const handleBidActionDisabled = (disabled: boolean) => {
+    setIsBidDisabled(disabled);
+  };
+  useEffect(() => {
+    setLoading(true)
+    if (auctionData.endTime) {
+      const endTimestamp = new Date(auctionData.endTime).getTime();
+      const now = Date.now();
+
+      if (now >= endTimestamp) {
+        setAuctionEnded(true); // Đấu giá đã kết thúc
+        setIsBidDisabled(true); // Vô hiệu hóa hành động đấu giá
+      }
+    }
+    setLoading(false)
+  }, [auctionData.endTime]);
 
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -63,7 +82,7 @@ const ComicAuction = () => {
       socket.off("bidUpdate");
     };
   }, [auctionData?.id, dispatch]);
-  if (loading) return <p>Loading comic details...</p>;
+  if (loading) return <Loading/>;
   if (!comic) return <p>Comic not found.</p>;
 
   const handleImageClick = (imageSrc: string) => {
@@ -92,21 +111,6 @@ const ComicAuction = () => {
     } catch (error) {
       console.error("Error placing bid:", error);
     }
-  };
-
-  const formatEndTime = (endTime: string) => {
-    const date = new Date(endTime);
-    return date.toLocaleString("vi-VN", {
-      timeZone: "Asia/Ho_Chi_Minh",
-      weekday: "short",
-      year: "numeric",
-      day: "2-digit",
-      month: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    });
   };
 
   return (
@@ -166,20 +170,11 @@ const ComicAuction = () => {
 
         <Grid size={5} className="auction-info">
           <div className="timer">
-            <p
-              style={{
-                fontFamily: "REM",
-                fontSize: "20px",
-                paddingBottom: "15px",
-              }}
-            >
-              KẾT THÚC VÀO: {formatEndTime(auctionData.endTime)}
-            </p>
             <CountdownFlipNumbers
+              onBidActionDisabled={handleBidActionDisabled}
               auctionId={auctionData.id}
               endTime={auctionData.endTime}
             />
-
             <div
               className="current-price"
               style={{
@@ -290,12 +285,14 @@ const ComicAuction = () => {
                 className="bid-input"
                 value={bidAmount}
                 onChange={handleBidInputChange}
+                disabled={isBidDisabled}
               />
               <Button
                 variant="contained"
                 className="bid-button"
                 onClick={handlePlaceBid}
                 sx={{ fontFamily: "REM" }}
+                disabled={isBidDisabled}
               >
                 RA GIÁ
               </Button>

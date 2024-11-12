@@ -25,6 +25,7 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [newComicRes, setNewComicRes] = useState(false);
   const [title, setTitle] = useState("");
+  const [titleError, setTitleError] = useState(false);
   const [author, setAuthor] = useState("");
   const [edition, setEdition] = useState("REGULAR");
   const [numOfComics, setNumOfComics] = useState(2);
@@ -68,11 +69,15 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
     } catch (error) {
       console.error("Image upload failed:", error);
     } finally {
-      setIsUploading(false); // Stop loading indicator
+      setIsUploading(false);
     }
   };
 
   const handleSubmit = () => {
+    if (!title.trim()) {
+      setTitleError(true);
+      return;
+    }
     setIsUploading(true);
     const comicData = {
       title,
@@ -81,7 +86,6 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
       edition,
       condition: used === 1 ? "USED" : "SEALED",
       quantity: quantity === 2 ? numOfComics : 1,
-      // numOfComics: quantity === 2 ? numOfComics : 1,
     };
 
     console.log(comicData);
@@ -141,7 +145,7 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
                     id="upload"
                     className="hidden"
                     onChange={handleFileChange}
-                    disabled={!!imageUrl} // Disable file input if an image is already uploaded
+                    disabled={!!imageUrl}
                   />
                 </div>
                 {imageUrl ? (
@@ -158,45 +162,28 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
                 )}
               </div>
               <div className="flex flex-col w-5/6 justify-center gap-7">
-                <input
-                  type="text"
-                  placeholder="Tựa đề của truyện..."
-                  className="py-2 border-b-2 px-2 w-[20em] border-black focus:!border-white"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-                <div className="flex flex-row w-full gap-5">
-                  <div className="w-1/2">
-                    <div className="flex flex-row gap-1">
-                      <h2 className="font-sm">Tác giả:</h2>
-                      <p className="text-red-500">*</p>
-                    </div>
-                    <input
-                      type="text"
-                      className="border border-gray-300 rounded-lg mt-2 p-2 min-w-[20em]"
-                      value={author}
-                      onChange={(e) => setAuthor(e.target.value)}
-                    />
-                  </div>
-                  <div className="w-1/2">
-                    <div className="flex flex-row gap-1">
-                      <h2 className="font-sm">Phiên bản:</h2>
-                      <p className="text-red-500">*</p>
-                    </div>
-                    <Select
-                      size="large"
-                      value={edition}
-                      onChange={(value) => setEdition(value)}
-                      style={{ width: 300, borderRadius: 9 }}
-                      options={[
-                        { value: "REGULAR", label: "Phiên bản thường" },
-                        { value: "SPECIAL", label: "Phiên bản đặc biệt" },
-                        { value: "LIMITED", label: "Phiên bản giới hạn" },
-                      ]}
-                      className="mt-2 border-1"
-                    />
-                  </div>
+                <div className="flex flex-col">
+                  <input
+                    type="text"
+                    placeholder="Tựa đề của truyện..."
+                    className={`py-2 border-b-2 px-2 w-[20em] ${
+                      titleError
+                        ? "border-red-500 focus:!border-red-500"
+                        : "border-black focus:!border-white"
+                    }`}
+                    value={title}
+                    onChange={(e) => {
+                      setTitle(e.target.value);
+                      setTitleError(false);
+                    }}
+                  />
+                  {titleError && (
+                    <p className="text-red-500 text-xs mt-1">
+                      Vui lòng nhập tựa đề của truyện.
+                    </p>
+                  )}
                 </div>
+
                 <div className="flex flex-row gap-5 w-full">
                   <div className="flex flex-col w-1/2">
                     <div className="flex flex-row">
@@ -236,19 +223,50 @@ const NewExchangeForm: React.FC<NewExchangeFormProps> = ({
                     </div>
                   </div>
                 </div>
+                <div className="flex flex-row w-full gap-5">
+                  <div className="w-1/2">
+                    <div className="flex flex-row gap-1">
+                      <h2 className="font-sm">Tác giả:</h2>
+                    </div>
+                    <input
+                      type="text"
+                      className="border border-gray-300 rounded-lg mt-2 p-2 min-w-[20em]"
+                      value={author}
+                      onChange={(e) => setAuthor(e.target.value)}
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <div className="flex flex-row gap-1">
+                      <h2 className="font-sm">Phiên bản:</h2>
+                    </div>
+                    <Select
+                      size="large"
+                      value={edition}
+                      onChange={(value) => setEdition(value)}
+                      style={{ width: 300, borderRadius: 9 }}
+                      options={[
+                        { value: "REGULAR", label: "Phiên bản thường" },
+                        { value: "SPECIAL", label: "Phiên bản đặc biệt" },
+                        { value: "LIMITED", label: "Phiên bản giới hạn" },
+                      ]}
+                      className="mt-2 border-1"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <div className="w-full flex justify-end py-2 px-14">
               <button
-                className="px-14 py-2 font-bold border border-black rounded-lg hover:opacity-70 duration-200"
+                className={` px-14 py-2 font-bold border border-black rounded-lg hover:opacity-70 duration-200`}
                 onClick={handleSubmit}
+                // disabled={!title.trim()}
               >
                 XONG
               </button>
             </div>
           </div>
         )}
-        {comicList < 4 && !newComicRes && (
+        {!newComicRes && (
           <div className="w-full flex items-start">
             <button
               className="px-3 py-1 border-2 rounded-md flex items-center hover:opacity-70 duration-200 gap-2"

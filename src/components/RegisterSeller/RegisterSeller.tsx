@@ -148,7 +148,7 @@ const RegisterSeller: React.FC = () => {
   };
 
   return (
-    <div className="w-full px-2 py-4">
+    <div className="w-full px-2 pb-4 pt-8">
       <div className="flex w-full items-center justify-center">
         <Steps
           current={current}

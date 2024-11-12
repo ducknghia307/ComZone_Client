@@ -163,7 +163,7 @@ export default function ExchangePost({
             <p className="px-4 font-light">
               Danh sách truyện{" "}
               <span className="font-semibold">{exchangeRequest.user.name}</span>{" "}
-              đang tìm kiếm trao đổi:
+              đang tìm kiếm trao đổi ({exchangeRequest.requestComics.length}):
             </p>
           </div>
 

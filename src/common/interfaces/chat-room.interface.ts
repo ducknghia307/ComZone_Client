@@ -9,5 +9,4 @@ export interface ChatRoom extends BaseInterface {
   lastMessage?: Message;
   comics?: Comic;
   exchangeRequest?: ExchangeRequest;
-  exchangeOffer?: ExchangeOffer;
 }

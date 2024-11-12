@@ -1,5 +1,5 @@
 import ExchangePost from "../components/exchange/ExchangePost";
-import { Button, message, notification, Tour } from "antd";
+import { Button, notification, Tour } from "antd";
 import type { TourProps } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
@@ -267,6 +267,8 @@ export default function ExchangeNewsFeed() {
                     isSelectModalOpen={isSelectModalOpen}
                     setIsSelectModalOpen={setIsSelectModalOpen}
                     currentUserId={userId}
+                    isChatOpen={isChatOpen}
+                    setIsChatOpen={setIsChatOpen}
                   />
                 );
               })

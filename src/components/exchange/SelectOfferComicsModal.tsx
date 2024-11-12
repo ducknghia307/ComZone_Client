@@ -9,10 +9,14 @@ export default function SelectOfferComicsModal({
   exchangeRequest,
   isSelectModalOpen,
   setIsSelectModalOpen,
+  isChatOpen,
+  setIsChatOpen,
 }: {
   exchangeRequest: ExchangeRequest;
   isSelectModalOpen: string;
   setIsSelectModalOpen: Function;
+  isChatOpen: boolean;
+  setIsChatOpen: Function;
   isLoading: boolean;
 }) {
   const [selectOptionValues, setSelectOptionValues] = useState<
@@ -65,14 +69,17 @@ export default function SelectOfferComicsModal({
         offerComics: selectedComicsList,
         compensationAmount: 0,
       })
-      .then(() => {
-        notification.success({
-          message: "Gửi thành công!",
-          description:
-            "Yêu cầu đề nghị trao đổi đã được gửi đi. Hãy chờ phản hồi của người nhận.",
-          duration: 10,
-        });
-        handleModalClose();
+      .then(async () => {
+        await privateAxios
+          .post("chat-rooms", {
+            secondUser: exchangeRequest.user.id,
+            exchangeRequest: exchangeRequest.id,
+          })
+          .then((res) => {
+            sessionStorage.setItem("connectedChat", res.data.id);
+            setIsChatOpen(true);
+            handleModalClose();
+          });
       })
       .catch(() => {
         notification.error({
@@ -164,11 +171,7 @@ export default function SelectOfferComicsModal({
             setIsOpen={setIsConfirming}
             title="Xác nhận gửi yêu cầu?"
             description={
-              <p>
-                Yêu cầu của bạn sẽ được gửi đến người dùng này. Bạn có thể tiếp
-                tục trao đổi và cập nhật yêu cầu của bạn khi trò chuyện trực
-                tiếp với họ.
-              </p>
+              <p>Bạn đã chắc chắn muốn gửi yêu cầu với những truyện này?</p>
             }
             cancelCallback={() => {}}
             confirmCallback={() => handleSubmitOffer()}

@@ -1,6 +1,6 @@
-import { MessageGroup } from "../../../common/interfaces/message.interface";
+import { MessageGroup } from "../../common/interfaces/message.interface";
 import moment from "moment/min/moment-with-locales";
-import styles from "../style.module.css";
+import styles from "./style.module.css";
 
 moment.locale("vi");
 

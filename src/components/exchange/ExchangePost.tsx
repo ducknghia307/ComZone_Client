@@ -4,12 +4,10 @@ import styles from "./style.module.css";
 import { ExchangeRequest } from "../../common/interfaces/exchange-request.interface";
 import moment from "moment/min/moment-with-locales";
 import dateFormat from "../../assistants/date.format";
-
-import SelectOfferComicsModal from "../chat/right/SelectOfferComicsModal";
+import SelectOfferComicsModal from "./SelectOfferComicsModal";
 import { Modal } from "antd";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
-
 
 moment.locale("vi");
 
@@ -20,6 +18,8 @@ export default function ExchangePost({
   isLoading,
   isSelectModalOpen,
   setIsSelectModalOpen,
+  isChatOpen,
+  setIsChatOpen,
   currentUserId,
 }: {
   exchangeRequest: ExchangeRequest;
@@ -28,6 +28,8 @@ export default function ExchangePost({
   isLoading: boolean;
   isSelectModalOpen: string;
   setIsSelectModalOpen: Function;
+  isChatOpen: boolean;
+  setIsChatOpen: Function;
   currentUserId: string;
 }) {
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
@@ -143,6 +145,8 @@ export default function ExchangePost({
               isLoading={isLoading}
               isSelectModalOpen={isSelectModalOpen}
               setIsSelectModalOpen={setIsSelectModalOpen}
+              isChatOpen={isChatOpen}
+              setIsChatOpen={setIsChatOpen}
             />
           </div>
         </div>

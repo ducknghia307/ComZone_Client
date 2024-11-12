@@ -1,10 +1,259 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import TablePagination from '@mui/material/TablePagination';
+import { privateAxios } from '../../middleware/axiosInstance';
+import { IconButton, Typography } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import OrderDetailMod from './OrderDetailMod';
+import AuctionDetailMod from '../modal/AuctionDetailMod';
+
+interface Order {
+  id: number;
+  customerName: string;
+  product: string;
+  quantity: number;
+  totalAmount: number;
+  status: string;
+}
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  // '&:nth-of-type(odd)': {
+  //   backgroundColor: theme.palette.action.hover,
+  // },
+  '&:last-child td, &:last-child th': {
+    border: 0,
+  },
+}));
 
 const ManageAuctions: React.FC = () => {
+  const [auctions, setAuctions] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAuction, setSelectedAuction] = useState(null);
+
+  const openOrderDetail = (orderId: string) => {
+    setSelectedOrderId(orderId);
+  };
+
+  const closeOrderDetail = () => {
+    setSelectedOrderId(null);
+  };
+
+  useEffect(() => {
+    const fetchOrdersWithItems = async () => {
+      try {
+        const response = await privateAxios.get("/auction");
+        const auctionsData = response.data;
+
+        // Check if auctionsData is an array and has expected data
+        if (!Array.isArray(auctionsData) || auctionsData.length === 0) {
+          console.error("No auctions data or unexpected format:", auctionsData);
+          setLoading(false);
+          return;
+        }
+
+        setAuctions(auctionsData);
+        console.log("Auctions:", auctionsData);
+      } catch (error) {
+        console.error("Error fetching auctions:", error);
+      } finally {
+        // Ensure loading is set to false after fetch completes or if an error occurs
+        setLoading(false);
+      }
+    };
+
+    fetchOrdersWithItems();
+  }, []);
+
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedAuction(null);
+  };
+
+  const handleEditClick = (auction) => {
+    setSelectedAuction({
+      ...auction,
+      sellerInfo: auction.comics.sellerId || {},
+      comics: auction.comics,
+    });
+    setIsModalOpen(true);
+  };
+
+
+  const handleModalSuccess = () => {
+    // Refresh or update the auctions data if necessary
+    handleModalClose();
+  };
+
+  const getStatusChipStyles = (status: string) => {
+    switch (status) {
+      case 'SUCCESSFUL':
+        return { color: '#4caf50', backgroundColor: '#e8f5e9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+      case 'UPCOMING':
+        return { color: '#6226EF', backgroundColor: '#EDE7F6', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+      case 'PROCESSING':
+        return { color: '#ff9800', backgroundColor: '#fff3e0', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', };
+      case 'ONGOING':
+        return { color: '#2196f3', backgroundColor: '#e3f2fd', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+      case 'FAILED':
+        return { color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+      case 'REJECTED':
+        return { color: '#f44336', backgroundColor: '#ffebee', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+    }
+  };
+
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case 'SUCCESSFUL':
+        return 'Thành công';
+      case 'UPCOMING':
+        return 'Sắp diễn ra';
+      case 'PROCESSING':
+        return 'Đang xử lí';
+      case 'ONGOING':
+        return 'Đang diễn ra';
+      case 'FAILED':
+        return 'Thất bại';
+      case 'REJECTED':
+        return 'Bị từ chối';
+      default:
+        return status;
+    }
+  };
+
+  const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+  };
+
   return (
     <div>
-      <h2>Quản lý dau gia</h2>
-      <p>auction</p>
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold' }}>
+        Quản lý đấu giá
+      </Typography>
+      <Paper>
+        <TableContainer>
+          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Người Bán</StyledTableCell>
+                <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>Tên Truyện</StyledTableCell>
+                <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>Trạng Thái Đấu Giá</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Thời Gian Bắt Đầu</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Thời Gian Kết Thúc</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Giá Khởi Điểm</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Bước Giá</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Giá Hiện Tại</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Chi Tiết</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              ) : (
+                auctions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((auction) => (
+                  <React.Fragment key={auction.id}>
+                    <StyledTableRow>
+                      <StyledTableCell >
+                        {auction.comics.sellerId.name}
+                      </StyledTableCell>
+                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>
+                        {truncateText(auction.comics.title, 20)}
+                      </StyledTableCell>
+                      <StyledTableCell align="left">
+                        <span style={getStatusChipStyles(auction.status)}>
+                          {translateStatus(auction.status)}
+                        </span>
+                      </StyledTableCell>
+                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>
+                        {new Date(auction.startTime).toLocaleString()}
+                      </StyledTableCell>
+                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>
+                        {new Date(auction.endTime).toLocaleString()}
+                      </StyledTableCell>
+                      <StyledTableCell align="left">
+                        {auction.reservePrice.toLocaleString()} đ
+                      </StyledTableCell>
+                      <StyledTableCell align="left">
+                        {auction.priceStep.toLocaleString()} đ
+                      </StyledTableCell>
+                      <StyledTableCell align="left">
+                        {auction.currentPrice.toLocaleString()} đ
+                      </StyledTableCell>
+                      <StyledTableCell align="left">
+                        <IconButton color="default" onClick={() => handleEditClick(auction)}>
+                          <InfoOutlinedIcon />
+                        </IconButton>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  </React.Fragment>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 15]}
+          component="div"
+          count={auctions.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+
+      {selectedAuction && (
+        <AuctionDetailMod
+          open={isModalOpen}
+          onCancel={handleModalClose}
+          comic={selectedAuction.comics}
+          auctionData={{
+            reservePrice: selectedAuction.reservePrice,
+            maxPrice: selectedAuction.maxPrice,
+            priceStep: selectedAuction.priceStep,
+            startTime: selectedAuction.startTime,
+            endTime: selectedAuction.endTime,
+            currentPrice: selectedAuction.currentPrice,
+            sellerInfo: selectedAuction.sellerInfo,
+            status: selectedAuction.status
+          }}
+          onSuccess={handleModalSuccess}
+        />
+      )}
     </div>
   );
 };

@@ -1,17 +1,13 @@
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { Modal } from "antd";
-import ChatRoomList from "../components/chat/left/ChatRoomList";
-import { useEffect, useRef, useState } from "react";
-import { ChatRoom } from "../common/interfaces/chat-room.interface";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import ChatSection from "../components/chat/middle/ChatSection";
-import { chatSlice } from "../redux/features/chat/chatSlice";
+import ChatRoomList from "../components/chat/ChatRoomList";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useAppSelector } from "../redux/hooks";
+import ChatSection from "../components/chat/ChatSection";
 import { privateAxios } from "../middleware/axiosInstance";
-import { authSlice } from "../redux/features/auth/authSlice";
 import Loading from "../components/loading/Loading";
-import { Message } from "../common/interfaces/message.interface";
-
-const socket = io("http://localhost:3001");
+import { Message, MessageGroup } from "../common/interfaces/message.interface";
+import { ChatRoom } from "../common/interfaces/chat-room.interface";
 
 export default function ChatModal({
   isChatOpen,
@@ -20,116 +16,140 @@ export default function ChatModal({
   isChatOpen: boolean;
   setIsChatOpen: Function;
 }) {
-  const { isLoggedIn, accessToken, isLoading, userId } = useAppSelector(
+  const { isLoggedIn, isLoading, userId } = useAppSelector(
     (state) => state.auth
   );
-  const dispatch = useAppDispatch();
 
-  const { currentChatRoomList, currentlySelectedRoom, currentMessageList } =
-    useAppSelector((state) => state.chat);
-
+  const [chatRoomList, setChatRoomList] = useState<ChatRoom[]>([]);
+  const [currentRoomId, setCurrentRoomId] = useState<string>("");
+  const [currentMessList, setCurrentMessList] = useState<MessageGroup[]>([]);
   const [messageInput, setMessageInput] = useState<string>("");
-
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
 
+  const currentRoomIdRef = useRef(currentRoomId);
+
+  const socketRef = useRef<Socket>();
+
   useEffect(() => {
-    dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
-    socket.on("connection", () => {
-      socket.on("new-message", async (newMessage: Message) => {
-        await fetchChatRoomList();
-        if (
-          currentlySelectedRoom &&
-          newMessage.chatRoom.id === currentlySelectedRoom.id
-        ) {
-          await fetchMessageList(currentlySelectedRoom);
+    socketRef.current = io("http://localhost:3001");
+
+    if (socketRef.current) {
+      socketRef.current.on("new-message", (newMessage: Message) => {
+        socketRef.current!.emit("update-room-list", {
+          userId,
+          chatRoomId: newMessage.chatRoom.id,
+        });
+        if (currentRoomIdRef.current.length === 0) return;
+
+        if (newMessage.chatRoom.id == currentRoomIdRef.current) {
+          socketRef.current!.emit("update-message-list", {
+            userId,
+            chatRoomId: currentRoomIdRef.current,
+          });
         }
       });
+    }
+
+    socketRef.current.on("new-room-list", (newRoomList: ChatRoom[]) => {
+      setChatRoomList(newRoomList);
     });
-    dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
-  }, []);
+
+    socketRef.current.on(
+      "new-message-list",
+      (newMessageList: MessageGroup[]) => {
+        setCurrentMessList(newMessageList);
+      }
+    );
+  }, [currentRoomId]);
 
   const fetchChatRoomList = async () => {
     await privateAxios
       .get("chat-rooms/user")
       .then((res) => {
-        const list = res.data;
-        console.log("CHATROOMS: ", list);
-        dispatch(chatSlice.actions.setChatRoomList(list));
+        const list: ChatRoom[] = res.data;
+        setChatRoomList(list);
 
-        if (!currentlySelectedRoom && list.length > 0) {
-          dispatch(chatSlice.actions.setCurrentlySelectedRoom(res.data[0]));
+        if (socketRef.current) socketRef.current.emit("join-room", { userId });
+
+        if (currentRoomId.length > 0) return;
+        if (list.length > 0) {
+          setCurrentRoomId(list[0].id);
         }
       })
       .catch((err) => console.log(err));
   };
 
-  const fetchMessageList = async (chatRoom: ChatRoom) => {
-    dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
-    await privateAxios
-      .get(`/chat-messages/chat-room/${chatRoom.id}`)
-      .then((res) => {
-        dispatch(chatSlice.actions.setMessageList(res.data));
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
-      });
-  };
-
-  const handleSelectChatRoom = async (chatRoom: ChatRoom) => {
-    dispatch(chatSlice.actions.setCurrentlySelectedRoom(chatRoom));
-  };
-
-  const selectConnectedChat = async () => {
-    if (
-      sessionStorage.getItem("connectedChat") &&
-      currentChatRoomList.length > 0
-    ) {
-      const foundChatRoom = currentChatRoomList.find(
-        (room) => room.id === sessionStorage.getItem("connectedChat")
-      );
-
-      if (foundChatRoom) {
-        dispatch(chatSlice.actions.setCurrentlySelectedRoom(foundChatRoom));
-      }
-
+  const connectSessionChatRoom = () => {
+    const sessionChat = sessionStorage.getItem("connectedChat");
+    if (!sessionChat) return;
+    if (chatRoomList.length > 0) {
+      setCurrentRoomId(sessionChat);
+      currentRoomIdRef.current = sessionChat;
       sessionStorage.removeItem("connectedChat");
     }
   };
 
   useEffect(() => {
     fetchChatRoomList();
-    selectConnectedChat();
-    currentlySelectedRoom && fetchMessageList(currentlySelectedRoom);
+    connectSessionChatRoom();
     scrollDown();
-  }, []);
+  }, [isChatOpen]);
 
-  useEffect(() => {
-    currentlySelectedRoom && fetchMessageList(currentlySelectedRoom);
-  }, [currentlySelectedRoom]);
+  const fetchMessageList = async () => {
+    if (currentRoomIdRef.current.length === 0) return;
+
+    await privateAxios
+      .get(`/chat-messages/chat-room/${currentRoomIdRef.current}`)
+      .then((res) => {
+        setCurrentMessList(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleSendMessage = async () => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !userId) {
       alert("Chưa đăng nhập!");
       return;
     } else {
-      if (currentlySelectedRoom && messageInput && messageInput.length > 0) {
-        socket.emit("send-new-message", {
-          token: accessToken,
-          chatRoom: currentlySelectedRoom.id,
+      if (!socketRef.current) return;
+
+      if (currentRoomId.length > 0 && messageInput && messageInput.length > 0) {
+        socketRef.current.emit("send-new-message", {
+          userId,
+          chatRoom: currentRoomId,
           content: messageInput,
           type: "TEXT",
         });
+
         setMessageInput("");
       }
     }
   };
 
-  const updateIsRead = async (chatRoomId: string) => {
-    // if (isLoggedIn && currentlySelectedRoom)
-    //   await dispatch(updateChatRoomIsRead(chatRoomId));
+  const handleSelectChatRoom = (chatRoom: ChatRoom) => {
+    setCurrentRoomId(chatRoom.id);
+    currentRoomIdRef.current = chatRoom.id;
+    if (chatRoom.lastMessage?.isRead) return;
+    updateIsRead(chatRoom);
+  };
+
+  useMemo(() => {
+    fetchMessageList();
+    currentRoomIdRef.current = currentRoomId;
+  }, [currentRoomId]);
+
+  const updateIsRead = async (chatRoom: ChatRoom) => {
+    await privateAxios
+      .patch(`chat-messages/chat-room/is-read/${chatRoom.id}`)
+      .then(() => {
+        socketRef.current!.emit("update-room-list", {
+          userId,
+          chatRoomId: chatRoom.id,
+        });
+      })
+      .catch((err) => console.log(err));
   };
 
   const scrollDown = () => {
@@ -139,10 +159,9 @@ export default function ChatModal({
 
   useEffect(() => {
     scrollDown();
-  }, [currentMessageList]);
+  }, [currentMessList, lastMessageRef]);
 
   const handleModalClose = () => {
-    dispatch(chatSlice.actions.reset);
     setIsChatOpen(false);
   };
 
@@ -155,26 +174,30 @@ export default function ChatModal({
       }}
       footer={null}
       centered
-      width={window.innerWidth * 0.9}
-      className="p-0"
+      maskClosable={false}
+      width={window.innerWidth * 0.8}
     >
       {isLoading && <Loading />}
       <div className="h-[90vh] xl:max-h-[1000px] flex items-stretch">
+        {isLoading && <Loading />}
         <ChatRoomList
-          chatRoomList={currentChatRoomList}
-          currentSelectedRoom={currentlySelectedRoom}
+          chatRoomList={chatRoomList}
+          currentRoom={chatRoomList.find(
+            (chatRoom) => chatRoom.id === currentRoomId
+          )}
           handleSelectChatRoom={handleSelectChatRoom}
         />
         <ChatSection
-          chatRoom={currentlySelectedRoom}
-          messagesList={currentMessageList}
+          currentRoom={chatRoomList.find(
+            (chatRoom) => chatRoom.id === currentRoomId
+          )}
+          currentMessList={currentMessList}
           handleSendMessage={handleSendMessage}
           messageInput={messageInput}
           setMessageInput={setMessageInput}
           updateIsRead={updateIsRead}
           lastMessageRef={lastMessageRef}
           isLoading={isLoading}
-          fetchChatRoomList={fetchChatRoomList}
         />
       </div>
     </Modal>

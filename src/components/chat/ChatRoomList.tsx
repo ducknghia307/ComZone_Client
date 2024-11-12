@@ -1,22 +1,22 @@
 import { useState } from "react";
-import { ChatRoom } from "../../../common/interfaces/chat-room.interface";
-import dateFormat from "../../../assistants/date.format";
+import dateFormat from "../../assistants/date.format";
 import { Avatar } from "antd";
+import { ChatRoom } from "../../common/interfaces/chat-room.interface";
 
 export default function ChatRoomList({
   chatRoomList,
-  currentSelectedRoom,
+  currentRoom,
   handleSelectChatRoom,
 }: {
-  chatRoomList: ChatRoom[] | [];
-  currentSelectedRoom: ChatRoom | null;
+  chatRoomList: ChatRoom[];
+  currentRoom: ChatRoom | undefined;
   handleSelectChatRoom: Function;
 }) {
   const [isDisplayedDefault, setIsDisplayedDefault] = useState<boolean>(true);
   return (
     <div
       className={`${
-        isDisplayedDefault ? "w-[25em]" : "w-fit"
+        isDisplayedDefault ? "basis-1/3" : "w-fit"
       }  border-r border-gray-300 transition-all duration-300 overflow-y-auto relative`}
     >
       <div
@@ -82,7 +82,7 @@ export default function ChatRoomList({
                   ? "justify-start pl-2 rounded-lg"
                   : "justify-center px-2 rounded-lg"
               } ${
-                currentSelectedRoom?.id === chatRoom.id
+                currentRoom?.id === chatRoom.id
                   ? "bg-sky-50"
                   : "duration-200 hover:bg-gray-100"
               } w-full min-h-20 max-h-32 flex items-center gap-4`}
@@ -105,7 +105,7 @@ export default function ChatRoomList({
                   } flex items-center gap-2 text-start font-light`}
                 >
                   <p
-                    className={`line-clamp-1 max-w-[8em] break-words ${
+                    className={`max-w-[15em] break-words whitespace-nowrap overflow-hidden text-ellipsis ${
                       !chatRoom.lastMessage?.isRead &&
                       !chatRoom.lastMessage?.mine &&
                       "font-semibold"

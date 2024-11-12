@@ -1,4 +1,4 @@
-import { ChatRoom } from "../../../common/interfaces/chat-room.interface";
+import { ChatRoom } from "../../common/interfaces/chat-room.interface";
 import moment from "moment/min/moment-with-locales";
 
 moment.locale("vi");
@@ -6,10 +6,10 @@ moment.locale("vi");
 export default function ChatSectionHeader({
   chatRoom,
 }: {
-  chatRoom: ChatRoom | null;
+  chatRoom: ChatRoom | undefined;
 }) {
   return (
-    <div className="w-full flex items-center justify-between gap-4 drop-shadow-xl px-4">
+    <div className="w-full flex items-center justify-between gap-4 px-4 py-4 border-b">
       <div className="flex items-center gap-4">
         <img
           src={chatRoom?.secondUser.avatar || ""}

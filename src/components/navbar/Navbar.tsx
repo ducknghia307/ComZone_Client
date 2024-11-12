@@ -4,10 +4,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { MenuProps } from "antd";
 import { Badge, Dropdown } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { authSlice, logOut } from "../../redux/features/auth/authSlice";
+import { authSlice } from "../../redux/features/auth/authSlice";
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
-import { Role, UserInfo } from "../../common/base.interface";
+import { UserInfo } from "../../common/base.interface";
 import {
   BookOutlined,
   ControlOutlined,
@@ -28,6 +28,7 @@ const Navbar = () => {
   const [isRegisterSellerModal, setIsRegisterSellerModal] =
     useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+  const [chatUnreadCount, setChatUnreadCount] = useState<number>(0);
   const navigate = useNavigate();
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -174,6 +175,11 @@ const Navbar = () => {
       icon: <LogoutOutlined style={{ fontSize: 18 }} />,
     },
   ];
+
+  const getMessageUnreadList = (value: number) => {
+    setChatUnreadCount(value);
+  };
+
   return (
     <>
       <nav className="bg-white border-b shadow-sm w-full ">
@@ -287,15 +293,21 @@ const Navbar = () => {
                       className=" items-center cursor-pointer duration-200 hover:opacity-50 ml-4 lg:flex hidden"
                       onClick={() => setIsChatOpen(!isChatOpen)}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        width="30"
-                        height="30"
-                        fill="currentColor"
+                      <Badge
+                        count={chatUnreadCount}
+                        overflowCount={9}
+                        showZero={false}
                       >
-                        <path d="M10 3H14C18.4183 3 22 6.58172 22 11C22 15.4183 18.4183 19 14 19V22.5C9 20.5 2 17.5 2 11C2 6.58172 5.58172 3 10 3ZM12 17H14C17.3137 17 20 14.3137 20 11C20 7.68629 17.3137 5 14 5H10C6.68629 5 4 7.68629 4 11C4 14.61 6.46208 16.9656 12 19.4798V17Z"></path>
-                      </svg>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          width="30"
+                          height="30"
+                          fill="currentColor"
+                        >
+                          <path d="M10 3H14C18.4183 3 22 6.58172 22 11C22 15.4183 18.4183 19 14 19V22.5C9 20.5 2 17.5 2 11C2 6.58172 5.58172 3 10 3ZM12 17H14C17.3137 17 20 14.3137 20 11C20 7.68629 17.3137 5 14 5H10C6.68629 5 4 7.68629 4 11C4 14.61 6.46208 16.9656 12 19.4798V17Z"></path>
+                        </svg>
+                      </Badge>
                     </li>
                     {/* noti */}
                     <li className="items-center cursor-pointer duration-200 hover:opacity-50 ml-4 lg:flex hidden">
@@ -540,7 +552,11 @@ const Navbar = () => {
         isRegisterSellerModal={isRegisterSellerModal}
         setIsRegisterSellerModal={setIsRegisterSellerModal}
       />
-      <ChatModal isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} />
+      <ChatModal
+        isChatOpen={isChatOpen}
+        setIsChatOpen={setIsChatOpen}
+        getMessageUnreadList={getMessageUnreadList}
+      />
     </>
   );
 };

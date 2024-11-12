@@ -257,6 +257,9 @@ export default function ExchangeNewsFeed() {
           <div className="w-full grid grid-cols-[repeat(auto-fill,50em)] items-stretch justify-center gap-8 py-4">
             {exchangeList && exchangeList.length > 0 ? (
               exchangeList.map((exchangeRequest, index: number) => {
+                const tourIndex = exchangeList.findIndex(
+                  (request) => request.user.id !== userId
+                );
                 return (
                   <ExchangePost
                     key={index}
@@ -269,6 +272,7 @@ export default function ExchangeNewsFeed() {
                     currentUserId={userId}
                     isChatOpen={isChatOpen}
                     setIsChatOpen={setIsChatOpen}
+                    tourIndex={tourIndex}
                   />
                 );
               })

@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { Modal } from "antd";
+import { Modal, notification } from "antd";
 import ChatRoomList from "../components/chat/ChatRoomList";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppSelector } from "../redux/hooks";
@@ -12,9 +12,11 @@ import { ChatRoom } from "../common/interfaces/chat-room.interface";
 export default function ChatModal({
   isChatOpen,
   setIsChatOpen,
+  getMessageUnreadList,
 }: {
   isChatOpen: boolean;
   setIsChatOpen: Function;
+  getMessageUnreadList?: Function;
 }) {
   const { isLoggedIn, isLoading, userId } = useAppSelector(
     (state) => state.auth
@@ -35,14 +37,17 @@ export default function ChatModal({
 
     if (socketRef.current) {
       socketRef.current.on("new-message", (newMessage: Message) => {
-        socketRef.current!.emit("update-room-list", {
+        socketRef.current?.emit("update-room-list", {
           userId,
           chatRoomId: newMessage.chatRoom.id,
         });
+
+        socketRef.current?.emit("get-unread-list", { userId });
+
         if (currentRoomIdRef.current.length === 0) return;
 
         if (newMessage.chatRoom.id == currentRoomIdRef.current) {
-          socketRef.current!.emit("update-message-list", {
+          socketRef.current?.emit("update-message-list", {
             userId,
             chatRoomId: currentRoomIdRef.current,
           });
@@ -60,6 +65,10 @@ export default function ChatModal({
         setCurrentMessList(newMessageList);
       }
     );
+
+    socketRef.current.on("new-unread-list", (unreadList: ChatRoom[]) => {
+      if (getMessageUnreadList) getMessageUnreadList(unreadList.length);
+    });
   }, [currentRoomId]);
 
   const fetchChatRoomList = async () => {
@@ -96,7 +105,7 @@ export default function ChatModal({
   }, [isChatOpen]);
 
   const fetchMessageList = async () => {
-    if (currentRoomIdRef.current.length === 0) return;
+    if (currentRoomIdRef.current.length === 0) setCurrentMessList([]);
 
     await privateAxios
       .get(`/chat-messages/chat-room/${currentRoomIdRef.current}`)
@@ -110,8 +119,12 @@ export default function ChatModal({
 
   const handleSendMessage = async () => {
     if (!isLoggedIn || !userId) {
-      alert("Chưa đăng nhập!");
-      return;
+      notification.info({
+        key: "auth",
+        message: "Chưa đăng nhập!",
+        description: "Bạn cần đăng nhập để thực hiện hành động này.",
+        duration: 5,
+      });
     } else {
       if (!socketRef.current) return;
 
@@ -125,6 +138,19 @@ export default function ChatModal({
 
         setMessageInput("");
       }
+    }
+  };
+
+  const handleSelectMessageAsComics = async () => {
+    if (!isLoggedIn || !userId) {
+      notification.info({
+        key: "auth",
+        message: "Chưa đăng nhập!",
+        description: "Bạn cần đăng nhập để thực hiện hành động này.",
+        duration: 5,
+      });
+    } else {
+      
     }
   };
 
@@ -148,6 +174,8 @@ export default function ChatModal({
           userId,
           chatRoomId: chatRoom.id,
         });
+
+        socketRef.current?.emit("get-unread-list", { userId });
       })
       .catch((err) => console.log(err));
   };
@@ -170,11 +198,11 @@ export default function ChatModal({
       open={isChatOpen}
       onCancel={(e) => {
         e.stopPropagation();
+        setCurrentRoomId("");
         handleModalClose();
       }}
       footer={null}
       centered
-      maskClosable={false}
       width={window.innerWidth * 0.8}
     >
       {isLoading && <Loading />}
@@ -198,6 +226,7 @@ export default function ChatModal({
           updateIsRead={updateIsRead}
           lastMessageRef={lastMessageRef}
           isLoading={isLoading}
+          setIsChatOpen={setIsChatOpen}
         />
       </div>
     </Modal>

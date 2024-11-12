@@ -28,10 +28,11 @@ export default function ExchangeSectionInChat({
     {
       key: 0,
       label: (
-        <p>
-          Danh sách truyện được yêu cầu (
-          {exchangeRequest?.requestComics.length || 0})
-        </p>
+        <span className="flex flex-row gap-1">
+          Danh sách{" "}
+          <p className="font-semibold">{exchangeRequest?.user.name}</p> đang tìm
+          kiếm trao đổi ({exchangeRequest?.requestComics.length || 0})
+        </span>
       ),
       children: (
         <div className="flex flex-col items-stretch justify-start gap-2">

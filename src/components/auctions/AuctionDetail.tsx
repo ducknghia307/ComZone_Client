@@ -26,22 +26,22 @@ const ComicAuction = () => {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [isBidDisabled, setIsBidDisabled] = useState(false);
-
+  const bidder = useAppSelector((state) => state.auth.userId);
   const handleBidActionDisabled = (disabled: boolean) => {
     setIsBidDisabled(disabled);
   };
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     if (auctionData.endTime) {
       const endTimestamp = new Date(auctionData.endTime).getTime();
       const now = Date.now();
 
       if (now >= endTimestamp) {
-        setAuctionEnded(true); 
-        setIsBidDisabled(true); 
+        setAuctionEnded(true);
+        setIsBidDisabled(true);
       }
     }
-    setLoading(false)
+    setLoading(false);
   }, [auctionData.endTime]);
 
   const dispatch = useAppDispatch();
@@ -82,7 +82,7 @@ const ComicAuction = () => {
       socket.off("bidUpdate");
     };
   }, [auctionData?.id, dispatch]);
-  if (loading) return <Loading/>;
+  if (loading) return <Loading />;
   if (!comic) return <p>Comic not found.</p>;
 
   const handleImageClick = (imageSrc: string) => {
@@ -98,7 +98,7 @@ const ComicAuction = () => {
     // Create bid payload
     const bidPayload = {
       auctionId: auctionData.id,
-      userId: users.id,
+      userId: bidder,
       price: parseFloat(bidAmount),
     };
 

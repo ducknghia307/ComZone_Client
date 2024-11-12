@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import "../ui/AuctionDetail.css";
-import { Button, Typography } from "@mui/material";
+import { Avatar, Button, Chip, Divider, Typography } from "@mui/material";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import { useParams } from "react-router-dom";
 import { publicAxios } from "../../middleware/axiosInstance";
@@ -94,25 +94,52 @@ const ComicAuction = () => {
     }
   };
 
+  const formatEndTime = (endTime: string) => {
+    const date = new Date(endTime);
+    return date.toLocaleString("vi-VN", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      weekday: "short",
+      year: "numeric",
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+  };
+
   return (
     <div className="auction-wrapper">
-      <div className="title-container">
+      <div
+        className="title-container"
+        style={{ borderBottom: "1px solid #ccc" }}
+      >
         <Typography
           style={{
             paddingLeft: "50px",
             fontSize: "23px",
             fontWeight: "bold",
             flex: "3",
+            fontFamily: "REM",
+            textShadow: "2px 2px #ccc",
           }}
         >
           {comic.title}
         </Typography>
-        <div className="condition-tag">
+        <div
+          className="condition-tag"
+          style={{
+            fontFamily: "REM",
+            textShadow: "3px 3px #000",
+            fontSize: "23px",
+          }}
+        >
           {comic.condition === "SEALED" ? "Nguyên Seal" : "Đã qua sử dụng"}
         </div>
       </div>
 
-      <Grid container spacing={2} className="auction-container">
+      <Grid container spacing={3} className="auction-container">
         <Grid size={7} className="comic-info">
           <div className="comic-images">
             <div style={{ width: "400px", height: "600px" }}>
@@ -139,16 +166,48 @@ const ComicAuction = () => {
 
         <Grid size={5} className="auction-info">
           <div className="timer">
-            <p>KẾT THÚC TRONG:</p>
+            <p
+              style={{
+                fontFamily: "REM",
+                fontSize: "20px",
+                paddingBottom: "15px",
+              }}
+            >
+              KẾT THÚC VÀO: {formatEndTime(auctionData.endTime)}
+            </p>
             <CountdownFlipNumbers
               auctionId={auctionData.id}
               endTime={auctionData.endTime}
             />
 
-            <div className="current-price">
-              <div className="current-price1">
-                <p>Giá hiện tại</p>
+            <div
+              className="current-price"
+              style={{
+                display: "flex",
+                justifyContent: "space-around",
+                padding: "10px 15px",
+              }}
+            >
+              <div
+                className="current-price1"
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <p
+                  style={{
+                    fontFamily: "REM",
+                    paddingBottom: "0",
+                    fontSize: "18px",
+                  }}
+                >
+                  Giá hiện tại:
+                </p>
                 <CountUp
+                  style={{
+                    fontFamily: "REM",
+                    fontSize: "28px",
+                    fontWeight: "bold",
+                    textShadow: "4px 4px #000",
+                  }}
                   start={
                     auctionData.currentPrice - auctionData.currentPrice / 2
                   } // Start from the previous price
@@ -159,34 +218,71 @@ const ComicAuction = () => {
                   suffix="₫" // Optional: Add a suffix (e.g., "₫")
                 />
               </div>
-              <div className="current-price2">
-                <p>Lượt đấu giá</p>
-                <h2>10</h2>
-              </div>
+              {/* <Divider sx={{ border: '1px solid grey' }} orientation="vertical" flexItem />
+              <div className="current-price2" >
+                <p style={{ fontFamily: "REM", fontSize: '18px' }}>Bước Giá</p>
+                <h3 style={{ fontFamily: "REM", fontSize: '28px', paddingTop: '15px' }}>{(auctionData.priceStep).toLocaleString("vi-VN")}đ</h3>
+              </div> */}
             </div>
           </div>
 
           <div className="shop-info">
-            <p style={{ display: "flex", alignItems: "center" }}>
-              <img
-                src={
-                  users?.avatar ||
-                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxfSUXtB9oG6_7ZgV3gFLrqGdkv61wqYkVVw&s"
-                }
-                alt=""
-                className="w-[1.8em] h-[1.8em] rounded-full mr-2 "
-              />
-              <p className="font-semibold mr-2">{users?.name}</p>
-              <StoreOutlinedIcon />
-            </p>
-            <p style={{ fontSize: "18px", paddingTop: "10px" }}>
+            <Chip
+              avatar={
+                <Avatar
+                  src={users?.avatar}
+                  alt="Vendor Avatar"
+                  style={{ width: "30px", height: "30px" }}
+                />
+              }
+              label={
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    fontSize: "16px",
+                    paddingLeft: "5px",
+                  }}
+                >
+                  {users?.name}
+                  <StoreOutlinedIcon
+                    style={{ fontSize: "24px", color: "#000" }}
+                  />
+                </div>
+              }
+              style={{
+                fontFamily: "REM",
+                fontWeight: "500",
+                fontSize: "20px",
+                padding: "20px 5px",
+                borderRadius: "8px",
+                backgroundColor: "#fff",
+                color: "#000",
+                border: "1px solid black",
+                boxShadow: "4px 4px #ccc",
+              }}
+            />
+
+            <p
+              style={{
+                fontSize: "17px",
+                paddingTop: "10px",
+                fontFamily: "REM",
+                fontWeight: "400",
+              }}
+            >
               Giá đấu tối thiểu tiếp theo:{" "}
-              {auctionData &&
-                (
-                  auctionData.currentPrice + auctionData.priceStep
-                ).toLocaleString("vi-VN")}
-              ₫
+              {auctionData && (
+                <span style={{ fontWeight: "bold" }}>
+                  {(
+                    auctionData.currentPrice + auctionData.priceStep
+                  ).toLocaleString("vi-VN")}
+                  đ
+                </span>
+              )}
             </p>
+
             <div className="bid-row">
               <input
                 type="text"
@@ -199,29 +295,91 @@ const ComicAuction = () => {
                 variant="contained"
                 className="bid-button"
                 onClick={handlePlaceBid}
+                sx={{ fontFamily: "REM" }}
               >
                 RA GIÁ
               </Button>
             </div>
-            <Button
-              variant="contained"
+            <div
               style={{
-                color: "#fff",
-                backgroundColor: "#000",
-                fontWeight: "bold",
-                fontSize: "18px",
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "25px",
               }}
             >
-              Mua ngay với giá {auctionData.maxPrice.toLocaleString("vi-VN")}₫
-            </Button>
+              <Button
+                variant="contained"
+                style={{
+                  color: "#fff",
+                  backgroundColor: "#000",
+                  fontWeight: "500",
+                  fontSize: "18px",
+                  fontFamily: "REM",
+                }}
+              >
+                Mua ngay với giá {auctionData.maxPrice.toLocaleString("vi-VN")}₫
+              </Button>
+            </div>
           </div>
 
           <div className="publisher">
-            <div className="publisher-detail">
-              <Typography style={{ fontSize: "16px", fontWeight: "bold" }}>
+            {/* <div className="publisher-detail">
+              <Typography style={{ fontSize: "16px", fontWeight: "bold", fontFamily: "REM" }}>
                 Tác giả:{" "}
-                <span style={{ fontWeight: "500" }}>{comic.author}</span>
+                <span style={{ fontWeight: "300" }}>{comic.author}</span>
               </Typography>
+            </div> */}
+            <p
+              style={{
+                fontSize: "17px",
+                paddingTop: "10px",
+                fontFamily: "REM",
+                fontWeight: "400",
+              }}
+            >
+              Tác Giả:{" "}
+              <span style={{ fontWeight: "bold" }}>{comic.author}</span>
+            </p>
+            {/* <div className="publisher-detail">
+              <Typography style={{ fontSize: "16px", fontWeight: "bold", fontFamily: "REM", paddingTop: '10px' }}>
+                Phiên Bản:{" "}
+                <span style={{ fontWeight: "300" }}>{comic.edition === 'REGULAR' ? 'Bản thường' : 'Bản đặc biệt'}</span>
+              </Typography>
+            </div> */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginTop: "15px",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "17px",
+                  fontFamily: "REM",
+                  fontWeight: "400",
+                  marginRight: "10px",
+                }}
+              >
+                Phiên Bản:
+              </p>
+              <Chip
+                label={
+                  comic.edition === "REGULAR" ? "Bản thường" : "Bản đặc biệt"
+                }
+                style={{
+                  fontFamily: "REM",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  padding: "18px 10px",
+                  backgroundColor:
+                    comic.edition === "REGULAR" ? "#fff" : "#000",
+                  color: comic.edition === "REGULAR" ? "#000" : "#fff",
+                  border:
+                    comic.edition === "REGULAR" ? "1px solid #000" : "none",
+                  borderRadius: "20px",
+                }}
+              />
             </div>
           </div>
         </Grid>

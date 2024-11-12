@@ -16,10 +16,10 @@ const ModAuctions: React.FC = () => {
     return (
         <div className="account-user-container w-full">
             <Grid container spacing={3}>
-                <Grid size={2.5} className="account-menu">
+                <Grid size={2} className="account-menu">
                     <Sidebar onSelect={setSelectedMenuItem}/>
                 </Grid>
-                <Grid size={9.5}>
+                <Grid size={10}>
                     <div className="content-section">
                         <ManageAuctions />
                     </div>

@@ -1,0 +1,45 @@
+.custom-popconfirm .ant-popover-inner {
+    padding: 16px;
+    background-color: #fdfdfd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    max-width: 280px;
+}
+
+.custom-popconfirm .ant-popover-message-title {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.custom-popconfirm .ant-popover-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+}
+
+.custom-popconfirm .ant-btn {
+    font-size: 14px;
+    padding: 4px 12px;
+    border-radius: 4px;
+}
+
+.custom-popconfirm .ant-btn-primary {
+    background-color: #ff4d4f !important; 
+    border: none;
+    color: white;
+}
+
+.custom-popconfirm .ant-btn-primary:hover {
+    background-color: #ff7875 !important; 
+    color: white;
+}
+
+.custom-popconfirm .ant-btn-default {
+    color: #595959;
+}
+
+.custom-popconfirm .ant-popover-arrow {
+    display: none;
+}

@@ -21,6 +21,7 @@ export default function ExchangePost({
   isChatOpen,
   setIsChatOpen,
   currentUserId,
+  tourIndex,
 }: {
   exchangeRequest: ExchangeRequest;
   refs: any[];
@@ -31,13 +32,11 @@ export default function ExchangePost({
   isChatOpen: boolean;
   setIsChatOpen: Function;
   currentUserId: string;
+  tourIndex: number;
 }) {
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [comicExchangeOffer, setComicExchangeOffer] = useState<Comic[]>([]);
-  // const showModal = () => {
-  //   setIsModalOpen(true);
-  // };
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -74,7 +73,7 @@ export default function ExchangePost({
       <div className="grow flex flex-col min-w-[30em] px-2 py-4">
         <div className="flex items-center justify-between gap-4">
           <div
-            ref={index === 0 ? refs[1] : null}
+            ref={index === tourIndex ? refs[1] : null}
             className="w-full flex items-center gap-4"
           >
             <img
@@ -124,6 +123,7 @@ export default function ExchangePost({
           >
             <div className="flex flex-row gap-4">
               <button
+                ref={index == tourIndex ? refs[1] : null}
                 className="border rounded-lg min-w-max p-2"
                 onClick={handleOpenModal}
               >
@@ -133,7 +133,7 @@ export default function ExchangePost({
                 </span>
               </button>
               <button
-                ref={index == 0 ? refs[2] : null}
+                ref={index == tourIndex ? refs[2] : null}
                 onClick={() => setIsSelectModalOpen(exchangeRequest.id)}
                 className="min-w-max p-2 bg-sky-700 text-white rounded-lg"
               >
@@ -154,7 +154,7 @@ export default function ExchangePost({
         <p className="pl-2 py-4">{exchangeRequest.postContent}</p>
 
         <div
-          ref={index === 0 ? refs[0] : null}
+          ref={index === tourIndex ? refs[0] : null}
           className={`${
             exchangeRequest.requestComics.length === 0 && "hidden"
           } w-full border border-gray-300 rounded-lg relative overflow-hidden mt-4`}
@@ -195,7 +195,6 @@ export default function ExchangePost({
         width={1000}
       >
         <div
-          ref={index === 0 ? refs[0] : null}
           className={`${
             comicExchangeOffer.length === 0 && "hidden"
           } w-full border border-gray-300 rounded-lg relative overflow-hidden mt-4`}

@@ -81,12 +81,18 @@ export interface Auction {
   id: string;
   shopName: string;
   productName: string;
-  status: "ongoing" | "completed" | "canceled";
+  status: "UPCOMING" | "PROCESSING" | "ONGOING" | "SUCCESSFUL" | "FAILED";
   imgUrl: string;
-  currentPrice?: string;
-  userBid?: string;
-  finalPrice?: string;
+  currentPrice?: number;
+  userBid?: number;
+  finalPrice?: number;  
   isWin?: boolean;
+  reservePrice: number; 
+  priceStep: number; 
+  startTime: string; 
+  endTime: string; 
+  comics: Comic; 
+  maxPrice: number;
 }
 
 //comic

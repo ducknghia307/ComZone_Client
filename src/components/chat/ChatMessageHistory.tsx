@@ -69,15 +69,18 @@ export default function ChatMessageHistory({
                           } w-[3em] h-[3em] rounded-full`}
                         />
                       )}
-                      <p
+                      <div
                         className={`min-w-12 max-w-80 px-2 py-2 ${
                           message.mine
                             ? "bg-sky-800 text-white"
                             : "bg-gray-50 drop-shadow-md"
                         } rounded-lg text-start`}
                       >
-                        {message.content}
-                      </p>
+                        {message.type === "TEXT" && message.content}
+                        {message.type === "COMICS" && message.comics && (
+                          <div>{message.comics.title}</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -3,7 +3,13 @@ import CurrencySplitter from "../../assistants/Spliter";
 import { Comic } from "../../common/base.interface";
 import { useState } from "react";
 
-export default function ComicsSectionInChat({ comics }: { comics: Comic }) {
+export default function ComicsSectionInChat({
+  comics,
+  setIsChatOpen,
+}: {
+  comics: Comic;
+  setIsChatOpen: Function;
+}) {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const navigate = useNavigate();
   return (
@@ -28,7 +34,10 @@ export default function ComicsSectionInChat({ comics }: { comics: Comic }) {
             MUA NGAY VỚI GIÁ {CurrencySplitter(comics.price)}đ
           </button>
           <button
-            onClick={() => navigate(`/detail/${comics.id}`)}
+            onClick={() => {
+              setIsChatOpen(false);
+              navigate(`/detail/${comics.id}`);
+            }}
             className={`${
               !isExpanded && "hidden"
             } px-2 py-1 font-semibold border border-black rounded-lg duration-200 hover:bg-gray-100`}

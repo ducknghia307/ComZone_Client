@@ -59,7 +59,7 @@ export default function ActionConfirm({
               handleCancel(e);
               confirmCallback();
             }}
-            className="px-8 py-2 rounded-lg font-semibold bg-green-600 text-white duration-200 hover:bg-green-800"
+            className="px-12 py-2 rounded-lg font-semibold bg-gray-900 text-white duration-200 hover:bg-gray-700"
           >
             XÁC NHẬN
           </button>

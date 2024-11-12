@@ -16,6 +16,7 @@ export default function ChatSection({
   updateIsRead,
   lastMessageRef,
   isLoading,
+  setIsChatOpen,
 }: {
   currentRoom: ChatRoom | undefined;
   currentMessList: MessageGroup[];
@@ -25,6 +26,7 @@ export default function ChatSection({
   updateIsRead: Function;
   lastMessageRef: any;
   isLoading: boolean;
+  setIsChatOpen: Function;
 }) {
   return (
     <div
@@ -36,7 +38,10 @@ export default function ChatSection({
       <div className="w-full flex flex-col items-stretch justify-start relative">
         <ChatSectionHeader chatRoom={currentRoom} />
         {currentRoom?.comics && (
-          <ComicsSectionInChat comics={currentRoom.comics} />
+          <ComicsSectionInChat
+            comics={currentRoom.comics}
+            setIsChatOpen={setIsChatOpen}
+          />
         )}
         {currentRoom?.exchangeRequest && (
           <ExchangeSectionInChat chatRoom={currentRoom} isLoading={isLoading} />

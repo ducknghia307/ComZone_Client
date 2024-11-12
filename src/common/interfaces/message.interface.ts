@@ -9,7 +9,7 @@ export interface Message extends BaseInterface {
   mine: boolean | null;
   isRead: boolean;
   repliedToMessage?: Message | null;
-  comics?: Comic;
+  comics?: Comic[];
 }
 
 export interface MessageGroup {

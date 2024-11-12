@@ -8,6 +8,7 @@ import { privateAxios } from "../middleware/axiosInstance";
 import Loading from "../components/loading/Loading";
 import { Message, MessageGroup } from "../common/interfaces/message.interface";
 import { ChatRoom } from "../common/interfaces/chat-room.interface";
+import { Comic } from "../common/base.interface";
 
 export default function ChatModal({
   isChatOpen,
@@ -25,7 +26,10 @@ export default function ChatModal({
   const [chatRoomList, setChatRoomList] = useState<ChatRoom[]>([]);
   const [currentRoomId, setCurrentRoomId] = useState<string>("");
   const [currentMessList, setCurrentMessList] = useState<MessageGroup[]>([]);
+
   const [messageInput, setMessageInput] = useState<string>("");
+  const [sentComicsList, setSentComicsList] = useState<Comic[]>([]);
+
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
 
   const currentRoomIdRef = useRef(currentRoomId);
@@ -33,7 +37,7 @@ export default function ChatModal({
   const socketRef = useRef<Socket>();
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3001");
+    socketRef.current = io("http://localhost:3000/chat");
 
     if (socketRef.current) {
       socketRef.current.on("new-message", (newMessage: Message) => {
@@ -131,7 +135,7 @@ export default function ChatModal({
       if (currentRoomId.length > 0 && messageInput && messageInput.length > 0) {
         socketRef.current.emit("send-new-message", {
           userId,
-          chatRoom: currentRoomId,
+          chatRoom: currentRoomIdRef.current,
           content: messageInput,
           type: "TEXT",
         });
@@ -141,7 +145,7 @@ export default function ChatModal({
     }
   };
 
-  const handleSelectMessageAsComics = async () => {
+  const handleSendMessageAsComics = async () => {
     if (!isLoggedIn || !userId) {
       notification.info({
         key: "auth",
@@ -150,7 +154,18 @@ export default function ChatModal({
         duration: 5,
       });
     } else {
-      
+      if (socketRef && socketRef.current) {
+        socketRef.current.emit("send-new-message", {
+          userId,
+          chatRoom: currentRoomIdRef.current,
+          content: "",
+          comics: sentComicsList.map((comics) => {
+            return comics.id;
+          }),
+          type: "COMICS",
+        });
+      }
+      setSentComicsList([]);
     }
   };
 
@@ -227,6 +242,9 @@ export default function ChatModal({
           lastMessageRef={lastMessageRef}
           isLoading={isLoading}
           setIsChatOpen={setIsChatOpen}
+          sentComicsList={sentComicsList}
+          setSentComicsList={setSentComicsList}
+          handleSendMessageAsComics={handleSendMessageAsComics}
         />
       </div>
     </Modal>

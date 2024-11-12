@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 import SendComicsModal from "./extraModals/SendComicsModal";
+import { Comic } from "../../common/base.interface";
 
 export default function ChatMessageInput({
   messageInput,
   setMessageInput,
   handleSendMessage,
+  sentComicsList,
+  setSentComicsList,
+  handleSendMessageAsComics,
 }: {
   messageInput: string;
   setMessageInput: Function;
   handleSendMessage: Function;
+  sentComicsList: Comic[];
+  setSentComicsList: Function;
+  handleSendMessageAsComics: Function;
 }) {
   const [isSendingComics, setIsSendingComics] = useState<boolean>(false);
 
@@ -23,7 +30,7 @@ export default function ChatMessageInput({
 
   return (
     <div className="w-full flex items-center gap-2 px-4">
-      <div className="flex items-center gap-8 px-4">
+      <div className="flex items-center gap-6 pl-2 pr-4">
         <button className="flex items-center text-gray-500 duration-200 hover:text-black">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -52,6 +59,9 @@ export default function ChatMessageInput({
         <SendComicsModal
           isOpen={isSendingComics}
           setIsOpen={setIsSendingComics}
+          sentComicsList={sentComicsList}
+          setSentComicsList={setSentComicsList}
+          handleSendMessageAsComics={handleSendMessageAsComics}
         />
       </div>
 

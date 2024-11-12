@@ -5,7 +5,7 @@ import ChatSectionHeader from "./ChatSectionHeader";
 import ComicsSectionInChat from "./ComicsSectionInChat";
 import ExchangeSectionInChat from "./ExchangeSectionInChat";
 import { ChatRoom } from "../../common/interfaces/chat-room.interface";
-import { useState } from "react";
+import { Comic } from "../../common/base.interface";
 
 export default function ChatSection({
   currentRoom,
@@ -17,6 +17,9 @@ export default function ChatSection({
   lastMessageRef,
   isLoading,
   setIsChatOpen,
+  sentComicsList,
+  setSentComicsList,
+  handleSendMessageAsComics,
 }: {
   currentRoom: ChatRoom | undefined;
   currentMessList: MessageGroup[];
@@ -27,6 +30,9 @@ export default function ChatSection({
   lastMessageRef: any;
   isLoading: boolean;
   setIsChatOpen: Function;
+  sentComicsList: Comic[];
+  setSentComicsList: Function;
+  handleSendMessageAsComics: Function;
 }) {
   return (
     <div
@@ -56,6 +62,9 @@ export default function ChatSection({
         handleSendMessage={handleSendMessage}
         messageInput={messageInput}
         setMessageInput={setMessageInput}
+        sentComicsList={sentComicsList}
+        setSentComicsList={setSentComicsList}
+        handleSendMessageAsComics={handleSendMessageAsComics}
       />
     </div>
   );

@@ -17,7 +17,7 @@ export default function ChatRoomList({
     <div
       className={`${
         isDisplayedDefault ? "basis-1/3" : "w-fit"
-      }  border-r border-gray-300 transition-all duration-300 overflow-y-auto relative`}
+      }  border-r border-gray-300 transition-all duration-300 overflow-y-auto overflow-x-hidden relative`}
     >
       <div
         className={`flex items-center sticky top-0 bg-white z-10 ${
@@ -73,6 +73,28 @@ export default function ChatRoomList({
       <div className="w-full flex flex-col justify-start gap-1">
         {chatRoomList.map((chatRoom: ChatRoom) => {
           const user = chatRoom.secondUser;
+          const lastMessageDisplay = () => {
+            if (chatRoom.lastMessage) {
+              switch (chatRoom.lastMessage.type) {
+                case "TEXT": {
+                  return (
+                    chatRoom.lastMessage?.mine &&
+                    "Bạn: " + chatRoom.lastMessage?.content
+                  );
+                }
+                case "COMICS": {
+                  return chatRoom.lastMessage.mine
+                    ? "Bạn"
+                    : chatRoom.secondUser.name +
+                        ` đã gửi ${chatRoom.lastMessage.comics?.length} truyện.`;
+                }
+                case "IMAGE":
+                case "LINK":
+                case "REPLY":
+                case "SYSTEM":
+              }
+            }
+          };
           return (
             <button
               key={chatRoom.id}
@@ -111,8 +133,7 @@ export default function ChatRoomList({
                       "font-semibold"
                     }`}
                   >
-                    {chatRoom.lastMessage?.mine && "Bạn: "}
-                    {chatRoom.lastMessage?.content}
+                    {lastMessageDisplay()}
                   </p>
                   <p>&#8226;</p>
                   <p className="text-xs pr-2">

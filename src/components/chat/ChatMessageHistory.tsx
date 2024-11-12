@@ -1,6 +1,7 @@
 import { MessageGroup } from "../../common/interfaces/message.interface";
 import moment from "moment/min/moment-with-locales";
 import styles from "./style.module.css";
+import { Avatar } from "antd";
 
 moment.locale("vi");
 
@@ -15,7 +16,7 @@ export default function ChatMessageHistory({
 
   return (
     <div
-      className={`grow overflow-y-auto flex flex-col justify-start gap-2 px-4 ${styles.chatHistory}`}
+      className={`grow overflow-y-auto overflow-x-hidden flex flex-col justify-start gap-2 px-4 ${styles.chatHistory}`}
     >
       {messagesList.map((messageGroup, index) => {
         return (
@@ -70,7 +71,7 @@ export default function ChatMessageHistory({
                         />
                       )}
                       <div
-                        className={`min-w-12 max-w-80 px-2 py-2 ${
+                        className={`min-w-12 max-w-[40em] px-2 py-2 ${
                           message.mine
                             ? "bg-sky-800 text-white"
                             : "bg-gray-50 drop-shadow-md"
@@ -78,7 +79,34 @@ export default function ChatMessageHistory({
                       >
                         {message.type === "TEXT" && message.content}
                         {message.type === "COMICS" && message.comics && (
-                          <div>{message.comics.title}</div>
+                          <div className="flex flex-col gap-1 group">
+                            <Avatar.Group
+                              shape="square"
+                              max={{ count: 5 }}
+                              className="hover:opacity-50 cursor-pointer"
+                            >
+                              {message.comics.map((comics) => {
+                                return (
+                                  <Avatar size={100}>
+                                    <img src={comics.coverImage} alt="" />
+                                  </Avatar>
+                                );
+                              })}
+                            </Avatar.Group>
+                            <p>
+                              {message.mine ? (
+                                "Bạn"
+                              ) : (
+                                <span className="font-semibold">
+                                  {message.user.name}
+                                </span>
+                              )}{" "}
+                              đã gửi {message.comics.length} truyện.{" "}
+                              <span className="text-xs italic hidden group-hover:inline">
+                                Nhấn vào để xem chi tiết!
+                              </span>
+                            </p>
+                          </div>
                         )}
                       </div>
                     </div>

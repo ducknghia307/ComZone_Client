@@ -20,8 +20,8 @@ export default function ActionConfirm({
 }) {
   const handleCancel = (e: any) => {
     e.stopPropagation();
-    cancelCallback();
     setIsOpen(false);
+    cancelCallback();
   };
 
   return (

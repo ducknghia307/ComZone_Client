@@ -39,7 +39,7 @@ export default function ChatSection({
       onClick={() => {
         if (currentRoom) updateIsRead(currentRoom);
       }}
-      className={`w-full flex flex-col items-stretch justify-between gap-2 pb-4`}
+      className={`w-full flex flex-col items-stretch justify-between gap-2`}
     >
       <div className="w-full flex flex-col items-stretch justify-start relative">
         <ChatSectionHeader chatRoom={currentRoom} />

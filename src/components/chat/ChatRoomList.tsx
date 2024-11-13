@@ -16,7 +16,7 @@ export default function ChatRoomList({
   return (
     <div
       className={`${
-        isDisplayedDefault ? "basis-1/3" : "w-fit"
+        isDisplayedDefault ? "basis-1/3 min-w-max" : "w-fit"
       }  border-r border-gray-300 transition-all duration-300 overflow-y-auto overflow-x-hidden relative`}
     >
       <div
@@ -78,15 +78,30 @@ export default function ChatRoomList({
               switch (chatRoom.lastMessage.type) {
                 case "TEXT": {
                   return (
-                    chatRoom.lastMessage?.mine &&
-                    "Bạn: " + chatRoom.lastMessage?.content
+                    <>
+                      {chatRoom.lastMessage?.mine && "Bạn: "}{" "}
+                      {chatRoom.lastMessage?.content}
+                    </>
                   );
                 }
                 case "COMICS": {
-                  return chatRoom.lastMessage.mine
-                    ? "Bạn"
-                    : chatRoom.secondUser.name +
-                        ` đã gửi ${chatRoom.lastMessage.comics?.length} truyện.`;
+                  return (
+                    <span className="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                      >
+                        <path d="M21 18H6C5.44772 18 5 18.4477 5 19C5 19.5523 5.44772 20 6 20H21V22H6C4.34315 22 3 20.6569 3 19V4C3 2.89543 3.89543 2 5 2H21V18ZM5 16.05C5.16156 16.0172 5.32877 16 5.5 16H19V4H5V16.05ZM16 9H8V7H16V9Z"></path>
+                      </svg>
+                      {chatRoom.lastMessage.mine
+                        ? "Bạn"
+                        : chatRoom.secondUser.name}{" "}
+                      đã gửi {chatRoom.lastMessage.comics?.length} truyện
+                    </span>
+                  );
                 }
                 case "IMAGE":
                 case "LINK":
@@ -127,7 +142,11 @@ export default function ChatRoomList({
                   } flex items-center gap-2 text-start font-light`}
                 >
                   <p
-                    className={`max-w-[15em] break-words whitespace-nowrap overflow-hidden text-ellipsis ${
+                    className={`${
+                      chatRoom.lastMessage?.mine
+                        ? "max-w-[12em]"
+                        : "max-w-[15em]"
+                    } break-words whitespace-nowrap overflow-hidden text-ellipsis ${
                       !chatRoom.lastMessage?.isRead &&
                       !chatRoom.lastMessage?.mine &&
                       "font-semibold"

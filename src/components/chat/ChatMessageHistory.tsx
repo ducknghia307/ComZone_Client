@@ -79,7 +79,7 @@ export default function ChatMessageHistory({
                       >
                         {message.type === "TEXT" && message.content}
                         {message.type === "COMICS" && message.comics && (
-                          <div className="flex flex-col gap-1 group">
+                          <div className="flex flex-col items-stretch gap-1 group">
                             <Avatar.Group
                               shape="square"
                               max={{ count: 5 }}
@@ -102,7 +102,7 @@ export default function ChatMessageHistory({
                                 </span>
                               )}{" "}
                               đã gửi {message.comics.length} truyện.{" "}
-                              <span className="text-xs italic hidden group-hover:inline">
+                              <span className="text-[0.7em] italic invisible group-hover:visible">
                                 Nhấn vào để xem chi tiết!
                               </span>
                             </p>

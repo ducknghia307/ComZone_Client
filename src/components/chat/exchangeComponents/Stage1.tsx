@@ -10,7 +10,6 @@ export default function Stage1({
   comicsGroup: Comic[];
 }) {
   const [isComicListModal, setIsComicListModal] = useState(false);
-  console.log(comicsGroup);
 
   // Function to handle the modal visibility toggle
   const handleModalToggle = () => {
@@ -52,7 +51,7 @@ export default function Stage1({
       <Modal
         title={
           <h2 className="text-lg p-2">
-            DANH SÁCH TRUYỆN CỦA {comicsGroup[0].sellerId.name}
+            Danh sách truyện của {comicsGroup[0].sellerId.name}
           </h2>
         }
         open={isComicListModal}
@@ -75,16 +74,6 @@ export default function Stage1({
                 <p>
                   <strong></strong> {comics.author}
                 </p>
-                <Collapse
-                  size="small"
-                  items={[
-                    {
-                      key: "1",
-                      label: "Mô tả truyện",
-                      children: <p>{comics.description}</p>,
-                    },
-                  ]}
-                />
               </div>
             </div>
           ))}

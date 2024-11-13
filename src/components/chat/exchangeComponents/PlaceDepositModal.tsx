@@ -53,7 +53,7 @@ const PlaceDepositModal: React.FC<ModalProp> = ({
       console.log("resTransactions", resTransactions.data);
       notification.success({
         message: "Đặt cọc thành công",
-        duration: 2,
+        duration: 5,
       });
       setFirstCurrentStage(2);
       onClose();
@@ -79,7 +79,7 @@ const PlaceDepositModal: React.FC<ModalProp> = ({
           <div className="flex flex-row gap-2">
             <WalletOutlined style={{ fontSize: "18px" }} />
             <h2 className="text-lg">
-              Số dư hiện tại: {CurrencySplitter(firstUser.balance)}d
+              Số dư hiện tại: {CurrencySplitter(firstUser.balance)} đ
             </h2>
           </div>
           {firstUser.balance - Number(exchangeRequest.depositAmount) > 0 ? (
@@ -88,8 +88,8 @@ const PlaceDepositModal: React.FC<ModalProp> = ({
                 Số dư của bạn sau khi đặt cọc:{" "}
                 {CurrencySplitter(
                   firstUser.balance - Number(exchangeRequest.depositAmount)
-                )}
-                d
+                )}{" "}
+                đ
               </h2>
             </div>
           ) : (
@@ -97,17 +97,20 @@ const PlaceDepositModal: React.FC<ModalProp> = ({
               <h2 className="text-red-500 text-base">Số dư không đủ.</h2>
               <h2
                 className="text-sky-700 text-base hover:cursor-pointer"
-                onClick={() =>
-                  //   setIsDepositModal(true)
-                  navigate("/accountmanagement/wallet")
-                }
+                onClick={() => {
+                  handleCancel();
+                  navigate("/accountmanagement/wallet");
+                }}
               >
                 Nạp thêm
               </h2>
             </div>
           )}
           <div className="w-full flex justify-end gap-3 mt-4">
-            <button className="font-semibold px-3 py-2 rounded-md hover:opacity-75 duration-200">
+            <button
+              onClick={() => handleCancel()}
+              className="font-semibold px-3 py-2 rounded-md hover:opacity-75 duration-200"
+            >
               HỦY
             </button>
             <button

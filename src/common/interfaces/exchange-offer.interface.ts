@@ -6,5 +6,5 @@ export interface ExchangeOffer extends BaseInterface {
   user: UserInfo;
   offerComics: Comic[];
   compensationAmount: number;
-  status: string;
+  status: "PENDING" | "SEEN" | "ACCEPTED" | "REJECTED";
 }

@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SendComicsModal from "./extraModals/SendComicsModal";
 import { Comic } from "../../common/base.interface";
+import PreviewSentImageModal from "./extraModals/PreviewSentImageModal";
+import { notification } from "antd";
 
 export default function ChatMessageInput({
   messageInput,
@@ -9,6 +11,9 @@ export default function ChatMessageInput({
   sentComicsList,
   setSentComicsList,
   handleSendMessageAsComics,
+  sentImage,
+  setSentImage,
+  handleSendMessageAsImage,
 }: {
   messageInput: string;
   setMessageInput: Function;
@@ -16,8 +21,14 @@ export default function ChatMessageInput({
   sentComicsList: Comic[];
   setSentComicsList: Function;
   handleSendMessageAsComics: Function;
+  sentImage: File | undefined;
+  setSentImage: Function;
+  handleSendMessageAsImage: Function;
 }) {
+  const [isSendingImage, setIsSendingImage] = useState<boolean>(false);
   const [isSendingComics, setIsSendingComics] = useState<boolean>(false);
+
+  const fileRef = useRef<any>();
 
   useEffect(() => {
     const sendMessageInput = document.getElementById("send-message");
@@ -31,7 +42,12 @@ export default function ChatMessageInput({
   return (
     <div className="w-full flex items-center gap-2 px-4">
       <div className="flex items-center gap-6 pl-2 pr-4">
-        <button className="flex items-center text-gray-500 duration-200 hover:text-black">
+        <button
+          onClick={() => {
+            if (fileRef) fileRef.current?.click();
+          }}
+          className="flex items-center text-gray-500 duration-200 hover:text-black"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -42,6 +58,32 @@ export default function ChatMessageInput({
             <path d="M21 15V18H24V20H21V23H19V20H16V18H19V15H21ZM21.0082 3C21.556 3 22 3.44495 22 3.9934V13H20V5H4V18.999L14 9L17 12V14.829L14 11.8284L6.827 19H14V21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082ZM8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7Z"></path>
           </svg>
         </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/png, image/gif, image/jpeg"
+          hidden
+          onChange={(e) => {
+            if (e.target.files) {
+              setSentImage(e.target.files[0]);
+              setIsSendingImage(true);
+            } else
+              notification.warning({
+                key: "upload",
+                message: "Tải hình ảnh lên không thành công",
+                description: "Vui lòng thử lại!",
+                duration: 5,
+              });
+          }}
+        />
+        <PreviewSentImageModal
+          isOpen={isSendingImage}
+          setIsOpen={setIsSendingImage}
+          sentImage={sentImage}
+          setSentImage={setSentImage}
+          handleSendMessageAsImage={handleSendMessageAsImage}
+        />
+
         <button
           onClick={() => setIsSendingComics(true)}
           className="flex items-center text-gray-500 duration-200 hover:text-black"

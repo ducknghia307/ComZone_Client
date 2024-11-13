@@ -20,6 +20,9 @@ export default function ChatSection({
   sentComicsList,
   setSentComicsList,
   handleSendMessageAsComics,
+  sentImage,
+  setSentImage,
+  handleSendMessageAsImage,
 }: {
   currentRoom: ChatRoom | undefined;
   currentMessList: MessageGroup[];
@@ -33,6 +36,9 @@ export default function ChatSection({
   sentComicsList: Comic[];
   setSentComicsList: Function;
   handleSendMessageAsComics: Function;
+  sentImage: File | undefined;
+  setSentImage: Function;
+  handleSendMessageAsImage: Function;
 }) {
   return (
     <div
@@ -41,31 +47,41 @@ export default function ChatSection({
       }}
       className={`w-full flex flex-col items-stretch justify-between gap-2`}
     >
-      <div className="w-full flex flex-col items-stretch justify-start relative">
-        <ChatSectionHeader chatRoom={currentRoom} />
-        {currentRoom?.comics && (
-          <ComicsSectionInChat
-            comics={currentRoom.comics}
-            setIsChatOpen={setIsChatOpen}
-          />
-        )}
-        {currentRoom?.exchangeRequest && (
-          <ExchangeSectionInChat chatRoom={currentRoom} isLoading={isLoading} />
-        )}
-      </div>
+      {!currentRoom ? null : (
+        <>
+          <div className="w-full flex flex-col items-stretch justify-start relative">
+            <ChatSectionHeader chatRoom={currentRoom} />
+            {currentRoom?.comics && (
+              <ComicsSectionInChat
+                comics={currentRoom.comics}
+                setIsChatOpen={setIsChatOpen}
+              />
+            )}
+            {currentRoom?.exchangeRequest && (
+              <ExchangeSectionInChat
+                chatRoom={currentRoom}
+                isLoading={isLoading}
+              />
+            )}
+          </div>
 
-      <ChatMessageHistory
-        messagesList={currentMessList}
-        lastMessageRef={lastMessageRef}
-      />
-      <ChatMessageInput
-        handleSendMessage={handleSendMessage}
-        messageInput={messageInput}
-        setMessageInput={setMessageInput}
-        sentComicsList={sentComicsList}
-        setSentComicsList={setSentComicsList}
-        handleSendMessageAsComics={handleSendMessageAsComics}
-      />
+          <ChatMessageHistory
+            messagesList={currentMessList}
+            lastMessageRef={lastMessageRef}
+          />
+          <ChatMessageInput
+            handleSendMessage={handleSendMessage}
+            messageInput={messageInput}
+            setMessageInput={setMessageInput}
+            sentComicsList={sentComicsList}
+            setSentComicsList={setSentComicsList}
+            handleSendMessageAsComics={handleSendMessageAsComics}
+            sentImage={sentImage}
+            setSentImage={setSentImage}
+            handleSendMessageAsImage={handleSendMessageAsImage}
+          />
+        </>
+      )}
     </div>
   );
 }

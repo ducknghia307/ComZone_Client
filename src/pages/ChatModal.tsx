@@ -2,13 +2,14 @@ import { io, Socket } from "socket.io-client";
 import { Modal, notification } from "antd";
 import ChatRoomList from "../components/chat/ChatRoomList";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAppSelector } from "../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import ChatSection from "../components/chat/ChatSection";
-import { privateAxios } from "../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../middleware/axiosInstance";
 import Loading from "../components/loading/Loading";
 import { Message, MessageGroup } from "../common/interfaces/message.interface";
 import { ChatRoom } from "../common/interfaces/chat-room.interface";
 import { Comic } from "../common/base.interface";
+import { authSlice } from "../redux/features/auth/authSlice";
 
 export default function ChatModal({
   isChatOpen,
@@ -22,6 +23,7 @@ export default function ChatModal({
   const { isLoggedIn, isLoading, userId } = useAppSelector(
     (state) => state.auth
   );
+  const dispatch = useAppDispatch();
 
   const [chatRoomList, setChatRoomList] = useState<ChatRoom[]>([]);
   const [currentRoomId, setCurrentRoomId] = useState<string>("");
@@ -29,6 +31,7 @@ export default function ChatModal({
 
   const [messageInput, setMessageInput] = useState<string>("");
   const [sentComicsList, setSentComicsList] = useState<Comic[]>([]);
+  const [sentImage, setSentImage] = useState<File>();
 
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
 
@@ -166,6 +169,46 @@ export default function ChatModal({
         });
       }
       setSentComicsList([]);
+      scrollDown();
+    }
+  };
+
+  const handleSendMessageAsImage = async () => {
+    if (!isLoggedIn || !userId) {
+      notification.info({
+        key: "auth",
+        message: "Chưa đăng nhập!",
+        description: "Bạn cần đăng nhập để thực hiện hành động này.",
+        duration: 5,
+      });
+    } else {
+      if (!sentImage) return;
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
+
+      var formData = new FormData();
+      formData.append("image", sentImage);
+      await publicAxios
+        .post("file/upload/image", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          console.log("Uploaded: ", res.data);
+          socketRef?.current?.emit("send-new-message", {
+            userId,
+            chatRoom: currentRoomIdRef.current,
+            content: res.data.imageUrl,
+            type: "IMAGE",
+          });
+
+          setSentImage(undefined);
+        })
+        .catch((err) => console.log(err))
+        .finally(() => {
+          dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+          scrollDown();
+        });
     }
   };
 
@@ -182,6 +225,7 @@ export default function ChatModal({
   }, [currentRoomId]);
 
   const updateIsRead = async (chatRoom: ChatRoom) => {
+    if (chatRoom.lastMessage?.isRead) return;
     await privateAxios
       .patch(`chat-messages/chat-room/is-read/${chatRoom.id}`)
       .then(() => {
@@ -245,6 +289,9 @@ export default function ChatModal({
           sentComicsList={sentComicsList}
           setSentComicsList={setSentComicsList}
           handleSendMessageAsComics={handleSendMessageAsComics}
+          sentImage={sentImage}
+          setSentImage={setSentImage}
+          handleSendMessageAsImage={handleSendMessageAsImage}
         />
       </div>
     </Modal>

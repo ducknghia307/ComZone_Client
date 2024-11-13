@@ -52,8 +52,9 @@ export default function SendComicsModal({
     else setSearchedList(comicsList);
   }, [searchKey]);
 
-  const handleConfirmSend = () => {
-    handleSendMessageAsComics();
+  const handleConfirmSend = async () => {
+    await handleSendMessageAsComics();
+    setIsConfirming(false);
     setIsOpen(false);
   };
 
@@ -63,6 +64,7 @@ export default function SendComicsModal({
       onCancel={(e) => {
         e.stopPropagation();
         setSentComicsList([]);
+        setIsConfirming(false);
         setIsOpen(false);
       }}
       centered
@@ -181,7 +183,7 @@ export default function SendComicsModal({
               </Avatar.Group>
             }
             cancelCallback={() => {
-              setIsOpen(false);
+              setIsConfirming(false);
             }}
             confirmCallback={() => handleConfirmSend()}
           />

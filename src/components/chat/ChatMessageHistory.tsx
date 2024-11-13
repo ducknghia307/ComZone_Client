@@ -1,7 +1,7 @@
 import { MessageGroup } from "../../common/interfaces/message.interface";
 import moment from "moment/min/moment-with-locales";
 import styles from "./style.module.css";
-import { Avatar } from "antd";
+import { Avatar, Image } from "antd";
 
 moment.locale("vi");
 
@@ -75,6 +75,8 @@ export default function ChatMessageHistory({
                           message.mine
                             ? "bg-sky-800 text-white"
                             : "bg-gray-50 drop-shadow-md"
+                        } ${
+                          message.type === "IMAGE" && "bg-white"
                         } rounded-lg text-start`}
                       >
                         {message.type === "TEXT" && message.content}
@@ -107,6 +109,14 @@ export default function ChatMessageHistory({
                               </span>
                             </p>
                           </div>
+                        )}
+                        {message.type === "IMAGE" && (
+                          <Image
+                            src={message.content}
+                            alt=""
+                            width={200}
+                            className="rounded-xl"
+                          />
                         )}
                       </div>
                     </div>

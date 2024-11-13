@@ -6,7 +6,7 @@ import ManageOrders from './ManageOrders';
 import Grid from '@mui/material/Grid2';
 import ManageAuctions from './ManageAutions';
 import ManageExchanges from './ManageExchanges';
-import ManageDeposits from './ManageDeposits';
+import ManageDeposits from './ManageWallet';
 import ManageFeedbacks from './ManageFeedbacks';
 
 const ModManagement: React.FC = () => {

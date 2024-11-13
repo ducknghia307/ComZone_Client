@@ -103,7 +103,7 @@ const ManageUsers: React.FC = () => {
 
   return (
     <div>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold' }}>
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM' }}>
         Quản lí người dùng
       </Typography>
       <Paper>
@@ -111,11 +111,11 @@ const ManageUsers: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-              <StyledTableCell>Ảnh</StyledTableCell>
-                <StyledTableCell>Tên Người Dùng</StyledTableCell>
-                <StyledTableCell align="right">Email</StyledTableCell>
-                <StyledTableCell align="right">Trạng thái</StyledTableCell>
-                <StyledTableCell align="right">Chỉnh Sửa</StyledTableCell>
+              <StyledTableCell style={{ fontFamily: 'REM' }}>Ảnh</StyledTableCell>
+                <StyledTableCell style={{ fontFamily: 'REM' }}>Tên Người Dùng</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Email</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Trạng thái</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Chỉnh Sửa</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -131,13 +131,13 @@ const ManageUsers: React.FC = () => {
                     <StyledTableCell align="center" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                       <img style={{ width: '50px', height: '50px', borderRadius: '50%' }} src={user.avatar || '/placeholder.png'} alt={user.name} />
                     </StyledTableCell>
-                    <StyledTableCell component="th" scope="row">
+                    <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM' }}>
                       {user.name}
                     </StyledTableCell>
-                    <StyledTableCell component="th" scope="row">
+                    <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM' }}>
                       {user.email}
                     </StyledTableCell>
-                    <StyledTableCell align="right">
+                    <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
                       <span style={getStatusColor(user.status)}>
                         {getStatusText(user.status)}
                       </span>

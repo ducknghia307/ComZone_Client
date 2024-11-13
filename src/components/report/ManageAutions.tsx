@@ -157,7 +157,7 @@ const ManageAuctions: React.FC = () => {
 
   return (
     <div>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold' }}>
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM' }}>
         Quản lý đấu giá
       </Typography>
       <Paper>
@@ -165,15 +165,15 @@ const ManageAuctions: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>Người Bán</StyledTableCell>
-                <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>Tên Truyện</StyledTableCell>
-                <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>Trạng Thái Đấu Giá</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Thời Gian Bắt Đầu</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Thời Gian Kết Thúc</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Giá Khởi Điểm</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Bước Giá</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Giá Hiện Tại</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Chi Tiết</StyledTableCell>
+                <StyledTableCell style={{ fontFamily: 'REM' }}>Người Bán</StyledTableCell>
+                <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Tên Truyện</StyledTableCell>
+                <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Trạng Thái Đấu Giá</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Thời Gian Bắt Đầu</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Thời Gian Kết Thúc</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Giá Khởi Điểm</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Bước Giá</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Giá Hiện Tại</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Chi Tiết</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -187,30 +187,30 @@ const ManageAuctions: React.FC = () => {
                 auctions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((auction) => (
                   <React.Fragment key={auction.id}>
                     <StyledTableRow>
-                      <StyledTableCell >
+                      <StyledTableCell style={{ fontFamily: 'REM' }}>
                         {auction.comics.sellerId.name}
                       </StyledTableCell>
-                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>
+                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                         {truncateText(auction.comics.title, 20)}
                       </StyledTableCell>
-                      <StyledTableCell align="left">
+                      <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
                         <span style={getStatusChipStyles(auction.status)}>
                           {translateStatus(auction.status)}
                         </span>
                       </StyledTableCell>
-                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>
+                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                         {new Date(auction.startTime).toLocaleString()}
                       </StyledTableCell>
-                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap' }}>
+                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                         {new Date(auction.endTime).toLocaleString()}
                       </StyledTableCell>
-                      <StyledTableCell align="left">
+                      <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
                         {auction.reservePrice.toLocaleString()} đ
                       </StyledTableCell>
-                      <StyledTableCell align="left">
+                      <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
                         {auction.priceStep.toLocaleString()} đ
                       </StyledTableCell>
-                      <StyledTableCell align="left">
+                      <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
                         {auction.currentPrice.toLocaleString()} đ
                       </StyledTableCell>
                       <StyledTableCell align="left">

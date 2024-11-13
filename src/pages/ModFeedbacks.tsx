@@ -3,7 +3,7 @@ import "../components/ui/AccountUser.css";
 import Grid from '@mui/material/Grid2';
 import Sidebar from '../components/report/Sidebar';
 import ManageExchanges from '../components/report/ManageExchanges';
-import ManageDeposits from '../components/report/ManageDeposits';
+import ManageDeposits from '../components/report/ManageWallet';
 import ManageFeedbacks from '../components/report/ManageFeedbacks';
 const ModFeedbacks: React.FC = () => {
 

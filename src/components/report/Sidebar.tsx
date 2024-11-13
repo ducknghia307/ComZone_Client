@@ -10,7 +10,7 @@ import { UserInfo } from "../../common/base.interface";
 import GavelOutlinedIcon from '@mui/icons-material/GavelOutlined';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 
-const Sidebar = ({onSelect}) => {
+const Sidebar = ({ onSelect }) => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("");
   const navigate = useNavigate();
 
@@ -25,7 +25,7 @@ const Sidebar = ({onSelect}) => {
   const fetchUserInfo = async () => {
     const response = await privateAxios("users/profile");
     console.log("user info", response);
-    
+
     setUserInfo(response.data);
   };
   useEffect(() => {
@@ -34,12 +34,11 @@ const Sidebar = ({onSelect}) => {
 
   return (
     <div>
-      <div className="menu-section" style={{marginTop:'-10px'}}>
+      <div className="menu-section" style={{ marginTop: '-10px', fontFamily: 'REM' }}>
         <ul>
           <li
-            className={`menu-item ${
-              currentUrl === "/mod/comics" ? "active" : ""
-            }`}
+            className={`menu-item ${currentUrl === "/mod/comics" ? "active" : ""
+              }`}
             onClick={() => {
               handleMenuItemClick("comics");
               navigate("/mod/comics");
@@ -48,9 +47,8 @@ const Sidebar = ({onSelect}) => {
             <ShoppingBagOutlinedIcon /> Quản Lý Truyện
           </li>
           <li
-            className={`menu-item ${
-              currentUrl === "/mod/users" ? "active" : ""
-            }`}
+            className={`menu-item ${currentUrl === "/mod/users" ? "active" : ""
+              }`}
             onClick={() => {
               handleMenuItemClick("users");
               navigate("/mod/users");
@@ -59,9 +57,8 @@ const Sidebar = ({onSelect}) => {
             <PersonOutlinedIcon /> Quản Lý Người Dùng
           </li>
           <li
-            className={`menu-item ${
-              currentUrl === "/mod/orders" ? "active" : ""
-            }`}
+            className={`menu-item ${currentUrl === "/mod/orders" ? "active" : ""
+              }`}
             onClick={() => {
               handleMenuItemClick("orders");
               navigate("/mod/orders");
@@ -70,9 +67,8 @@ const Sidebar = ({onSelect}) => {
             <TvOutlinedIcon /> Quản Lý Đơn Hàng
           </li>
           <li
-            className={`menu-item ${
-              currentUrl === "/mod/auctions" ? "active" : ""
-            }`}
+            className={`menu-item ${currentUrl === "/mod/auctions" ? "active" : ""
+              }`}
             onClick={() => {
               handleMenuItemClick("auctions");
               navigate("/mod/auctions");
@@ -81,9 +77,8 @@ const Sidebar = ({onSelect}) => {
             <GavelOutlinedIcon /> Quản Lý Đấu Giá
           </li>
           <li
-            className={`menu-item ${
-              currentUrl === "/mod/exchanges" ? "active" : ""
-            }`}
+            className={`menu-item ${currentUrl === "/mod/exchanges" ? "active" : ""
+              }`}
             onClick={() => {
               handleMenuItemClick("exchanges");
               navigate("/mod/exchanges");
@@ -92,9 +87,8 @@ const Sidebar = ({onSelect}) => {
             <MultipleStopOutlinedIcon /> Quản Lý Trao Đổi
           </li>
           <li
-            className={`menu-item ${
-              currentUrl === "/mod/deposits" ? "active" : ""
-            }`}
+            className={`menu-item ${currentUrl === "/mod/deposits" ? "active" : ""
+              }`}
             onClick={() => {
               handleMenuItemClick("deposits");
               navigate("/mod/deposits");
@@ -103,9 +97,8 @@ const Sidebar = ({onSelect}) => {
             <AccountBalanceWalletOutlinedIcon /> Quản Lý Ví
           </li>
           <li
-            className={`menu-item ${
-              currentUrl === "/mod/feedbacks" ? "active" : ""
-            }`}
+            className={`menu-item ${currentUrl === "/mod/feedbacks" ? "active" : ""
+              }`}
             onClick={() => {
               handleMenuItemClick("feedbacks");
               navigate("/mod/feedbacks");

@@ -1,19 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Button,
-  Box,
-  IconButton,
-  TablePagination,
-  TextField,
-} from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Button, Box, IconButton, TablePagination, TextField, } from "@mui/material";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import "../ui/UserWallet.css";
@@ -22,98 +8,7 @@ import DepositForm from "./DepositForm";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { BaseInterface, UserInfo } from "../../common/base.interface";
 import CurrencySplitter from "../../assistants/Spliter";
-
-const transactions = [
-  {
-    date: "01/10/2024",
-    type: "Nạp Tiền",
-    amount: "+ 100.000",
-    status: "Đang xử lý",
-    note: "Nạp qua VNPay",
-  },
-  {
-    date: "01/10/2024",
-    type: "Rút Tiền",
-    amount: "- 100.000",
-    status: "Hoàn Tất",
-    note: "Rút về tài khoản ngân hàng",
-  },
-  {
-    date: "01/10/2024",
-    type: "Rút Tiền",
-    amount: "- 50.000",
-    status: "Hoàn Tất",
-    note: "Rút về tài khoản ngân hàng",
-  },
-  {
-    date: "01/10/2024",
-    type: "Nạp Tiền",
-    amount: "+ 250.000",
-    status: "Hoàn Tất",
-    note: "Nạp qua ZaloPay",
-  },
-  {
-    date: "01/10/2024",
-    type: "Nạp Tiền",
-    amount: "+ 500.000",
-    status: "Hoàn Tất",
-    note: "Nạp qua ZaloPay",
-  },
-  {
-    date: "01/10/2024",
-    type: "Nạp Tiền",
-    amount: "+ 300.000",
-    status: "Hoàn Tất",
-    note: "Nạp qua VNPay",
-  },
-  {
-    date: "01/10/2024",
-    type: "Rút Tiền",
-    amount: "- 70.000",
-    status: "Hoàn Tất",
-    note: "Rút về tài khoản ngân hàng",
-  },
-  {
-    date: "01/10/2024",
-    type: "Rút Tiền",
-    amount: "- 70.000",
-    status: "Hoàn Tất",
-    note: "Rút về tài khoản ngân hàng",
-  },
-  {
-    date: "01/10/2024",
-    type: "Rút Tiền",
-    amount: "- 70.000",
-    status: "Hoàn Tất",
-    note: "Rút về tài khoản ngân hàng",
-  },
-  {
-    date: "01/10/2024",
-    type: "Rút Tiền",
-    amount: "- 70.000",
-    status: "Hoàn Tất",
-    note: "Rút về tài khoản ngân hàng",
-  },
-  {
-    date: "01/10/2024",
-    type: "Rút Tiền",
-    amount: "- 70.000",
-    status: "Hoàn Tất",
-    note: "Rút về tài khoản ngân hàng",
-  },
-  {
-    date: "01/10/2024",
-    type: "Rút Tiền",
-    amount: "- 70.000",
-    status: "Hoàn Tất",
-    note: "Rút về tài khoản ngân hàng",
-  },
-];
-// interface Wallet extends BaseInterface {
-//   balance: number;
-//   nonWithdrawableAmount: number;
-//   status: number;
-// }
+import { useAppSelector } from "../../redux/hooks";
 const UserWallet = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
@@ -121,6 +16,10 @@ const UserWallet = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [transactions, setTransactions] = useState([]);
+  const userId = useAppSelector((state) => state.auth.userId);
+  console.log("userid", userId);
+
   const fetchUserInfo = async () => {
     try {
       const response = await privateAxios("/users/profile");
@@ -130,6 +29,27 @@ const UserWallet = () => {
       console.log("...");
     }
   };
+  const fetchUserTransactions = async () => {
+    try {
+      const response = await privateAxios.get(`/transactions/user`, {
+        params: { userId },
+      });
+      const data = await response.data;
+      // Transform the API response data to match table columns
+      const formattedTransactions = data.map((transaction) => ({
+        date: new Date(transaction.createdAt).toLocaleDateString("vi-VN"),
+        type: transaction.amount > 0 ? "Nạp Tiền" : "Rút Tiền",
+        amount: `${transaction.amount > 0 ? "+" : ""}${transaction.amount.toLocaleString("vi-VN")} đ`,
+        status: transaction.status,
+        note: transaction.note || "Không có ghi chú",
+      }));
+      setTransactions(formattedTransactions);
+      console.log("transactions", response.data);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -145,7 +65,29 @@ const UserWallet = () => {
   );
   useEffect(() => {
     fetchUserInfo();
+    fetchUserTransactions()
   }, []);
+
+  const getStatusChipStyles = (status: string) => {
+    switch (status) {
+      case 'SUCCESSFUL':
+        return { color: '#4caf50', backgroundColor: '#e8f5e9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+      case 'PENDING':
+        return { color: '#ff9800', backgroundColor: '#fff3e0', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', };
+      case 'FAILED':
+        return { color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+    }
+  };
+
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case 'SUCCESSFUL': return 'Thành công';
+      case 'PENDING': return 'Đang xử lí';
+      case 'FAILED': return 'Thất bại';
+      default: return status;
+    }
+  };
+
   return (
     <div className="wallet-container">
       {showDepositForm && userInfo ? (
@@ -240,14 +182,7 @@ const UserWallet = () => {
             </Box>
             <Button
               sx={{
-                marginTop: 3,
-                display: "block",
-                marginLeft: "auto",
-                marginRight: "auto",
-                color: "#fff",
-                backgroundColor: "#000",
-                padding: "5px 20px",
-                fontSize: "16px",
+                marginTop: 3, display: "block", marginLeft: "auto", marginRight: "auto", color: "#fff", backgroundColor: "#000", padding: "5px 20px", fontSize: "16px",
               }}
             >
               TIẾN HÀNH RÚT TIỀN
@@ -258,10 +193,7 @@ const UserWallet = () => {
         <>
           <Typography
             sx={{
-              fontSize: "30px",
-              fontWeight: "bold",
-              textAlign: "center",
-              paddingBottom: "20px",
+              fontSize: "30px", fontWeight: "bold", textAlign: "center", paddingBottom: "20px", fontFamily: 'REM'
             }}
           >
             VÍ COMZONE
@@ -274,10 +206,10 @@ const UserWallet = () => {
           >
             <Box>
               <div style={{ display: "flex", marginRight: "20px" }}>
-                <Typography variant="h6" mr={2}>
+                <Typography variant="h6" mr={2} sx={{ fontFamily: 'REM' }}>
                   Số dư hiện tại:
                 </Typography>
-                <Typography variant="h6" sx={{ color: "#FF8A00" }}>
+                <Typography variant="h6" sx={{ color: "#FF8A00", fontFamily: 'REM' }}>
                   {isVisible
                     ? `${CurrencySplitter(userInfo?.balance)} đ`
                     : "****** đ"}
@@ -287,14 +219,14 @@ const UserWallet = () => {
                 </IconButton>
               </div>
               <div style={{ display: "flex", marginRight: "20px" }}>
-                <Typography variant="h6" mr={2}>
+                <Typography variant="h6" mr={2} sx={{ fontFamily: 'REM' }}>
                   Hiện có thể rút:
                 </Typography>
-                <Typography variant="h6" sx={{ color: "#FF8A00" }}>
+                <Typography variant="h6" sx={{ color: "#FF8A00", fontFamily: 'REM' }}>
                   {isVisible
                     ? `${CurrencySplitter(
-                        userInfo?.balance - userInfo?.nonWithdrawableAmount
-                      )} đ`
+                      userInfo?.balance - userInfo?.nonWithdrawableAmount
+                    )} đ`
                     : "****** đ"}
                 </Typography>
                 <IconButton onClick={() => setIsVisible(!isVisible)}>
@@ -306,10 +238,7 @@ const UserWallet = () => {
             <Box display="flex" gap={2}>
               <Button
                 sx={{
-                  backgroundColor: "#fff",
-                  color: "#000",
-                  border: "1px solid black",
-                  padding: "5px 20px",
+                  backgroundColor: "#fff", color: "#000", border: "1px solid black", padding: "5px 20px", fontFamily: 'REM'
                 }}
                 onClick={() => setShowWithdrawForm(true)}
               >
@@ -317,9 +246,7 @@ const UserWallet = () => {
               </Button>
               <Button
                 sx={{
-                  backgroundColor: "#004F7A",
-                  color: "#fff",
-                  padding: "5px 20px",
+                  backgroundColor: "#000", color: "#fff", padding: "5px 20px", fontFamily: 'REM'
                 }}
                 onClick={() => setShowDepositForm(true)}
               >
@@ -332,19 +259,19 @@ const UserWallet = () => {
             <Table>
               <TableHead>
                 <TableRow style={{ backgroundColor: "black" }}>
-                  <TableCell style={{ color: "white", textAlign: "center" }}>
+                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
                     Ngày giao dịch
                   </TableCell>
-                  <TableCell style={{ color: "white", textAlign: "center" }}>
+                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
                     Loại giao dịch
                   </TableCell>
-                  <TableCell style={{ color: "white", textAlign: "center" }}>
+                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
                     Số Tiền (đ)
                   </TableCell>
-                  <TableCell style={{ color: "white", textAlign: "center" }}>
+                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
                     Trạng Thái
                   </TableCell>
-                  <TableCell style={{ color: "white", textAlign: "center" }}>
+                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
                     Ghi Chú
                   </TableCell>
                 </TableRow>
@@ -352,11 +279,15 @@ const UserWallet = () => {
               <TableBody>
                 {paginatedTransactions.map((transaction, index) => (
                   <TableRow key={index}>
-                    <TableCell align="center">{transaction.date}</TableCell>
-                    <TableCell align="center">{transaction.type}</TableCell>
-                    <TableCell align="center">{transaction.amount}</TableCell>
-                    <TableCell align="center">{transaction.status}</TableCell>
-                    <TableCell align="center">{transaction.note}</TableCell>
+                    <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.date}</TableCell>
+                    <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.type}</TableCell>
+                    <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.amount}</TableCell>
+                    <TableCell sx={{ fontFamily: 'REM' }} align="center">
+                      <span style={getStatusChipStyles(transaction.status)}>
+                        {translateStatus(transaction.status)}
+                      </span>
+                    </TableCell>
+                    <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.note}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -36,7 +36,7 @@ import ModUsers from "../../pages/ModUsers";
 import ModOrders from "../../pages/ModOrders";
 import ModAuctions from "../../pages/ModAuctions";
 import ModExchanges from "../../pages/ModExchanges";
-import ModDeposits from "../../pages/ModDeposits";
+import ModDeposits from "../../pages/ModWallet";
 import ModFeedbacks from "../../pages/ModFeedbacks";
 
 const AppRouter = () => {

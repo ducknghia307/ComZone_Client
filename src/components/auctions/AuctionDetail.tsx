@@ -13,6 +13,8 @@ import CountdownFlipNumbers from "./CountDown";
 import CountUp from "react-countup";
 import Loading from "../loading/Loading";
 import ConfettiExplosion from 'react-confetti-explosion';
+// import "antd/dist/antd.css";
+import { Modal } from "antd";
 
 // Countdown renderer function
 const ComicAuction = () => {
@@ -27,6 +29,7 @@ const ComicAuction = () => {
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [isBidDisabled, setIsBidDisabled] = useState(false);
   const bidder = useAppSelector((state) => state.auth.userId);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const handleBidActionDisabled = (disabled: boolean) => {
     setIsBidDisabled(disabled);
   };
@@ -41,13 +44,17 @@ const ComicAuction = () => {
         setIsBidDisabled(true); // Vô hiệu hóa hành động đấu giá
 
         // Kiểm tra nếu người dùng hiện tại là winner
-        // if (bidder && auctionData.winnerId === bidder) {
-        //   setIsWinner(true); 
-        // }
+        if (bidder) {
+          setIsModalVisible(true);
+        }
       }
     }
     setLoading(false)
   }, [auctionData?.endTime, auctionData?.winnerId]);
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+  };
 
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -122,15 +129,32 @@ const ComicAuction = () => {
     <div className="auction-wrapper">
       {bidder && (
         <>
-          <ConfettiExplosion
-            force={0.6}
-            duration={5000}
-            particleCount={200}
-            width={1600}
-          />
-          <Typography variant="h4" style={{ color: 'green', textAlign: 'center', margin: '20px' }}>
-            Chúc mừng! Bạn là người thắng cuộc!
-          </Typography>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+            <ConfettiExplosion
+              force={0.8}
+              duration={5000}
+              particleCount={400}
+              width={1600}
+            />
+          </div>
+          <Modal
+            title="🎉 Chúc Mừng!"
+            visible={isModalVisible}
+            onOk={handleModalClose}
+            onCancel={handleModalClose}
+            centered
+            okText="Tuyệt vời!"
+            cancelButtonProps={{ style: { display: "none" } }}
+            width={600}
+            bodyStyle={{ paddingTop: "10px", paddingBottom: "20px", fontSize: "18px", }}
+            okButtonProps={{ style: { color: "white", backgroundColor: "black", fontWeight: "bold", fontSize: "16px", }, }}
+          >
+            <Typography
+              style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center", color: "green", lineHeight: "1.5", }}
+            >
+              Bạn là người thắng cuộc trong phiên đấu giá! 🎊
+            </Typography>
+          </Modal>
         </>
       )}
       <div

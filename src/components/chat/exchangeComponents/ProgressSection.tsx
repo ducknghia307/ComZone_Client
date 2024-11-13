@@ -8,6 +8,8 @@ import Stage1 from "./Stage1";
 import Stage2 from "./Stage2";
 import Stage3 from "./Stage3";
 import Stage4 from "./Stage4";
+import PlaceDepositModal from "./PlaceDepositModal";
+import DepositWalletModal from "./DepositWalletModal";
 
 export default function ProgressSection({
   exchangeOffer,
@@ -19,9 +21,9 @@ export default function ProgressSection({
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
   const [firstCurrentStage, setFirstCurrentStage] = useState<number>(1);
   const [secondCurrentStage, setSecondCurrentStage] = useState<number>(1);
-
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const exchangeRequest: ExchangeRequest = exchangeOffer.exchangeRequest;
-
+  const [isDepositModal, setIsDepositModal] = useState<boolean>(false);
   const firstUser =
     exchangeOffer.user.id === userId
       ? exchangeOffer.user
@@ -43,6 +45,9 @@ export default function ProgressSection({
       : exchangeOffer.offerComics;
 
   const getFirstUserProgress = async () => {};
+  const handleShowDepositModal = () => {
+    setIsModalVisible(true);
+  };
 
   if (isExpanded)
     return (
@@ -177,7 +182,26 @@ export default function ProgressSection({
         <ActionButtons
           currentStage={firstCurrentStage}
           oppositeCurrentStage={secondCurrentStage}
+          onShowModal={handleShowDepositModal}
         />
+        {exchangeRequest.depositAmount && (
+          <PlaceDepositModal
+            isModalVisible={isModalVisible}
+            onClose={() => setIsModalVisible(false)}
+            firstUser={firstUser}
+            exchangeRequest={exchangeRequest}
+            setIsDepositModal={setIsDepositModal}
+            setFirstCurrentStage={setFirstCurrentStage}
+          />
+        )}
+        {firstUser.balance && exchangeRequest.depositAmount && (
+          <DepositWalletModal
+            isDepositModal={isDepositModal}
+            setIsDepositModal={setIsDepositModal}
+            balance={firstUser.balance}
+            amount={exchangeRequest.depositAmount}
+          />
+        )}
       </div>
     );
   else return <div className=""></div>;

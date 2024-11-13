@@ -12,9 +12,9 @@ import { setAuctionData } from "../../redux/features/auction/auctionSlice";
 import CountdownFlipNumbers from "./CountDown";
 import CountUp from "react-countup";
 import Loading from "../loading/Loading";
+import ConfettiExplosion from 'react-confetti-explosion';
 
 // Countdown renderer function
-
 const ComicAuction = () => {
   const { id } = useParams<Record<string, string>>(); // Get ID from URL
   const [comic, setComic] = useState<any>(null);
@@ -37,12 +37,17 @@ const ComicAuction = () => {
       const now = Date.now();
 
       if (now >= endTimestamp) {
-        setAuctionEnded(true);
-        setIsBidDisabled(true);
+        setAuctionEnded(true); // Đấu giá đã kết thúc
+        setIsBidDisabled(true); // Vô hiệu hóa hành động đấu giá
+
+        // Kiểm tra nếu người dùng hiện tại là winner
+        // if (bidder && auctionData.winnerId === bidder) {
+        //   setIsWinner(true); 
+        // }
       }
     }
-    setLoading(false);
-  }, [auctionData.endTime]);
+    setLoading(false)
+  }, [auctionData?.endTime, auctionData?.winnerId]);
 
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -115,6 +120,19 @@ const ComicAuction = () => {
 
   return (
     <div className="auction-wrapper">
+      {bidder && (
+        <>
+          <ConfettiExplosion
+            force={0.6}
+            duration={5000}
+            particleCount={200}
+            width={1600}
+          />
+          <Typography variant="h4" style={{ color: 'green', textAlign: 'center', margin: '20px' }}>
+            Chúc mừng! Bạn là người thắng cuộc!
+          </Typography>
+        </>
+      )}
       <div
         className="title-container"
         style={{ borderBottom: "1px solid #ccc" }}

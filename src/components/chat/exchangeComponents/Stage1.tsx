@@ -1,6 +1,7 @@
-import { Avatar } from "antd";
+import { Avatar, Collapse, Modal } from "antd";
 import { Comic } from "../../../common/base.interface";
-
+import { useState } from "react";
+import styles from "../../exchange/style.module.css";
 export default function Stage1({
   currentStage,
   comicsGroup,
@@ -8,6 +9,13 @@ export default function Stage1({
   currentStage: number;
   comicsGroup: Comic[];
 }) {
+  const [isComicListModal, setIsComicListModal] = useState(false);
+  console.log(comicsGroup);
+
+  // Function to handle the modal visibility toggle
+  const handleModalToggle = () => {
+    setIsComicListModal(!isComicListModal);
+  };
   return (
     <div className="relative flex items-center">
       <Avatar.Group
@@ -16,8 +24,8 @@ export default function Stage1({
         max={{ count: 3 }}
         className={`${currentStage >= 1 && "opacity-50"}`}
       >
-        {comicsGroup.map((comics: Comic) => {
-          return <Avatar src={comics.coverImage} />;
+        {comicsGroup.map((comics: Comic, index: number) => {
+          return <Avatar src={comics.coverImage} key={index} />;
         })}
       </Avatar.Group>
 
@@ -34,12 +42,54 @@ export default function Stage1({
       </span>
 
       <p
-        className={`absolute bottom-[-50%] left-1/2 translate-x-[-50%] text-[0.7em] whitespace-nowrap ${
+        className={`absolute hover:opacity-85 hover:cursor-pointer duration-200 bottom-[-50%] left-1/2 translate-x-[-50%] text-[0.7em] whitespace-nowrap ${
           currentStage >= 1 && "opacity-50"
         }`}
+        onClick={handleModalToggle}
       >
-        Chọn danh sách truyện
+        Xem danh sách truyện
       </p>
+      <Modal
+        title={
+          <h2 className="text-lg p-2">
+            DANH SÁCH TRUYỆN CỦA {comicsGroup[0].sellerId.name}
+          </h2>
+        }
+        open={isComicListModal}
+        onCancel={handleModalToggle}
+        footer={null}
+        width={800}
+      >
+        <div
+          className={`max-h-[25em] p-2 mt-2 overflow-y-auto ${styles.exchangeRequest}`}
+        >
+          {comicsGroup.map((comics: Comic, index) => (
+            <div key={index} className="mb-4 w-full flex flex-row gap-5">
+              <img
+                src={comics.coverImage}
+                alt={comics.title}
+                className="w-32 h-32 mb-2 rounded-lg"
+              />
+              <div className="w-full flex flex-col gap-2">
+                <h3 className="font-bold text-base">{comics.title}</h3>
+                <p>
+                  <strong></strong> {comics.author}
+                </p>
+                <Collapse
+                  size="small"
+                  items={[
+                    {
+                      key: "1",
+                      label: "Mô tả truyện",
+                      children: <p>{comics.description}</p>,
+                    },
+                  ]}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Modal>
     </div>
   );
 }

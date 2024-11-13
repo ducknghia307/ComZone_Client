@@ -4,10 +4,12 @@ export default function ActionButtons({
   onShowModal,
   isExpanded,
   setIsExpanded,
+  handleShowDeliveryModal,
 }: {
   currentStage: number;
   oppositeCurrentStage: number;
   onShowModal: () => void;
+  handleShowDeliveryModal: () => void;
   isExpanded: boolean;
   setIsExpanded: Function;
 }) {
@@ -33,7 +35,7 @@ export default function ActionButtons({
           <div className="flex items-stretch justify-center px-2 mt-1">
             <button
               className="w-full bg-gray-900 text-white py-2 border border-gray-900 rounded-lg duration-200 hover:bg-white hover:text-black"
-              // onClick={onShowModal}
+              onClick={handleShowDeliveryModal}
             >
               Chọn thông tin giao hàng
             </button>

@@ -13,6 +13,7 @@ import DepositWalletModal from "./DepositWalletModal";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import styles from "./style.module.css";
 import { Deposit } from "../../../common/interfaces/deposit.interface";
+import DeliveryAddressModal from "./DeliveryAddressModal";
 
 export default function ProgressSection({
   exchangeOffer,
@@ -27,6 +28,7 @@ export default function ProgressSection({
   const [firstCurrentStage, setFirstCurrentStage] = useState<number>(1);
   const [secondCurrentStage, setSecondCurrentStage] = useState<number>(1);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isDeliveryModal, setDeliveryModal] = useState<boolean>(false);
   const exchangeRequest: ExchangeRequest = exchangeOffer.exchangeRequest;
   const [isDepositModal, setIsDepositModal] = useState<boolean>(false);
   const firstUser =
@@ -104,6 +106,10 @@ export default function ProgressSection({
 
   const handleShowDepositModal = () => {
     setIsModalVisible(true);
+  };
+
+  const handleShowDeliveryModal = () => {
+    setDeliveryModal(true);
   };
 
   if (isExpanded)
@@ -242,6 +248,7 @@ export default function ProgressSection({
           isExpanded={isExpanded}
           setIsExpanded={setIsExpanded}
           onShowModal={handleShowDepositModal}
+          handleShowDeliveryModal={handleShowDeliveryModal}
         />
       </div>
     );
@@ -284,6 +291,7 @@ export default function ProgressSection({
           isExpanded={isExpanded}
           setIsExpanded={setIsExpanded}
           onShowModal={handleShowDepositModal}
+          handleShowDeliveryModal={handleShowDeliveryModal}
         />
         {exchangeRequest.depositAmount && (
           <PlaceDepositModal
@@ -303,6 +311,10 @@ export default function ProgressSection({
             amount={exchangeRequest.depositAmount}
           />
         )}
+        <DeliveryAddressModal
+          isDeliveryModal={isDeliveryModal}
+          setDeliveryModal={setDeliveryModal}
+        />
       </div>
     );
 }

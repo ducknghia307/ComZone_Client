@@ -131,7 +131,7 @@ export default function CustomizedTables() {
 
   return (
     <div>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold' }}>
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM' }}>
         Quản lí truyện tranh
       </Typography>
       <Paper>
@@ -139,13 +139,13 @@ export default function CustomizedTables() {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>Ảnh Bìa</StyledTableCell>
-                <StyledTableCell>Tên Truyện</StyledTableCell>
-                <StyledTableCell align="right">Tác giả</StyledTableCell>
-                <StyledTableCell align="right">Tình Trạng</StyledTableCell>
-                <StyledTableCell align="right">Tập/Bộ</StyledTableCell>
-                <StyledTableCell align="right">Trạng thái</StyledTableCell>
-                <StyledTableCell align="right">Chỉnh Sửa</StyledTableCell>
+                <StyledTableCell style={{ fontFamily: 'REM' }}>Ảnh Bìa</StyledTableCell>
+                <StyledTableCell style={{ fontFamily: 'REM' }}>Tên Truyện</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Tác giả</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Tình Trạng</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Tập/Bộ</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Trạng thái</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Chỉnh Sửa</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -161,20 +161,20 @@ export default function CustomizedTables() {
                     <StyledTableCell align="right">
                       <img style={{ width: '100px', height: '140px' }} src={comic.coverImage} alt={comic.title} />
                     </StyledTableCell>
-                    <StyledTableCell component="th" scope="row">
+                    <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM' }}>
                       {comic.title}
                     </StyledTableCell>
-                    <StyledTableCell align="right">{comic.author}</StyledTableCell>
-                    <StyledTableCell align="right">
+                    <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>{comic.author}</StyledTableCell>
+                    <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
                       <span style={getConditionColor(comic.condition)}>
                         {getConditionText(comic.condition)}
                       </span>
                     </StyledTableCell>
-                    <StyledTableCell align="right">
+                    <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
                       {comic.quantity > 1 ? 'Bộ Truyện' : 'Tập Truyện'}
                     </StyledTableCell>
 
-                    <StyledTableCell align="right">
+                    <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
                       <span style={getStatusColor(comic.status)}>
                         {getStatusText(comic.status)}
                       </span>

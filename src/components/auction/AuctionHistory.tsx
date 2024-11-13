@@ -1,28 +1,95 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Button, TextField } from '@mui/material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import Countdown from 'react-countdown';
 import '../ui/AuctionHistory.css';
-import { Auction } from '../../common/base.interface';
+import { Auction, OrderDetailData } from '../../common/base.interface';
+import { privateAxios } from '../../middleware/axiosInstance';
+import { useAppSelector } from '../../redux/hooks';
+import { useNavigate } from 'react-router-dom';
 
 interface AuctionHistoryProps {
     auctions: Auction[];
-  }
+}
 
-  const AuctionHistory: React.FC<AuctionHistoryProps> = ({ auctions }) => {
+const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
     const [selectedAuctionStatus, setSelectedAuctionStatus] = useState('all');
+    const [loading, setLoading] = useState(true);
+    const [auctions, setAuctions] = useState([]);
+    const userId = useAppSelector((state) => state.auth.userId);
+    console.log("userid", userId);
 
-    const getAuctionStatusTextColor = (status: string) => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchOrdersWithItems = async () => {
+            try {
+                if (!userId) {
+                    console.error("User ID not found");
+                    setLoading(false);
+                    return;
+                }
+                const response = await privateAxios.get(`/auction/user/joined`, {
+                    params: { userId },
+                });
+
+                console.log("API Response:", response);
+                const auctionsData = response.data;
+
+                if (!Array.isArray(auctionsData) || auctionsData.length === 0) {
+                    console.error("No auctions data or unexpected format:", auctionsData);
+                    setLoading(false);
+                    return;
+                }
+
+                setAuctions(auctionsData);
+                console.log("Auctions user:", auctionsData);
+            } catch (error) {
+                console.error("Error fetching auctions:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+
+        fetchOrdersWithItems();
+    }, [userId]); // Chạy lại khi userId thay đổi
+
+
+    const getStatusChipStyles = (status: string) => {
         switch (status) {
-            case 'ongoing':
-                return '#28bacf';
-            case 'completed':
-                return '#228B22';
-            case 'canceled':
-                return '#FF4500';
+            case 'SUCCESSFUL':
+                return { color: '#4caf50', backgroundColor: '#e8f5e9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+            // case 'UPCOMING':
+            //     return { color: '#6226EF', backgroundColor: '#EDE7F6', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+            case 'PROCESSING':
+                return { color: '#ff9800', backgroundColor: '#fff3e0', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', };
+            case 'ONGOING':
+                return { color: '#2196f3', backgroundColor: '#e3f2fd', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+            case 'FAILED':
+                return { color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+            case 'REJECTED':
+                return { color: '#f44336', backgroundColor: '#ffebee', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+        }
+    };
+
+    const translateStatus = (status: string) => {
+        switch (status) {
+            case 'SUCCESSFUL':
+                return 'Thành công';
+            // case 'UPCOMING':
+            //     return 'Sắp diễn ra';
+            case 'PROCESSING':
+                return 'Đang xử lí';
+            case 'ONGOING':
+                return 'Đang diễn ra';
+            case 'FAILED':
+                return 'Thất bại';
+            case 'REJECTED':
+                return 'Bị từ chối';
             default:
-                return '#000';
+                return status;
         }
     };
 
@@ -31,24 +98,35 @@ interface AuctionHistoryProps {
     };
 
     const renderAuctionContent = () => {
+        // Ensure data is loaded before rendering
+        if (loading) {
+            return <Typography>Loading...</Typography>;
+        }
+
+        // If there are no auctions after filtering, display a message
         const filteredAuctions = selectedAuctionStatus === 'all'
             ? auctions
-            : auctions.filter(auction => auction.status === selectedAuctionStatus);
+            : auctions.filter((auction: Auction) => auction.status === selectedAuctionStatus);
 
-        return filteredAuctions.map(auction => {
-            const isWin = auction.status === 'completed' && (auction.isWin ?? false);
+        if (filteredAuctions.length === 0) {
+            return <Typography>Không có dữ liệu đấu giá phù hợp.</Typography>;
+        }
+
+        // Map through the filtered auctions and render each auction
+        return filteredAuctions.map((auction: Auction) => {
+            const isWin = auction.status === 'SUCCESSFUL' && (auction.isWin ?? false);
 
             return (
                 <div key={auction.id}
                     style={{
-                        backgroundColor: '#fff',  // Giữ màu nền trắng
+                        backgroundColor: '#fff',
                         borderRadius: '8px',
                         marginBottom: '20px',
                         padding: '16px',
                         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
                         borderLeft: isWin || auction.isWin === false
-                        ? `5px solid ${getAuctionResultColor(isWin)}`
-                        : 'none', // Thêm viền màu trái nếu win/lose
+                            ? `5px solid ${getAuctionResultColor(isWin)}`
+                            : 'none',
                     }}
                 >
                     <div
@@ -56,27 +134,21 @@ interface AuctionHistoryProps {
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
-                            marginBottom: '12px',
+                            // marginBottom: '10px',
                             padding: '10px 30px'
                         }}
                     >
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <StoreOutlinedIcon style={{ marginRight: '8px' }} />
-                            <Typography sx={{ fontSize: '20px' }} variant="subtitle1">
-                                {auction.shopName}
+                            <Typography sx={{ fontSize: '18px' }} variant="subtitle1">
+                                {auction.comics.sellerId.name}
                             </Typography>
                         </div>
 
-                        {/* Chip màu cho status đấu giá */}
-                        <div
-                            style={{
-                                backgroundColor: getAuctionStatusTextColor(auction.status),
-                                padding: '5px 10px',
-                                borderRadius: '16px',
-                            }}
-                        >
-                            <Typography sx={{ fontSize: '16px', color: '#fff' }}>
-                                {getAuctionStatusText(auction.status)}
+                        {/* Chip màu cho trạng thái đấu giá */}
+                        <div style={getStatusChipStyles(auction.status)}>
+                            <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
+                                {translateStatus(auction.status)}
                             </Typography>
                         </div>
                     </div>
@@ -85,8 +157,7 @@ interface AuctionHistoryProps {
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', gap: "20px" }}>
                                 <img
-                                    src={auction.imgUrl}
-                                    alt={auction.productName}
+                                    src={auction.comics.coverImage}
                                     style={{ width: '150px', marginRight: '16px' }}
                                 />
                                 <div>
@@ -94,34 +165,34 @@ interface AuctionHistoryProps {
                                         sx={{ fontSize: '28px', fontWeight: 'bold' }}
                                         variant="body1"
                                     >
-                                        {auction.productName}
+                                        {auction.comics.title}
                                     </Typography>
 
-                                    {auction.status === 'ongoing' && (
-                                        <div>
-                                            <Typography
-                                                sx={{ fontSize: '20px', marginTop: '12px' }}
-                                                variant="body2"
-                                            >
-                                                Giá hiện tại: <span style={{ color: "#0000FF" }}>{auction.currentPrice}</span>
-                                            </Typography>
-                                            <Typography
-                                                sx={{ fontSize: '20px', marginTop: '8px' }}
-                                                variant="body2"
-                                            >
-                                                Bạn đã đặt giá: <span style={{ color: "#FF7F00" }}>{auction.userBid}</span>
-                                            </Typography>
-                                        </div>
-                                    )}
+                                    {/* {auction.status === 'ONGOING' && ( */}
+                                    <div>
+                                        <Typography
+                                            sx={{ fontSize: '20px', marginTop: '12px' }}
+                                            variant="body2"
+                                        >
+                                            Giá hiện tại: <span style={{ color: "#0000FF" }}>{auction.currentPrice?.toLocaleString('vi-VN')} đ</span>
+                                        </Typography>
+                                        <Typography
+                                            sx={{ fontSize: '20px', marginTop: '8px' }}
+                                            variant="body2"
+                                        >
+                                            Bạn đã đặt giá: <span style={{ color: "#FF7F00" }}>1.100.000 đ</span>
+                                        </Typography>
+                                    </div>
+                                    {/* )} */}
 
-                                    {auction.status === 'completed' && (
+                                    {/* {auction.status === 'SUCCESSFUL' && (
                                         <div>
                                             {isWin ? (
                                                 <Typography
                                                     sx={{ fontSize: '24px', marginTop: '12px' }}
                                                     variant="body2"
                                                 >
-                                                    Giá cuối cùng: <span style={{ color: "#32CD32" }}>{auction.finalPrice}</span>
+                                                    Giá cuối cùng: <span style={{ color: "#32CD32" }}>{auction.finalPrice?.toLocaleString('vi-VN')}</span>
                                                 </Typography>
                                             ) : (
                                                 <>
@@ -129,22 +200,22 @@ interface AuctionHistoryProps {
                                                         sx={{ fontSize: '24px', marginTop: '12px' }}
                                                         variant="body2"
                                                     >
-                                                        Bạn đã đặt giá: <span style={{ color: "#FF7F00" }}>{auction.userBid}</span>
+                                                        Bạn đã đặt giá: <span style={{ color: "#FF7F00" }}>{auction.userBid?.toLocaleString('vi-VN')}</span>
                                                     </Typography>
                                                     <Typography
                                                         sx={{ fontSize: '24px', marginTop: '8px' }}
                                                         variant="body2"
                                                     >
-                                                        Giá chiến thắng: <span style={{ color: "#FF0000" }}>{auction.finalPrice}</span>
+                                                        Giá chiến thắng: <span style={{ color: "#FF0000" }}>{auction.finalPrice?.toLocaleString('vi-VN')}</span>
                                                     </Typography>
                                                 </>
                                             )}
                                         </div>
-                                    )}
+                                    )} */}
                                 </div>
                             </div>
 
-                            {auction.status !== 'canceled' && (
+                            {/* {auction.status !== 'FAILED' && (
                                 <div
                                     style={{
                                         display: 'flex',
@@ -155,9 +226,9 @@ interface AuctionHistoryProps {
                                     <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>
                                         Thời gian còn lại:
                                     </Typography>
-                                    {auction.status === 'ongoing' ? (
+                                    {auction.status === 'ONGOING' ? (
                                         <Countdown
-                                            date={Date.now() + 100000000}
+                                            date={new Date(auction.endTime)}
                                             renderer={renderer}
                                         />
                                     ) : (
@@ -181,7 +252,7 @@ interface AuctionHistoryProps {
                                         </div>
                                     )}
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
 
@@ -194,10 +265,11 @@ interface AuctionHistoryProps {
                             paddingRight: '20px'
                         }}
                     >
-                        {auction.status === 'ongoing' ? (
+                        {auction.status === 'ONGOING' || auction.status === 'PROCESSING' ? (
                             <Button
                                 variant="contained"
                                 style={{ backgroundColor: '#000000', color: '#FFFFFF', fontSize: '16px' }}
+                                onClick={() => navigate(`/auctiondetail/${auction.id}`)}
                             >
                                 TRỞ LẠI CUỘC ĐẤU GIÁ
                             </Button>
@@ -215,39 +287,26 @@ interface AuctionHistoryProps {
         });
     };
 
-    const renderer = ({ days, hours, minutes, seconds }: any) => (
-        <div className="countdown1">
-            <div className="time-box1">
-                <span className="time">{days.toString().padStart(2, '0')}</span>
-                <span className="label">Ngày</span>
-            </div>
-            <div className="time-box1">
-                <span className="time">{hours.toString().padStart(2, '0')}</span>
-                <span className="label">Giờ</span>
-            </div>
-            <div className="time-box1">
-                <span className="time">{minutes.toString().padStart(2, '0')}</span>
-                <span className="label">Phút</span>
-            </div>
-            <div className="time-box1">
-                <span className="time">{seconds.toString().padStart(2, '0')}</span>
-                <span className="label">Giây</span>
-            </div>
-        </div>
-    );
-
-    const getAuctionStatusText = (status: string) => {
-        switch (status) {
-            case 'ongoing':
-                return "Cuộc Đấu Giá Đang diễn ra";
-            case 'completed':
-                return "Cuộc Đấu Giá Đã kết thúc";
-            case 'canceled':
-                return "Cuộc Đấu Giá Bị Hủy";
-            default:
-                return "Tất cả trạng thái đấu giá";
-        }
-    };
+    // const renderer = ({ days, hours, minutes, seconds }: any) => (
+    //     <div className="countdown1">
+    //         <div className="time-box1">
+    //             <span className="time">{days.toString().padStart(2, '0')}</span>
+    //             <span className="label">Ngày</span>
+    //         </div>
+    //         <div className="time-box1">
+    //             <span className="time">{hours.toString().padStart(2, '0')}</span>
+    //             <span className="label">Giờ</span>
+    //         </div>
+    //         <div className="time-box1">
+    //             <span className="time">{minutes.toString().padStart(2, '0')}</span>
+    //             <span className="label">Phút</span>
+    //         </div>
+    //         <div className="time-box1">
+    //             <span className="time">{seconds.toString().padStart(2, '0')}</span>
+    //             <span className="label">Giây</span>
+    //         </div>
+    //     </div>
+    // );
 
     return (
         <div>
@@ -258,21 +317,33 @@ interface AuctionHistoryProps {
                 >
                     Tất cả
                 </span>
+                {/* <span
+                    className={`status-auction-tab ${selectedAuctionStatus === 'UPCOMING' ? 'active' : ''}`}
+                    onClick={() => setSelectedAuctionStatus('UPCOMING')}
+                >
+                    Sắp diễn ra
+                </span> */}
                 <span
-                    className={`status-auction-tab ${selectedAuctionStatus === 'ongoing' ? 'active' : ''}`}
-                    onClick={() => setSelectedAuctionStatus('ongoing')}
+                    className={`status-auction-tab ${selectedAuctionStatus === 'PROCESSING' ? 'active' : ''}`}
+                    onClick={() => setSelectedAuctionStatus('PROCESSING')}
+                >
+                    Đang xử lí
+                </span>
+                <span
+                    className={`status-auction-tab ${selectedAuctionStatus === 'ONGOING' ? 'active' : ''}`}
+                    onClick={() => setSelectedAuctionStatus('ONGOING')}
                 >
                     Đang diễn ra
                 </span>
                 <span
-                    className={`status-auction-tab ${selectedAuctionStatus === 'completed' ? 'active' : ''}`}
-                    onClick={() => setSelectedAuctionStatus('completed')}
+                    className={`status-auction-tab ${selectedAuctionStatus === 'SUCCESSFUL' ? 'active' : ''}`}
+                    onClick={() => setSelectedAuctionStatus('SUCCESSFUL')}
                 >
                     Kết Thúc
                 </span>
                 <span
-                    className={`status-auction-tab ${selectedAuctionStatus === 'canceled' ? 'active' : ''}`}
-                    onClick={() => setSelectedAuctionStatus('canceled')}
+                    className={`status-auction-tab ${selectedAuctionStatus === 'FAILED' ? 'active' : ''}`}
+                    onClick={() => setSelectedAuctionStatus('FAILED')}
                 >
                     Bị Hủy
                 </span>

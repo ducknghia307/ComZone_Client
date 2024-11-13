@@ -3,8 +3,8 @@ import "../components/ui/AccountUser.css";
 import Grid from '@mui/material/Grid2';
 import Sidebar from '../components/report/Sidebar';
 import ManageExchanges from '../components/report/ManageExchanges';
-import ManageDeposits from '../components/report/ManageDeposits';
-const ModDeposits: React.FC = () => {
+import ManageWallet from '../components/report/ManageWallet';
+const ModWallet: React.FC = () => {
 
     const currentUrl = window.location.pathname;
     console.log('URL', currentUrl)
@@ -22,11 +22,11 @@ const ModDeposits: React.FC = () => {
                 </Grid>
                 <Grid size={10}>
                     <div className="content-section">
-                        <ManageDeposits />
+                        <ManageWallet />
                     </div>
                 </Grid>
             </Grid>
         </div>
     );
 };
-export default ModDeposits;
+export default ModWallet;

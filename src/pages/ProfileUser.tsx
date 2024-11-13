@@ -167,7 +167,7 @@ const ProfileUser: React.FC = () => {
               src={newAvatar || profileData.avatar}
               alt="avatar"
               className="avatar-image1"
-              style={{ width: "150px", height: "auto", borderRadius: "50%" }}
+              style={{ width: "150px", height: "150px", borderRadius: "75px" }}
             />
             {editing && (
               <>

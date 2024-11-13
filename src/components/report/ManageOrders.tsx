@@ -223,7 +223,7 @@ const ManageOrders: React.FC = () => {
 
   return (
     <div>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold' }}>
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM' }}>
         Quản lý đơn hàng
       </Typography>
       <Paper>
@@ -231,13 +231,13 @@ const ManageOrders: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>Mã Vận Đơn (nếu có)</StyledTableCell>
-                <StyledTableCell align="left">Người Đặt</StyledTableCell>
-                <StyledTableCell align="left">Người Bán</StyledTableCell>
-                <StyledTableCell align="right">Tổng Tiền</StyledTableCell>
-                <StyledTableCell align="right">Phương Thức Thanh Toán</StyledTableCell>
-                <StyledTableCell align="right">Trạng Thái</StyledTableCell>
-                <StyledTableCell align="right">Chi Tiết</StyledTableCell>
+                <StyledTableCell style={{ fontFamily: 'REM' }}>Mã Vận Đơn (nếu có)</StyledTableCell>
+                <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>Người Đặt</StyledTableCell>
+                <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>Người Bán</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Tổng Tiền</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Phương Thức Thanh Toán</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Trạng Thái</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Chi Tiết</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -251,25 +251,25 @@ const ManageOrders: React.FC = () => {
                 orders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
                   <React.Fragment key={order.id}>
                     <StyledTableRow>
-                      <StyledTableCell rowSpan={order.items.length + 1} component="th" scope="row">
+                      <StyledTableCell style={{ fontFamily: 'REM' }} rowSpan={order.items.length + 1} component="th" scope="row">
                         {order.deliveryTrackingCode}
                       </StyledTableCell>
-                      <StyledTableCell rowSpan={order.items.length + 1} align="left">
+                      <StyledTableCell style={{ fontFamily: 'REM' }} rowSpan={order.items.length + 1} align="left">
                         {order.toName}
                       </StyledTableCell>
                     </StyledTableRow>
                     {order.items.map((item, index) => (
                       <StyledTableRow key={index}>
-                        <StyledTableCell align="left">
+                        <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
                           {order.fromName}
                         </StyledTableCell>
-                        <StyledTableCell align="right">
+                        <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
                           <span>{Number(order.totalPrice).toLocaleString("vi-VN")} đ</span>
                         </StyledTableCell>
-                        <StyledTableCell align="right">
+                        <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
                           {order.paymentMethod}
                         </StyledTableCell>
-                        <StyledTableCell align="right">
+                        <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
                           <span style={getStatusColor(order.status, order.deliveryStatus)}>
                             {getStatusText(order.status, order.deliveryStatus)}
                           </span>

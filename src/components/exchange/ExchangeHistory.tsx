@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "../ui/ExchangeHistory.css"
 import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { privateAxios } from '../../middleware/axiosInstance';
+import { useAppSelector } from '../../redux/hooks';
 
 const exchangeData = [
     {
@@ -93,6 +95,40 @@ const exchangeData = [
 const ExchangeHistory = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [exchangeRequest, setExchangeRequest] = useState([]);
+    const [exchangeOffer, setExchangeOffer] = useState([]);
+
+    const userId = useAppSelector((state) => state.auth.userId);
+    console.log("userid", userId);
+
+    const fetchUserExchangeRequest = async () => {
+        try {
+            const response = await privateAxios.get(`/exchange-requests/user`, {
+                params: { userId },
+            });
+            setExchangeRequest(response.data);
+            console.log("exchange requests", response.data);
+        } catch (error) {
+            console.error("Error fetching exchange requests:", error);
+        }
+    };
+
+    const fetchUserExchangeOffer = async () => {
+        try {
+            const response = await privateAxios.get(`/exchange-offers/comics/user`, {
+                params: { userId },
+            });
+            setExchangeOffer(response.data);
+            console.log("exchange offers", response.data);
+        } catch (error) {
+            console.error("Error fetching exchange offers:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserExchangeRequest();
+        fetchUserExchangeOffer();
+    }, []);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -103,6 +139,25 @@ const ExchangeHistory = () => {
         setPage(0);
     };
 
+    // const combinedData = [
+    //     ...exchangeRequest.map((req) => ({
+    //         date: new Date(req.createdAt).toLocaleDateString("vi-VN"),
+    //         user: req.user?.name || "N/A",
+    //         provided: req.requestComics?.map((comic) => comic.title) || [],
+    //         received: [], // Adjust as necessary
+    //         status: req.status,
+    //         note: req.postContent || "Không có ghi chú",
+    //     })),
+    //     ...exchangeOffer.map((offer) => ({
+    //         date: new Date(offer.createdAt).toLocaleDateString("vi-VN"),
+    //         user: offer.sellerId?.name || "N/A",
+    //         provided: [offer.title],
+    //         received: [], // Adjust as necessary
+    //         status: offer.status,
+    //         note: offer.description || "Không có ghi chú",
+    //     })),
+    // ];
+
     const paginatedData = exchangeData.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
@@ -111,14 +166,14 @@ const ExchangeHistory = () => {
     return (
         <Paper sx={{ width: '100%', overflow: 'hidden', padding: '20px 50px' }}>
             <Typography variant="h5" align="center" sx={{ margin: 2, fontWeight: 'bold' }}>
-                LỊCH SỬ TRAO ĐỔI TRUYỆN CỦA BẠN
+                LỊCH SỬ TRAO ĐỔI TRUYỆN
             </Typography>
             <TableContainer component={Paper} className="wallet-table-container">
                 <Table>
                     <TableHead>
                         <TableRow style={{ backgroundColor: 'black' }}>
                             <TableCell style={{ color: 'white', textAlign: 'center' }}>Ngày giao dịch</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Người trao đổi </TableCell>
+                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Người trao đổi với</TableCell>
                             <TableCell style={{ color: 'white', textAlign: 'center' }}>Truyện cung cấp</TableCell>
                             <TableCell style={{ color: 'white', textAlign: 'center' }}>Truyện nhận được</TableCell>
                             <TableCell style={{ color: 'white', textAlign: 'center' }}>Trạng thái giao dịch</TableCell>

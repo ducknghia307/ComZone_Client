@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { Modal, notification } from "antd";
 import ChatRoomList from "../components/chat/ChatRoomList";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../redux/hooks";
 import ChatSection from "../components/chat/ChatSection";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
@@ -219,7 +219,7 @@ export default function ChatModal({
     updateIsRead(chatRoom);
   };
 
-  useMemo(() => {
+  useEffect(() => {
     fetchMessageList();
     currentRoomIdRef.current = currentRoomId;
   }, [currentRoomId]);

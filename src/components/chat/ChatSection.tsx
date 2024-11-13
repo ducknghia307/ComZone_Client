@@ -6,16 +6,19 @@ import ComicsSectionInChat from "./ComicsSectionInChat";
 import ExchangeSectionInChat from "./ExchangeSectionInChat";
 import { ChatRoom } from "../../common/interfaces/chat-room.interface";
 import { Comic } from "../../common/base.interface";
+import { MutableRefObject } from "react";
 
 export default function ChatSection({
   currentRoom,
+  currentRoomIdRef,
   currentMessList,
+  fetchChatRoomList,
   handleSendMessage,
   messageInput,
   setMessageInput,
   updateIsRead,
   lastMessageRef,
-  isLoading,
+  setIsLoading,
   setIsChatOpen,
   sentComicsList,
   setSentComicsList,
@@ -23,15 +26,19 @@ export default function ChatSection({
   sentImage,
   setSentImage,
   handleSendMessageAsImage,
+  handleDeleteExchangeOffer,
 }: {
   currentRoom: ChatRoom | undefined;
+  currentRoomIdRef: MutableRefObject<string>;
   currentMessList: MessageGroup[];
+  fetchChatRoomList: Function;
   handleSendMessage: Function;
   messageInput: string;
   setMessageInput: Function;
   updateIsRead: Function;
   lastMessageRef: any;
   isLoading: boolean;
+  setIsLoading: Function;
   setIsChatOpen: Function;
   sentComicsList: Comic[];
   setSentComicsList: Function;
@@ -39,6 +46,7 @@ export default function ChatSection({
   sentImage: File | undefined;
   setSentImage: Function;
   handleSendMessageAsImage: Function;
+  handleDeleteExchangeOffer: Function;
 }) {
   return (
     <div
@@ -59,8 +67,11 @@ export default function ChatSection({
             )}
             {currentRoom?.exchangeRequest && (
               <ExchangeSectionInChat
+              currentRoomIdRef={currentRoomIdRef}
                 chatRoom={currentRoom}
-                isLoading={isLoading}
+                setIsLoading={setIsLoading}
+                fetchChatRoomList={fetchChatRoomList}
+                handleDeleteExchangeOffer={handleDeleteExchangeOffer}
               />
             )}
           </div>

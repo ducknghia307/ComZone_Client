@@ -1,7 +1,7 @@
 import type { CollapseProps } from "antd";
 import { Collapse } from "antd";
 import { Comic } from "../../common/base.interface";
-import { useCallback, useEffect, useState } from "react";
+import { MutableRefObject, useCallback, useEffect, useState } from "react";
 import { ChatRoom } from "../../common/interfaces/chat-room.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { ExchangeOffer } from "../../common/interfaces/exchange-offer.interface";
@@ -11,9 +11,16 @@ import ProgressSection from "./exchangeComponents/ProgressSection";
 
 export default function ExchangeSectionInChat({
   chatRoom,
+  currentRoomIdRef,
+  handleDeleteExchangeOffer,
+  fetchChatRoomList,
+  setIsLoading,
 }: {
   chatRoom: ChatRoom;
-  isLoading: boolean;
+  currentRoomIdRef: MutableRefObject<string>;
+  setIsLoading: Function;
+  fetchChatRoomList: Function;
+  handleDeleteExchangeOffer: Function;
 }) {
   const { userId } = useAppSelector((state) => state.auth);
   const [exchangeOffer, setExchangeOffer] = useState<ExchangeOffer>();
@@ -65,7 +72,7 @@ export default function ExchangeSectionInChat({
 
   const fetchExchangeOffer = useCallback(async () => {
     if (!exchangeRequest) return;
-
+    setIsLoading(true);
     await privateAxios
       .get(
         `exchange-offers/exchange-request/${exchangeRequest.id}/offer-user/${
@@ -74,57 +81,42 @@ export default function ExchangeSectionInChat({
       )
       .then((res) => {
         const offer = res.data;
-        setExchangeOffer(offer);
+        if (offer) setExchangeOffer(offer);
+        else setExchangeOffer(undefined);
       })
-      .catch((err) => console.log(err));
-  }, [chatRoom]);
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  }, [currentRoomIdRef]);
 
   useEffect(() => {
     fetchExchangeOffer();
-  }, [chatRoom]);
+  }, [currentRoomIdRef]);
 
   const updateExchangeOfferSeenStatus = async () => {
-    await privateAxios
-      .patch(`exchange-offers/status/seen/${exchangeOffer?.id}`)
-      .then((res) => {
-        if (res.data.status === "SEEN") fetchExchangeOffer();
-      })
-      .catch((err) => console.log(err));
-  };
-
-  const offerStatusDisplay = () => {
-    if (!exchangeOffer) return;
-    switch (exchangeOffer.status) {
-      case "PENDING":
-        return (
-          <>Đang chờ {exchangeOffer.exchangeRequest.user.name} phản hồi...</>
-        );
-      case "SEEN":
-        return (
-          <>Đang chờ {exchangeOffer.exchangeRequest.user.name} phản hồi...</>
-        );
-      case "ACCEPTED":
-        return <p className="text-green-600">Đã được chấp nhận</p>;
-      case "REJECTED":
-        return <>Đã bị từ chối.</>;
-    }
+    if (
+      exchangeRequest &&
+      exchangeRequest.user.id === userId &&
+      exchangeOffer?.status === "PENDING"
+    )
+      await privateAxios
+        .patch(`exchange-offers/status/seen/${exchangeOffer?.id}`)
+        .then(() => {
+          fetchExchangeOffer();
+        })
+        .catch((err) => console.log(err));
   };
 
   if (!exchangeRequest) return;
 
   if (exchangeRequest.status !== "DEALING")
     return (
-      <div className="w-full flex flex-col items-stretch justify-between gap-1 px-2">
+      <div className="w-full flex flex-col items-stretch justify-between gap-1 px-2 overflow-y-auto">
         <Collapse items={requestItems} size="large" className="w-full mt-1" />
 
         <div className="flex items-center gap-1 pt-1">
           <button
             onClick={() => {
-              if (
-                exchangeRequest.user.id === userId &&
-                exchangeOffer?.status === "PENDING"
-              )
-                updateExchangeOfferSeenStatus();
+              updateExchangeOfferSeenStatus();
               setIsViewingOffer(true);
             }}
             className={`relative grow flex items-center justify-center gap-2 py-2 rounded-lg border border-black duration-200 hover:bg-gray-100`}
@@ -140,16 +132,18 @@ export default function ExchangeSectionInChat({
             </svg>
             <p>
               Xem truyện{" "}
-              <span>
-                {exchangeOffer?.user.id === userId
-                  ? "bạn"
-                  : chatRoom.secondUser.name}
-              </span>{" "}
+              {exchangeOffer?.user.id === userId ? (
+                "bạn"
+              ) : (
+                <span className="font-semibold">
+                  {chatRoom.secondUser.name}
+                </span>
+              )}{" "}
               yêu cầu
             </p>
             <span
               className={`${
-                (chatRoom.firstUser.id !== userId ||
+                (exchangeRequest.user.id !== userId ||
                   exchangeOffer?.status !== "PENDING") &&
                 "hidden"
               } p-1 rounded-full bg-red-500 absolute right-0 top-0 translate-x-1/3 translate-y-[-50%]`}
@@ -160,25 +154,17 @@ export default function ExchangeSectionInChat({
                 exchangeOffer={exchangeOffer}
                 isOpen={isViewingOffer}
                 setIsOpen={setIsViewingOffer}
+                chatRoomId={chatRoom.id}
+                fetchChatRoomList={fetchChatRoomList}
+                fetchExchangeOffer={fetchExchangeOffer}
+                handleDeleteExchangeOffer={handleDeleteExchangeOffer}
+                setIsLoading={setIsLoading}
               />
             )}
           </button>
-
-          {exchangeRequest.user.id !== userId &&
-            exchangeOffer?.status === "PENDING" && (
-              <span className="basis-1/12 text-center py-2 text-white bg-red-600 rounded-lg">
-                HỦY
-              </span>
-            )}
         </div>
       </div>
     );
   else if (exchangeRequest.status === "DEALING" && exchangeOffer)
-    return (
-      <ProgressSection
-        exchangeRequest={exchangeRequest}
-        exchangeOffer={exchangeOffer}
-        userId={userId}
-      />
-    );
+    return <ProgressSection exchangeOffer={exchangeOffer} userId={userId} />;
 }

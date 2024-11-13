@@ -2,14 +2,13 @@ import { io, Socket } from "socket.io-client";
 import { Modal, notification } from "antd";
 import ChatRoomList from "../components/chat/ChatRoomList";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { useAppSelector } from "../redux/hooks";
 import ChatSection from "../components/chat/ChatSection";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
 import Loading from "../components/loading/Loading";
 import { Message, MessageGroup } from "../common/interfaces/message.interface";
 import { ChatRoom } from "../common/interfaces/chat-room.interface";
 import { Comic } from "../common/base.interface";
-import { authSlice } from "../redux/features/auth/authSlice";
 
 export default function ChatModal({
   isChatOpen,
@@ -20,10 +19,9 @@ export default function ChatModal({
   setIsChatOpen: Function;
   getMessageUnreadList?: Function;
 }) {
-  const { isLoggedIn, isLoading, userId } = useAppSelector(
-    (state) => state.auth
-  );
-  const dispatch = useAppDispatch();
+  const { isLoggedIn, userId } = useAppSelector((state) => state.auth);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [chatRoomList, setChatRoomList] = useState<ChatRoom[]>([]);
   const [currentRoomId, setCurrentRoomId] = useState<string>("");
@@ -112,6 +110,8 @@ export default function ChatModal({
   }, [isChatOpen]);
 
   const fetchMessageList = async () => {
+    if (!currentRoomIdRef || !currentRoomIdRef.current) return;
+
     if (currentRoomIdRef.current.length === 0) setCurrentMessList([]);
 
     await privateAxios
@@ -183,7 +183,7 @@ export default function ChatModal({
       });
     } else {
       if (!sentImage) return;
-      dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
+      setIsLoading(true);
 
       var formData = new FormData();
       formData.append("image", sentImage);
@@ -206,7 +206,7 @@ export default function ChatModal({
         })
         .catch((err) => console.log(err))
         .finally(() => {
-          dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+          setIsLoading(false);
           scrollDown();
         });
     }
@@ -225,18 +225,19 @@ export default function ChatModal({
   }, [currentRoomId]);
 
   const updateIsRead = async (chatRoom: ChatRoom) => {
-    if (chatRoom.lastMessage?.isRead) return;
-    await privateAxios
-      .patch(`chat-messages/chat-room/is-read/${chatRoom.id}`)
-      .then(() => {
-        socketRef.current!.emit("update-room-list", {
-          userId,
-          chatRoomId: chatRoom.id,
-        });
+    if (chatRoom.lastMessage?.isRead || chatRoom.lastMessage?.mine) return;
+    else
+      await privateAxios
+        .patch(`chat-messages/chat-room/is-read/${chatRoom.id}`)
+        .then(() => {
+          socketRef.current!.emit("update-room-list", {
+            userId,
+            chatRoomId: chatRoom.id,
+          });
 
-        socketRef.current?.emit("get-unread-list", { userId });
-      })
-      .catch((err) => console.log(err));
+          socketRef.current?.emit("get-unread-list", { userId });
+        })
+        .catch((err) => console.log(err));
   };
 
   const scrollDown = () => {
@@ -250,6 +251,24 @@ export default function ChatModal({
 
   const handleModalClose = () => {
     setIsChatOpen(false);
+  };
+
+  const handleDeleteExchangeOffer = async (chatRoomId: string) => {
+    setIsLoading(true);
+    await privateAxios
+      .delete(`chat-rooms/${chatRoomId}`)
+      .then(() => {
+        fetchChatRoomList();
+        notification.info({
+          message: "Thu hồi thành công",
+          description: "Yêu cầu của bạn đã được thu hồi.",
+          duration: 5,
+        });
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -278,13 +297,16 @@ export default function ChatModal({
           currentRoom={chatRoomList.find(
             (chatRoom) => chatRoom.id === currentRoomId
           )}
+          currentRoomIdRef={currentRoomIdRef}
           currentMessList={currentMessList}
+          fetchChatRoomList={fetchChatRoomList}
           handleSendMessage={handleSendMessage}
           messageInput={messageInput}
           setMessageInput={setMessageInput}
           updateIsRead={updateIsRead}
           lastMessageRef={lastMessageRef}
           isLoading={isLoading}
+          setIsLoading={setIsLoading}
           setIsChatOpen={setIsChatOpen}
           sentComicsList={sentComicsList}
           setSentComicsList={setSentComicsList}
@@ -292,6 +314,7 @@ export default function ChatModal({
           sentImage={sentImage}
           setSentImage={setSentImage}
           handleSendMessageAsImage={handleSendMessageAsImage}
+          handleDeleteExchangeOffer={handleDeleteExchangeOffer}
         />
       </div>
     </Modal>

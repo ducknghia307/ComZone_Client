@@ -5,4 +5,5 @@ export interface ExchangeRequest extends BaseInterface {
   requestComics: Comic[];
   postContent: string;
   status: "AVAILABLE" | "DEALING" | "SUCCESSFUL" | "REMOVED";
+  depositAmount?: number;
 }

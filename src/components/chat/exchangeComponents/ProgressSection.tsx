@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ExchangeOffer } from "../../../common/interfaces/exchange-offer.interface";
 import { ExchangeRequest } from "../../../common/interfaces/exchange-request.interface";
 import { Avatar, Tooltip } from "antd";
@@ -10,15 +10,20 @@ import Stage3 from "./Stage3";
 import Stage4 from "./Stage4";
 import PlaceDepositModal from "./PlaceDepositModal";
 import DepositWalletModal from "./DepositWalletModal";
+import { privateAxios } from "../../../middleware/axiosInstance";
+import styles from "./style.module.css";
+import { Deposit } from "../../../common/interfaces/deposit.interface";
 
 export default function ProgressSection({
   exchangeOffer,
   userId,
+  setIsLoading,
 }: {
   exchangeOffer: ExchangeOffer;
   userId: string;
+  setIsLoading: Function;
 }) {
-  const [isExpanded, setIsExpanded] = useState<boolean>(true);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [firstCurrentStage, setFirstCurrentStage] = useState<number>(1);
   const [secondCurrentStage, setSecondCurrentStage] = useState<number>(1);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -44,7 +49,59 @@ export default function ProgressSection({
       ? exchangeRequest.requestComics
       : exchangeOffer.offerComics;
 
-  const getFirstUserProgress = async () => {};
+  const getUserCurrentStage = (stage: number) => {
+    switch (stage) {
+      case 1:
+        return "Đang tiến hành đặt cọc";
+      case 2:
+        return "Đang ghi nhận thông tin giao hàng";
+      case 3:
+        return "Đang chờ giao truyện";
+      case 4:
+        return "Đã nhận được truyện";
+    }
+  };
+
+  const fetchUserProgresses = async () => {
+    setIsLoading(true);
+
+    try {
+      const exchangeDeposits = await privateAxios
+        .get(`deposits/exchange-request/${exchangeRequest.id}`)
+        .then((res) => {
+          console.log("Deposits: ", res.data);
+          return res.data;
+        })
+        .catch((err) => console.log(err));
+
+      if (exchangeDeposits && exchangeDeposits.length > 0) {
+        if (
+          exchangeDeposits.find(
+            (deposit: Deposit) => deposit.user.id === firstUser.id
+          )
+        ) {
+          setFirstCurrentStage(2);
+        }
+
+        if (
+          exchangeDeposits.find(
+            (deposit: Deposit) => deposit.user.id === secondUser.id
+          )
+        ) {
+          setSecondCurrentStage(2);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProgresses();
+  }, [exchangeOffer]);
+
   const handleShowDepositModal = () => {
     setIsModalVisible(true);
   };
@@ -182,6 +239,49 @@ export default function ProgressSection({
         <ActionButtons
           currentStage={firstCurrentStage}
           oppositeCurrentStage={secondCurrentStage}
+          isExpanded={isExpanded}
+          setIsExpanded={setIsExpanded}
+        />
+      </div>
+    );
+  else
+    return (
+      <div className="w-full flex flex-col items-stretch justify-start">
+        <div className="basis-full flex items-center justify-between px-2 py-2">
+          <div className="w-[45%] flex items-center justify-start gap-4 overflow-hidden">
+            <Avatar src={firstUser.avatar} size={40} />
+            <p className="font-light text-gray-500">
+              {getUserCurrentStage(firstCurrentStage)}
+            </p>
+            <div className={`${styles.smallDotTyping} mx-4`}></div>
+          </div>
+
+          <div className="grow flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="currentColor"
+            >
+              <path d="M16.0503 12.0498L21 16.9996L16.0503 21.9493L14.636 20.5351L17.172 17.9988L4 17.9996V15.9996L17.172 15.9988L14.636 13.464L16.0503 12.0498ZM7.94975 2.0498L9.36396 3.46402L6.828 5.9988L20 5.99955V7.99955L6.828 7.9988L9.36396 10.5351L7.94975 11.9493L3 6.99955L7.94975 2.0498Z"></path>
+            </svg>
+          </div>
+
+          <div className="w-[45%] flex flex-row-reverse items-center justify-start gap-4 overflow-hidden">
+            <Avatar src={secondUser.avatar} size={40} />
+            <p className="font-light text-gray-500">
+              {getUserCurrentStage(secondCurrentStage)}
+            </p>
+            <div className={`${styles.smallDotTyping} mx-4`}></div>
+          </div>
+        </div>
+
+        <ActionButtons
+          currentStage={firstCurrentStage}
+          oppositeCurrentStage={secondCurrentStage}
+          isExpanded={isExpanded}
+          setIsExpanded={setIsExpanded}
           onShowModal={handleShowDepositModal}
         />
         {exchangeRequest.depositAmount && (
@@ -204,5 +304,4 @@ export default function ProgressSection({
         )}
       </div>
     );
-  else return <div className=""></div>;
 }

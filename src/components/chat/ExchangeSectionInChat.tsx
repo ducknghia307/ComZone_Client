@@ -166,5 +166,11 @@ export default function ExchangeSectionInChat({
       </div>
     );
   else if (exchangeRequest.status === "DEALING" && exchangeOffer)
-    return <ProgressSection exchangeOffer={exchangeOffer} userId={userId} />;
+    return (
+      <ProgressSection
+        exchangeOffer={exchangeOffer}
+        userId={userId}
+        setIsLoading={setIsLoading}
+      />
+    );
 }

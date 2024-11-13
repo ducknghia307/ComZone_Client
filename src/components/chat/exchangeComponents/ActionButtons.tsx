@@ -45,12 +45,12 @@ export default function ActionButtons({
   };
 
   return (
-    <div className="relative flex items-stretch justify-center px-2 mt-1">
+    <div className="relative w-full flex flex-col items-stretch justify-center px-2 mt-1">
       {getButton()}
 
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="absolute bottom-[-70%] p-1 rounded-full drop-shadow-lg bg-gray-50 duration-200 hover:bg-gray-00"
+        className="absolute bottom-[-70%] left-1/2 translate-x-[-50%] p-1 rounded-full drop-shadow-lg bg-gray-50 duration-200 transition-all hover:bg-gray-00"
       >
         {isExpanded ? (
           <svg

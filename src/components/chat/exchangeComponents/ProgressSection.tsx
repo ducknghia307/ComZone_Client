@@ -116,7 +116,7 @@ export default function ProgressSection({
               <p className="font-light text-xs text-gray-600">Bạn</p>
             </div>
 
-            <div className="flex items-center gap-16">
+            <div className="flex items-center gap-8 xl:gap-16">
               <Stage1
                 currentStage={firstCurrentStage}
                 comicsGroup={firstComicsGroup}
@@ -197,7 +197,7 @@ export default function ProgressSection({
           <div className="flex flex-row-reverse items-center justify-start gap-8">
             <Avatar src={secondUser.avatar} size={64} />
 
-            <div className="flex flex-row-reverse items-center gap-16">
+            <div className="flex flex-row-reverse items-center gap-8 xl:gap-16">
               <Stage1
                 currentStage={secondCurrentStage}
                 comicsGroup={secondComicsGroup}
@@ -241,6 +241,7 @@ export default function ProgressSection({
           oppositeCurrentStage={secondCurrentStage}
           isExpanded={isExpanded}
           setIsExpanded={setIsExpanded}
+          onShowModal={handleShowDepositModal}
         />
       </div>
     );

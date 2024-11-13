@@ -1,46 +1,125 @@
-import { Collapse, Modal, notification, Tooltip } from "antd";
+import { Modal, notification, Tooltip } from "antd";
 import { ExchangeOffer } from "../../../common/interfaces/exchange-offer.interface";
 import { Comic } from "../../../common/base.interface";
 import styles from "../../exchange/style.module.css";
 import { useState } from "react";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
 import { privateAxios } from "../../../middleware/axiosInstance";
+import DepositSubmitModal from "./DepositSubmitModal";
 export default function ViewExchangeOfferModal({
   isOpen,
   setIsOpen,
   userId,
   exchangeOffer,
+  fetchExchangeOffer,
+  chatRoomId,
+  fetchChatRoomList,
+  handleDeleteExchangeOffer,
+  setIsLoading,
 }: {
   isOpen: boolean;
   setIsOpen: Function;
   userId: string;
   exchangeOffer: ExchangeOffer | undefined;
+  fetchExchangeOffer: Function;
+  chatRoomId: string;
+  fetchChatRoomList: Function;
+  handleDeleteExchangeOffer: Function;
+  setIsLoading: Function;
 }) {
   const [isConfirmingAccept, setIsConfirmingAccept] = useState<boolean>(false);
   const [isConfirmingReject, setIsConfirmingReject] = useState<boolean>(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState<boolean>(false);
+  const [isSettingDeposit, setIsSettingDeposit] = useState<boolean>(false);
 
   const isRequestUser = userId === exchangeOffer?.exchangeRequest.user.id;
 
-  const handleAcceptOrReject = async (type: "accept" | "reject") => {
+  const handleSelectAccept = async () => {
+    await Promise.resolve(setIsConfirmingAccept(false));
+    setIsSettingDeposit(true);
+  };
+
+  const handleAccept = async () => {
+    setIsLoading(true);
     await privateAxios
-      .patch(
-        `exchange-offers/status/${
-          type === "accept" ? "accepted" : "rejected"
-        }/${exchangeOffer?.id}`
-      )
+      .patch(`exchange-offers/status/accepted/${exchangeOffer?.id}`)
       .then((res) => {
         console.log(res.data);
-        setIsOpen(false);
+        fetchExchangeOffer();
+        fetchChatRoomList();
+        notification.success({
+          key: "successful-accept",
+          message: "Chấp nhận trao đổi thành công.",
+          description:
+            "Giờ đây bạn có thể tiếp tục trao đổi và tiến hành thực hiện các thao tác cuối cùng để hoàn tất quá trình trao đổi truyện của bạn.",
+          duration: 8,
+        });
       })
       .catch((err) => {
         console.log(err);
         notification.error({
+          key: "error",
+          message: "Lỗi hệ thống!",
+          description: "Vui lòng thử lại sau!",
+          duration: 5,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const handleReject = async () => {
+    setIsLoading(true);
+    await privateAxios
+      .patch(`exchange-offers/status/rejected/${exchangeOffer?.id}`)
+      .then((res) => {
+        console.log(res.data);
+        fetchExchangeOffer();
+        fetchChatRoomList();
+        notification.success({
+          key: "successful-reject",
+          message: "Từ chối thành công.",
+          description: `Bạn đã từ chối yêu cầu của ${exchangeOffer?.user.name}!`,
+          duration: 8,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        notification.error({
+          key: "error",
           message: "Lỗi hệ thống",
           description: "Vui lòng thử lại sau!",
           duration: 5,
         });
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
+
+  const deleteExchangeOffer = async () => {
+    if (!exchangeOffer) return;
+    setIsLoading(true);
+    await privateAxios
+      .delete(`exchange-offers/${exchangeOffer.id}`)
+      .then(() => {
+        handleDeleteExchangeOffer(chatRoomId);
+      })
+      .catch((err) => {
+        console.log(err);
+        notification.error({
+          key: "error",
+          message: "Thu hồi thất bại",
+          description: "Vui lòng thử lại sau.",
+          duration: 5,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
     <Modal
       title={
@@ -116,7 +195,7 @@ export default function ViewExchangeOfferModal({
                           <p>
                             Tình trạng:{" "}
                             {comics.condition === "SEALED"
-                              ? "Nguyện seal"
+                              ? "Nguyên seal"
                               : "Đã qua sử dụng"}
                           </p>
                         )}
@@ -175,13 +254,20 @@ export default function ViewExchangeOfferModal({
               >
                 <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11.0026 16L6.75999 11.7574L8.17421 10.3431L11.0026 13.1716L16.6595 7.51472L18.0737 8.92893L11.0026 16Z"></path>
               </svg>
-              CHẤP NHẬN
+              CHẤP NHẬN TRAO ĐỔI
             </button>
+            <DepositSubmitModal
+              isOpen={isSettingDeposit}
+              setIsOpen={setIsSettingDeposit}
+              exchangeRequest={exchangeOffer.exchangeRequest}
+              handleAccept={handleAccept}
+              setIsLoading={setIsLoading}
+            />
             <ActionConfirm
               isOpen={isConfirmingAccept}
               setIsOpen={setIsConfirmingAccept}
               cancelCallback={() => {}}
-              confirmCallback={() => handleAcceptOrReject("accept")}
+              confirmCallback={() => handleSelectAccept()}
               title="Xác nhận chấp nhận trao đổi?"
               description={
                 <p className="text-xs font-light italic">
@@ -195,12 +281,47 @@ export default function ViewExchangeOfferModal({
               isOpen={isConfirmingReject}
               setIsOpen={setIsConfirmingReject}
               cancelCallback={() => {}}
-              confirmCallback={() => handleAcceptOrReject("reject")}
+              confirmCallback={() => handleReject()}
               title="Xác nhận từ chối yêu cầu trao đổi này?"
             />
           </div>
         ) : (
-          <div className="w-full flex flex-row gap-4 mt-6 justify-end px-4">
+          <div className="w-full flex flex-row-reverse gap-2 mt-6 justify-end px-4">
+            <button
+              onClick={() => setIsConfirmingDelete(true)}
+              className="px-4 py-2 text-white bg-red-700 hover:bg-red-800 duration-200 rounded-lg"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="currentColor"
+              >
+                <path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z"></path>
+              </svg>
+            </button>
+            <ActionConfirm
+              isOpen={isConfirmingDelete}
+              setIsOpen={setIsConfirmingDelete}
+              title="Xác nhận thu hồi yêu cầu trao đổi?"
+              description={
+                <p className="text-red-500 text-xs italic">
+                  Thao tác này không thể được hoàn tác.
+                  <br />
+                  Cuộc trò chuyện của bạn với{" "}
+                  <span className="font-semibold">
+                    {exchangeOffer?.exchangeRequest.user.name}
+                  </span>{" "}
+                  cũng sẽ bị xóa.
+                </p>
+              }
+              cancelCallback={() => {}}
+              confirmCallback={() => {
+                deleteExchangeOffer();
+                // setIsConfirmingDelete(false);
+              }}
+            />
             <button className="basis-1/3 flex items-center justify-center gap-2 py-2 rounded-md font-semibold border border-gray-400 duration-200 hover:border-black">
               <Tooltip
                 title={

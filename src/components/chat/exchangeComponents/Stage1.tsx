@@ -34,7 +34,7 @@ export default function Stage1({
       </span>
 
       <p
-        className={`absolute bottom-[-40%] left-1/2 translate-x-[-50%] text-[0.7em] whitespace-nowrap ${
+        className={`absolute bottom-[-50%] left-1/2 translate-x-[-50%] text-[0.7em] whitespace-nowrap ${
           currentStage >= 1 && "opacity-50"
         }`}
       >

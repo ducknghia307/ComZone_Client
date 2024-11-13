@@ -89,7 +89,7 @@ export default function ChatMessageHistory({
                             >
                               {message.comics.map((comics) => {
                                 return (
-                                  <Avatar size={100}>
+                                  <Avatar key={comics.id} size={100}>
                                     <img src={comics.coverImage} alt="" />
                                   </Avatar>
                                 );

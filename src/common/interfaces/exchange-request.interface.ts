@@ -4,5 +4,5 @@ export interface ExchangeRequest extends BaseInterface {
   user: UserInfo;
   requestComics: Comic[];
   postContent: string;
-  status: string;
+  status: "AVAILABLE" | "DEALING" | "SUCCESSFUL" | "REMOVED";
 }

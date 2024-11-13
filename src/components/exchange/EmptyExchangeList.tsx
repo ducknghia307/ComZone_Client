@@ -9,7 +9,7 @@ export default function EmptyExchangeList({
     <div
       className={`${
         isLoading && "hidden"
-      } min-h-[70vh] flex items-center justify-center gap-16 REM py-8`}
+      } min-h-[70vh] w-full flex items-center justify-center gap-16 REM py-8`}
     >
       <img
         src={EmptyIcon}

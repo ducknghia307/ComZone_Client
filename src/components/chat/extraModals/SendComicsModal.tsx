@@ -1,20 +1,27 @@
-import { Modal } from "antd";
+import { Avatar, Modal } from "antd";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import { useEffect, useState } from "react";
 import { Comic } from "../../../common/base.interface";
 import { toLowerCaseNonAccentVietnamese } from "../../../assistants/non-accent-vietnamese";
+import ActionConfirm from "../../actionConfirm/ActionConfirm";
 
 export default function SendComicsModal({
   isOpen,
   setIsOpen,
+  sentComicsList,
+  setSentComicsList,
+  handleSendMessageAsComics,
 }: {
   isOpen: boolean;
   setIsOpen: Function;
+  sentComicsList: Comic[];
+  setSentComicsList: Function;
+  handleSendMessageAsComics: Function;
 }) {
-  const [selectedList, setSelectedList] = useState<Comic[]>([]);
   const [comicsList, setComicsList] = useState<Comic[]>([]);
   const [searchedList, setSearchedList] = useState<Comic[]>([]);
   const [searchKey, setSearchKey] = useState<string>("");
+  const [isConfirming, setIsConfirming] = useState<boolean>(false);
 
   const fetchUserComics = async () => {
     await privateAxios
@@ -28,7 +35,7 @@ export default function SendComicsModal({
 
   useEffect(() => {
     fetchUserComics();
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     if (searchKey.length > 0)
@@ -45,8 +52,10 @@ export default function SendComicsModal({
     else setSearchedList(comicsList);
   }, [searchKey]);
 
-  const handleConfirmSend = () => {
-    console.log(selectedList);
+  const handleConfirmSend = async () => {
+    await handleSendMessageAsComics();
+    setIsConfirming(false);
+    setIsOpen(false);
   };
 
   return (
@@ -54,17 +63,19 @@ export default function SendComicsModal({
       open={isOpen}
       onCancel={(e) => {
         e.stopPropagation();
+        setSentComicsList([]);
+        setIsConfirming(false);
         setIsOpen(false);
       }}
       centered
       footer={null}
       width={800}
     >
-      <div className="flex flex-col items-stretch gap-4 py-4">
+      <div className="flex flex-col items-stretch gap-4 pt-4">
         <div className="flex items-center justify-between gap-4 pr-8">
           <p className="font-semibold text-lg">Chọn truyện của bạn để gửi:</p>
           <p className="italic font-light text-xs">
-            Đã chọn: {selectedList.length} / 10
+            Đã chọn: {sentComicsList.length} / 10
           </p>
         </div>
 
@@ -92,22 +103,22 @@ export default function SendComicsModal({
 
         <div className="flex flex-col min-h-[40vh] max-h-[40vh] items-stretch gap-2 overflow-y-auto">
           {searchedList.map((comics: Comic) => {
-            const isSelected = selectedList.some((c) => c.id === comics.id);
+            const isSelected = sentComicsList.some((c) => c.id === comics.id);
             return (
               <button
                 onClick={() => {
                   if (isSelected)
-                    setSelectedList(
-                      selectedList.filter((c) => c.id !== comics.id)
+                    setSentComicsList(
+                      sentComicsList.filter((c) => c.id !== comics.id)
                     );
-                  else if (selectedList.length < 10)
-                    setSelectedList((prev) => [...prev, comics]);
+                  else if (sentComicsList.length < 10)
+                    setSentComicsList((prev: any) => [...prev, comics]);
                 }}
                 key={comics.id}
                 className={`flex items-center text-start gap-4 border rounded-lg px-2 py-1 relative transition-all duration-200 ${
                   isSelected ? "border-black font-semibold" : "border-gray-300"
                 } ${
-                  selectedList.length === 10 &&
+                  sentComicsList.length === 10 &&
                   !isSelected &&
                   "opacity-40 cursor-default"
                 }`}
@@ -140,21 +151,42 @@ export default function SendComicsModal({
         <div className="flex items-center justify-end gap-8 mt-8">
           <button
             onClick={() => {
-              selectedList.length === 0
+              sentComicsList.length === 0
                 ? setIsOpen(false)
-                : setSelectedList([]);
+                : setSentComicsList([]);
             }}
             className="hover:underline"
           >
-            {selectedList.length === 0 ? "Quay lại" : "Chọn lại"}
+            {sentComicsList.length === 0 ? "Quay lại" : "Chọn lại"}
           </button>
           <button
-            disabled={selectedList.length === 0}
-            onClick={() => handleConfirmSend()}
-            className="px-16 py-1 rounded-lg bg-sky-700 text-white duration-200 hover:bg-sky-900 disabled:bg-gray-300"
+            disabled={sentComicsList.length === 0}
+            onClick={() => setIsConfirming(true)}
+            className="px-16 py-2 rounded-lg bg-sky-700 text-white duration-200 hover:bg-sky-900 disabled:bg-gray-300"
           >
             GỬI
           </button>
+
+          <ActionConfirm
+            isOpen={isConfirming}
+            setIsOpen={setIsConfirming}
+            title={`Xác nhận gửi ${sentComicsList.length} truyện?`}
+            description={
+              <Avatar.Group shape="square" max={{ count: 5 }}>
+                {sentComicsList.map((comics) => {
+                  return (
+                    <Avatar size={100}>
+                      <img src={comics.coverImage} alt="" />
+                    </Avatar>
+                  );
+                })}
+              </Avatar.Group>
+            }
+            cancelCallback={() => {
+              setIsConfirming(false);
+            }}
+            confirmCallback={() => handleConfirmSend()}
+          />
         </div>
       </div>
     </Modal>

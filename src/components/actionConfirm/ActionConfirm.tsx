@@ -15,19 +15,18 @@ export default function ActionConfirm({
   title: string;
   description?: string | ReactNode;
   confirmCallback: Function;
-  cancelCallback: Function;
+  cancelCallback?: Function;
   extraWarning?: string;
 }) {
-  const handleCancel = (e: any) => {
-    e.stopPropagation();
-    cancelCallback();
-    setIsOpen(false);
-  };
-
   return (
     <Modal
       open={isOpen}
-      onCancel={handleCancel}
+      onCancel={(e) => {
+        e.stopPropagation();
+        setIsOpen(false);
+        cancelCallback && cancelCallback();
+      }}
+      destroyOnClose={true}
       footer={null}
       width={500}
       centered
@@ -51,12 +50,20 @@ export default function ActionConfirm({
         )}
 
         <div className="flex items-center justify-end gap-8  mt-4">
-          <button onClick={handleCancel} className="p-2 hover:underline">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(false);
+              if (cancelCallback) cancelCallback();
+            }}
+            className="p-2 hover:underline"
+          >
             Quay lại
           </button>
           <button
             onClick={(e) => {
-              handleCancel(e);
+              e.stopPropagation();
+              setIsOpen(false);
               confirmCallback();
             }}
             className="px-12 py-2 rounded-lg font-semibold bg-gray-900 text-white duration-200 hover:bg-gray-700"

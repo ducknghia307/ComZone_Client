@@ -317,7 +317,7 @@ export default function ProgressSection({
           onShowModal={handleShowDepositModal}
           handleShowDeliveryModal={handleShowDeliveryModal}
         />
-        {exchangeRequest.depositAmount && (
+        {exchangeRequest.depositAmount ? (
           <PlaceDepositModal
             isModalVisible={isModalVisible}
             onClose={() => setIsModalVisible(false)}
@@ -326,14 +326,18 @@ export default function ProgressSection({
             setIsDepositModal={setIsDepositModal}
             setFirstCurrentStage={setFirstCurrentStage}
           />
+        ) : (
+          ""
         )}
-        {firstUser.balance && exchangeRequest.depositAmount && (
+        {firstUser.balance && exchangeRequest.depositAmount ? (
           <DepositWalletModal
             isDepositModal={isDepositModal}
             setIsDepositModal={setIsDepositModal}
             balance={firstUser.balance}
             amount={exchangeRequest.depositAmount}
           />
+        ) : (
+          ""
         )}
         {exchangeRequest && (
           <DeliveryAddressModal

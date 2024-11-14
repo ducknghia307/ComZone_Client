@@ -73,7 +73,6 @@ const DepositWalletModal: React.FC<DepositModalProp> = ({
   return (
     <>
       <Modal
-        // title="NẠP TIỀN VÀO VÍ"
         className="REM "
         open={isDepositModal}
         onOk={handleOk}
@@ -133,7 +132,6 @@ const DepositWalletModal: React.FC<DepositModalProp> = ({
               onClick={() => setSelectedWalletMethod("ZaloPay")}
             >
               <div className="flex items-center ">
-                {/* Display TickCircle if ZaloPay is selected */}
                 {selectedWalletMethod === "ZaloPay" && (
                   <img
                     src={TickCircle}
@@ -158,7 +156,6 @@ const DepositWalletModal: React.FC<DepositModalProp> = ({
               onClick={() => setSelectedWalletMethod("VNPay")}
             >
               <div className="flex items-center ">
-                {/* Display TickCircle if VNPay is selected */}
                 {selectedWalletMethod === "VNPay" && (
                   <img
                     src={TickCircle}

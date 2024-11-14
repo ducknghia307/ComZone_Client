@@ -52,7 +52,7 @@ export default function ActionButtons({
 
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="absolute bottom-[-70%] left-1/2 translate-x-[-50%] p-1 rounded-full drop-shadow-lg bg-gray-50 duration-200 transition-all hover:bg-gray-00"
+        className="absolute bottom-[-70%] left-1/2 translate-x-[-50%] p-1 rounded-full drop-shadow-lg bg-gray-50 duration-200 transition-all hover:bg-gray-100"
       >
         {isExpanded ? (
           <svg

@@ -18,6 +18,7 @@ export default function DepositSubmitModal({
   setIsLoading: Function;
 }) {
   const [depositAmount, setDepositAmount] = useState<number>(0);
+  const [isDeliveryRequired, setIsDeliveryRequired] = useState<boolean>(true);
   const [confirmCheck, setConfirmCheck] = useState<boolean>(false);
 
   const handleSubmitDeposit = async () => {
@@ -25,8 +26,9 @@ export default function DepositSubmitModal({
     if (confirmCheck) {
       console.log(depositAmount);
       await privateAxios
-        .patch(`exchange-requests/deposit-amount/${exchangeRequest.id}`, {
-          amount: depositAmount,
+        .patch(`exchange-requests/exchange-settings/${exchangeRequest.id}`, {
+          depositAmount,
+          isDeliveryRequired,
         })
         .catch((err) => console.log(err))
         .finally(() => setIsLoading(false));

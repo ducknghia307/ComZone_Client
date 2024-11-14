@@ -6,4 +6,5 @@ export interface ExchangeRequest extends BaseInterface {
   postContent: string;
   status: "AVAILABLE" | "DEALING" | "SUCCESSFUL" | "REMOVED";
   depositAmount?: number;
+  isDeliveryRequired?: boolean;
 }

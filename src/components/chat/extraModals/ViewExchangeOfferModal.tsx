@@ -160,9 +160,9 @@ export default function ViewExchangeOfferModal({
         <div
           className={`max-h-[20em] overflow-y-auto ${styles.exchangeRequest} px-2`}
         >
-          {exchangeOffer?.offerComics.map((comics: Comic) => {
+          {exchangeOffer?.offerComics.map((comics: Comic, index: number) => {
             return (
-              <>
+              <div key={index}>
                 <div
                   key={comics.id}
                   className={`${
@@ -219,7 +219,7 @@ export default function ViewExchangeOfferModal({
                     </div>
                   </div>
                 </div>
-              </>
+              </div>
             );
           })}
         </div>

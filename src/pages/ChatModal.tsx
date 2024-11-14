@@ -9,6 +9,7 @@ import Loading from "../components/loading/Loading";
 import { Message, MessageGroup } from "../common/interfaces/message.interface";
 import { ChatRoom } from "../common/interfaces/chat-room.interface";
 import { Comic } from "../common/base.interface";
+import { ExchangeOffer } from "../common/interfaces/exchange-offer.interface";
 
 export default function ChatModal({
   isChatOpen,
@@ -19,7 +20,9 @@ export default function ChatModal({
   setIsChatOpen: Function;
   getMessageUnreadList?: Function;
 }) {
-  const { isLoggedIn, userId } = useAppSelector((state) => state.auth);
+  const { isLoggedIn, userId, accessToken } = useAppSelector(
+    (state) => state.auth
+  );
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,6 +33,8 @@ export default function ChatModal({
   const [messageInput, setMessageInput] = useState<string>("");
   const [sentComicsList, setSentComicsList] = useState<Comic[]>([]);
   const [sentImage, setSentImage] = useState<File>();
+
+  const [exchangeOffer, setExchangeOffer] = useState<ExchangeOffer>();
 
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
 
@@ -107,7 +112,7 @@ export default function ChatModal({
     fetchChatRoomList();
     connectSessionChatRoom();
     scrollDown();
-  }, [isChatOpen]);
+  }, [isChatOpen, accessToken, userId, isLoggedIn]);
 
   const fetchMessageList = async () => {
     if (!currentRoomIdRef || !currentRoomIdRef.current) return;
@@ -253,6 +258,33 @@ export default function ChatModal({
     setIsChatOpen(false);
   };
 
+  const fetchExchangeOffer = async () => {
+    if (!currentRoomId || chatRoomList.length === 0) return;
+    const chatRoom = chatRoomList.find((room) => room.id === currentRoomId);
+    if (!chatRoom || !chatRoom.exchangeRequest) return;
+
+    await privateAxios
+      .get(
+        `exchange-offers/exchange-request/${
+          chatRoom.exchangeRequest.id
+        }/offer-user/${
+          chatRoom.exchangeRequest.user.id === userId
+            ? chatRoom.secondUser.id
+            : userId
+        }`
+      )
+      .then((res) => {
+        const offer = res.data;
+        if (offer) setExchangeOffer(offer);
+        else setExchangeOffer(undefined);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    fetchExchangeOffer();
+  }, [currentRoomId]);
+
   const handleDeleteExchangeOffer = async (chatRoomId: string) => {
     setIsLoading(true);
     await privateAxios
@@ -315,6 +347,9 @@ export default function ChatModal({
           setSentImage={setSentImage}
           handleSendMessageAsImage={handleSendMessageAsImage}
           handleDeleteExchangeOffer={handleDeleteExchangeOffer}
+          exchangeOffer={exchangeOffer}
+          setExchangeOffer={setExchangeOffer}
+          fetchExchangeOffer={fetchExchangeOffer}
         />
       </div>
     </Modal>

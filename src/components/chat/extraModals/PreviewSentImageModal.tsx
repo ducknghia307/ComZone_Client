@@ -1,6 +1,4 @@
-import { Image, Modal, notification } from "antd";
-import { useState } from "react";
-import ActionConfirm from "../../actionConfirm/ActionConfirm";
+import { Modal, notification } from "antd";
 
 export default function PreviewSentImageModal({
   isOpen,
@@ -15,11 +13,8 @@ export default function PreviewSentImageModal({
   setSentImage: Function;
   handleSendMessageAsImage: Function;
 }) {
-  const [isConfirming, setIsConfirming] = useState<boolean>(false);
-
   const handleConfirmSend = async () => {
     await handleSendMessageAsImage();
-    setIsConfirming(false);
     setIsOpen(false);
   };
 
@@ -38,7 +33,6 @@ export default function PreviewSentImageModal({
         onCancel={(e) => {
           e.stopPropagation();
           setSentImage(undefined);
-          setIsConfirming(false);
           setIsOpen(false);
         }}
         centered
@@ -65,22 +59,11 @@ export default function PreviewSentImageModal({
             </button>
             <button
               disabled={!sentImage}
-              onClick={() => setIsConfirming(true)}
+              onClick={() => handleConfirmSend()}
               className="px-16 py-2 rounded-lg bg-sky-700 text-white duration-200 hover:bg-sky-900 disabled:bg-gray-300"
             >
               GỬI
             </button>
-
-            <ActionConfirm
-              isOpen={isConfirming}
-              setIsOpen={setIsConfirming}
-              title={`Xác nhận gửi ảnh?`}
-              description={<Image />}
-              cancelCallback={() => {
-                setIsConfirming(false);
-              }}
-              confirmCallback={() => handleConfirmSend()}
-            />
           </div>
         </div>
       </Modal>

@@ -22,37 +22,39 @@ export default function ActionButtons({
       );
     switch (currentStage) {
       case 1:
-        return (
-          <button
-            className="w-full bg-gray-900 text-white py-2 border border-gray-900 rounded-lg duration-200 hover:bg-white hover:text-black"
-            onClick={onShowModal}
-          >
-            Tiến hành đặt cọc
-          </button>
-        );
+        return "Thêm thông tin giao hàng";
       case 2:
-        return (
-          <div className="flex items-stretch justify-center px-2 mt-1">
-            <button
-              className="w-full bg-gray-900 text-white py-2 border border-gray-900 rounded-lg duration-200 hover:bg-white hover:text-black"
-              onClick={handleShowDeliveryModal}
-            >
-              Chọn thông tin giao hàng
-            </button>
-          </div>
-        );
+        return "Tiến hành đặt cọc";
       case 3:
       case 4:
     }
   };
 
+  const handleButtonTrigger = () => {
+    switch (currentStage) {
+      case 1: {
+        handleShowDeliveryModal();
+        break;
+      }
+      case 2: {
+        onShowModal();
+        break;
+      }
+    }
+  };
+
   return (
     <div className="relative w-full flex flex-col items-stretch justify-center px-2 mt-1">
-      {getButton()}
+      <button
+        className="w-full bg-gray-600 font-semibold text-white py-2 border hover:border-gray-900 rounded-lg duration-300 hover:bg-white hover:text-black"
+        onClick={handleButtonTrigger}
+      >
+        {getButton()}
+      </button>
 
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="absolute bottom-[-70%] left-1/2 translate-x-[-50%] p-1 rounded-full drop-shadow-lg bg-gray-50 duration-200 transition-all hover:bg-gray-100"
+        className="absolute bottom-[-70%] left-1/2 translate-x-[-50%] p-1 rounded-full drop-shadow-lg bg-gray-50 duration-200 transition-all hover:bg-gray-100 z-10"
       >
         {isExpanded ? (
           <svg

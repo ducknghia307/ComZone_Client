@@ -3,6 +3,7 @@ import { useState } from "react";
 import CurrencySplitter from "../../../assistants/Spliter";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import { ExchangeRequest } from "../../../common/interfaces/exchange-request.interface";
+import ActionConfirm from "../../actionConfirm/ActionConfirm";
 
 export default function DepositSubmitModal({
   isOpen,
@@ -19,6 +20,8 @@ export default function DepositSubmitModal({
 }) {
   const [depositAmount, setDepositAmount] = useState<number>(0);
   const [isDeliveryRequired, setIsDeliveryRequired] = useState<boolean>(true);
+  const [isConfirmingNotRequired, setIsConfirmingNotRequired] =
+    useState<boolean>(false);
   const [confirmCheck, setConfirmCheck] = useState<boolean>(false);
 
   const handleSubmitDeposit = async () => {
@@ -78,7 +81,7 @@ export default function DepositSubmitModal({
           <span className="absolute top-1/2 left-3 translate-y-[-50%]">đ</span>
         </div>
 
-        <div className="font-light text-xs text-red-600 mt-4">
+        <div className="font-light text-xs text-red-600 my-4">
           <p className="font-semibold pb-2">Lưu ý:</p>
           <ul className="list-disc px-8">
             <li>
@@ -98,14 +101,72 @@ export default function DepositSubmitModal({
           </ul>
         </div>
 
+        <div className="flex flex-col items-start gap-2 my-4">
+          <p className="text-xl font-semibold">GIAO HÀNG & NHẬN HÀNG</p>
+          <p className="font-light text-sm">
+            Chúng tôi khuyến khích bạn sử dụng dịch vụ giao hàng của ComZone để
+            tránh những điều không mong đợi xảy ra xuyên suốt quá trình trao đổi
+            truyện của bạn.
+          </p>
+
+          <div className="w-full flex items-stretch justify-center gap-2 pt-4 pb-2">
+            <button
+              onClick={() => {
+                setIsDeliveryRequired(true);
+              }}
+              className={`grow flex items-center justify-center gap-2 border ${
+                isDeliveryRequired
+                  ? "border-black border-2"
+                  : "border-gray-300 opacity-50 hover:bg-gray-100"
+              } px-4 py-4 rounded-lg duration-200`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="currentColor"
+              >
+                <path d="M14.5998 8.00033H21C22.1046 8.00033 23 8.89576 23 10.0003V12.1047C23 12.3659 22.9488 12.6246 22.8494 12.8662L19.755 20.3811C19.6007 20.7558 19.2355 21.0003 18.8303 21.0003H2C1.44772 21.0003 1 20.5526 1 20.0003V10.0003C1 9.44804 1.44772 9.00033 2 9.00033H5.48184C5.80677 9.00033 6.11143 8.84246 6.29881 8.57701L11.7522 0.851355C11.8947 0.649486 12.1633 0.581978 12.3843 0.692483L14.1984 1.59951C15.25 2.12534 15.7931 3.31292 15.5031 4.45235L14.5998 8.00033ZM7 10.5878V19.0003H18.1606L21 12.1047V10.0003H14.5998C13.2951 10.0003 12.3398 8.77128 12.6616 7.50691L13.5649 3.95894C13.6229 3.73105 13.5143 3.49353 13.3039 3.38837L12.6428 3.0578L7.93275 9.73038C7.68285 10.0844 7.36341 10.3746 7 10.5878ZM5 11.0003H3V19.0003H5V11.0003Z"></path>
+              </svg>
+              <p>Áp dụng giao hàng</p>
+            </button>
+            <button
+              onClick={() => setIsConfirmingNotRequired(true)}
+              className={`grow flex items-center justify-center rounded-lg gap-2 border ${
+                !isDeliveryRequired
+                  ? "border-black border-2"
+                  : "border-gray-300 text-gray-300"
+              } px-4 py-4`}
+            >
+              <p className="text-xs font-light">Không áp dụng giao hàng</p>
+            </button>
+            <ActionConfirm
+              isOpen={isConfirmingNotRequired}
+              setIsOpen={setIsConfirmingNotRequired}
+              title="Xác nhận không lựa chọn áp dụng giao hàng?"
+              description={
+                <p className="text-red-500 font-light text-xs">
+                  Nếu không áp dụng giao hàng, ComZone sẽ hoàn toàn không chịu
+                  trách nhiệm cho những sự cố xảy ra trong quá trình giao và
+                  nhận truyện của bạn.
+                </p>
+              }
+              confirmCallback={() => {
+                setIsDeliveryRequired(false);
+              }}
+            />
+          </div>
+        </div>
+
         <div className="flex items-start gap-2 my-4">
           <Checkbox
             checked={confirmCheck}
             onChange={() => setConfirmCheck(!confirmCheck)}
           />
           <p className="font-light text-xs">
-            Tôi đã hiểu cách thức hoạt động của quá trình cọc của ComZone, và
-            tôi đã xác nhận quyết định cho mức cọc của mình.
+            Tôi đã hiểu cách thức hoạt động của quá trình cọc và giao hàng, nhận
+            hàng của ComZone, và tôi đã xác nhận lựa chọn của mình.
           </p>
         </div>
 

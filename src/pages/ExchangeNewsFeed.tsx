@@ -232,7 +232,7 @@ export default function ExchangeNewsFeed() {
   return (
     <div className="w-full flex justify-center bg-[rgba(0,0,0,0.03)]">
       {isLoading && <Loading />}
-      <div className="w-full flex items-start justify-center min-h-[80vh] px-8 pb-8 REM border-4">
+      <div className="w-full flex items-start justify-center min-h-[80vh] px-8 pb-8 REM">
         <div className="w-full flex flex-col items-center justify-start gap-2 py-8">
           <ExchangeSearchBar
             isLoggedIn={isLoggedIn}

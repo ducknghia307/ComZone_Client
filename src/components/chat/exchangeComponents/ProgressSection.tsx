@@ -160,7 +160,7 @@ export default function ProgressSection({
           </div>
 
           {/* Middle */}
-          <div className="flex flex-col justify-center items-center gap-2">
+          <div className="flex flex-col justify-center items-center gap-2 bg-black text-white w-fit self-center px-4 py-2 rounded-lg">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -216,7 +216,7 @@ export default function ProgressSection({
               >
                 <path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path>
               </svg>
-              <Stage2 currentStage={secondCurrentStage} />
+              <Stage2 currentStage={secondCurrentStage} rotate={true} />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -226,7 +226,7 @@ export default function ProgressSection({
               >
                 <path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path>
               </svg>
-              <Stage3 currentStage={secondCurrentStage} rotate={true} />
+              <Stage3 currentStage={secondCurrentStage} />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

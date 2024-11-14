@@ -58,7 +58,11 @@ const DeliveryMethod = ({
       <div className="w-1/2 bg-white pt-4 flex flex-col gap-2">
         <h2 className="font-bold">THÔNG TIN VẬN CHUYỂN</h2>
 
-        <div className="w-full flex items-center justify-between gap-2 font-light text-xs italic">
+        <div
+          className={`${
+            deliveryPrice === 0 && "hidden"
+          } w-full flex items-center justify-between gap-2 font-light text-xs italic`}
+        >
           <div className="flex gap-2 items-center">
             <svg
               width="24px"
@@ -101,10 +105,18 @@ const DeliveryMethod = ({
           <p className="text-end">{formattedDate()}</p>
         </div>
 
-        <div className="w-full flex items-center justify-between gap-2 text-sm">
+        <div
+          className={`${
+            deliveryPrice === 0 && "hidden"
+          } w-full flex items-center justify-between gap-2 text-sm`}
+        >
           <p>Phí giao hàng: </p>
           <p>{CurrencySplitter(deliveryPrice || 0)} đ</p>
         </div>
+
+        <p className={`${deliveryPrice === 0 ? "inline" : "hidden"} text-sm font-light italic text-red-600`}>
+          Chưa ghi nhận thông tin giao hàng
+        </p>
       </div>
     </div>
   );

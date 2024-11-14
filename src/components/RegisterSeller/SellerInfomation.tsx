@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { UserInfo } from "../../common/base.interface";
 import { Input } from "antd";
 
-interface SellerInfomationProps {
+interface SellerInformationProps {
   userInfo?: UserInfo;
   otp: string;
   setOtp: (otp: string) => void;
@@ -13,7 +13,7 @@ interface SellerInfomationProps {
   setPhone: (phone: string) => void;
 }
 
-const SellerInfomation: React.FC<SellerInfomationProps> = ({
+const SellerInfomation: React.FC<SellerInformationProps> = ({
   userInfo,
   otp,
   setOtp,
@@ -54,25 +54,32 @@ const SellerInfomation: React.FC<SellerInfomationProps> = ({
       {!userInfo ? (
         <h2>Vui lòng đăng nhập</h2>
       ) : (
-        <div className="w-full px-16 py-8 flex flex-col items-center justify-center">
-          <div className="w-2/3 flex flex-col">
-            <h2>Tên người bán</h2>
-            <input
-              className="p-2 border rounded-lg w-full mt-2"
-              type="text"
-              value={name}
-              onChange={(e) => setLocalName(e.target.value)}
-            />
-          </div>
-          <div className="w-2/3 flex flex-col mt-4">
+        <div className="w-full px-16 pt-4 pb-8 flex flex-col items-stretch justify-center gap-4">
+          <div className="flex flex-col mt-4">
             <h2>Email</h2>
             <input
-              className="p-2 border rounded-lg w-full mt-2"
+              disabled={true}
+              className="p-2 border rounded-lg w-fit mt-2 disabled:bg-gray-200 disabled:text-white disabled:cursor-not-allowed"
               type="text"
               value={email}
               onChange={(e) => setLocalEmail(e.target.value)}
             />
           </div>
+
+          <div className="flex flex-col">
+            <h2>Tên người bán</h2>
+            <p className="text-[0.7em] font-light italic text-sky-700">
+              Đây là tên dùng để hiển thị cho những sản phẩm được đăng bán của
+              bạn trên hệ thống.
+            </p>
+            <input
+              className="p-2 border rounded-lg min-w-fit xl:w-1/2 mt-2"
+              type="text"
+              value={name}
+              onChange={(e) => setLocalName(e.target.value)}
+            />
+          </div>
+
           <div className="w-2/3 flex flex-col mt-4">
             <h2>Số điện thoại</h2>
             <div className="relative w-full">
@@ -81,7 +88,11 @@ const SellerInfomation: React.FC<SellerInfomationProps> = ({
                 type="text"
                 placeholder="Nhập số điện thoại"
                 value={phone}
-                onChange={(e) => setLocalPhone(e.target.value)}
+                onChange={(e) => {
+                  const isValidNumber = e.target.value.match(/^[0-9]*$/);
+                  if (isValidNumber && e.target.value.length < 11)
+                    setLocalPhone(e.target.value);
+                }}
               />
               <button
                 className="absolute right-1 top-1/2 transform -translate-y-1/2 mt-1 px-4 py-1 bg-black text-white rounded-lg hover:bg-gray-800 duration-200"

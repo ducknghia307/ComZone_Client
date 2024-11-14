@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import DeliveryAddress from "../components/checkout/DeliveryAddress";
 import PaymentMethod from "../components/checkout/PaymentMethod";
 import OrderCheck from "../components/checkout/OrderCheck";
 import {
   Address,
-  // BaseInterface,
   Comic,
   SellerDetails,
   UserInfo,
-  // UserInfo,
 } from "../common/base.interface";
 import { privateAxios } from "../middleware/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
@@ -54,31 +52,6 @@ const Checkout = () => {
   const [notes, setNotes] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const [modal, contextHolder] = Modal.useModal();
-  const countDown = () => {
-    let secondsToGo = 3;
-
-    const instance = modal.success({
-      title: "Đặt hàng thành công!",
-      content: `Chuyển trang trong vòng ${secondsToGo} giây...`,
-      okText: "Chuyển ngay",
-      onOk: () => {
-        navigate("/order/complete");
-      },
-    });
-
-    const timer = setInterval(() => {
-      secondsToGo -= 1;
-      instance.update({
-        content: `Chuyển trang trong vòng ${secondsToGo} giây...`,
-      });
-    }, 1000);
-
-    setTimeout(() => {
-      clearInterval(timer);
-      instance.destroy();
-      navigate("/order/complete");
-    }, secondsToGo * 1000);
-  };
 
   const fetchUserInfo = async () => {
     try {
@@ -119,15 +92,14 @@ const Checkout = () => {
   }, []);
 
   const fetchDeliveryDetails = async () => {
-    setIsLoading(true);
-    setDeliveryDetails([]);
-    setSellerDetailsGroup([]);
-    setTotalDeliveryPrice(0);
-
     if (!selectedAddress) {
       setIsLoading(false);
-      return;
     } else {
+      setIsLoading(true);
+      setDeliveryDetails([]);
+      setSellerDetailsGroup([]);
+      setTotalDeliveryPrice(0);
+
       await Promise.all(
         Object.keys(groupedSelectedComics).map(async (sellerId) => {
           const sellerDetails = await privateAxios.get(
@@ -141,10 +113,9 @@ const Checkout = () => {
             ward: sellerDetails.data.ward.id,
           };
 
-          console.log("first: ", groupedSelectedComics[sellerId].comics.length);
           if (sellerDetails && selectedAddress)
             await privateAxios
-              .post("/orders/delivery-details", {
+              .post("/deliveries/details", {
                 fromDistrict: sellerAddress.district,
                 fromWard: sellerAddress.ward,
                 toDistrict: selectedAddress.district.id,
@@ -222,23 +193,48 @@ const Checkout = () => {
           (details) => details.user.id === sellerId
         );
 
+        const newUserDeliveryInfo = await privateAxios
+          .post("delivery-information", {
+            name: selectedAddress?.fullName,
+            phone: selectedAddress?.phone,
+            provinceId: selectedAddress?.province.id,
+            districtId: selectedAddress?.district.id,
+            wardId: selectedAddress?.ward.id,
+            address: selectedAddress?.detailedAddress,
+          })
+          .then((res) => {
+            return res.data;
+          })
+          .catch((err) => console.log(err));
+
+        const newSellerDeliveryInfo = await privateAxios
+          .post("delivery-information", {
+            name: sellerDetails?.user.name,
+            phone: sellerDetails?.verifiedPhone,
+            provinceId: sellerDetails?.province.id,
+            districtId: sellerDetails?.district.id,
+            wardId: sellerDetails?.ward.id,
+            address: sellerDetails?.detailedAddress,
+          })
+          .then((res) => {
+            return res.data;
+          })
+          .catch((err) => console.log(err));
+
+        const newDelivery = await privateAxios
+          .post("deliveries/order", {
+            fromAddressId: newSellerDeliveryInfo.id,
+            toAddressId: newUserDeliveryInfo.id,
+          })
+          .then((res) => {
+            return res.data;
+          })
+          .catch((err) => console.log(err));
+
         const orderResponse = await privateAxios.post("/orders", {
           totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
           paymentMethod: selectedPaymentMethod,
-          fromName: sellerGroup.sellerName,
-          fromPhone: sellerDetails?.verifiedPhone,
-          fromAddress: sellerDetails?.fullAddress,
-          fromProvinceName: sellerDetails?.province.name,
-          fromDistrictId: sellerDetails?.district.id,
-          fromDistrictName: sellerDetails?.district.name,
-          fromWardId: sellerDetails?.ward.id,
-          fromWardName: sellerDetails?.ward.name,
-          toName: selectedAddress?.fullName,
-          toPhone: selectedAddress?.phone,
-          toAddress: selectedAddress?.fullAddress,
-          toDistrictId: selectedAddress?.district.id,
-          toWardId: selectedAddress?.ward.id,
-          deliveryFee: sellerDeliveryPrice,
+          deliveryId: newDelivery.id,
           addressId: selectedAddress?.id,
           note: notes[sellerId] || "",
         });
@@ -288,8 +284,7 @@ const Checkout = () => {
         }
       }
       sessionStorage.removeItem("selectedComics");
-      countDown();
-      // navigate("/order/complete");
+      navigate("/order/complete");
     } catch (error: any) {
       if (error.response) {
         console.error("Server responded with:", error.response.data); // Log detailed server error
@@ -340,8 +335,9 @@ const Checkout = () => {
                 handleSubmit={handleSubmit}
                 navigate={navigate}
                 isConfirmDisabled={
-                  selectedPaymentMethod === "wallet" &&
-                  userWalletBalance < totalPrice + totalDeliveryPrice
+                  !selectedAddress ||
+                  (selectedPaymentMethod === "wallet" &&
+                    userWalletBalance < totalPrice + totalDeliveryPrice)
                 }
               />
             </div>

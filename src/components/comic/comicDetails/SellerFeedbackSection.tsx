@@ -14,7 +14,9 @@ export default function SellerFeedbackSection({
       </p>
 
       {(feedbackList?.length === 0 || !feedbackList) && (
-        <p className="w-full text-xs font-light py-8 text-center">Chưa có đánh giá</p>
+        <p className="w-full text-xs font-light py-8 text-center">
+          Chưa có đánh giá
+        </p>
       )}
     </div>
   );

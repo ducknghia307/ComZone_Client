@@ -9,7 +9,7 @@ interface AddressListProps {
   updateAddress: (addressId: string, updatedAddress: Address) => void;
   refreshAddresses: () => void;
   onAddAddress?: () => void;
-  handleSetIsEdit: boolean;
+  handleSetIsEdit: boolean | undefined;
 }
 
 const AddressList: React.FC<AddressListProps> = ({

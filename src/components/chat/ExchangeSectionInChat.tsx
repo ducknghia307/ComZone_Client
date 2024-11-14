@@ -1,7 +1,7 @@
 import type { CollapseProps } from "antd";
 import { Collapse } from "antd";
 import { Comic } from "../../common/base.interface";
-import { MutableRefObject, useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { ChatRoom } from "../../common/interfaces/chat-room.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { ExchangeOffer } from "../../common/interfaces/exchange-offer.interface";
@@ -11,19 +11,22 @@ import ProgressSection from "./exchangeComponents/ProgressSection";
 
 export default function ExchangeSectionInChat({
   chatRoom,
-  currentRoomIdRef,
+  exchangeOffer,
+  setExchangeOffer,
   handleDeleteExchangeOffer,
   fetchChatRoomList,
   setIsLoading,
+  fetchExchangeOffer,
 }: {
   chatRoom: ChatRoom;
-  currentRoomIdRef: MutableRefObject<string>;
+  exchangeOffer: ExchangeOffer | undefined;
+  setExchangeOffer: Function;
   setIsLoading: Function;
   fetchChatRoomList: Function;
   handleDeleteExchangeOffer: Function;
+  fetchExchangeOffer: Function;
 }) {
   const { userId } = useAppSelector((state) => state.auth);
-  const [exchangeOffer, setExchangeOffer] = useState<ExchangeOffer>();
   const [isViewingOffer, setIsViewingOffer] = useState<boolean>(false);
 
   const { exchangeRequest } = chatRoom;
@@ -69,28 +72,6 @@ export default function ExchangeSectionInChat({
       ),
     },
   ];
-
-  const fetchExchangeOffer = useCallback(async () => {
-    if (!exchangeRequest) return;
-    setIsLoading(true);
-    await privateAxios
-      .get(
-        `exchange-offers/exchange-request/${exchangeRequest.id}/offer-user/${
-          exchangeRequest.user.id === userId ? chatRoom.secondUser.id : userId
-        }`
-      )
-      .then((res) => {
-        const offer = res.data;
-        if (offer) setExchangeOffer(offer);
-        else setExchangeOffer(undefined);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setIsLoading(false));
-  }, [currentRoomIdRef]);
-
-  useEffect(() => {
-    fetchExchangeOffer();
-  }, [currentRoomIdRef]);
 
   const updateExchangeOfferSeenStatus = async () => {
     if (
@@ -150,6 +131,7 @@ export default function ExchangeSectionInChat({
             />
             {exchangeOffer && (
               <ViewExchangeOfferModal
+                key={exchangeOffer.id}
                 userId={userId}
                 exchangeOffer={exchangeOffer}
                 isOpen={isViewingOffer}

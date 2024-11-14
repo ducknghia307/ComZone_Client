@@ -7,6 +7,7 @@ import ExchangeSectionInChat from "./ExchangeSectionInChat";
 import { ChatRoom } from "../../common/interfaces/chat-room.interface";
 import { Comic } from "../../common/base.interface";
 import { MutableRefObject } from "react";
+import { ExchangeOffer } from "../../common/interfaces/exchange-offer.interface";
 
 export default function ChatSection({
   currentRoom,
@@ -27,6 +28,9 @@ export default function ChatSection({
   setSentImage,
   handleSendMessageAsImage,
   handleDeleteExchangeOffer,
+  exchangeOffer,
+  setExchangeOffer,
+  fetchExchangeOffer,
 }: {
   currentRoom: ChatRoom | undefined;
   currentRoomIdRef: MutableRefObject<string>;
@@ -47,6 +51,9 @@ export default function ChatSection({
   setSentImage: Function;
   handleSendMessageAsImage: Function;
   handleDeleteExchangeOffer: Function;
+  exchangeOffer: ExchangeOffer | undefined;
+  setExchangeOffer: Function;
+  fetchExchangeOffer: Function;
 }) {
   return (
     <div
@@ -67,11 +74,13 @@ export default function ChatSection({
             )}
             {currentRoom?.exchangeRequest && (
               <ExchangeSectionInChat
-              currentRoomIdRef={currentRoomIdRef}
+                exchangeOffer={exchangeOffer}
+                setExchangeOffer={setExchangeOffer}
                 chatRoom={currentRoom}
                 setIsLoading={setIsLoading}
                 fetchChatRoomList={fetchChatRoomList}
                 handleDeleteExchangeOffer={handleDeleteExchangeOffer}
+                fetchExchangeOffer={fetchExchangeOffer}
               />
             )}
           </div>

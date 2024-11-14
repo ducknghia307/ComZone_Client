@@ -282,7 +282,7 @@ export default function ExchangeNewsFeed() {
                 isLoading={isLoading}
               />
             ) : (
-              <EmptyExchangeList isLoading={isLoading} />
+              !isLoading && <EmptyExchangeList isLoading={isLoading} />
             )}
           </div>
         </div>

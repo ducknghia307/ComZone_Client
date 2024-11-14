@@ -71,7 +71,6 @@ export default function ProgressSection({
       const exchangeDeposits = await privateAxios
         .get(`deposits/exchange-request/${exchangeRequest.id}`)
         .then((res) => {
-          console.log("Deposits: ", res.data);
           return res.data;
         })
         .catch((err) => console.log(err));

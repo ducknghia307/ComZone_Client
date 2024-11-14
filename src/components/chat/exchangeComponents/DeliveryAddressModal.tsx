@@ -9,15 +9,18 @@ import {
   WardDrop,
 } from "../../../common/base.interface";
 import { privateAxios } from "../../../middleware/axiosInstance";
+import { ExchangeRequest } from "../../../common/interfaces/exchange-request.interface";
 
 interface DeliveryAddressModalProps {
   isDeliveryModal: boolean;
   setDeliveryModal: Dispatch<SetStateAction<boolean>>;
+  exchangeRequest: ExchangeRequest;
 }
 
 const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
   isDeliveryModal,
   setDeliveryModal,
+  exchangeRequest,
 }) => {
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [provinceDrop, setProvinceDrop] = useState<ProvinceDrop[]>([]);
@@ -35,6 +38,10 @@ const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
   const [detailAddressError, setDetailAddressError] = useState<string | null>(
     null
   );
+  const [name, setName] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const handleClose = () => {
     setDeliveryModal(false);
@@ -118,30 +125,59 @@ const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
     fetchWards(value);
   };
 
-  //   const isAddressValid = (): boolean => {
-  //     return (
-  //       !!selectProvince &&
-  //       !!selectDistrict &&
-  //       !!selectWard &&
-  //       detailAddress.trim() !== ""
-  //     );
-  //   };
-
   useEffect(() => {
     fetchProvinces();
   }, []);
 
-  useEffect(() => {
-    // validateAddress(isAddressValid());
-  }, [selectProvince, selectDistrict, selectWard, detailAddress]);
+  const handleSubmitAddress = () => {
+    let hasError = false;
 
-  // Log the selected address details
-  const logAddress = () => {
-    console.log("Province:", selectProvince?.name);
-    console.log("District:", selectDistrict?.name);
-    console.log("Ward:", selectWard?.name);
-    console.log("Detail Address:", detailAddress);
-    handleClose();
+    if (!name.trim()) {
+      setNameError("Vui lòng nhập họ tên người nhận");
+      hasError = true;
+    }
+
+    if (!phone.trim()) {
+      setPhoneError("Vui lòng nhập số điện thoại");
+      hasError = true;
+    } else if (!/^[0-9]{10}$/.test(phone)) {
+      setPhoneError("Số điện thoại không hợp lệ");
+      hasError = true;
+    }
+
+    if (!selectProvince) {
+      setProvinceError("Vui lòng chọn tỉnh/thành phố");
+      hasError = true;
+    }
+
+    if (!selectDistrict) {
+      setDistrictError("Vui lòng chọn quận/huyện");
+      hasError = true;
+    }
+
+    if (!selectWard) {
+      setWardError("Vui lòng chọn phường/xã");
+      hasError = true;
+    }
+
+    if (!detailAddress.trim()) {
+      setDetailAddressError("Vui lòng nhập địa chỉ cụ thể");
+      hasError = true;
+    }
+
+    if (!hasError) {
+      const dataPayload = {
+        name: name,
+        phone,
+        province: selectProvince?.id,
+        district: selectDistrict?.id,
+        ward: selectWard?.id,
+        detailAddress,
+      };
+      // console.log(dataPayload);
+
+      // const resDeliveryInfo = await privateAxios.post("/delivery-information", dataPayload)
+    }
   };
 
   return (
@@ -153,6 +189,46 @@ const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
       width={800}
     >
       <div className="p-2 bg-white rounded-md">
+        <div className="flex flex-row w-full gap-12">
+          <div className="flex flex-col gap-1 w-full">
+            <h3 className="font-semibold flex flex-row gap-2">
+              Họ và tên người nhận <p className="text-red-500">*</p>
+            </h3>
+            <input
+              type="text"
+              placeholder="Ví dụ: Nguyễn Văn A"
+              className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setNameError(null);
+              }}
+            />
+            {nameError && (
+              <span className="text-red-500  top-1">{nameError}</span>
+            )}
+          </div>
+          <div className="flex flex-col gap-1 w-full">
+            <h3 className="font-semibold flex flex-row gap-2">
+              Số điện thoại người nhận <p className="text-red-500">*</p>
+            </h3>
+            <input
+              type="text"
+              placeholder="Ví dụ: 0987XXXXXX"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setPhoneError(null);
+              }}
+              className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
+            />
+            {phoneError && (
+              <span className="text-red-500 mt-20 absolute italic">
+                {phoneError}
+              </span>
+            )}
+          </div>
+        </div>
         <div className="flex flex-row w-full gap-5 mt-2">
           <div className="flex flex-col gap-1 w-full">
             <h3 className="font-semibold flex flex-row gap-2">
@@ -258,7 +334,7 @@ const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
           </button>
           <button
             className="font-semibold px-5 py-2 text-white bg-black rounded-md hover:opacity-75 duration-200"
-            onClick={logAddress}
+            onClick={handleSubmitAddress}
           >
             XÁC NHẬN
           </button>

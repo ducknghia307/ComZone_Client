@@ -3,7 +3,7 @@ import styles from "./style.module.css";
 export default function Stage3({ currentStage }: { currentStage: number }) {
   return (
     <div className="relative flex items-center p-2">
-      {currentStage < 2 ? (
+      {currentStage < 3 ? (
         <div className="p-2">
           <div className={`${styles.dotTyping}`}></div>
         </div>
@@ -11,8 +11,8 @@ export default function Stage3({ currentStage }: { currentStage: number }) {
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
-          width="24"
-          height="24"
+          width="36"
+          height="36"
           fill="currentColor"
           className="fill-green-600"
         >
@@ -22,10 +22,10 @@ export default function Stage3({ currentStage }: { currentStage: number }) {
 
       <p
         className={`absolute bottom-[-40%] left-1/2 translate-x-[-50%] text-[0.7em] whitespace-nowrap ${
-          currentStage >= 2 && "bottom-[-50%] opacity-50"
+          currentStage >= 3 && "bottom-[-50%] opacity-50"
         }`}
       >
-        {currentStage < 2 ? "Đang tiến hành cọc" : "Đã hoàn tất cọc"}
+        {currentStage < 3 ? "Đang tiến hành cọc" : "Đã hoàn tất cọc"}
       </p>
     </div>
   );

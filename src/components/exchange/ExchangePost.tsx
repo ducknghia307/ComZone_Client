@@ -11,7 +11,6 @@ import { privateAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
 import SelectOfferComicsModal from "./SelectOfferComicsModal";
 
-
 moment.locale("vi");
 
 export default function ExchangePost({
@@ -27,15 +26,15 @@ export default function ExchangePost({
   tourIndex,
 }: {
   exchangeRequest: ExchangeRequest;
-  refs: any[];
+  refs?: any[];
   index: number;
   isLoading: boolean;
-  isSelectModalOpen: string;
-  setIsSelectModalOpen: Function;
-  isChatOpen: boolean;
-  setIsChatOpen: Function;
+  isSelectModalOpen?: string;
+  setIsSelectModalOpen?: Function;
+  isChatOpen?: boolean;
+  setIsChatOpen?: Function;
   currentUserId: string;
-  tourIndex: number;
+  tourIndex?: number;
 }) {
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);

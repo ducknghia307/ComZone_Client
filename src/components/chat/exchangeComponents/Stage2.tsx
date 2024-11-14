@@ -10,18 +10,15 @@ export default function Stage2({
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
-        width="28"
-        height="28"
+        width="24"
+        height="24"
         fill="currentColor"
-        style={{
-          transform: `${rotate === true ? "rotateY(180deg)" : ""}`,
-        }}
       >
-        <path d="M8.96456 18C8.72194 19.6961 7.26324 21 5.5 21C3.73676 21 2.27806 19.6961 2.03544 18H1V6C1 5.44772 1.44772 5 2 5H16C16.5523 5 17 5.44772 17 6V8H20L23 12.0557V18H20.9646C20.7219 19.6961 19.2632 21 17.5 21C15.7368 21 14.2781 19.6961 14.0354 18H8.96456ZM15 7H3V15.0505C3.63526 14.4022 4.52066 14 5.5 14C6.8962 14 8.10145 14.8175 8.66318 16H14.3368C14.5045 15.647 14.7296 15.3264 15 15.0505V7ZM17 13H21V12.715L18.9917 10H17V13ZM17.5 19C18.1531 19 18.7087 18.5826 18.9146 18C18.9699 17.8436 19 17.6753 19 17.5C19 16.6716 18.3284 16 17.5 16C16.6716 16 16 16.6716 16 17.5C16 17.6753 16.0301 17.8436 16.0854 18C16.2913 18.5826 16.8469 19 17.5 19ZM7 17.5C7 16.6716 6.32843 16 5.5 16C4.67157 16 4 16.6716 4 17.5C4 17.6753 4.03008 17.8436 4.08535 18C4.29127 18.5826 4.84689 19 5.5 19C6.15311 19 6.70873 18.5826 6.91465 18C6.96992 17.8436 7 17.6753 7 17.5Z"></path>
+        <path d="M17 2V4H20.0066C20.5552 4 21 4.44495 21 4.9934V21.0066C21 21.5552 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5551 3 21.0066V4.9934C3 4.44476 3.44495 4 3.9934 4H7V2H17ZM7 6H5V20H19V6H17V8H7V6ZM9 16V18H7V16H9ZM9 13V15H7V13H9ZM9 10V12H7V10H9ZM15 4H9V6H15V4Z"></path>
       </svg>
       <span
         className={`text-green-600 absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] ${
-          currentStage < 3 && "hidden"
+          currentStage < 2 && "hidden"
         }`}
       >
         <svg
@@ -37,10 +34,10 @@ export default function Stage2({
 
       <p
         className={`absolute bottom-[-40%] left-1/2 translate-x-[-50%] text-[0.7em] whitespace-nowrap ${
-          currentStage >= 3 && "opacity-50"
+          currentStage >= 2 && "opacity-50"
         }`}
       >
-        Phương thức giao hàng
+        {currentStage < 2 ? "Nhập thông tin giao hàng" : "Đã hoàn tất"}
       </p>
     </div>
   );

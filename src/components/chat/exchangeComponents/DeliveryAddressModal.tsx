@@ -1,4 +1,4 @@
-import { Modal, Select } from "antd";
+import { message, Modal, Select } from "antd";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   District,
@@ -9,18 +9,23 @@ import {
   WardDrop,
 } from "../../../common/base.interface";
 import { privateAxios } from "../../../middleware/axiosInstance";
-import { ExchangeRequest } from "../../../common/interfaces/exchange-request.interface";
+import { ExchangeOffer } from "../../../common/interfaces/exchange-offer.interface";
+import Loading from "../../loading/Loading";
 
 interface DeliveryAddressModalProps {
   isDeliveryModal: boolean;
   setDeliveryModal: Dispatch<SetStateAction<boolean>>;
-  exchangeRequest: ExchangeRequest;
+  exchangeOffer: ExchangeOffer;
+  currentUser: string;
+  setFirstCurrentStage: Dispatch<SetStateAction<number>>;
 }
 
 const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
   isDeliveryModal,
   setDeliveryModal,
-  exchangeRequest,
+  exchangeOffer,
+  currentUser,
+  setFirstCurrentStage,
 }) => {
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [provinceDrop, setProvinceDrop] = useState<ProvinceDrop[]>([]);
@@ -42,7 +47,7 @@ const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
   const [nameError, setNameError] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState<string | null>(null);
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleClose = () => {
     setDeliveryModal(false);
   };
@@ -129,7 +134,8 @@ const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
     fetchProvinces();
   }, []);
 
-  const handleSubmitAddress = () => {
+  const handleSubmitAddress = async () => {
+    setIsLoading(true);
     let hasError = false;
 
     if (!name.trim()) {
@@ -166,181 +172,218 @@ const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
     }
 
     if (!hasError) {
-      const dataPayload = {
-        name: name,
-        phone,
-        province: selectProvince?.id,
-        district: selectDistrict?.id,
-        ward: selectWard?.id,
-        detailAddress,
-      };
-      // console.log(dataPayload);
+      try {
+        const dataPayload = {
+          name: name,
+          phone,
+          provinceId: selectProvince?.id,
+          districtId: selectDistrict?.id,
+          wardId: selectWard?.id,
+          address: detailAddress,
+        };
+        console.log(dataPayload);
 
-      // const resDeliveryInfo = await privateAxios.post("/delivery-information", dataPayload)
+        const resDeliveryInfo = await privateAxios.post(
+          "/delivery-information",
+          dataPayload
+        );
+        if (currentUser === "request") {
+          await privateAxios.post("/deliveries/exchange-request", {
+            exchangeRequest: exchangeOffer.exchangeRequest.id,
+            addressId: resDeliveryInfo.data.id,
+          });
+        } else {
+          await privateAxios
+            .post("/deliveries/exchange-offer", {
+              exchangeOffer: exchangeOffer.id,
+              addressId: resDeliveryInfo.data.id,
+            })
+            .then((res) => {
+              console.log(res.data);
+            });
+        }
+        message.success("Cập nhật địa chỉ thành công");
+        setFirstCurrentStage(2);
+        setDeliveryModal(false);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+        setIsLoading(false);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Modal
-      title={<h2 className="text-xl p-2">NHẬP THÔNG TIN GIAO HÀNG</h2>}
-      open={isDeliveryModal}
-      onCancel={handleClose}
-      footer={null}
-      width={800}
-    >
-      <div className="p-2 bg-white rounded-md">
-        <div className="flex flex-row w-full gap-12">
-          <div className="flex flex-col gap-1 w-full">
+    <>
+      {isLoading && <Loading />}
+      <Modal
+        title={<h2 className="text-xl p-2">NHẬP THÔNG TIN GIAO HÀNG</h2>}
+        open={isDeliveryModal}
+        onCancel={handleClose}
+        footer={null}
+        width={800}
+      >
+        <div className="p-2 bg-white rounded-md">
+          <div className="flex flex-row w-full gap-12">
+            <div className="flex flex-col gap-1 w-full">
+              <h3 className="font-semibold flex flex-row gap-2">
+                Họ và tên người nhận <p className="text-red-500">*</p>
+              </h3>
+              <input
+                type="text"
+                placeholder="Ví dụ: Nguyễn Văn A"
+                className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setNameError(null);
+                }}
+              />
+              {nameError && (
+                <span className="text-red-500  top-1">{nameError}</span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1 w-full">
+              <h3 className="font-semibold flex flex-row gap-2">
+                Số điện thoại người nhận <p className="text-red-500">*</p>
+              </h3>
+              <input
+                type="text"
+                placeholder="Ví dụ: 0987XXXXXX"
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  setPhoneError(null);
+                }}
+                className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
+              />
+              {phoneError && (
+                <span className="text-red-500 mt-20 absolute italic">
+                  {phoneError}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-row w-full gap-5 mt-2">
+            <div className="flex flex-col gap-1 w-full">
+              <h3 className="font-semibold flex flex-row gap-2">
+                Tỉnh/Thành phố <p className="text-red-500">*</p>
+              </h3>
+              <Select
+                showSearch
+                placeholder="Chọn tỉnh/thành phố"
+                filterOption={(input, option) =>
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                options={provinceDrop}
+                onChange={handleProvinceChange}
+                className="REM"
+                value={selectProvince?.id}
+              />
+              {provinceError && (
+                <span className="text-red-500 mt-16 pt-2 absolute italic">
+                  {provinceError}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1 w-full">
+              <h3 className="font-semibold flex flex-row gap-2">
+                Quận/Huyện <p className="text-red-500">*</p>
+              </h3>
+              <Select
+                showSearch
+                placeholder="Chọn quận/huyện"
+                filterOption={(input, option) =>
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                options={districtDrop}
+                onChange={handleDistrictChange}
+                className="REM"
+                disabled={!selectProvince}
+                value={selectDistrict?.id}
+              />
+              {districtError && (
+                <span className="text-red-500 mt-16 pt-2 absolute italic">
+                  {districtError}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1 w-full">
+              <h3 className="font-semibold flex flex-row gap-2">
+                Phường/Xã <p className="text-red-500">*</p>
+              </h3>
+              <Select
+                showSearch
+                placeholder="Chọn phường/xã"
+                filterOption={(input, option) =>
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                options={wardDrop}
+                onChange={(value) => {
+                  setSelectWard(
+                    wards.find((ward) => ward.id === value) || null
+                  );
+                  setWardError(null);
+                }}
+                className="REM"
+                disabled={!selectDistrict}
+                value={selectWard?.id}
+              />
+              {wardError && (
+                <span className="text-red-500 mt-16 pt-2 absolute italic">
+                  {wardError}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 w-full mt-10">
             <h3 className="font-semibold flex flex-row gap-2">
-              Họ và tên người nhận <p className="text-red-500">*</p>
+              Địa chỉ cụ thể (Số nhà, tên đường){" "}
+              <p className="text-red-500">*</p>
             </h3>
             <input
               type="text"
-              placeholder="Ví dụ: Nguyễn Văn A"
+              placeholder="Ví dụ: 123/32 Hòa Bình"
               className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
-              value={name}
               onChange={(e) => {
-                setName(e.target.value);
-                setNameError(null);
+                setDetailAddress(e.target.value);
+                setDetailAddressError(null);
               }}
             />
-            {nameError && (
-              <span className="text-red-500  top-1">{nameError}</span>
-            )}
-          </div>
-          <div className="flex flex-col gap-1 w-full">
-            <h3 className="font-semibold flex flex-row gap-2">
-              Số điện thoại người nhận <p className="text-red-500">*</p>
-            </h3>
-            <input
-              type="text"
-              placeholder="Ví dụ: 0987XXXXXX"
-              value={phone}
-              onChange={(e) => {
-                setPhone(e.target.value);
-                setPhoneError(null);
-              }}
-              className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
-            />
-            {phoneError && (
-              <span className="text-red-500 mt-20 absolute italic">
-                {phoneError}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-row w-full gap-5 mt-2">
-          <div className="flex flex-col gap-1 w-full">
-            <h3 className="font-semibold flex flex-row gap-2">
-              Tỉnh/Thành phố <p className="text-red-500">*</p>
-            </h3>
-            <Select
-              showSearch
-              placeholder="Chọn tỉnh/thành phố"
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-              options={provinceDrop}
-              onChange={handleProvinceChange}
-              className="REM"
-              value={selectProvince?.id}
-            />
-            {provinceError && (
+            {detailAddressError && (
               <span className="text-red-500 mt-16 pt-2 absolute italic">
-                {provinceError}
+                {detailAddressError}
               </span>
             )}
           </div>
-          <div className="flex flex-col gap-1 w-full">
-            <h3 className="font-semibold flex flex-row gap-2">
-              Quận/Huyện <p className="text-red-500">*</p>
-            </h3>
-            <Select
-              showSearch
-              placeholder="Chọn quận/huyện"
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-              options={districtDrop}
-              onChange={handleDistrictChange}
-              className="REM"
-              disabled={!selectProvince}
-              value={selectDistrict?.id}
-            />
-            {districtError && (
-              <span className="text-red-500 mt-16 pt-2 absolute italic">
-                {districtError}
-              </span>
-            )}
-          </div>
-          <div className="flex flex-col gap-1 w-full">
-            <h3 className="font-semibold flex flex-row gap-2">
-              Phường/Xã <p className="text-red-500">*</p>
-            </h3>
-            <Select
-              showSearch
-              placeholder="Chọn phường/xã"
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-              options={wardDrop}
-              onChange={(value) => {
-                setSelectWard(wards.find((ward) => ward.id === value) || null);
-                setWardError(null);
-              }}
-              className="REM"
-              disabled={!selectDistrict}
-              value={selectWard?.id}
-            />
-            {wardError && (
-              <span className="text-red-500 mt-16 pt-2 absolute italic">
-                {wardError}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-col gap-1 w-full mt-10">
-          <h3 className="font-semibold flex flex-row gap-2">
-            Địa chỉ cụ thể (Số nhà, tên đường) <p className="text-red-500">*</p>
-          </h3>
-          <input
-            type="text"
-            placeholder="Ví dụ: 123/32 Hòa Bình"
-            className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"
-            onChange={(e) => {
-              setDetailAddress(e.target.value);
-              setDetailAddressError(null);
-            }}
-          />
-          {detailAddressError && (
-            <span className="text-red-500 mt-16 pt-2 absolute italic">
-              {detailAddressError}
-            </span>
-          )}
-        </div>
 
-        <div className="w-full flex justify-end gap-3 mt-4">
-          <button
-            className="font-semibold px-3 py-2 rounded-md hover:opacity-75 duration-200"
-            onClick={handleClose}
-          >
-            HỦY
-          </button>
-          <button
-            className="font-semibold px-5 py-2 text-white bg-black rounded-md hover:opacity-75 duration-200"
-            onClick={handleSubmitAddress}
-          >
-            XÁC NHẬN
-          </button>
+          <div className="w-full flex justify-end gap-3 mt-4">
+            <button
+              className="font-semibold px-3 py-2 rounded-md hover:opacity-75 duration-200"
+              onClick={handleClose}
+            >
+              HỦY
+            </button>
+            <button
+              className="font-semibold px-5 py-2 text-white bg-black rounded-md hover:opacity-75 duration-200"
+              onClick={handleSubmitAddress}
+            >
+              XÁC NHẬN
+            </button>
+          </div>
         </div>
-      </div>
-    </Modal>
+      </Modal>
+    </>
   );
 };
 

@@ -14,6 +14,8 @@ import { privateAxios } from "../../../middleware/axiosInstance";
 import styles from "./style.module.css";
 import { Deposit } from "../../../common/interfaces/deposit.interface";
 import DeliveryAddressModal from "./DeliveryAddressModal";
+import Stage5 from "./Stage5";
+import SuccessfulModal from "./SuccessfulModal";
 
 export default function ProgressSection({
   exchangeOffer,
@@ -31,10 +33,14 @@ export default function ProgressSection({
   const [isDeliveryModal, setDeliveryModal] = useState<boolean>(false);
   const exchangeRequest: ExchangeRequest = exchangeOffer.exchangeRequest;
   const [isDepositModal, setIsDepositModal] = useState<boolean>(false);
+  const [isSuccessfulModal, setSuccessfulModal] = useState<boolean>(false);
+  const [isProblemModal, setIsProblemModal] = useState<boolean>(false);
   const firstUser =
     exchangeOffer.user.id === userId
       ? exchangeOffer.user
       : exchangeRequest.user;
+  const currentUser = exchangeOffer.user.id === userId ? "offer" : "request";
+  console.log(currentUser);
 
   const secondUser =
     exchangeOffer.user.id !== userId
@@ -54,9 +60,9 @@ export default function ProgressSection({
   const getUserCurrentStage = (stage: number) => {
     switch (stage) {
       case 1:
-        return "Đang tiến hành đặt cọc";
-      case 2:
         return "Đang ghi nhận thông tin giao hàng";
+      case 2:
+        return "Đang tiến hành đặt cọc";
       case 3:
         return "Đang chờ giao truyện";
       case 4:
@@ -68,6 +74,34 @@ export default function ProgressSection({
     setIsLoading(true);
 
     try {
+      const deliveryRequestInformation = await privateAxios
+        .get(`/deliveries/exchange-request/${exchangeRequest.id}`)
+        .then((res) => {
+          return res.data;
+        })
+        .catch((err) => console.log(err));
+      console.log(deliveryRequestInformation);
+
+      const deliveryOfferInformation = await privateAxios
+        .get(`/deliveries/exchange-offer/${exchangeOffer.id}`)
+        .then((res) => {
+          return res.data;
+        })
+        .catch((err) => console.log(err));
+      if (deliveryRequestInformation && deliveryRequestInformation.length > 0) {
+        if (currentUser === "request") {
+          setFirstCurrentStage(2);
+        } else {
+          setSecondCurrentStage(2);
+        }
+      }
+      if (deliveryOfferInformation && deliveryOfferInformation.length > 0) {
+        if (currentUser === "offer") {
+          setFirstCurrentStage(2);
+        } else {
+          setSecondCurrentStage(2);
+        }
+      }
       const exchangeDeposits = await privateAxios
         .get(`deposits/exchange-request/${exchangeRequest.id}`)
         .then((res) => {
@@ -81,7 +115,7 @@ export default function ProgressSection({
             (deposit: Deposit) => deposit.user.id === firstUser.id
           )
         ) {
-          setFirstCurrentStage(2);
+          setFirstCurrentStage(3);
         }
 
         if (
@@ -89,7 +123,7 @@ export default function ProgressSection({
             (deposit: Deposit) => deposit.user.id === secondUser.id
           )
         ) {
-          setSecondCurrentStage(2);
+          setSecondCurrentStage(3);
         }
       }
     } catch (err) {
@@ -155,7 +189,17 @@ export default function ProgressSection({
               >
                 <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
               </svg>
-              <Stage4 currentStage={secondCurrentStage} />
+              <Stage4 currentStage={firstCurrentStage} />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path>
+              </svg>
+              <Stage5 currentStage={firstCurrentStage} />
             </div>
           </div>
 
@@ -237,6 +281,16 @@ export default function ProgressSection({
                 <path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path>
               </svg>
               <Stage4 currentStage={secondCurrentStage} />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path>
+              </svg>
+              <Stage5 currentStage={secondCurrentStage} />
             </div>
           </div>
         </div>
@@ -248,6 +302,7 @@ export default function ProgressSection({
           setIsExpanded={setIsExpanded}
           onShowModal={handleShowDepositModal}
           handleShowDeliveryModal={handleShowDeliveryModal}
+          setSuccessfulModal={setSuccessfulModal}
         />
         {exchangeRequest.depositAmount && (
           <PlaceDepositModal
@@ -271,9 +326,15 @@ export default function ProgressSection({
           <DeliveryAddressModal
             isDeliveryModal={isDeliveryModal}
             setDeliveryModal={setDeliveryModal}
-            exchangeRequest={exchangeRequest}
+            exchangeOffer={exchangeOffer}
+            currentUser={currentUser}
+            setFirstCurrentStage={setFirstCurrentStage}
           />
         )}
+        <SuccessfulModal
+          isSuccessfulModal={isSuccessfulModal}
+          setSuccessfulModal={setSuccessfulModal}
+        />
       </div>
     );
   else
@@ -316,6 +377,7 @@ export default function ProgressSection({
           setIsExpanded={setIsExpanded}
           onShowModal={handleShowDepositModal}
           handleShowDeliveryModal={handleShowDeliveryModal}
+          setSuccessfulModal={setSuccessfulModal}
         />
         {exchangeRequest.depositAmount ? (
           <PlaceDepositModal
@@ -343,9 +405,15 @@ export default function ProgressSection({
           <DeliveryAddressModal
             isDeliveryModal={isDeliveryModal}
             setDeliveryModal={setDeliveryModal}
-            exchangeRequest={exchangeRequest}
+            exchangeOffer={exchangeOffer}
+            currentUser={currentUser}
+            setFirstCurrentStage={setFirstCurrentStage}
           />
         )}
+        <SuccessfulModal
+          isSuccessfulModal={isSuccessfulModal}
+          setSuccessfulModal={setSuccessfulModal}
+        />
       </div>
     );
 }

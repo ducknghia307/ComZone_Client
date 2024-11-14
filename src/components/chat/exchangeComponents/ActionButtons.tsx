@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export default function ActionButtons({
   currentStage,
   oppositeCurrentStage,
@@ -5,6 +7,7 @@ export default function ActionButtons({
   isExpanded,
   setIsExpanded,
   handleShowDeliveryModal,
+  setSuccessfulModal,
 }: {
   currentStage: number;
   oppositeCurrentStage: number;
@@ -12,6 +15,7 @@ export default function ActionButtons({
   handleShowDeliveryModal: () => void;
   isExpanded: boolean;
   setIsExpanded: Function;
+  setSuccessfulModal: Dispatch<SetStateAction<boolean>>;
 }) {
   const getButton = () => {
     if (currentStage > oppositeCurrentStage)
@@ -25,7 +29,6 @@ export default function ActionButtons({
         return "Thêm thông tin giao hàng";
       case 2:
         return "Tiến hành đặt cọc";
-      case 3:
       case 4:
     }
   };
@@ -45,13 +48,26 @@ export default function ActionButtons({
 
   return (
     <div className="relative w-full flex flex-col items-stretch justify-center px-2 mt-1">
-      <button
-        className="w-full bg-gray-600 font-semibold text-white py-2 border hover:border-gray-900 rounded-lg duration-300 hover:bg-white hover:text-black"
-        onClick={handleButtonTrigger}
-      >
-        {getButton()}
-      </button>
-
+      {currentStage === 3 ? (
+        <div className="flex items-stretch gap-2">
+          <button className="basis-1/3 min-w-max py-2 rounded-lg bg-red-700 text-white hover:opacity-80 duration-200">
+            Gặp vấn đề khi nhận hàng
+          </button>
+          <button
+            className="grow py-2 rounded-lg bg-gray-600  text-white hover:opacity-80 duration-200"
+            onClick={() => setSuccessfulModal(true)}
+          >
+            Đã nhận thành công
+          </button>
+        </div>
+      ) : (
+        <button
+          className="w-full bg-gray-600 font-semibold text-white py-2 border hover:border-gray-900 rounded-lg duration-300 hover:bg-white hover:text-black"
+          onClick={handleButtonTrigger}
+        >
+          {getButton()}
+        </button>
+      )}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="absolute bottom-[-70%] left-1/2 translate-x-[-50%] p-1 rounded-full drop-shadow-lg bg-gray-50 duration-200 transition-all hover:bg-gray-100 z-10"

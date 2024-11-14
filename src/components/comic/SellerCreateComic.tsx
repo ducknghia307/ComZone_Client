@@ -4,6 +4,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { Button, Typography } from "@mui/material";
+import { message, notification } from "antd";
+import Loading from "../loading/Loading";
 
 interface Genre {
   id: string;
@@ -15,8 +17,9 @@ const SellerCreateComic: React.FC = () => {
     title: "",
     author: "",
     genre: [] as Genre[], // Specify the type of genre here
-    price: "",
+    price: 0,
     quantity: "",
+    episodesList: [],
     description: "",
     publishedDate: null,
     edition: "", // New field
@@ -28,6 +31,8 @@ const SellerCreateComic: React.FC = () => {
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [contentImages, setContentImages] = useState<string[]>([]);
   const [isSeries, setIsSeries] = useState(false);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -64,9 +69,10 @@ const SellerCreateComic: React.FC = () => {
       title: "",
       author: "",
       genre: [],
-      price: "",
+      price: 0,
       quantity: "",
       description: "",
+      episodesList: [],
       publishedDate: null,
       edition: "", // New field
       condition: "", // New field
@@ -113,27 +119,41 @@ const SellerCreateComic: React.FC = () => {
         contentFormData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-      alert("Content images uploaded successfully!");
       return {
         coverImageUrls,
         previewChapterUrls: contentResponse.data.imageUrls,
       };
     } catch (error) {
       console.error("Error uploading images:", error);
-      alert("Failed to upload images. Please try again.");
+      message.error("Không thể tải ảnh lên!", 5);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!coverImage) {
-      alert("Both cover and back images must be provided.");
-      return; // Exit early
+      message.warning({
+        key: "image-warning",
+        content: "Yêu cầu phải thêm ảnh bìa và ảnh nội dung!",
+        duration: 5,
+      });
+      return;
     }
 
+    if (formData.episodesList.length > parseInt(formData.quantity)) {
+      message.warning({
+        key: "quantity-warning",
+        content:
+          "Số lượng số tập, tên tập lớn hơn số lượng cuốn trong bộ truyện!",
+        duration: 5,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
     const response = await handleUpload(coverImage, contentImages);
-    console.log("RESPONSE", response);
-    // Prepare data to send
+
     const comicData = {
       genreIds: formData.genre.map((g) => g.id),
       title: formData.title,
@@ -141,75 +161,77 @@ const SellerCreateComic: React.FC = () => {
       description: formData.description,
       coverImage: response?.coverImageUrls,
       previewChapter: response?.previewChapterUrls,
-      price: parseFloat(formData.price) || 0,
+      price: formData.price || 0,
       quantity: isSeries ? parseInt(formData.quantity) || 1 : 1,
+      episodesList: isSeries ? formData.episodesList : null,
       edition: formData.edition,
       condition: formData.condition,
-      page: parseInt(formData.page) || 0,
+      page: parseInt(formData.page) || null,
       publishedDate: formData.publishedDate,
     };
 
-    console.log("Comic Data to Send:", comicData);
-
-    // Send data to API
     privateAxios
       .post("/comics", comicData)
       .then((response) => {
         console.log("Comic Created:", response.data);
-        alert("Truyện mới đã được thêm thành công!");
-        navigate("/sellermanagement");
+        notification.success({
+          key: "success",
+          message: "Tạo truyện mới thành công",
+          description:
+            "Truyện đã được thêm vào danh sách truyện của bạn. Bạn có thể bắt đầu bán trong phần quản lý truyện.",
+          duration: 8,
+        });
+        navigate("/sellermanagement/comic");
       })
       .catch((error) => {
         console.error("Error creating comic:", error);
-        alert("Đã có lỗi xảy ra khi thêm truyện.");
+        notification.error({
+          message: "Đã có lỗi xảy ra khi thêm truyện.",
+          duration: 5,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
   return (
-    <div className="form-container">
-      <div className="create-comic-form">
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            margin: "5px",
-          }}
-        >
-          <ArrowBackIcon
-            sx={{ fontSize: "40px", cursor: "pointer" }}
-            onClick={() => navigate("/sellermanagement/comic")}
-          />
-          <Typography
-            sx={{
-              paddingBottom: "35px",
-              color: "#000",
-              fontWeight: "bold",
-              marginLeft:"120px"
-            }}
-            variant="h4"
-            className="form-title"
-          >
-            {isSeries ? "THÊM BỘ TRUYỆN" : "THÊM TRUYỆN"}
-          </Typography>
-          <Button variant="outlined" onClick={toggleFormType}>
-            {isSeries ? "Thêm Truyện" : "Thêm Bộ Truyện"}
-          </Button>
-        </div>
-
-        <ComicForm
-        isSeries={isSeries}
-          formData={formData}
-          setFormData={setFormData}
-          genres={genres}
-          coverImage={coverImage}
-          setCoverImage={setCoverImage}
-          contentImages={contentImages}
-          setContentImages={setContentImages}
-          handleGenreChange={handleGenreChange}
-          handleSubmit={handleSubmit}
+    <div className="flex flex-col items-stretch px-8">
+      {isLoading && <Loading />}
+      <div className="xl:w-2/3 w-full flex items-center justify-between mx-auto">
+        <ArrowBackIcon
+          sx={{ fontSize: "40px", cursor: "pointer" }}
+          onClick={() => navigate("/sellermanagement/comic")}
         />
+        <Typography
+          sx={{
+            paddingBottom: "35px",
+            color: "#000",
+            fontWeight: "bold",
+            marginLeft: "120px",
+          }}
+          variant="h4"
+          className="form-title"
+        >
+          {isSeries ? "THÊM BỘ TRUYỆN" : "THÊM TRUYỆN"}
+        </Typography>
+        <Button variant="outlined" onClick={toggleFormType}>
+          {isSeries ? "Thêm Truyện" : "Thêm Bộ Truyện"}
+        </Button>
       </div>
+
+      <ComicForm
+        isSeries={isSeries}
+        formData={formData}
+        setFormData={setFormData}
+        genres={genres}
+        coverImage={coverImage}
+        setCoverImage={setCoverImage}
+        contentImages={contentImages}
+        setContentImages={setContentImages}
+        handleGenreChange={handleGenreChange}
+        handleSubmit={handleSubmit}
+      />
     </div>
   );
 };

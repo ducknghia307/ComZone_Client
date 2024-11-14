@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Comic, UserInfo } from "../../common/base.interface";
 import { useNavigate, useParams } from "react-router-dom";
-import { privateAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ComicsImages from "./comicDetails/ComicsImages";
 import ComicsMainInfo from "./comicDetails/ComicsMainInfo";
 import ComZonePros from "./comicDetails/ComZonePros";
@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { message } from "antd";
 import { callbackUrl } from "../../redux/features/navigate/navigateSlice";
 import ChatModal from "../../pages/ChatModal";
+import { SellerFeedback } from "../../common/interfaces/seller-feedback.interface";
 
 export default function ComicsDetailTemp() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
@@ -24,20 +25,18 @@ export default function ComicsDetailTemp() {
   const [imageList, setImageList] = useState<string[]>([]);
   const [currentImage, setCurrentImage] = useState<string>("");
   const [sellerDetails, setSellerDetails] = useState();
-  const [feedbackList, setFeedbackList] = useState();
+  const [feedbackList, setFeedbackList] = useState<SellerFeedback[]>([]);
+  const [totalFeedback, setTotalFeedback] = useState<number>(0);
   const [comicsListFromSeller, setComicsListFromSeller] = useState<
     Comic[] | []
   >([]);
   const [hasMore, setHasMore] = useState(true);
-  // const accessToken = useAppSelector((state) => state.auth.accessToken);
   const dispatch = useAppDispatch();
   const [userInfo, setUserInfo] = useState<UserInfo>();
-  // const [recommendedList, setRecommendedList] = useState<Comic[] | []>([]);
   const [isInCart, setIsInCart] = useState<boolean>(false);
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const { id } = useParams();
-  // const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
@@ -59,6 +58,7 @@ export default function ComicsDetailTemp() {
       })
       .catch((err) => console.log(err));
   };
+
   const fetchUserInfo = async () => {
     try {
       const res = await privateAxios("/users/profile");
@@ -67,6 +67,19 @@ export default function ComicsDetailTemp() {
       console.log("Error to fetch user information:", error);
     }
   };
+
+  const fetchSellerFeedback = async () => {
+    await publicAxios
+      .get(`seller-feedback/seller/some/${seller?.id}`)
+      .then((res) => {
+        if (res.data.length > 0) {
+          setFeedbackList(res.data[0]);
+          setTotalFeedback(res.data[1]);
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+
   const checkIsInCart = () => {
     const cartKey = "cart";
     const userId = userInfo?.id;
@@ -137,7 +150,9 @@ export default function ComicsDetailTemp() {
   useEffect(() => {
     fetchUserInfo();
     fetchCurrentComics();
-  }, [id]);
+    fetchSellerFeedback();
+  }, [id, seller]);
+
   useEffect(() => {
     if (userInfo) {
       checkIsInCart();
@@ -188,6 +203,7 @@ export default function ComicsDetailTemp() {
                 <SellerFeedbackSection
                   seller={seller}
                   feedbackList={feedbackList}
+                  totalFeedback={totalFeedback}
                 />
               </div>
             </div>

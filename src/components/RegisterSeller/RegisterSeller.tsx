@@ -7,7 +7,11 @@ import { UserInfo } from "../../common/base.interface";
 import RegisterSellerSuccess from "./RegisterSellerSuccess";
 import { useNavigate } from "react-router-dom";
 
-const RegisterSeller: React.FC = () => {
+const RegisterSeller = ({
+  setIsRegisterSellerModal,
+}: {
+  setIsRegisterSellerModal: Function;
+}) => {
   const [current, setCurrent] = useState(0);
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [otp, setOtp] = useState("");
@@ -20,7 +24,7 @@ const RegisterSeller: React.FC = () => {
   const [phone, setPhone] = useState<string>("");
   const [district, setDistrict] = useState<number | null>(null);
   const [province, setProvince] = useState<number | null>(null);
-  const [ward, setWard] = useState<number | null>(null);
+  const [ward, setWard] = useState<string | null>(null);
   const [detailedAddress, setDetailedAddress] = useState<string>("");
 
   const validateAddress = (isValid: boolean) => {
@@ -39,6 +43,10 @@ const RegisterSeller: React.FC = () => {
 
   const handleSendOtp = () => {
     if (phone) {
+      if (phone.length !== 10 || phone.charAt(0) !== "0")
+        message.warning(
+          "Số điện thoại không hợp lệ! Số điện thoại phải có đúng 10 số."
+        );
       setOtpSent(true);
     } else {
       message.warning("Bạn cần nhập số điện thoại để gửi mã xác thực OTP!");
@@ -56,6 +64,7 @@ const RegisterSeller: React.FC = () => {
         } else {
           message.error("Mã xác thực không hợp lệ. Vui lòng kiểm tra lại.");
         }
+        setOtp("");
       }
     } else if (current === 1) {
       if (!isAddressComplete) {
@@ -75,7 +84,7 @@ const RegisterSeller: React.FC = () => {
   const items = [
     {
       key: "Thông tin Người bán",
-      title: <span className="whitespace-nowrap">Thông tin Người bán</span>,
+      title: <span className="whitespace-nowrap">Thông tin người bán</span>,
     },
     {
       key: "Cài đặt vận chuyển",
@@ -144,6 +153,8 @@ const RegisterSeller: React.FC = () => {
         "Đã xảy ra lỗi khi đăng ký thông tin người bán. Vui lòng thử lại."
       );
       console.error("Error posting seller details:", error);
+    } finally {
+      setIsRegisterSellerModal(false);
     }
   };
 
@@ -155,15 +166,22 @@ const RegisterSeller: React.FC = () => {
           items={items}
           labelPlacement="vertical"
           progressDot
-          className="w-2/3"
         />
       </div>
       <div className="w-full">{steps[current].content}</div>
       <div className="flex w-full items-center justify-center">
-        <div className="mt-6 flex flex-row items-center justify-end w-full h-10">
+        <div className="mt-6 flex flex-row items-center justify-end w-full h-10 gap-4">
+          {current > 0 && (
+            <button
+              className="px-8 py-2 rounded-lg bg-white text-black duration-200 hover:opacity-70 border border-black"
+              onClick={prev}
+            >
+              Quay lại
+            </button>
+          )}
           {current < steps.length - 1 && (
             <button
-              className="px-4 py-2 rounded-lg bg-black text-white duration-200 hover:opacity-70"
+              className="px-16 py-2 rounded-lg bg-black text-white duration-200 hover:opacity-70"
               onClick={next}
             >
               Tiếp theo
@@ -171,18 +189,10 @@ const RegisterSeller: React.FC = () => {
           )}
           {current === steps.length - 1 && (
             <button
-              className="px-4 py-2 rounded-lg bg-black text-white duration-200 hover:opacity-70"
+              className="px-16 py-2 rounded-lg bg-green-700 text-white duration-200 hover:opacity-70"
               onClick={handleFinish} // Call handleFinish when "Hoàn thành" is clicked
             >
               Hoàn thành
-            </button>
-          )}
-          {current > 0 && (
-            <button
-              className="px-4 py-2 rounded-lg bg-white text-black duration-200 hover:opacity-70 border border-black ml-4"
-              onClick={prev}
-            >
-              Quay lại
             </button>
           )}
         </div>

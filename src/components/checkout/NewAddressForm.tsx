@@ -15,7 +15,7 @@ import { privateAxios } from "../../middleware/axiosInstance";
 import { LoadingOutlined } from "@ant-design/icons";
 
 interface UserComponentProps {
-  userInfo: UserInfo;
+  userInfo?: UserInfo;
   onClose: () => void;
   refreshAddresses: () => void;
 }
@@ -33,8 +33,8 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
   const [wards, setWards] = useState<Ward[]>([]);
   const [wardDrop, setWardDrop] = useState<WardDrop[]>([]);
   const [selectWard, setSelectWard] = useState<Ward | null>(null); //
-  const [name, setName] = useState(userInfo.name);
-  const [phone, setPhone] = useState<string>(userInfo.phone || "");
+  const [name, setName] = useState(userInfo?.name);
+  const [phone, setPhone] = useState<string>(userInfo?.phone || "");
   const [detailAddress, setDetailAddress] = useState("");
   const [isDefault, setIsDefault] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
@@ -155,8 +155,8 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
       setNameError(null);
     }
 
-    if (!phone || !/^\d{10,11}$/.test(phone)) {
-      setPhoneError("Số điện thoại phải đủ 10 số.");
+    if (!phone || !/^\d{10}$/.test(phone)) {
+      setPhoneError("Số điện thoại phải chứa đúng 10 số.");
       isValid = false;
     } else {
       setPhoneError(null);
@@ -280,7 +280,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
               placeholder="Ví dụ: 0987XXXXXX"
               value={phone}
               onChange={(e) => {
-                setPhone(e.target.value);
+                if (e.target.value.length < 11) setPhone(e.target.value);
                 setPhoneError(null);
               }}
               className="placeholder-gray-400 font-light border border-black px-2 py-3 rounded-xl w-full"

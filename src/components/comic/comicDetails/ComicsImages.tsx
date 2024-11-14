@@ -1,6 +1,6 @@
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Modal } from "antd";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
@@ -55,17 +55,16 @@ export default function ComicsImages({
   };
 
   return (
-    <>
+    <div className="min-w-[15em] w-[20em] gap-2">
       <div className="w-full bg-white flex flex-col items-center justify-center rounded-xl py-2 drop-shadow-md top-4 sticky">
         <div
-          className="w-5/6 p-2 flex justify-center max-w-[20em] cursor-pointer"
+          className="w-full px-2 pb-4 flex justify-center cursor-pointer"
           onClick={() => setIsModalOpen(true)}
         >
-          <img
-            src={currentImage}
-            alt=""
-            className="w-full object-cover border min-h-[30em] max-h-[30em]"
-          />
+          <span
+            className="w-full h-[30em] bg-cover bg-no-repeat bg-center rounded-lg"
+            style={{ backgroundImage: `url(${currentImage})` }}
+          ></span>
         </div>
         <div className="flex justify-between items-center w-full max-w-[25rem] px-4">
           {imageList.length > 4 && (
@@ -176,6 +175,6 @@ export default function ComicsImages({
           </div>
         </div>
       </Modal>
-    </>
+    </div>
   );
 }

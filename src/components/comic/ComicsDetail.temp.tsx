@@ -168,25 +168,23 @@ export default function ComicsDetailTemp() {
     <>
       {contextHolder}
       <div className="REM min-h-[200vh] bg-gray-100 pb-8">
-        <div className="flex flex-col justify-start items-center gap-4 px-4 pt-4 pb-8 relative">
+        <div className="flex flex-col justify-start items-center gap-4 pt-4 pb-8 relative">
           <div className="w-full flex items-start justify-center gap-4 relative">
             <div className="w-2/3 max-w-[80em] flex flex-col justify-end gap-4 relative">
               <div className="w-full flex justify-center gap-4">
-                <div className="grow min-w-[10em] max-w-[20em] gap-2">
-                  <ComicsImages
-                    currentImage={currentImage}
-                    setCurrentImage={setCurrentImage}
-                    imageList={imageList}
-                  />
-                </div>
-                <div className="grow min-w-[20em] max-w-[45em] flex flex-col gap-2">
+                <ComicsImages
+                  currentImage={currentImage}
+                  setCurrentImage={setCurrentImage}
+                  imageList={imageList}
+                />
+                <div className="grow min-w-[20em] flex flex-col gap-2">
                   <ComicsMainInfo currentComics={currentComics} />
                   <ComZonePros />
                   <ComicsDetailedInfo currentComics={currentComics} />
                   <ComicsDescription currentComics={currentComics} />
                 </div>
               </div>
-              <div className="flex justify-start">
+              <div className="flex justify-start max-w-[80em]">
                 <SellerFeedbackSection
                   seller={seller}
                   feedbackList={feedbackList}
@@ -208,14 +206,14 @@ export default function ComicsDetailTemp() {
             </div>
           </div>
 
-          <div className="w-full max-w-[122em] px-4">
+          <div className="w-full max-w-[123em] px-4">
             <OtherComicsFromSeller
               seller={seller}
               comicsListFromSeller={comicsListFromSeller}
             />
           </div>
 
-          <div className="w-full max-w-[122em] px-8">
+          <div className="w-full max-w-[125em] px-8">
             <RecommendedComicsList
               comicsList={comicsListFromSeller}
               fetchMoreData={fetchCurrentComics}

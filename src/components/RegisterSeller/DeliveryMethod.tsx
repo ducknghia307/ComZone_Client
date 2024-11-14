@@ -13,7 +13,7 @@ interface DeliveryMethodProps {
   validateAddress: (isValid: boolean) => void;
   setDistrict: (district: number) => void;
   setProvince: (province: number) => void;
-  setWard: (ward: number) => void;
+  setWard: (ward: string) => void;
   setDetailedAddress: (address: string) => void;
 }
 const DeliveryMethod: React.FC<DeliveryMethodProps> = ({
@@ -142,6 +142,16 @@ const DeliveryMethod: React.FC<DeliveryMethodProps> = ({
 
   return (
     <div className="p-4 bg-white rounded-md">
+      <div className="flex flex-col items-start justify-start gap-1">
+        <p className="text-lg font-semibold">NHẬP THÔNG TIN GIAO HÀNG</p>
+        <p className="font-light text-xs">
+          Địa chỉ nơi thuận tiện nhất của bạn để dịch vụ giao hàng của chúng tôi
+          có thể đến lấy truyện và tiến hành giao hàng.
+        </p>
+        <p className="text-xs font-light italic text-red-600">
+          Lưu ý: Chỉ ghi nhận 1 địa chỉ duy nhất.
+        </p>
+      </div>
       <div className="flex flex-row w-full gap-5 mt-8">
         <div className="flex flex-col gap-1 w-full">
           <h3 className="font-semibold flex flex-row gap-2">

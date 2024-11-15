@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import { privateAxios } from "../middleware/axiosInstance";
 
 const socket = io("http://localhost:3000", {
   autoConnect: false, // Delay connection until explicitly connected
@@ -12,6 +13,7 @@ export const connectSocket = () => {
 
 socket.on("connect", () => {
   console.log("Socket connected:", socket.id);
+  privateAxios.patch("users/active-status/online");
 });
 
 socket.on("disconnect", () => {

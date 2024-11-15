@@ -100,8 +100,8 @@ export default function SelectOfferComicsModal({
       width={1000}
       maskClosable={false}
     >
-      <div className="w-full lg:h-[40vh] py-4 flex flex-col items-stretch justify-between gap-4">
-        <div className="flex flex-col items-stretch gap-8">
+      <div className="w-full lg:h-[60vh] py-4 flex flex-col items-stretch justify-between gap-4">
+        <div className="flex flex-col items-stretch gap-4">
           <p className="text-[1.5em] font-semibold">
             Chọn truyện của bạn dùng để trao đổi:
           </p>
@@ -151,7 +151,57 @@ export default function SelectOfferComicsModal({
             </p>
           </div>
         </div>
+        <div className="flex flex-col items-stretch gap-4 border-t pt-3">
+          <p className="text-[1.5em] font-semibold">
+            Chọn truyện của <span>{exchangeRequest.user.name}</span> mà bạn muốn
+            trao đổi:
+          </p>
+          <p className="font-light italic">
+            Chọn những truyện của{" "}
+            <span className="font-semibold">{exchangeRequest.user.name}</span>{" "}
+            mà bạn muốn để trao đổi.
+          </p>
+          <Select
+            mode="multiple"
+            style={{ width: "100%" }}
+            placeholder="Chọn truyện..."
+            virtual={true}
+            allowClear={true}
+            size="large"
+            value={selectedComicsList}
+            options={selectOptionValues}
+            filterOption={(input, option) =>
+              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            }
+            optionRender={(option) => (
+              <div className="h-max flex items-center gap-2">
+                <img src={option.data.image} className="w-[2em] rounded-lg" />
+                <p>{option.data.label}</p>
+              </div>
+            )}
+            onSelect={(value: string) => {
+              setSelectedComicsList((prev) => [...prev, value]);
+            }}
+            onDeselect={(value: string) => {
+              const filtered = selectedComicsList.filter(
+                (comics) => comics !== value
+              );
+              setSelectedComicsList(filtered);
+            }}
+            onClear={() => setSelectedComicsList([])}
+          />
 
+          <div
+            className={`${
+              selectedComicsList.length === 0 && "hidden"
+            } flex items-center justify-between gap-2 text-lg`}
+          >
+            <p className="font-light">
+              Tổng số truyện được chọn:{" "}
+              <span className="font-semibold">{selectedComicsList.length}</span>
+            </p>
+          </div>
+        </div>
         <div className="flex items-center justify-end gap-8">
           <button
             onClick={(e) => handleModalClose(e)}

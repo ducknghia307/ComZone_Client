@@ -38,6 +38,12 @@ import ModAuctions from "../../pages/ModAuctions";
 import ModExchanges from "../../pages/ModExchanges";
 import ModDeposits from "../../pages/ModWallet";
 import ModFeedbacks from "../../pages/ModFeedbacks";
+import ExchangeWaiting from "../../pages/exchange/ExchangeWaiting";
+import ExchangeRequestSend from "../../pages/exchange/ExchangeRequestSend";
+import ExchangeDealing from "../../pages/exchange/ExchangeDealing";
+import ExchangeDelivering from "../../pages/exchange/ExchangeDelivering";
+import ExchangeSuccessful from "../../pages/exchange/ExchangeSuccessful";
+import ExchangeCancel from "../../pages/exchange/ExchangeCancel";
 
 const AppRouter = () => {
   return (
@@ -74,7 +80,16 @@ const AppRouter = () => {
           element={<SellerEditComicDetail />}
         />
         <Route path="/search" element={<Genres />} />
-        <Route path="/exchange" element={<ExchangeNewsFeed />} />
+        <Route path="/exchange-news-feed" element={<ExchangeNewsFeed />} />
+        <Route path="/exchange/waiting" element={<ExchangeWaiting />} />
+        <Route
+          path="/exchange/request-send"
+          element={<ExchangeRequestSend />}
+        />
+        <Route path="/exchange/dealing" element={<ExchangeDealing />} />
+        <Route path="/exchange/delivering" element={<ExchangeDelivering />} />
+        <Route path="/exchange/successful" element={<ExchangeSuccessful />} />
+        <Route path="/exchange/cancel" element={<ExchangeCancel />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/signin" element={<SignIn />} />

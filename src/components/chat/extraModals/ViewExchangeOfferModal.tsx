@@ -1,7 +1,7 @@
 import { Modal, notification, Tooltip } from "antd";
 import { ExchangeOffer } from "../../../common/interfaces/exchange-offer.interface";
 import { Comic } from "../../../common/base.interface";
-import styles from "../../exchange/style.module.css";
+import styles from "../../exchangeNewsFeed/style.module.css";
 import { useState } from "react";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
 import { privateAxios } from "../../../middleware/axiosInstance";

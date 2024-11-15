@@ -1,7 +1,7 @@
 import { Avatar, Collapse, Modal } from "antd";
 import { Comic } from "../../../common/base.interface";
 import { useState } from "react";
-import styles from "../../exchange/style.module.css";
+import styles from "../../exchangeNewsFeed/style.module.css";
 export default function Stage1({
   currentStage,
   comicsGroup,

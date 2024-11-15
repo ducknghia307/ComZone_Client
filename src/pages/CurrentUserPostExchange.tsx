@@ -5,7 +5,7 @@ import { UserInfo } from "../common/base.interface";
 import ProfileTab from "../components/Profile/ProfileTab";
 import Loading from "../components/loading/Loading";
 import { ExchangeRequest } from "../common/interfaces/exchange-request.interface";
-import ExchangePost from "../components/exchange/ExchangePost";
+import ExchangePost from "../components/exchangeNewsFeed/ExchangePost";
 
 const CurrentUserPostExchange = () => {
   const [userInfo, setUserInfo] = useState<UserInfo>();

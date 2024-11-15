@@ -155,7 +155,7 @@ export default function ExchangePost({
 
         <p className="pl-2 py-4">{exchangeRequest.postContent}</p>
 
-        <div
+        {/* <div
           ref={index === tourIndex ? refs[0] : null}
           className={`${
             exchangeRequest.requestComics.length === 0 && "hidden"
@@ -186,7 +186,7 @@ export default function ExchangePost({
                 );
               })}
           </div>
-        </div>
+        </div> */}
       </div>
       <Modal
         title="Basic Modal"

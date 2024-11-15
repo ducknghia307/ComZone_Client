@@ -7,6 +7,7 @@ import { ExchangeElement } from "../../common/interfaces/exchange-post.interface
 import { UserInfo } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
 import Loading from "../loading/Loading";
+import { PictureOutlined } from "@ant-design/icons";
 
 export default function CreatePostModal({
   openCreatePost,
@@ -137,9 +138,9 @@ export default function CreatePostModal({
         width={1000}
       >
         <h2 className="text-xl font-medium my-4">
-          ĐĂNG BÀI YÊU CẦU TRAO ĐỔI TRUYỆN
+          ĐĂNG BÀI TÌM KIẾM TRUYỆN ĐỂ TRAO ĐỔI
         </h2>
-        {userInfo && (
+        {/* {userInfo && (
           <ComicListToExchange
             comicList={comicList}
             setComicList={setComicList}
@@ -158,7 +159,7 @@ export default function CreatePostModal({
             setComicList={setComicList}
             userInfo={userInfo}
           />
-        )}
+        )} */}
         <div className="flex flex-row gap-1 mt-4">
           <h2>Nội dung bài viết:</h2>
           <p className="text-red-500">*</p>
@@ -173,11 +174,31 @@ export default function CreatePostModal({
           autoSize={{ minRows: 3, maxRows: 5 }}
           className="mt-2 p-3"
         />
+        <p className="text-sm italic text-green-600 mt-2">
+          Hãy mô tả chi tiết truyện của bạn. Việc mô tả càng chi tiết sẽ giúp
+          người khác hiểu rõ hơn về điều bạn mong muốn.
+        </p>
         {postContentError && (
           <p className="text-red-500 text-xs mt-1">
             Cần nhập nội dung bài đăng
           </p>
         )}
+        <div className="flex mt-4"></div>
+        <button
+          className=" h-20 w-20 p-4 border bg-gray-100 hover:opacity-75 duration-200 rounded-lg flex flex-col items-center justify-center gap-2"
+          onClick={() =>
+            document.getElementById("previewChapterUpload")?.click()
+          }
+        >
+          <PictureOutlined />
+          <p className="text-nowrap">Thêm ảnh</p>
+          <input
+            type="file"
+            // onChange={handlePreviewChapterChange}
+            className="hidden"
+            id="previewChapterUpload"
+          />
+        </button>
         <div className="w-full flex justify-end mt-4 flex-row gap-10">
           <button
             className="border-none font-semibold hover:opacity-70 duration-200"

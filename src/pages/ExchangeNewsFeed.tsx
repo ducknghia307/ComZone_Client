@@ -1,19 +1,19 @@
-import ExchangePost from "../components/exchange/ExchangePost";
+import ExchangePost from "../components/exchangeNewsFeed/ExchangePost";
 import { Button, notification, Tour } from "antd";
 import type { TourProps } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
 import { ExchangeRequest } from "../common/interfaces/exchange-request.interface";
 import Loading from "../components/loading/Loading";
-import ExchangeSearchBar from "../components/exchange/ExchangeSearchBar";
-import CreatePostModal from "../components/exchange/CreatePostModal";
-import SubscriptionModal from "../components/exchange/SubscriptionModal";
+import ExchangeSearchBar from "../components/exchangeNewsFeed/ExchangeSearchBar";
+import CreatePostModal from "../components/exchangeNewsFeed/CreatePostModal";
+import SubscriptionModal from "../components/exchangeNewsFeed/SubscriptionModal";
 import "../components/ui/Exchange.css";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { useSearchParams } from "react-router-dom";
-import ExchangeNotFound from "../components/exchange/ExchangeNotFound";
+import ExchangeNotFound from "../components/exchangeNewsFeed/ExchangeNotFound";
 import ChatModal from "./ChatModal";
-import EmptyExchangeList from "../components/exchange/EmptyExchangeList";
+import EmptyExchangeList from "../components/exchangeNewsFeed/EmptyExchangeList";
 import { authSlice } from "../redux/features/auth/authSlice";
 
 export default function ExchangeNewsFeed() {
@@ -183,7 +183,7 @@ export default function ExchangeNewsFeed() {
       });
     } else {
       //FETCH USER'S EXCHANGE SUBSCRIPTION
-      setOpenSubscription(true);
+      setOpenCreatePost(true);
     }
   };
 
@@ -243,11 +243,11 @@ export default function ExchangeNewsFeed() {
             handleSearch={handleSearch}
           />
 
-          <SubscriptionModal
+          {/* <SubscriptionModal
             openSubscription={openSubscription}
             setOpenSubscription={setOpenSubscription}
             handleSelectSubscription={handleSelectSubscription}
-          />
+          /> */}
 
           <CreatePostModal
             openCreatePost={openCreatePost}

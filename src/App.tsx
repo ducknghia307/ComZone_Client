@@ -1,9 +1,28 @@
+import React, { useEffect } from "react";
+
 import Navbar from "./components/navbar/Navbar";
 import AppRouter from "./components/appRouter/AppRouter";
 import Footer from "./components/footer/Footer";
 import { ConfigProvider } from "antd";
+import socket, { connectSocket } from "./services/socket";
+import { useAppSelector } from "./redux/hooks";
 
 function App() {
+  // Get accessToken and userId from the Redux store
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+  const userId = useAppSelector((state) => state.auth.userId);
+
+  useEffect(() => {
+    if (accessToken && userId) {
+      connectSocket();
+    }
+    socket.emit("joinRoom", userId);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [accessToken, userId]); // Run this effect only when accessToken or userId changes
+
   return (
     <ConfigProvider
       theme={{

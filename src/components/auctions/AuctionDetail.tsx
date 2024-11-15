@@ -4,19 +4,19 @@ import "../ui/AuctionDetail.css";
 import { Avatar, Button, Chip, Divider, Typography } from "@mui/material";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import { useParams } from "react-router-dom";
-import { publicAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ComicsDescription from "../comic/comicDetails/ComicsDescription";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import socket from "../../services/socket";
+import socket, { connectSocket } from "../../services/socket";
 import { setAuctionData } from "../../redux/features/auction/auctionSlice";
 import CountdownFlipNumbers from "./CountDown";
 import CountUp from "react-countup";
 import Loading from "../loading/Loading";
-import ConfettiExplosion from 'react-confetti-explosion';
-// import "antd/dist/antd.css";
+import ConfettiExplosion from "react-confetti-explosion";
 import { Modal } from "antd";
+import { io } from "socket.io-client";
+import { auctionAnnoucement } from "../../redux/features/notification/announcementSlice";
 
-// Countdown renderer function
 const ComicAuction = () => {
   const { id } = useParams<Record<string, string>>(); // Get ID from URL
   const [comic, setComic] = useState<any>(null);
@@ -28,46 +28,74 @@ const ComicAuction = () => {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [isBidDisabled, setIsBidDisabled] = useState(false);
-  const bidder = useAppSelector((state) => state.auth.userId);
+  const userId = useAppSelector((state) => state.auth.userId);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const auctionAnnouce = useAppSelector(
+    (state) => state.annoucement.auctionAnnounce
+  );
   const handleBidActionDisabled = (disabled: boolean) => {
     setIsBidDisabled(disabled);
   };
-  useEffect(() => {
-    setLoading(true);
-    if (auctionData.endTime) {
-      const endTimestamp = new Date(auctionData.endTime).getTime();
-      const now = Date.now();
-
-      if (now >= endTimestamp) {
-        setAuctionEnded(true); // Đấu giá đã kết thúc
-        setIsBidDisabled(true); // Vô hiệu hóa hành động đấu giá
-
-        // Kiểm tra nếu người dùng hiện tại là winner
-        if (bidder) {
-          setIsModalVisible(true);
-        }
-      }
-    }
-    setLoading(false)
-  }, [auctionData?.endTime, auctionData?.winnerId]);
 
   const handleModalClose = () => {
+    privateAxios
+      .post(`/announcements/${auctionAnnouce?.id}/read`)
+      .then(() => {
+        console.log("Announcement marked as read.");
+      })
+      .catch((error) => {
+        console.error("Error marking announcement as read:", error);
+      });
+
     setIsModalVisible(false);
   };
 
   const dispatch = useAppDispatch();
-  useEffect(() => {
-    console.log("Updated auctionData:", auctionData);
-  }, [auctionData]); // This will log auctionData every time it is updated
 
+  useEffect(() => {
+    fetchUnreadAnnouncementForAuction();
+  }, [auctionData]);
+
+  useEffect(() => {
+    if (socket && socket.connected) {
+      console.log("Socket connected, emitting joinRoom");
+      socket.emit("joinRoom", userId);
+    } else {
+      connectSocket(); // Ensure the socket is connected
+    }
+
+    socket.on("notification", (data) => {
+      dispatch(auctionAnnoucement(data));
+    });
+    socket.io.on("reconnect", () => {
+      console.log("Reconnected to the server");
+    });
+    // Clean up the listener on component unmount
+    return () => {
+      if (socket) {
+        socket.off("notification");
+      }
+    };
+  }, [userId, socket]);
+
+  const fetchUnreadAnnouncementForAuction = async () => {
+    try {
+      const response = await privateAxios.get(
+        `/announcements/auction/${auctionData.id}/unread`
+      );
+      if (response.data) {
+        dispatch(auctionAnnoucement(response.data));
+      }
+    } catch (error) {
+      console.error("Failed to fetch unread announcement:", error);
+    }
+  };
   useEffect(() => {
     const fetchComicDetails = async () => {
       try {
         const response = await publicAxios.get(`/auction/${id}`);
-        console.log(":", response.data);
         const comicData = response.data.comics;
-        setUsers(comicData.sellerId); // Assuming sellerId contains user details
+        setUsers(comicData.sellerId);
         setComic(comicData);
         setMainImage(comicData.coverImage);
         setPreviewChapter(comicData.previewChapter || []);
@@ -82,14 +110,30 @@ const ComicAuction = () => {
   }, [id]);
 
   useEffect(() => {
+    setLoading(true);
+    if (auctionData?.endTime) {
+      const endTimestamp = new Date(auctionData.endTime).getTime();
+      const now = Date.now();
+
+      if (now >= endTimestamp) {
+        setAuctionEnded(true);
+        setIsBidDisabled(true);
+
+        if (userId) {
+          setIsModalVisible(true);
+        }
+      }
+    }
+    setLoading(false);
+  }, [auctionData?.endTime, auctionData?.winnerId]);
+
+  useEffect(() => {
     socket.on("bidUpdate", (data: any) => {
-      // Update auction data with the new bid
       console.log("123123", data.placeBid.auction);
 
-      dispatch(setAuctionData(data.placeBid.auction)); // Dispatch to Redux
+      dispatch(setAuctionData(data.placeBid.auction));
     });
 
-    // Cleanup listener on component unmount
     return () => {
       socket.off("bidUpdate");
     };
@@ -102,57 +146,74 @@ const ComicAuction = () => {
   };
 
   const handleBidInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBidAmount(e.target.value); // Only update the bidAmount state
+    setBidAmount(e.target.value);
   };
 
   const handlePlaceBid = async () => {
     console.log("123");
-    // Create bid payload
+
     const bidPayload = {
       auctionId: auctionData.id,
-      userId: bidder,
+      userId: userId,
       price: parseFloat(bidAmount),
     };
 
-    // Emit bid data via socket
     socket.emit("placeBid", bidPayload);
-
-    try {
-      // If the bid is successful, update the state and make the API request
-      // dispatch(placeBid({ current_bid: bidPayload.price }));
-    } catch (error) {
-      console.error("Error placing bid:", error);
-    }
   };
-
   return (
     <div className="auction-wrapper">
-      {bidder && (
+      {auctionAnnouce && (
         <>
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            <ConfettiExplosion
-              force={0.8}
-              duration={5000}
-              particleCount={400}
-              width={1600}
-            />
-          </div>
+          {auctionAnnouce.status === "SUCCESSFUL" && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              <ConfettiExplosion
+                force={0.8}
+                duration={5000}
+                particleCount={400}
+                width={1600}
+              />
+            </div>
+          )}
           <Modal
-            title="🎉 Chúc Mừng!"
-            visible={isModalVisible}
+            title={`${auctionAnnouce?.title}`}
+            open={isModalVisible}
             onOk={handleModalClose}
             onCancel={handleModalClose}
             centered
-            okText="Tuyệt vời!"
             cancelButtonProps={{ style: { display: "none" } }}
             width={600}
-            bodyStyle={{ paddingTop: "10px", paddingBottom: "20px", fontSize: "18px", }}
-            okButtonProps={{ style: { color: "white", backgroundColor: "black", fontWeight: "bold", fontSize: "16px", }, }}
+            bodyStyle={{
+              paddingTop: "10px",
+              paddingBottom: "20px",
+              fontSize: "18px",
+            }}
+            okButtonProps={{
+              style: {
+                color: "white",
+                backgroundColor: "black",
+                fontWeight: "bold",
+                fontSize: "16px",
+              },
+            }}
           >
             <Typography
-              style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center", color: "green", lineHeight: "1.5", }}
+              style={{
+                fontSize: "20px",
+                fontWeight: "bold",
+                textAlign: "center",
+                color: auctionAnnouce.status === "SUCCESSFUL" ? "green" : "red",
+                lineHeight: "1.5",
+              }}
             >
-              Bạn là người thắng cuộc trong phiên đấu giá! 🎊
+              {auctionAnnouce?.message}{" "}
+              {auctionAnnouce.status === "SUCCESSFUL" ? "🎊" : ""}
             </Typography>
           </Modal>
         </>

@@ -41,16 +41,16 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
     });
   };
 
-  const declareWinner = async () => {
-    try {
-      const response = await publicAxios.get(
-        `/auction/declare-winner/${auctionId}`
-      );
-      console.log("Winner Declared:", response.data);
-    } catch (error) {
-      console.error("Error declaring winner:", error);
-    }
-  };
+  // const declareWinner = async () => {
+  //   try {
+  //     const response = await publicAxios.get(
+  //       `/auction/declare-winner/${auctionId}`
+  //     );
+  //     console.log("Winner Declared:", response.data);
+  //   } catch (error) {
+  //     console.error("Error declaring winner:", error);
+  //   }
+  // };
 
   useEffect(() => {
     setLoading(true);
@@ -66,7 +66,7 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         setAuctionEnded(true); // Đấu giá đã kết thúc
         onBidActionDisabled(true);
-        declareWinner(); // Call declareWinner when countdown ends
+        // declareWinner(); // Call declareWinner when countdown ends
         onBidActionDisabled?.(true); // Notify parent component to disable bidding
         return;
       }

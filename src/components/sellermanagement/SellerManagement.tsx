@@ -37,6 +37,8 @@ const SellerManagement = () => {
   const navigate = useNavigate();
 
   const handleAuction = (comic) => {
+    console.log('::::',comic);
+    
     setSelectedComic(comic); // Set the selected comic
     setIsModalVisible(true); // Show the modal
   };

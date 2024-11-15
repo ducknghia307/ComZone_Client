@@ -11,9 +11,11 @@ import {
 } from "antd";
 import moment, { Moment } from "moment";
 import dayjs from "dayjs";
+import { privateAxios } from "../../../middleware/axiosInstance";
 
 // Define types for the comic and props
 interface Comic {
+  id: string;
   coverImage: string;
   title: string;
   author: string;
@@ -44,10 +46,20 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
   const startTime = dayjs(form.getFieldValue("startTime"));
   // Handle form submission
   const handleSubmit = async (values: AuctionFormValues) => {
-    console.log(values); // Handle form submission logic
-    onSuccess(); // You can trigger any success action here
+    console.log('11',comic.id);
+    try {
+      const response = await privateAxios.post("/auction", {
+        ...values,
+        comicId: comic.id,
+        status:"ONGOING" // Add comic ID to the auction data
+      });
+      console.log(response.data);
+      onSuccess(); // Trigger success action after successful API call
+    } catch (error) {
+      console.error("Error during API call:", error);
+      // Handle any error state or show notification
+    }
   };
-
   // Custom validator to check that the end time is not more than 7 days after the start time
   const validateEndTime = (rule, value) => {
     const startTime = form.getFieldValue("startTime");

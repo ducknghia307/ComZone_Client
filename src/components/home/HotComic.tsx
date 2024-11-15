@@ -76,12 +76,11 @@ const HotComic: React.FC = () => {
           : await publicAxios.get("/comics/status/available"); // For guests
 
          const data = response.data;
-         console.log('12312312',data)
 
         const hotComics = data.filter(
           (comic: any) => comic.condition === "SEALED"
         );
-console.log('12312312',hotComics)
+
         setComics(hotComics);
       } catch (error) {
         console.error("Error fetching comics:", error);

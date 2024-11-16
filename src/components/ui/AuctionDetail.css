@@ -39,7 +39,6 @@
   z-index: 1;
 }
 
-
 .auction-container {
   padding: 30px 30px 0px 30px;
 }
@@ -75,13 +74,38 @@
 
 .small-images {
   display: flex;
-  flex-direction: column;
-  padding-left: 40px;
-  gap: 16px;
-  max-height: 600px;
-  width: 140px;
-  /* overflow-y: auto; */
-  padding-right: 5px;
+  flex-direction: column; /* Stack images vertically */
+  gap: 10px; /* Add space between the images */
+  max-height: 600px; /* Set a maximum height for the container */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 10px;
+  scrollbar-width: thin; /* For Firefox: make scrollbar thinner */
+  scrollbar-color: #cccccc transparent; /* For Firefox: style the scrollbar */
+}
+
+.small-images::-webkit-scrollbar {
+  width: 6px; /* Adjust the scrollbar width */
+}
+
+.small-images::-webkit-scrollbar-thumb {
+  background: #cccccc; /* Change the scrollbar color */
+  border-radius: 10px; /* Make the scrollbar round */
+}
+
+.small-images::-webkit-scrollbar-track {
+  background: transparent; /* Make the scrollbar track transparent */
+}
+
+.small-comic-image {
+  height: 100px; /* Adjust the height of the images */
+  width: auto; /* Maintain aspect ratio */
+  cursor: pointer;
+  border: 1px solid transparent; /* Optional: add border */
+  transition: border-color 0.3s; /* Smooth transition on hover */
+}
+
+.small-comic-image:hover {
+  border-color: #007bff; /* Highlight border on hover */
 }
 
 .small-comic-image {

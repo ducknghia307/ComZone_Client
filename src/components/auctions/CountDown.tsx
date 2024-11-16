@@ -4,16 +4,16 @@ import "../../components/ui/CountDown.css";
 import Grid from "@mui/material/Grid2";
 import { publicAxios } from "../../middleware/axiosInstance";
 import Loading from "../loading/Loading";
+import { useAppSelector } from "../../redux/hooks";
 
 interface CountdownFlipNumbersProps {
-  endTime: string;
-  auctionId: string; // Pass auctionId for the API call
+  auction: { id: string; status: string; endTime: string };
+
   onBidActionDisabled: (disabled: boolean) => void; // Optional prop to notify parent component
 }
 
 const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
-  endTime,
-  auctionId,
+  auction,
   onBidActionDisabled,
 }) => {
   const [timeLeft, setTimeLeft] = useState({
@@ -22,7 +22,7 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
     minutes: 0,
     seconds: 0,
   });
-
+  const auctionData = useAppSelector((state: any) => state.auction.auctionData);
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [loading, setLoading] = useState(true); // Loading state
 
@@ -41,21 +41,24 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
     });
   };
 
-  // const declareWinner = async () => {
-  //   try {
-  //     const response = await publicAxios.get(
-  //       `/auction/declare-winner/${auctionId}`
-  //     );
-  //     console.log("Winner Declared:", response.data);
-  //   } catch (error) {
-  //     console.error("Error declaring winner:", error);
-  //   }
-  // };
+  const declareWinner = async () => {
+    if (auction.status === "ONGOING") {
+      try {
+        const response = await publicAxios.get(
+          `/auction/declare-winner/${auction.id}`
+        );
+
+        console.log("Winner Declared:", response.data);
+      } catch (error) {
+        console.error("Error declaring winner:", error);
+      }
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
     // Ensure endTime is in valid timestamp format (milliseconds)
-    const endTimestamp = new Date(endTime).getTime();
+    const endTimestamp = new Date(auctionData.endTime).getTime();
 
     const updateTimeLeft = () => {
       const now = Date.now();
@@ -65,8 +68,7 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
         clearInterval(timer);
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         setAuctionEnded(true); // Đấu giá đã kết thúc
-        onBidActionDisabled(true);
-        // declareWinner(); // Call declareWinner when countdown ends
+        declareWinner(); // Call declareWinner when countdown ends
         onBidActionDisabled?.(true); // Notify parent component to disable bidding
         return;
       }
@@ -88,7 +90,7 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
     const timer = setInterval(updateTimeLeft, 1000);
     setLoading(false);
     return () => clearInterval(timer); // Cleanup the interval on unmount
-  }, [endTime, auctionId]);
+  }, [auctionData.endTime, auction.id]);
 
   return (
     <div>
@@ -113,148 +115,43 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
             paddingBottom: "15px",
           }}
         >
-          KẾT THÚC VÀO: {formatEndTime(endTime)}
+          KẾT THÚC VÀO: {formatEndTime(auctionData.endTime)}
         </p>
       )}
       <Grid className="countdown" sx={{ gap: "15px" }}>
-        {/* The rest of your countdown logic */}
-        <div className="time-box">
-          <div
-            className="flip-wrapper"
-            style={{
-              borderRadius: "5px",
-              overflow: "hidden",
-              width: "54px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#fff",
-            }}
-          >
-            <FlipNumbers
-              height={45}
-              width={16}
-              play
-              color="#000"
-              background="#fff"
-              numbers={timeLeft.days.toString().padStart(2, "0")}
-              numberStyle={{
-                fontSize: "22px",
-                fontFamily: "REM",
-                fontWeight: "500",
+        {["days", "hours", "minutes", "seconds"].map((unit, index) => (
+          <div key={unit} className="time-box">
+            <div
+              className="flip-wrapper"
+              style={{
+                borderRadius: "5px",
+                overflow: "hidden",
+                width: "54px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#fff",
               }}
-            />
+            >
+              <FlipNumbers
+                height={45}
+                width={16}
+                play
+                color="#000"
+                background="#fff"
+                numbers={timeLeft[unit as keyof typeof timeLeft]
+                  .toString()
+                  .padStart(2, "0")}
+                numberStyle={{
+                  fontSize: "22px",
+                  fontFamily: "REM",
+                  fontWeight: "500",
+                }}
+              />
+            </div>
+            <span className="label1">{unit === "days" ? "Ngày" : unit}</span>
           </div>
-          <span
-            className="label1"
-            style={{ fontFamily: "REM", fontSize: "14px" }}
-          >
-            Ngày
-          </span>
-        </div>
-
-        <div className="time-box">
-          <div
-            className="flip-wrapper"
-            style={{
-              borderRadius: "5px",
-              overflow: "hidden",
-              width: "54px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#fff",
-            }}
-          >
-            <FlipNumbers
-              height={45}
-              width={16}
-              play
-              color="#000"
-              background="#fff"
-              numbers={timeLeft.hours.toString().padStart(2, "0")}
-              numberStyle={{
-                fontSize: "22px",
-                fontFamily: "REM",
-                fontWeight: "500",
-              }}
-            />
-          </div>
-          <span
-            className="label1"
-            style={{ fontFamily: "REM", fontSize: "14px" }}
-          >
-            Giờ
-          </span>
-        </div>
-        <div className="time-box">
-          <div
-            className="flip-wrapper"
-            style={{
-              borderRadius: "5px",
-              overflow: "hidden",
-              width: "54px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#fff",
-            }}
-          >
-            <FlipNumbers
-              height={45}
-              width={16}
-              play
-              color="#000"
-              background="#fff"
-              numbers={timeLeft.minutes.toString().padStart(2, "0")}
-              numberStyle={{
-                fontSize: "22px",
-                fontFamily: "REM",
-                fontWeight: "500",
-              }}
-            />
-          </div>
-          <span
-            className="label1"
-            style={{ fontFamily: "REM", fontSize: "14px" }}
-          >
-            Phút
-          </span>
-        </div>
-        <div className="time-box">
-          <div
-            className="flip-wrapper"
-            style={{
-              borderRadius: "5px",
-              overflow: "hidden",
-              width: "54px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#fff",
-            }}
-          >
-            <FlipNumbers
-              height={45}
-              width={16}
-              play
-              color="#000"
-              background="#fff"
-              numbers={timeLeft.seconds.toString().padStart(2, "0")}
-              numberStyle={{
-                fontSize: "22px",
-                fontFamily: "REM",
-                fontWeight: "500",
-              }}
-            />
-          </div>
-          <span
-            className="label1"
-            style={{ fontFamily: "REM", fontSize: "14px" }}
-          >
-            Giây
-          </span>
-        </div>
+        ))}
       </Grid>
     </div>
   );

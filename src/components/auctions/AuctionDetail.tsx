@@ -189,10 +189,12 @@ const ComicAuction = () => {
             centered
             cancelButtonProps={{ style: { display: "none" } }}
             width={600}
-            bodyStyle={{
-              paddingTop: "10px",
-              paddingBottom: "20px",
-              fontSize: "18px",
+            styles={{
+              body: {
+                paddingTop: "10px",
+                paddingBottom: "20px",
+                fontSize: "18px",
+              },
             }}
             okButtonProps={{
               style: {
@@ -274,9 +276,8 @@ const ComicAuction = () => {
         <Grid size={5} className="auction-info">
           <div className="timer">
             <CountdownFlipNumbers
+              auction={auctionData}
               onBidActionDisabled={handleBidActionDisabled}
-              auctionId={auctionData.id}
-              endTime={auctionData.endTime}
             />
             <div
               className="current-price"
@@ -288,7 +289,12 @@ const ComicAuction = () => {
             >
               <div
                 className="current-price1"
-                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  flexDirection: "column",
+                }}
               >
                 <p
                   style={{
@@ -316,11 +322,24 @@ const ComicAuction = () => {
                   suffix="₫" // Optional: Add a suffix (e.g., "₫")
                 />
               </div>
-              {/* <Divider sx={{ border: '1px solid grey' }} orientation="vertical" flexItem />
-              <div className="current-price2" >
-                <p style={{ fontFamily: "REM", fontSize: '18px' }}>Bước Giá</p>
-                <h3 style={{ fontFamily: "REM", fontSize: '28px', paddingTop: '15px' }}>{(auctionData.priceStep).toLocaleString("vi-VN")}đ</h3>
-              </div> */}
+              <Divider
+                sx={{ border: "1px solid grey" }}
+                orientation="vertical"
+                flexItem
+              />
+              <div className="current-price2">
+                <p style={{ fontFamily: "REM", fontSize: "18px" }}>Bước Giá</p>
+                <h3
+                  style={{
+                    fontFamily: "REM",
+                    fontSize: "28px",
+                    fontWeight: "bold",
+                    textShadow: "4px 4px #000",
+                  }}
+                >
+                  {auctionData.priceStep.toLocaleString("vi-VN")}đ
+                </h3>
+              </div>
             </div>
           </div>
 

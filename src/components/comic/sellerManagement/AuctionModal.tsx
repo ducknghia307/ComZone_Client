@@ -46,12 +46,12 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
   const startTime = dayjs(form.getFieldValue("startTime"));
   // Handle form submission
   const handleSubmit = async (values: AuctionFormValues) => {
-    console.log('11',comic.id);
+    console.log("11", comic.id);
     try {
       const response = await privateAxios.post("/auction", {
         ...values,
-        comicId: comic.id,
-        status:"ONGOING" // Add comic ID to the auction data
+        comicsId: comic.id,
+        status: "ONGOING", // Add comic ID to the auction data
       });
       console.log(response.data);
       onSuccess(); // Trigger success action after successful API call
@@ -70,6 +70,11 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
     // Use dayjs instead of moment
     if (dayjs(value).isBefore(dayjs(startTime))) {
       return Promise.reject("Thời gian kết thúc phải sau thời gian bắt đầu");
+    }
+    if (dayjs(value).diff(dayjs(startTime), "days") < 1) {
+      return Promise.reject(
+        "Thời gian kết thúc phải cách thời gian bắt đầu ít nhất 1 ngày"
+      );
     }
 
     // Check if the end time is more than 7 days after the start time
@@ -167,8 +172,11 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               ]}
             >
               <DatePicker
-                showTime
-                format="YYYY-MM-DD HH:mm:ss"
+                showTime={{
+                  format: "HH:mm",
+                  second: false, // Disable seconds
+                }}
+                format="YYYY-MM-DD HH:mm"
                 style={{ width: "100%" }}
                 placeholder="Chọn thời gian bắt đầu"
               />
@@ -185,31 +193,25 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               ]}
             >
               <DatePicker
-                showTime
-                format="YYYY-MM-DD HH:mm:ss"
+                showTime={{
+                  format: "HH:mm",
+                  second: false, // Disable seconds
+                }}
+                format="YYYY-MM-DD HH:mm"
                 style={{ width: "100%" }}
                 placeholder="Nhập thời gian kết thúc"
                 disabledDate={(current) => {
                   const startTime = form.getFieldValue("startTime");
-                  if (!startTime) return false; // Don't disable any dates until start time is set
+                  if (!startTime) return false;
 
-                  const startDayjs = dayjs(startTime); // Convert startTime to dayjs
-                  const sevenDaysAfter = startDayjs.add(7, "days"); // Get the date 7 days after startTime
+                  const startDayjs = dayjs(startTime);
+                  const oneDayAfter = startDayjs.add(1, "day");
+                  const sevenDaysAfter = startDayjs.add(7, "days");
 
-                  // Disable dates before start date or after 7 days from start date
                   return (
-                    current.isBefore(startDayjs) ||
-                    current.isAfter(sevenDaysAfter)
+                    current.isBefore(oneDayAfter.startOf("day")) ||
+                    current.isAfter(sevenDaysAfter.endOf("day"))
                   );
-                }}
-                disabledTime={() => {
-                  if (!startTime) return {};
-                  return {
-                    disabledHours: () => {
-                      const hours = startTime.add(7, "days").hour(); // Use dayjs here
-                      return Array.from({ length: 24 }, (_, i) => i >= hours);
-                    },
-                  };
                 }}
               />
             </Form.Item>

@@ -4,7 +4,14 @@
   background-color: #f5f5f5;
   font-size: 50px;
 }
-
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
 .auction-result {
   position: relative;
   width: 100%;
@@ -16,6 +23,8 @@
   height: 50px;
   border-radius: 0;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .title-container {

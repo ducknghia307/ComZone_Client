@@ -16,6 +16,7 @@ import ConfettiExplosion from "react-confetti-explosion";
 import { Modal } from "antd";
 import { io } from "socket.io-client";
 import { auctionAnnoucement } from "../../redux/features/notification/announcementSlice";
+import AuctionPublisher from "./AuctionPublisher";
 
 const ComicAuction = () => {
   const { id } = useParams<Record<string, string>>(); // Get ID from URL
@@ -30,6 +31,11 @@ const ComicAuction = () => {
   const [isBidDisabled, setIsBidDisabled] = useState(false);
   const userId = useAppSelector((state) => state.auth.userId);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isWinner, setIsWinner] = React.useState(false);
+  React.useEffect(() => {
+    const mockAuctionResult = Math.random() > 0.5; // Randomly simulate win or lose
+    setIsWinner(mockAuctionResult);
+  }, []);
   const auctionAnnouce = useAppSelector(
     (state) => state.annoucement.auctionAnnounce
   );
@@ -160,8 +166,49 @@ const ComicAuction = () => {
 
     socket.emit("placeBid", bidPayload);
   };
+  const AuctionResult = ({ isWinner }: { isWinner: boolean }) => {
+    return (
+      <div
+        className="auction-result"
+        style={{
+          backgroundColor: isWinner ? "#d4edda" : "#f8d7da",
+          color: isWinner ? "#155724" : "#721c24",
+        }}
+      >
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            display: "inline-block",
+            animation: "marquee 3s linear infinite",
+            fontFamily: "REM",
+            fontWeight: "500",
+            fontSize: "18px",
+          }}
+        >
+          {isWinner
+            ? "🎉 Bạn đã đấu giá thành công!"
+            : "😞 Bạn đã đấu giá thất bại."}
+        </div>
+        <style>
+          {`
+            @keyframes marquee {
+              0% {
+                transform: translateX(100%);
+              }
+              100% {
+                transform: translateX(-100%);
+              }
+            }
+          `}
+        </style>
+      </div>
+    );
+  };
+
+
   return (
-    <div className="auction-wrapper">
+    <div className="auction-wrapper" style={{ position: "relative" }}>
+      <AuctionResult isWinner={isWinner} />
       {auctionAnnouce && (
         <>
           {auctionAnnouce.status === "SUCCESSFUL" && (
@@ -440,69 +487,8 @@ const ComicAuction = () => {
               </Button>
             </div>
           </div>
-
-          <div className="publisher">
-            {/* <div className="publisher-detail">
-              <Typography style={{ fontSize: "16px", fontWeight: "bold", fontFamily: "REM" }}>
-                Tác giả:{" "}
-                <span style={{ fontWeight: "300" }}>{comic.author}</span>
-              </Typography>
-            </div> */}
-            <p
-              style={{
-                fontSize: "17px",
-                paddingTop: "10px",
-                fontFamily: "REM",
-                fontWeight: "400",
-              }}
-            >
-              Tác Giả:{" "}
-              <span style={{ fontWeight: "bold" }}>{comic.author}</span>
-            </p>
-            {/* <div className="publisher-detail">
-              <Typography style={{ fontSize: "16px", fontWeight: "bold", fontFamily: "REM", paddingTop: '10px' }}>
-                Phiên Bản:{" "}
-                <span style={{ fontWeight: "300" }}>{comic.edition === 'REGULAR' ? 'Bản thường' : 'Bản đặc biệt'}</span>
-              </Typography>
-            </div> */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginTop: "15px",
-              }}
-            >
-              <p
-                style={{
-                  fontSize: "17px",
-                  fontFamily: "REM",
-                  fontWeight: "400",
-                  marginRight: "10px",
-                }}
-              >
-                Phiên Bản:
-              </p>
-              <Chip
-                label={
-                  comic.edition === "REGULAR" ? "Bản thường" : "Bản đặc biệt"
-                }
-                style={{
-                  fontFamily: "REM",
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  padding: "18px 10px",
-                  backgroundColor:
-                    comic.edition === "REGULAR" ? "#fff" : "#000",
-                  color: comic.edition === "REGULAR" ? "#000" : "#fff",
-                  border:
-                    comic.edition === "REGULAR" ? "1px solid #000" : "none",
-                  borderRadius: "20px",
-                }}
-              />
-            </div>
-          </div>
+          <AuctionPublisher comic={comic} />
         </Grid>
-
         <div className="mb-10 w-full">
           <ComicsDescription currentComics={comic} fontSize="1rem" />
         </div>
@@ -510,5 +496,4 @@ const ComicAuction = () => {
     </div>
   );
 };
-
 export default ComicAuction;

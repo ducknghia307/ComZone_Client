@@ -165,7 +165,10 @@ const Genres: React.FC<GenresProps> = ({
     (comic) => comic.status !== "AUCTION"
   );
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number | null | undefined) => {
+    if (price == null) {
+      return "N/A"; // Handle null or undefined price gracefully
+    }
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
   };
 

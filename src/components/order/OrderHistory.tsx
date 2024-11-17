@@ -38,6 +38,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
   const [isOrderDetailsOpen, setOrderDetailsOpen] = useState(false);
   //   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrdersWithItems = async () => {
@@ -86,7 +87,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         };
       case "COMPLETED":
         return {
-          color: '#fef6c7', backgroundColor: '#395f18', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
+          color: '#395f18', backgroundColor: '#fef6c7', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
         };
       case "CANCELED":
         return {
@@ -116,12 +117,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     }
   };
 
-  const handleOpenModal = (sellerName: string, sellerId: string, userId: string) => {
+  const handleOpenModal = (sellerName: string, sellerId: string, userId: string, orderId: string) => {
     setSelectedSellerName(sellerName);
     setSelectedSellerId(sellerId);
     setSelectedUserId(userId);
     setOpenModal(true);
-
+    setSelectedOrderId(orderId);
   };
 
   const handleCloseModal = () => {
@@ -144,6 +145,15 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
       ? orders
       : orders.filter((order) => order.status === selectedStatus);
   console.log(filteredOrders);
+
+  const handleStatusUpdate = (orderId: string, newStatus: string) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+  };
+
 
   return (
     <div>
@@ -297,78 +307,16 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
 
             <div
               style={{
+                flex: "1 1 auto",
                 display: "flex",
-                justifyContent: "space-between",
-                padding: "0px 20px 20px 20px",
+                justifyContent: "flex-end",
+                gap: "10px",
+                paddingBottom:'20px',
+                paddingRight: '20px'
               }}
             >
-              {order.status === "DELIVERED" ? (
+              {order.status === "COMPLETED" ? (
                 <>
-                  <div
-                    style={{
-                      flex: "1 1 auto",
-                      display: "flex",
-                      justifyContent: "flex-start",
-                      gap: "10px",
-                      // paddingLeft:'10px'
-                    }}
-                  >
-                    <Button
-                      sx={{
-                        color: "#000",
-                        backgroundColor: "#fff",
-                        border: "1px solid black",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        fontFamily: "REM",
-                      }}
-                      onClick={() => openOrderDetailsModal(order)}
-                    >
-                      Xem Chi Tiết
-                    </Button>
-                  </div>
-
-                  <div
-                    style={{
-                      flex: "1 1 auto",
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      gap: "20px",
-                    }}
-                  >
-                    <Button
-                      sx={{
-                        color: "#fff",
-                        backgroundColor: "#00BFA6",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        fontFamily: "REM",
-                      }}
-                      onClick={() => handleOpenModal(order.items[0].comics.sellerId.name || "N/A", order.items[0].comics.sellerId.id, order.user.id)}
-                    >
-                      Đã Nhận Được Hàng
-                    </Button>
-                    <Button
-                      sx={{
-                        color: "#fff",
-                        backgroundColor: "#FFB74D",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        fontFamily: "REM",
-                      }}
-                    >
-                      Chưa Nhận Được Hàng
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div
-                  style={{
-                    flex: "1 1 auto",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                  }}
-                >
                   <Button
                     sx={{
                       color: "#000",
@@ -383,9 +331,82 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                   >
                     Xem Chi Tiết
                   </Button>
-                </div>
+                  <Button
+                    sx={{
+                      color: "#fff",
+                      backgroundColor: "#00BFA6",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "5px 20px",
+                      fontFamily: "REM",
+                    }}
+                    onClick={() => alert("Liên hệ người bán!")}
+                  >
+                    Liên hệ người bán
+                  </Button>
+                </>
+              ) : order.status === "DELIVERED" ? (
+                <>
+                  <Button
+                    sx={{
+                      color: "#000",
+                      backgroundColor: "#fff",
+                      border: "1px solid black",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "5px 20px",
+                      fontFamily: "REM",
+                    }}
+                    onClick={() => openOrderDetailsModal(order)}
+                  >
+                    Xem Chi Tiết
+                  </Button>
+                  <Button
+                    sx={{
+                      color: "#fff",
+                      backgroundColor: "#00BFA6",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "5px 20px",
+                      fontFamily: "REM",
+                    }}
+                    onClick={() =>
+                      handleOpenModal(order.items[0].comics.sellerId.name || "N/A", order.items[0].comics.sellerId.id, order.user.id,order.id.toString())
+                    }
+                  >
+                    Đã Nhận Được Hàng
+                  </Button>
+                  <Button
+                    sx={{
+                      color: "#fff",
+                      backgroundColor: "#FFB74D",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "5px 20px",
+                      fontFamily: "REM",
+                    }}
+                  >
+                    Chưa Nhận Được Hàng
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  sx={{
+                    color: "#000",
+                    backgroundColor: "#fff",
+                    border: "1px solid black",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                    padding: "5px 20px",
+                    fontFamily: "REM",
+                  }}
+                  onClick={() => openOrderDetailsModal(order)}
+                >
+                  Xem Chi Tiết
+                </Button>
               )}
             </div>
+
             {/* Modal xem chi tiết*/}
             <OrderDetailsModal
               open={isOrderDetailsOpen}
@@ -401,6 +422,8 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           sellerName={selectedSellerName}
           sellerId={selectedSellerId} // Truyền sellerId
           userId={selectedUserId}
+          orderId={selectedOrderId} // Truyền orderId
+          onStatusUpdate={handleStatusUpdate} // Truyền callback
         />
       </div>
     </div>

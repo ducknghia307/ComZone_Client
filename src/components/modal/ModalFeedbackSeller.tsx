@@ -14,14 +14,18 @@ interface ModalFeedbackSellerProps {
     sellerName: string;
     sellerId: string;
     userId: string;
+    orderId: string; // Thêm orderId để cập nhật trạng thái
+    onStatusUpdate: (orderId: number, newStatus: string) => void; // Callback để cập nhật trạng thái
 }
 
-const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose, sellerName, sellerId, userId }) => {
+const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose, sellerName, sellerId, userId, orderId, onStatusUpdate }) => {
     const [ratingValue, setRatingValue] = useState<number | null>(null);
     const [images, setImages] = useState<File[]>([]);
     const [orders, setOrders] = useState<OrderDetailData[]>([]);
     const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
     const [commentText, setCommentText] = useState<string>('');
+
+    console.log("orderId", orderId);
 
     useEffect(() => {
         const fetchOrdersWithItems = async () => {
@@ -97,13 +101,32 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                 seller: sellerId,
                 rating: ratingValue,
                 comment: commentText,
-                attachedImages: imageUrls // Include uploaded image URLs in the payload
+                attachedImages: imageUrls, // Include uploaded image URLs in the payload
+                order: orderId,
+                isFeedback: true
             };
 
             await privateAxios.post('/seller-feedback', payload);
+
+            const statusPayload = {
+                order: orderId,
+                isFeedback: true,
+            };
+
+            console.log("Updating orderId:", orderId);
+            console.log("Payload for PATCH:", statusPayload);
+
+            // Update order status
+            const response = await privateAxios.patch(`/orders/status/successful`, statusPayload);
+            console.log("Order status update response:", response.data);
+
+            // Gọi callback để cập nhật giao diện
+            // onStatusUpdate(orderId, "COMPLETED");
+            onStatusUpdate(orderId, "COMPLETED");
+
             alert("Đánh giá đã được gửi thành công!");
             console.log(payload);
-            
+
             onClose();
         } catch (error) {
             console.error("Error submitting feedback:", error);
@@ -159,7 +182,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                         {sellerName}
                     </Button>
                 </div>
-                
+
                 <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
                     <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>Hình ảnh (tối đa 4):</Typography>
                     <input

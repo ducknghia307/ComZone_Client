@@ -6,6 +6,7 @@ import TvOutlinedIcon from "@mui/icons-material/TvOutlined";
 import DeliveryDiningOutlinedIcon from "@mui/icons-material/DeliveryDiningOutlined";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import "../ui/SellerCreateComic.css";
+import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 
 interface SidebarProps {
     currentUrl: string;
@@ -41,11 +42,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentUrl, handleMenuItemClick }) =>
                         <TvOutlinedIcon /> Quản Lý Đấu Giá
                     </li>
                     <li
-                        className={`menu-item ${currentUrl === '/sellermanagement/delivery' ? 'active' : ''}`}
-                        onClick={() => { handleMenuItemClick('delivery'); navigate('/sellermanagement/delivery') }}
+                        className={`menu-item ${currentUrl === '/sellermanagement/feedback' ? 'active' : ''}`}
+                        onClick={() => { handleMenuItemClick('feedback'); navigate('/sellermanagement/feedback') }}
                         style={{ whiteSpace: "nowrap" }}
                     >
-                        <DeliveryDiningOutlinedIcon /> Thông Tin Giao Hàng
+                        <TextSnippetOutlinedIcon /> Quản Lý Đánh Giá
                     </li>
                 </ul>
             </div>

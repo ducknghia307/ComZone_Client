@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+    Chip,
     IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography
 } from '@mui/material';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -152,6 +153,23 @@ const OrderManagement = () => {
     return (
         <div className='seller-container' style={{ width: '100%', overflow: 'hidden', padding: '10px 10px 0 10px' }}>
             <Typography variant="h5" className="content-header">Quản Lý Đơn Hàng</Typography>
+            {orders.length === 0 ? (
+                <Chip
+                    label="Bạn chưa nhận được đơn hàng nào"
+                    style={{
+                        margin: 'auto',
+                        display: 'inline-flex',
+                        backgroundColor: '#f0f0f0',
+                        color: '#000',
+                        fontSize: '16px',
+                        padding: '20px',
+                        borderRadius: '20px',
+                        fontWeight: 'bold',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
+                />
+            ) : (
             <TableContainer component={Paper} className="order-table-container" sx={{ border: '1px solid black' }}>
                 <Table>
                     <TableHead>
@@ -201,7 +219,7 @@ const OrderManagement = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </TableContainer>
-
+            )}
             {selectedOrderId && (
                 <OrderDetailSeller
                     open={Boolean(selectedOrderId)}

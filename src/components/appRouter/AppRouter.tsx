@@ -23,6 +23,7 @@ import ExchangeUser from "../../pages/ExchangeUser";
 import ComicManagementSeller from "../../pages/ComicManagementSeller";
 import OrderManagementSeller from "../../pages/OrderManagementSeller";
 import AuctionManagementSeller from "../../pages/AuctionManagementSeller";
+import FeedbackManagementSeller from "../../pages/FeedbackManagementSeller";
 import AllHotComics from "../../pages/HotComic";
 import ComicZoneMembership from "../membership/ComicZoneMembership";
 import NotFound from "../notFound/NotFound";
@@ -44,6 +45,8 @@ import ExchangeDealing from "../../pages/exchange/ExchangeDealing";
 import ExchangeDelivering from "../../pages/exchange/ExchangeDelivering";
 import ExchangeSuccessful from "../../pages/exchange/ExchangeSuccessful";
 import ExchangeCancel from "../../pages/exchange/ExchangeCancel";
+import AdminUsers from "../../pages/AdminUsers";
+import AdminDashboard from "../../pages/AdminDashboard";
 
 const AppRouter = () => {
   return (
@@ -74,6 +77,10 @@ const AppRouter = () => {
         <Route
           path="/sellermanagement/auction"
           element={<AuctionManagementSeller />}
+        />
+        <Route
+          path="/sellermanagement/feedback"
+          element={<FeedbackManagementSeller />}
         />
         <Route
           path="/sellermanagement/edit/:id"
@@ -128,6 +135,9 @@ const AppRouter = () => {
         <Route path="/mod/exchanges" element={<ModExchanges />} />
         <Route path="/mod/deposits" element={<ModDeposits />} />
         <Route path="/mod/feedbacks" element={<ModFeedbacks />} />
+
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </div>
   );

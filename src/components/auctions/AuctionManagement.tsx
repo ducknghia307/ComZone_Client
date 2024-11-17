@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "../ui/AuctionManagement.css";
 import {
-    Box, IconButton, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography
+    Box, Chip, IconButton, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography
 } from '@mui/material';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DoNotDisturbOutlinedIcon from '@mui/icons-material/DoNotDisturbOutlined';
@@ -124,99 +124,116 @@ const AuctionManagement = () => {
     if (loading) return <p>Loading...</p>;
 
     return (
-
         <div className='seller-container' style={{ width: '100%', overflow: 'hidden' }}>
             <Typography variant="h5" className="content-header">Quản lí đấu giá</Typography>
-            <Box sx={{ marginBottom: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <TextField
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchOutlinedIcon />
-                                    </InputAdornment>
-                                ),
-                            },
-                        }}
-                        size='small'
-                        placeholder="Tìm kiếm truyện đấu giá..."
-                        variant="outlined"
-                    />
-                </div>
-            </Box>
-            <TableContainer component={Paper} className="auction-table-container" sx={{ border: '1px solid black' }}>
-                <Table>
-                    <TableHead>
-                        <TableRow style={{ backgroundColor: 'black' }}>
-                            <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Ảnh Chính</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Tên Truyện</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời Gian Bắt Đầu</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời Gian Kết Thúc</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Giá Khởi Điểm</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Bước Giá</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Giá Hiện Tại</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Trạng Thái Đấu Giá</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Action</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {paginatedData.map((auction, index) => (
-                            <TableRow key={index}>
-                                <TableCell align="center">
-                                    <img src={auction.comics.coverImage} alt="Cover" style={{ width: 70, height: 110, margin: 'auto' }} />
-                                </TableCell>
-                                <TableCell style={{ whiteSpace: 'nowrap' }} align="center" title={auction.comics.title}>
-                                    {truncateText(auction.comics.title, 20)}
-                                </TableCell>
-                                <TableCell style={{ whiteSpace: 'nowrap' }} align="center">{new Date(auction.startTime).toLocaleString()}</TableCell>
-                                <TableCell style={{ whiteSpace: 'nowrap' }} align="center">{new Date(auction.endTime).toLocaleString()}</TableCell>
-                                <TableCell align="center">{auction.reservePrice.toLocaleString()} đ</TableCell>
-                                <TableCell align="center">{auction.priceStep.toLocaleString()} đ</TableCell>
-                                <TableCell align="center">{auction.currentPrice?.toLocaleString()} đ</TableCell>
-                                <TableCell align="center">
-                                    <span style={getStatusChipStyles(auction.status)}>
-                                        {translateStatus(auction.status)}
-                                    </span>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <div style={{ display: 'flex' }}>
-                                        {auction.status === 'FAILED' && (
-                                            <IconButton color="primary" onClick={() => handleEditClick(auction)}>
-                                                <EditOutlinedIcon />
-                                            </IconButton>
-                                        )}
-                                        <Popconfirm
-                                            title="Dừng phiên đấu giá"
-                                            description="Bạn có thực sự muốn dừng phiên đấu giá này?"
-                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                            onConfirm={() => handleStopAuction(auction.id)}
-                                            okText="Hủy"
-                                            cancelText="Thoát"
-                                            overlayClassName="custom-popconfirm"
-                                        >
-                                            <IconButton color="error">
-                                                <DoNotDisturbOutlinedIcon />
-                                            </IconButton>
-                                        </Popconfirm>
-
-                                    </div>
-
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 15]}
-                    component="div"
-                    count={auctions.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
+            {auctions.length === 0 ? (
+                <Chip
+                    label="Bạn chưa bắt đầu phiên đấu giá nào"
+                    style={{
+                        margin: 'auto',
+                        display: 'inline-flex',
+                        backgroundColor: '#f0f0f0',
+                        color: '#000',
+                        fontSize: '16px',
+                        padding: '20px',
+                        borderRadius: '20px',
+                        fontWeight: 'bold',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
                 />
-            </TableContainer>
+            ) : (<>
+                <Box sx={{ marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <TextField
+                            slotProps={{
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchOutlinedIcon />
+                                        </InputAdornment>
+                                    ),
+                                },
+                            }}
+                            size='small'
+                            placeholder="Tìm kiếm truyện đấu giá..."
+                            variant="outlined"
+                        />
+                    </div>
+                </Box>
+                <TableContainer component={Paper} className="auction-table-container" sx={{ border: '1px solid black' }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow style={{ backgroundColor: 'black' }}>
+                                <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Ảnh Chính</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Tên Truyện</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời Gian Bắt Đầu</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời Gian Kết Thúc</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Giá Khởi Điểm</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Bước Giá</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Giá Hiện Tại</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Trạng Thái Đấu Giá</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center', whiteSpace: 'nowrap' }}>Action</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {paginatedData.map((auction, index) => (
+                                <TableRow key={index}>
+                                    <TableCell align="center">
+                                        <img src={auction.comics.coverImage} alt="Cover" style={{ width: 70, height: 110, margin: 'auto' }} />
+                                    </TableCell>
+                                    <TableCell style={{ whiteSpace: 'nowrap' }} align="center" title={auction.comics.title}>
+                                        {truncateText(auction.comics.title, 20)}
+                                    </TableCell>
+                                    <TableCell style={{ whiteSpace: 'nowrap' }} align="center">{new Date(auction.startTime).toLocaleString()}</TableCell>
+                                    <TableCell style={{ whiteSpace: 'nowrap' }} align="center">{new Date(auction.endTime).toLocaleString()}</TableCell>
+                                    <TableCell align="center">{auction.reservePrice.toLocaleString()} đ</TableCell>
+                                    <TableCell align="center">{auction.priceStep.toLocaleString()} đ</TableCell>
+                                    <TableCell align="center">{auction.currentPrice?.toLocaleString()} đ</TableCell>
+                                    <TableCell align="center">
+                                        <span style={getStatusChipStyles(auction.status)}>
+                                            {translateStatus(auction.status)}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div style={{ display: 'flex' }}>
+                                            {auction.status === 'FAILED' && (
+                                                <IconButton color="primary" onClick={() => handleEditClick(auction)}>
+                                                    <EditOutlinedIcon />
+                                                </IconButton>
+                                            )}
+                                            <Popconfirm
+                                                title="Dừng phiên đấu giá"
+                                                description="Bạn có thực sự muốn dừng phiên đấu giá này?"
+                                                icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                                onConfirm={() => handleStopAuction(auction.id)}
+                                                okText="Hủy"
+                                                cancelText="Thoát"
+                                                overlayClassName="custom-popconfirm"
+                                            >
+                                                <IconButton color="error">
+                                                    <DoNotDisturbOutlinedIcon />
+                                                </IconButton>
+                                            </Popconfirm>
+
+                                        </div>
+
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 15]}
+                        component="div"
+                        count={auctions.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </TableContainer>
+            </>)}
 
             {selectedAuction && (
                 <AuctionModalEdit

@@ -96,7 +96,7 @@ const Sidebar = ({ onSelect }) => {
           >
             <AccountBalanceWalletOutlinedIcon /> Quản Lý Ví
           </li>
-          <li
+          {/* <li
             className={`menu-item ${currentUrl === "/mod/feedbacks" ? "active" : ""
               }`}
             onClick={() => {
@@ -105,7 +105,7 @@ const Sidebar = ({ onSelect }) => {
             }}
           >
             <EventNoteOutlinedIcon /> Quản Lý Đánh Giá
-          </li>
+          </li> */}
         </ul>
       </div>
     </div>

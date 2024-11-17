@@ -149,7 +149,16 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
                 }}
               />
             </div>
-            <span className="label1">{unit === "days" ? "Ngày" : unit}</span>
+            {/* <span className="label1">{unit === "days" ? "Ngày" : unit}</span> */}
+            <span className="label1">
+              {unit === "days"
+                ? "Ngày"
+                : unit === "hours"
+                  ? "Giờ"
+                  : unit === "minutes"
+                    ? "Phút"
+                    : "Giây"}
+            </span>
           </div>
         ))}
       </Grid>

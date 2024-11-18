@@ -3,7 +3,10 @@ import { Button, notification, Tour } from "antd";
 import type { TourProps } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
-import { Exchange } from "../common/interfaces/exchange.interface";
+import {
+  Exchange,
+  ExchangePostInterface,
+} from "../common/interfaces/exchange.interface";
 import Loading from "../components/loading/Loading";
 import ExchangeSearchBar from "../components/exchangeNewsFeed/ExchangeSearchBar";
 import CreatePostModal from "../components/exchangeNewsFeed/CreatePostModal";
@@ -23,7 +26,7 @@ export default function ExchangeNewsFeed() {
   const dispatch = useAppDispatch();
   const [beginTour, setBeginTour] = useState(false);
 
-  const [exchangeList, setExchangeList] = useState<Exchange[]>([]);
+  const [postList, setPostList] = useState<ExchangePostInterface[]>([]);
   const [userExchangeComicsList, setUserExchangeComicsList] = useState<Comic[]>(
     []
   );
@@ -142,9 +145,9 @@ export default function ExchangeNewsFeed() {
     dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
     try {
       if (searchParams.get("search")) {
-        setExchangeList(
+        setPostList(
           await publicAxios
-            .get(`exchanges/search`, {
+            .get(`exchange-posts/search`, {
               params: {
                 key: searchKey,
               },
@@ -154,8 +157,8 @@ export default function ExchangeNewsFeed() {
             })
         );
       } else
-        setExchangeList(
-          await publicAxios.get(`exchanges/all/pending`).then((res) => {
+        setPostList(
+          await publicAxios.get(`exchange-posts/available`).then((res) => {
             console.log(res.data);
             return res.data;
           })
@@ -272,15 +275,15 @@ export default function ExchangeNewsFeed() {
           />
 
           <div className="w-full grid grid-cols-[repeat(auto-fill,50em)] items-stretch justify-center gap-8 py-4">
-            {exchangeList && exchangeList.length > 0 ? (
-              exchangeList.map((exchange, index: number) => {
-                const tourIndex = exchangeList.findIndex(
-                  (request) => request.postUser.id !== userId
+            {postList && postList.length > 0 ? (
+              postList.map((post, index: number) => {
+                const tourIndex = postList.findIndex(
+                  (post) => post.user.id !== userId
                 );
                 return (
                   <ExchangePost
                     key={index}
-                    exchange={exchange}
+                    post={post}
                     userExchangeComicsList={userExchangeComicsList}
                     refs={[ref1, ref2, ref3]}
                     index={index}
@@ -292,6 +295,7 @@ export default function ExchangeNewsFeed() {
                     setIsChatOpen={setIsChatOpen}
                     tourIndex={tourIndex}
                     navigate={navigate}
+                    isLoggedIn={isLoggedIn}
                   />
                 );
               })

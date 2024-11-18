@@ -2,18 +2,21 @@ import { Avatar, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
-import { Exchange } from "../../common/interfaces/exchange.interface";
+import {
+  Exchange,
+  ExchangePostInterface,
+} from "../../common/interfaces/exchange.interface";
 import ActionConfirm from "../actionConfirm/ActionConfirm";
 
 export default function SelectOfferComicsModal({
-  exchange,
+  post,
   userExchangeComicsList,
   isSelectModalOpen,
   setIsSelectModalOpen,
   isChatOpen,
   setIsChatOpen,
 }: {
-  exchange: Exchange;
+  post: ExchangePostInterface;
   userExchangeComicsList: Comic[];
   isSelectModalOpen: string;
   setIsSelectModalOpen: Function;
@@ -39,38 +42,36 @@ export default function SelectOfferComicsModal({
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
 
   const fetchPostUserOfferComics = async () => {
-    await publicAxios
-      .get(`comics/exchange/${exchange.postUser.id}`)
-      .then((res) => {
-        const list = res.data;
-        if (!list && list.length === 0) return;
-        else {
-          setRequestSelectOptionValues([]);
-          setPostSelectOptionValues([]);
+    await publicAxios.get(`comics/exchange/${post.user.id}`).then((res) => {
+      const list = res.data;
+      if (!list && list.length === 0) return;
+      else {
+        setRequestSelectOptionValues([]);
+        setPostSelectOptionValues([]);
 
-          userExchangeComicsList.map((comics: Comic) => {
-            setRequestSelectOptionValues((prev) => [
-              ...(prev as []),
-              {
-                label: comics.title,
-                value: comics.id,
-                image: comics.coverImage,
-              },
-            ]);
-          });
+        userExchangeComicsList.map((comics: Comic) => {
+          setRequestSelectOptionValues((prev) => [
+            ...(prev as []),
+            {
+              label: comics.title,
+              value: comics.id,
+              image: comics.coverImage,
+            },
+          ]);
+        });
 
-          list.map((comics: Comic) => {
-            setPostSelectOptionValues((prev) => [
-              ...(prev as []),
-              {
-                label: comics.title,
-                value: comics.id,
-                image: comics.coverImage,
-              },
-            ]);
-          });
-        }
-      });
+        list.map((comics: Comic) => {
+          setPostSelectOptionValues((prev) => [
+            ...(prev as []),
+            {
+              label: comics.title,
+              value: comics.id,
+              image: comics.coverImage,
+            },
+          ]);
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -89,18 +90,18 @@ export default function SelectOfferComicsModal({
     setIsSelectModalOpen("");
   };
 
-  const handleSubmitOffer = async () => {
+  const handleSubmitRequest = async () => {
     await privateAxios
       .post("exchange-comics", {
-        exchangeId: exchange.id,
+        postId: post.id,
         requestUserComicsList: selectedRequestComicsList,
         postUserComicsList: selectedPostComicsList,
       })
-      .then(async () => {
+      .then(async (res) => {
         await privateAxios
           .post("chat-rooms", {
-            secondUser: exchange.postUser.id,
-            exchange: exchange.id,
+            secondUser: post.user.id,
+            exchange: res.data.exchange.id,
           })
           .then((res) => {
             sessionStorage.setItem("connectedChat", res.data.id);
@@ -108,7 +109,8 @@ export default function SelectOfferComicsModal({
             handleModalClose();
           });
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         notification.error({
           message: "Gửi không thành công!",
           description:
@@ -121,7 +123,7 @@ export default function SelectOfferComicsModal({
 
   return (
     <Modal
-      open={isSelectModalOpen === exchange.id}
+      open={isSelectModalOpen === post.id}
       onCancel={(e) => handleModalClose(e)}
       footer={null}
       width={1000}
@@ -133,8 +135,8 @@ export default function SelectOfferComicsModal({
           Bạn sẽ chọn những truyện của bạn dùng để trao đổi, sau đó bạn có thể
           chọn truyện của{" "}
           <span className="font-semibold">
-            <Avatar src={exchange.postUser.avatar} />
-            &nbsp;{exchange.postUser.name}
+            <Avatar src={post.user.avatar} />
+            &nbsp;{post.user.name}
           </span>{" "}
           để gửi yêu cầu trao đổi với họ.
         </p>
@@ -199,8 +201,8 @@ export default function SelectOfferComicsModal({
             <div className="basis-1/2 flex flex-col items-stretch gap-4">
               <p className="font-light italic">
                 Chọn những truyện của{" "}
-                <span className="font-semibold">{exchange.postUser.name}</span>{" "}
-                mà bạn muốn để trao đổi.
+                <span className="font-semibold">{post.user.name}</span> mà bạn
+                muốn để trao đổi.
               </p>
               <Select
                 mode="multiple"
@@ -283,7 +285,7 @@ export default function SelectOfferComicsModal({
             description={
               <p>Bạn đã chắc chắn muốn gửi yêu cầu với những truyện này?</p>
             }
-            confirmCallback={() => handleSubmitOffer()}
+            confirmCallback={() => handleSubmitRequest()}
           />
         </div>
       </div>

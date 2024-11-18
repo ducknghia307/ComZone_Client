@@ -134,7 +134,7 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
         condition: used === 1 ? "USED" : "SEALED",
       };
       console.log(comicData);
-      const res = await privateAxios.post("/comics/exchange-offer", comicData);
+      const res = await privateAxios.post("/comics/exchange", comicData);
       console.log(res);
 
       openNotification();

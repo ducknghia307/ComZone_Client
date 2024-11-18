@@ -24,7 +24,7 @@ const CurrentUserComicExchange = () => {
   const fetchComicExchangeOffer = async () => {
     try {
       setIsLoading(true);
-      const res = await privateAxios("/comics/exchange-offer/user");
+      const res = await privateAxios("/comics/exchange/user");
       setComicExchangeOffer(res.data);
     } catch (error) {
       console.log("Error:", error);

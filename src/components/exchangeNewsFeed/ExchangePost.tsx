@@ -1,7 +1,10 @@
 import { useState } from "react";
 import SingleOfferedComics from "./SingleOfferedComics";
 import styles from "./style.module.css";
-import { Exchange } from "../../common/interfaces/exchange.interface";
+import {
+  Exchange,
+  ExchangePostInterface,
+} from "../../common/interfaces/exchange.interface";
 import moment from "moment/min/moment-with-locales";
 import dateFormat from "../../assistants/date.format";
 import { Modal, notification } from "antd";
@@ -13,7 +16,7 @@ import { NavigateFunction } from "react-router-dom";
 moment.locale("vi");
 
 export default function ExchangePost({
-  exchange,
+  post,
   userExchangeComicsList,
   refs,
   index,
@@ -25,8 +28,9 @@ export default function ExchangePost({
   currentUserId,
   tourIndex,
   navigate,
+  isLoggedIn,
 }: {
-  exchange: Exchange;
+  post: ExchangePostInterface;
   userExchangeComicsList: Comic[];
   refs?: any[];
   index: number;
@@ -38,6 +42,7 @@ export default function ExchangePost({
   currentUserId: string;
   tourIndex?: number;
   navigate: NavigateFunction;
+  isLoggedIn: boolean;
 }) {
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,12 +64,12 @@ export default function ExchangePost({
     fetchComicExchangeOffer();
   };
   const checkTimeDisplay =
-    exchange.createdAt &&
-    moment(new Date()).unix() - moment(exchange.createdAt).unix() > 172800;
+    post.createdAt &&
+    moment(new Date()).unix() - moment(post.createdAt).unix() > 172800;
 
   const fetchComicExchangeOffer = async () => {
     try {
-      const res = await publicAxios(`comics/exchange/${exchange.postUser.id}`);
+      const res = await publicAxios(`comics/exchange/${post.user.id}`);
       setComicExchangeOffer(res.data);
     } catch (error) {
       console.log("Error:", error);
@@ -80,29 +85,29 @@ export default function ExchangePost({
           >
             <img
               src={
-                exchange.postUser.avatar ||
+                post.user.avatar ||
                 "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small/postUser-profile-icon-profile-avatar-postUser-icon-male-icon-face-icon-profile-icon-free-png.png"
               }
               className="w-[4em] h-[4em] rounded-full"
             />
             <div className="flex flex-col items-start gap-1">
               <p className="font-semibold text-lg tracking-wide">
-                {exchange.postUser.name}
+                {post.user.name}
               </p>
               <p className="font-light text-[0.7em] tracking-wider">
                 {checkTimeDisplay ? (
                   <span>
-                    {dateFormat(exchange.createdAt, "dd/mm/yy")} &#8226;{" "}
-                    {dateFormat(exchange.createdAt, "HH:MM")}
+                    {dateFormat(post.createdAt, "dd/mm/yy")} &#8226;{" "}
+                    {dateFormat(post.createdAt, "HH:MM")}
                   </span>
                 ) : (
-                  moment(exchange.createdAt).calendar()
+                  moment(post.createdAt).calendar()
                 )}
               </p>
             </div>
             <span
               className={`${
-                exchange.postUser.role !== "SELLER" && "hidden"
+                post.user.role !== "SELLER" && "hidden"
               } flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500 text-white`}
             >
               <svg
@@ -118,9 +123,7 @@ export default function ExchangePost({
             </span>
           </div>
 
-          <div
-            className={`${currentUserId === exchange.postUser.id && "hidden"}`}
-          >
+          <div className={`${currentUserId === post.user.id && "hidden"}`}>
             <div className="flex flex-row gap-4">
               <button
                 ref={refs && index == tourIndex ? refs[1] : null}
@@ -128,12 +131,23 @@ export default function ExchangePost({
                 onClick={handleOpenModal}
               >
                 Xem truyện của{" "}
-                <span className="font-semibold">{exchange.postUser.name}</span>
+                <span className="font-semibold">{post.user.name}</span>
               </button>
               <button
                 ref={refs && index == tourIndex ? refs[2] : null}
                 onClick={() => {
-                  if (userExchangeComicsList.length === 0) {
+                  if (!isLoggedIn) {
+                    notification.info({
+                      key: "not-logged-in",
+                      message: "Bạn cần đăng nhập để bắt đầu trao đổi!",
+                      description: (
+                        <button className="w-full py-2 rounded-md text-white font-semibold bg-sky-600 duration-200 hover:bg-sky-700">
+                          Đăng nhập
+                        </button>
+                      ),
+                      duration: 5,
+                    });
+                  } else if (userExchangeComicsList.length === 0) {
                     notification.info({
                       key: "empty_exchange_comics",
                       message: "Bạn chưa có truyện để trao đổi!",
@@ -153,7 +167,7 @@ export default function ExchangePost({
                       ),
                       duration: 8,
                     });
-                  } else setIsSelectModalOpen(exchange.id);
+                  } else setIsSelectModalOpen(post.id);
                 }}
                 className="min-w-max p-2 bg-sky-700 text-white rounded-lg"
               >
@@ -161,7 +175,7 @@ export default function ExchangePost({
               </button>
             </div>
             <SelectOfferComicsModal
-              exchange={exchange}
+              post={post}
               userExchangeComicsList={userExchangeComicsList}
               isLoading={isLoading}
               isSelectModalOpen={isSelectModalOpen}
@@ -172,7 +186,7 @@ export default function ExchangePost({
           </div>
         </div>
 
-        <p className="pl-2 py-4">{exchange.postContent}</p>
+        <p className="pl-2 py-4">{post.postContent}</p>
       </div>
       <Modal
         open={isModalOpen}
@@ -189,8 +203,7 @@ export default function ExchangePost({
           <div className="w-full bg-[rgba(0,0,0,0.03)] border-b border-gray-300 py-2 top-0 sticky">
             <p className="px-4 font-light">
               Danh sách truyện{" "}
-              <span className="font-semibold">{exchange.postUser.name}</span>{" "}
-              đang có:
+              <span className="font-semibold">{post.user.name}</span> đang có:
             </p>
           </div>
 

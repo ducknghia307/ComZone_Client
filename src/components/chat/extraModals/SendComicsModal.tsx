@@ -25,7 +25,7 @@ export default function SendComicsModal({
 
   const fetchUserComics = async () => {
     await privateAxios
-      .get(`exchange-offers/comics/user`)
+      .get(`comics/exchange/user`)
       .then((res) => {
         setComicsList(res.data);
         setSearchedList(res.data);

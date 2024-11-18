@@ -1,20 +1,20 @@
 import { useState } from "react";
 import SingleOfferedComics from "./SingleOfferedComics";
 import styles from "./style.module.css";
-import { ExchangeRequest } from "../../common/interfaces/exchange-request.interface";
+import { Exchange } from "../../common/interfaces/exchange.interface";
 import moment from "moment/min/moment-with-locales";
 import dateFormat from "../../assistants/date.format";
-
-// import SelectOfferComicsModal from "../chat/right/SelectOfferComicsModal";
-import { Modal } from "antd";
-import { privateAxios } from "../../middleware/axiosInstance";
+import { Modal, notification } from "antd";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
 import SelectOfferComicsModal from "./SelectOfferComicsModal";
+import { NavigateFunction } from "react-router-dom";
 
 moment.locale("vi");
 
 export default function ExchangePost({
-  exchangeRequest,
+  exchange,
+  userExchangeComicsList,
   refs,
   index,
   isLoading,
@@ -24,17 +24,20 @@ export default function ExchangePost({
   setIsChatOpen,
   currentUserId,
   tourIndex,
+  navigate,
 }: {
-  exchangeRequest: ExchangeRequest;
+  exchange: Exchange;
+  userExchangeComicsList: Comic[];
   refs?: any[];
   index: number;
   isLoading: boolean;
-  isSelectModalOpen?: string;
-  setIsSelectModalOpen?: Function;
-  isChatOpen?: boolean;
-  setIsChatOpen?: Function;
+  isSelectModalOpen: string;
+  setIsSelectModalOpen: Function;
+  isChatOpen: boolean;
+  setIsChatOpen: Function;
   currentUserId: string;
   tourIndex?: number;
+  navigate: NavigateFunction;
 }) {
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,15 +59,12 @@ export default function ExchangePost({
     fetchComicExchangeOffer();
   };
   const checkTimeDisplay =
-    exchangeRequest.createdAt &&
-    moment(new Date()).unix() - moment(exchangeRequest.createdAt).unix() >
-      172800;
+    exchange.createdAt &&
+    moment(new Date()).unix() - moment(exchange.createdAt).unix() > 172800;
 
   const fetchComicExchangeOffer = async () => {
     try {
-      const res = await privateAxios(
-        `/comics/exchange-offer/${exchangeRequest.user.id}`
-      );
+      const res = await publicAxios(`comics/exchange/${exchange.postUser.id}`);
       setComicExchangeOffer(res.data);
     } catch (error) {
       console.log("Error:", error);
@@ -75,34 +75,34 @@ export default function ExchangePost({
       <div className="grow flex flex-col min-w-[30em] px-2 py-4">
         <div className="flex items-center justify-between gap-4">
           <div
-            ref={index === tourIndex ? refs[1] : null}
+            ref={refs && index === tourIndex ? refs[1] : null}
             className="w-full flex items-center gap-4"
           >
             <img
               src={
-                exchangeRequest.user.avatar ||
-                "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+                exchange.postUser.avatar ||
+                "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small/postUser-profile-icon-profile-avatar-postUser-icon-male-icon-face-icon-profile-icon-free-png.png"
               }
               className="w-[4em] h-[4em] rounded-full"
             />
             <div className="flex flex-col items-start gap-1">
               <p className="font-semibold text-lg tracking-wide">
-                {exchangeRequest.user.name}
+                {exchange.postUser.name}
               </p>
               <p className="font-light text-[0.7em] tracking-wider">
                 {checkTimeDisplay ? (
                   <span>
-                    {dateFormat(exchangeRequest.createdAt, "dd/mm/yy")} &#8226;{" "}
-                    {dateFormat(exchangeRequest.createdAt, "HH:MM")}
+                    {dateFormat(exchange.createdAt, "dd/mm/yy")} &#8226;{" "}
+                    {dateFormat(exchange.createdAt, "HH:MM")}
                   </span>
                 ) : (
-                  moment(exchangeRequest.createdAt).calendar()
+                  moment(exchange.createdAt).calendar()
                 )}
               </p>
             </div>
             <span
               className={`${
-                exchangeRequest.user.role !== "SELLER" && "hidden"
+                exchange.postUser.role !== "SELLER" && "hidden"
               } flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500 text-white`}
             >
               <svg
@@ -119,31 +119,50 @@ export default function ExchangePost({
           </div>
 
           <div
-            className={`${
-              currentUserId === exchangeRequest.user.id && "hidden"
-            }`}
+            className={`${currentUserId === exchange.postUser.id && "hidden"}`}
           >
             <div className="flex flex-row gap-4">
               <button
-                ref={index == tourIndex ? refs[1] : null}
+                ref={refs && index == tourIndex ? refs[1] : null}
                 className="border rounded-lg min-w-max p-2"
                 onClick={handleOpenModal}
               >
                 Xem truyện của{" "}
-                <span className="font-semibold">
-                  {exchangeRequest.user.name}
-                </span>
+                <span className="font-semibold">{exchange.postUser.name}</span>
               </button>
               <button
-                ref={index == tourIndex ? refs[2] : null}
-                onClick={() => setIsSelectModalOpen(exchangeRequest.id)}
+                ref={refs && index == tourIndex ? refs[2] : null}
+                onClick={() => {
+                  if (userExchangeComicsList.length === 0) {
+                    notification.info({
+                      key: "empty_exchange_comics",
+                      message: "Bạn chưa có truyện để trao đổi!",
+                      description: (
+                        <p className="text-xs">
+                          Bạn phải thực hiện thêm thông tin của truyện mà bạn
+                          muốn dùng để trao đổi trên hệ thống trước khi thực
+                          hiện trao đổi.
+                          <br />
+                          <button
+                            onClick={() => navigate("")}
+                            className="text-sky-600 underline mt-2"
+                          >
+                            Thêm truyện ngay
+                          </button>
+                        </p>
+                      ),
+                      duration: 8,
+                    });
+                  } else setIsSelectModalOpen(exchange.id);
+                }}
                 className="min-w-max p-2 bg-sky-700 text-white rounded-lg"
               >
                 Bắt đầu trao đổi
               </button>
             </div>
             <SelectOfferComicsModal
-              exchangeRequest={exchangeRequest}
+              exchange={exchange}
+              userExchangeComicsList={userExchangeComicsList}
               isLoading={isLoading}
               isSelectModalOpen={isSelectModalOpen}
               setIsSelectModalOpen={setIsSelectModalOpen}
@@ -153,43 +172,9 @@ export default function ExchangePost({
           </div>
         </div>
 
-        <p className="pl-2 py-4">{exchangeRequest.postContent}</p>
-
-        {/* <div
-          ref={index === tourIndex ? refs[0] : null}
-          className={`${
-            exchangeRequest.requestComics.length === 0 && "hidden"
-          } w-full border border-gray-300 rounded-lg relative overflow-hidden mt-4`}
-        >
-          <div className="w-full bg-[rgba(0,0,0,0.03)] border-b border-gray-300 py-2 top-0 sticky">
-            <p className="px-4 font-light">
-              Danh sách truyện{" "}
-              <span className="font-semibold">{exchangeRequest.user.name}</span>{" "}
-              đang tìm kiếm trao đổi ({exchangeRequest.requestComics.length}):
-            </p>
-          </div>
-
-          <div
-            className={`w-full flex flex-wrap gap-x-[2%] gap-y-2 p-2 max-h-[25em] relative overflow-y-auto ${styles.exchangeRequest}`}
-          >
-            {exchangeRequest.requestComics &&
-              exchangeRequest.requestComics.map((comics, index) => {
-                return (
-                  <SingleOfferedComics
-                    key={index}
-                    comics={comics}
-                    index={index}
-                    currentlySelected={currentlySelected}
-                    handleSelect={handleSelect}
-                    length={exchangeRequest.requestComics?.length || 0}
-                  />
-                );
-              })}
-          </div>
-        </div> */}
+        <p className="pl-2 py-4">{exchange.postContent}</p>
       </div>
       <Modal
-        title="Basic Modal"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -199,18 +184,18 @@ export default function ExchangePost({
         <div
           className={`${
             comicExchangeOffer.length === 0 && "hidden"
-          } w-full border border-gray-300 rounded-lg relative overflow-hidden mt-4`}
+          } w-full border border-gray-300 rounded-lg relative overflow-hidden mt-8`}
         >
           <div className="w-full bg-[rgba(0,0,0,0.03)] border-b border-gray-300 py-2 top-0 sticky">
             <p className="px-4 font-light">
               Danh sách truyện{" "}
-              <span className="font-semibold">{exchangeRequest.user.name}</span>{" "}
+              <span className="font-semibold">{exchange.postUser.name}</span>{" "}
               đang có:
             </p>
           </div>
 
           <div
-            className={`w-full flex flex-wrap gap-x-[2%] gap-y-2 p-2 max-h-[25em] relative overflow-y-auto ${styles.exchangeRequest}`}
+            className={`w-full flex flex-wrap gap-x-[2%] gap-y-2 p-2 max-h-[25em] relative overflow-y-auto ${styles.exchange}`}
           >
             {comicExchangeOffer &&
               comicExchangeOffer.map((comics, index) => {

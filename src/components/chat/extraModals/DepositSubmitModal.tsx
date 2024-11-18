@@ -2,7 +2,7 @@ import { Checkbox, Modal } from "antd";
 import { useState } from "react";
 import CurrencySplitter from "../../../assistants/Spliter";
 import { privateAxios } from "../../../middleware/axiosInstance";
-import { ExchangeRequest } from "../../../common/interfaces/exchange-request.interface";
+import { ExchangeRequest } from "../../../common/interfaces/exchange.interface";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
 
 export default function DepositSubmitModal({

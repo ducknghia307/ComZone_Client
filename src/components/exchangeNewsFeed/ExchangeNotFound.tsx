@@ -41,7 +41,7 @@ export default function ExchangeNotFound({
         </span>
         <span className="flex flex-col items-center justify-center gap-2 mt-2">
           <p className="text-xs">Bạn có thể thử lại với từ khóa khác hoặc</p>
-          <Link to="/exchange">
+          <Link to="/exchange-news-feed">
             <button className="bg-sky-800 text-white font-bold hover:bg-sky-900 rounded-xl mt-2 px-4 py-2">
               XEM TẤT CẢ
             </button>

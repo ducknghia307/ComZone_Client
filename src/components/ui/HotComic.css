@@ -8,8 +8,6 @@
 .hot-comic-cards {
     margin: 0 80px;
     position: relative;
-    display: flex; /* Flexbox giúp áp dụng gap dễ dàng */
-    gap: 20px;
 }
 
 .hot-comic-card {

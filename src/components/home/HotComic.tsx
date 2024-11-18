@@ -75,13 +75,15 @@ const HotComic: React.FC = () => {
           ? await privateAxios.get("/comics/except-seller/available") // For logged-in users
           : await publicAxios.get("/comics/status/available"); // For guests
 
-         const data = response.data;
+        const data = response.data;
 
         const hotComics = data.filter(
           (comic: any) => comic.condition === "SEALED"
         );
 
         setComics(hotComics);
+        console.log("sealed comic",hotComics);
+        
       } catch (error) {
         console.error("Error fetching comics:", error);
       } finally {
@@ -119,8 +121,8 @@ const HotComic: React.FC = () => {
             responsive={responsive}
             customButtonGroup={
               <CustomButtonGroup
-                next={() => {}}
-                previous={() => {}}
+                next={() => { }}
+                previous={() => { }}
                 carouselState={{
                   currentSlide: 0,
                   totalItems: 0,

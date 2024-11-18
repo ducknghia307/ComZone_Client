@@ -383,12 +383,12 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                             border: '2px solid black',
                                         }}
                                     />
-                                    <InfoRow label="Họ tên" value={orderDetail.toName} />
-                                    <InfoRow label="Số điện thoại" value={orderDetail.toPhone} />
-                                    <InfoRow label="Địa chỉ" value={orderDetail.toAddress} />
+                                    <InfoRow label="Họ tên" value={orderDetail.delivery.to.name} />
+                                    <InfoRow label="Số điện thoại" value={orderDetail.delivery.to.phone} />
+                                    <InfoRow label="Địa chỉ" value={orderDetail.delivery.to.address} />
                                 </Box>
 
-                                <Divider orientation="vertical" flexItem />
+                                <Divider orientation="vertical" flexItem/>
 
                                 <Box display="flex" flexDirection="column" flex={1} gap={1}>
                                     <Chip
@@ -403,9 +403,9 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                             border: '2px solid black',
                                         }}
                                     />
-                                    <InfoRow label="Họ tên" value={orderDetail.fromName} />
-                                    <InfoRow label="Số điện thoại" value={orderDetail.fromPhone} />
-                                    <InfoRow label="Địa chỉ" value={orderDetail.fromAddress} />
+                                    <InfoRow label="Họ tên" value={orderDetail.delivery.from.name} />
+                                    <InfoRow label="Số điện thoại" value={orderDetail.delivery.from.phone} />
+                                    <InfoRow label="Địa chỉ" value={orderDetail.delivery.from.address} />
                                 </Box>
 
                                 <Divider orientation="vertical" flexItem />
@@ -417,8 +417,8 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                             fontSize: '18px', fontWeight: 'bold', backgroundColor: '#fff', color: '#000', padding: '18px 25px', fontFamily: "REM", border: '2px solid black',
                                         }}
                                     />
-                                    <InfoRow label="Tổng tiền" value={`${orderDetail.totalPrice.toLocaleString()} đ`} />
-                                    <InfoRow label="Phí vận chuyển" value={`${orderDetail.deliveryFee.toLocaleString()} đ`} />
+                                    <InfoRow label="Tổng tiền" value={`${orderDetail.totalPrice} đ`} />
+                                    <InfoRow label="Phí vận chuyển" value={`${orderDetail.delivery.deliveryFee} đ`} />
                                     <InfoRow label="Phương thức thanh toán" value={orderDetail.paymentMethod === 'WALLET' ? 'Ví Comzone' : orderDetail.paymentMethod} />
                                     <InfoRow
                                         label="Trạng thái thanh toán"
@@ -462,7 +462,7 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                                     <TableCell>{item.comics.title}</TableCell>
                                                     <TableCell>{item.comics.author || 'N/A'}</TableCell>
                                                     <TableCell>{item.comics.price.toLocaleString()} đ</TableCell>
-                                                    <TableCell>{item.comics.volumeType || 'N/A'}</TableCell>
+                                                    <TableCell>{item.comics.quantity > 1 ? "Bộ truyện" : "Tập truyện"}</TableCell>
                                                 </TableRow>
                                             ))
                                         ) : (

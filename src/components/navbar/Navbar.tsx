@@ -180,6 +180,10 @@ const Navbar = () => {
     setChatUnreadCount(value);
   };
 
+  if (userInfo?.role === "ADMIN" || userInfo?.role === "MODERATOR") {
+    return null; // Không có navbar
+  }
+
   return (
     <>
       <nav className="bg-white border-b shadow-sm w-full ">

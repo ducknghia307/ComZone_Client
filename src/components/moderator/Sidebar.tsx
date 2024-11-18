@@ -45,13 +45,8 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
 
   const menuItems = [
     {
-      title: "Bảng Điều Khiển",
-      path: "/admin/dashboard",
-      icon: <AirplayOutlinedIcon sx={{ color: 'inherit' }} />
-    },
-    {
       title: "Quản Lý Người Dùng",
-      path: "/admin/users",
+      path: "/mod/users",
       icon: <PersonOutlineOutlinedIcon sx={{ color: 'inherit' }} />
     }
   ];
@@ -93,7 +88,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
               letterSpacing: '0.05em'
             }}
           >
-            ADMIN PANEL
+            MOD PANEL
           </Typography>
         )}
         <IconButton onClick={onToggleCollapse} sx={{ color: '#fff' }}>

@@ -9,9 +9,10 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { IconButton, Typography } from '@mui/material';
+import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import OrderDetailMod from './OrderDetailMod';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 
 interface Order {
   id: number;
@@ -24,7 +25,7 @@ interface Order {
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
+    backgroundColor: '#c66a7a',
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.body}`]: {
@@ -33,11 +34,9 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  // '&:nth-of-type(odd)': {
-  //   backgroundColor: theme.palette.action.hover,
-  // },
-  '&:last-child td, &:last-child th': {
-    border: 0,
+  backgroundColor: '#fff', // Background color for rows
+  '&:nth-of-type(odd)': {
+    backgroundColor: '#ffe3d842', // Alternate rows with light pink shade
   },
 }));
 
@@ -222,8 +221,27 @@ const ManageOrders: React.FC = () => {
   };
 
   return (
-    <div>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM' }}>
+    <div style={{paddingBottom:'40px'}}>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+      {/* Search Box */}
+      <TextField
+        variant="outlined"
+        placeholder="Tìm kiếm..."
+        // value={searchTerm}
+        // onChange={handleSearch}
+        size="small"
+        sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchOutlinedIcon sx={{ color: '#fff' }} />
+            </InputAdornment>
+          ),
+          style: { color: '#fff' },
+        }}
+      />
+    </Box>
+    <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color:'#71002b' }}>
         Quản lý đơn hàng
       </Typography>
       <Paper>
@@ -252,19 +270,20 @@ const ManageOrders: React.FC = () => {
                   <React.Fragment key={order.id}>
                     <StyledTableRow>
                       <StyledTableCell style={{ fontFamily: 'REM' }} rowSpan={order.items.length + 1} component="th" scope="row">
-                        {order.deliveryTrackingCode}
+                        {order.delivery.deliveryTrackingCode}
                       </StyledTableCell>
                       <StyledTableCell style={{ fontFamily: 'REM' }} rowSpan={order.items.length + 1} align="left">
-                        {order.toName}
+                        {order.delivery.to.name}
                       </StyledTableCell>
                     </StyledTableRow>
                     {order.items.map((item, index) => (
                       <StyledTableRow key={index}>
                         <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
-                          {order.fromName}
+                          {order.delivery.from.name}
                         </StyledTableCell>
                         <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
-                          <span>{Number(order.totalPrice).toLocaleString("vi-VN")} đ</span>
+                          {/* <span>{Number(order.totalPrice).toLocaleString("vi-VN")} đ</span> */}
+                          <span>{order.totalPrice} đ</span>
                         </StyledTableCell>
                         <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
                           {order.paymentMethod}

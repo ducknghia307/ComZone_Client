@@ -8,7 +8,7 @@ import {
 import moment from "moment/min/moment-with-locales";
 import dateFormat from "../../assistants/date.format";
 import { Modal, notification } from "antd";
-import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
+import { publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
 import SelectOfferComicsModal from "./SelectOfferComicsModal";
 import { NavigateFunction } from "react-router-dom";
@@ -18,7 +18,6 @@ moment.locale("vi");
 export default function ExchangePost({
   post,
   userExchangeComicsList,
-  refs,
   index,
   isLoading,
   isSelectModalOpen,
@@ -32,7 +31,6 @@ export default function ExchangePost({
 }: {
   post: ExchangePostInterface;
   userExchangeComicsList: Comic[];
-  refs?: any[];
   index: number;
   isLoading: boolean;
   isSelectModalOpen: string;
@@ -79,10 +77,7 @@ export default function ExchangePost({
     <div className="w-full flex rounded-lg px-4 max-w-[100em] bg-white drop-shadow-md">
       <div className="grow flex flex-col min-w-[30em] px-2 py-4">
         <div className="flex items-center justify-between gap-4">
-          <div
-            ref={refs && index === tourIndex ? refs[1] : null}
-            className="w-full flex items-center gap-4"
-          >
+          <div className="w-full flex items-center gap-4">
             <img
               src={
                 post.user.avatar ||
@@ -123,67 +118,83 @@ export default function ExchangePost({
             </span>
           </div>
 
-          <div className={`${currentUserId === post.user.id && "hidden"}`}>
-            <div className="flex flex-row gap-4">
-              <button
-                ref={refs && index == tourIndex ? refs[1] : null}
-                className="border rounded-lg min-w-max p-2"
-                onClick={handleOpenModal}
-              >
-                Xem truyện của{" "}
-                <span className="font-semibold">{post.user.name}</span>
-              </button>
-              <button
-                ref={refs && index == tourIndex ? refs[2] : null}
-                onClick={() => {
-                  if (!isLoggedIn) {
-                    notification.info({
-                      key: "not-logged-in",
-                      message: "Bạn cần đăng nhập để bắt đầu trao đổi!",
-                      description: (
-                        <button className="w-full py-2 rounded-md text-white font-semibold bg-sky-600 duration-200 hover:bg-sky-700">
-                          Đăng nhập
-                        </button>
-                      ),
-                      duration: 5,
-                    });
-                  } else if (userExchangeComicsList.length === 0) {
-                    notification.info({
-                      key: "empty_exchange_comics",
-                      message: "Bạn chưa có truyện để trao đổi!",
-                      description: (
-                        <p className="text-xs">
-                          Bạn phải thực hiện thêm thông tin của truyện mà bạn
-                          muốn dùng để trao đổi trên hệ thống trước khi thực
-                          hiện trao đổi.
-                          <br />
-                          <button
-                            onClick={() => navigate("")}
-                            className="text-sky-600 underline mt-2"
-                          >
-                            Thêm truyện ngay
+          {!post.mine && !post.already ? (
+            <div className={``}>
+              <div className="flex flex-row gap-4">
+                <button
+                  className="border rounded-lg min-w-max p-2"
+                  onClick={handleOpenModal}
+                >
+                  Xem truyện của{" "}
+                  <span className="font-semibold">{post.user.name}</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (!isLoggedIn) {
+                      notification.info({
+                        key: "not-logged-in",
+                        message: "Bạn cần đăng nhập để bắt đầu trao đổi!",
+                        description: (
+                          <button className="w-full py-2 rounded-md text-white font-semibold bg-sky-600 duration-200 hover:bg-sky-700">
+                            Đăng nhập
                           </button>
-                        </p>
-                      ),
-                      duration: 8,
-                    });
-                  } else setIsSelectModalOpen(post.id);
-                }}
-                className="min-w-max p-2 bg-sky-700 text-white rounded-lg"
-              >
-                Bắt đầu trao đổi
-              </button>
+                        ),
+                        duration: 5,
+                      });
+                    } else if (userExchangeComicsList.length === 0) {
+                      notification.info({
+                        key: "empty_exchange_comics",
+                        message: "Bạn chưa có truyện để trao đổi!",
+                        description: (
+                          <p className="text-xs">
+                            Bạn phải thực hiện thêm thông tin của truyện mà bạn
+                            muốn dùng để trao đổi trên hệ thống trước khi thực
+                            hiện trao đổi.
+                            <br />
+                            <button
+                              onClick={() => navigate("")}
+                              className="text-sky-600 underline mt-2"
+                            >
+                              Thêm truyện ngay
+                            </button>
+                          </p>
+                        ),
+                        duration: 8,
+                      });
+                    } else setIsSelectModalOpen(post.id);
+                  }}
+                  className="min-w-max p-2 bg-sky-700 text-white rounded-lg"
+                >
+                  Bắt đầu trao đổi
+                </button>
+              </div>
+              <SelectOfferComicsModal
+                post={post}
+                userExchangeComicsList={userExchangeComicsList}
+                isLoading={isLoading}
+                isSelectModalOpen={isSelectModalOpen}
+                setIsSelectModalOpen={setIsSelectModalOpen}
+                isChatOpen={isChatOpen}
+                setIsChatOpen={setIsChatOpen}
+              />
             </div>
-            <SelectOfferComicsModal
-              post={post}
-              userExchangeComicsList={userExchangeComicsList}
-              isLoading={isLoading}
-              isSelectModalOpen={isSelectModalOpen}
-              setIsSelectModalOpen={setIsSelectModalOpen}
-              isChatOpen={isChatOpen}
-              setIsChatOpen={setIsChatOpen}
-            />
-          </div>
+          ) : (
+            post.already &&
+            post.alreadyExchange && (
+              <button
+                onClick={() => {
+                  sessionStorage.setItem(
+                    "connectedExchange",
+                    post.alreadyExchange?.id || ""
+                  );
+                  navigate("/exchange/sent-request");
+                }}
+                className="text-[0.7em] font-light min-w-fit underline"
+              >
+                Xem yêu cầu của bạn
+              </button>
+            )
+          )}
         </div>
 
         <p className="pl-2 py-4">{post.postContent}</p>

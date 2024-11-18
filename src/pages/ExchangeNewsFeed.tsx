@@ -1,7 +1,6 @@
 import ExchangePost from "../components/exchangeNewsFeed/ExchangePost";
-import { Button, notification, Tour } from "antd";
-import type { TourProps } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { notification } from "antd";
+import { useEffect, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
 import {
   Exchange,
@@ -24,7 +23,6 @@ export default function ExchangeNewsFeed() {
     (state) => state.auth
   );
   const dispatch = useAppDispatch();
-  const [beginTour, setBeginTour] = useState(false);
 
   const [postList, setPostList] = useState<ExchangePostInterface[]>([]);
   const [userExchangeComicsList, setUserExchangeComicsList] = useState<Comic[]>(
@@ -43,104 +41,6 @@ export default function ExchangeNewsFeed() {
 
   const navigate = useNavigate();
 
-  const ref1 = useRef(null);
-  const ref2 = useRef(null);
-  const ref3 = useRef(null);
-
-  const steps: TourProps["steps"] = [
-    {
-      title: "Truyện người khác cần.",
-      description:
-        "Bắt đầu với việc xem thử bạn có truyện người khác cần hay không.",
-      cover: (
-        <img
-          alt="select_tour"
-          src="https://cdn-icons-png.freepik.com/256/12640/12640222.png?semt=ais_hybrid"
-          className="max-w-[100px] mx-auto"
-        />
-      ),
-      placement: "rightTop",
-      target: () => ref1.current,
-      nextButtonProps: {
-        children: (
-          <Button type="primary" size="small">
-            Tiếp theo
-          </Button>
-        ),
-        style: {
-          marginInlineStart: "0px",
-          padding: "0px 8px",
-        },
-      },
-    },
-    {
-      title: "Xem truyện họ đang có.",
-      description:
-        "Bạn có thể xem danh sách những truyện người đăng đang có trong trang cá nhân của họ.",
-      cover: (
-        <img
-          alt="select_tour"
-          src="https://cdn-icons-png.flaticon.com/512/8424/8424155.png"
-          className="max-w-[100px] mx-auto"
-        />
-      ),
-      placement: "leftTop",
-      target: () => ref2.current,
-      nextButtonProps: {
-        children: (
-          <Button type="primary" size="small">
-            Tiếp theo
-          </Button>
-        ),
-        style: {
-          marginInlineStart: "0px",
-          padding: "0px 8px",
-        },
-      },
-      prevButtonProps: {
-        children: <Button size="small">Quay lại</Button>,
-        style: {
-          marginInlineStart: "0px",
-          marginRight: "4px",
-          padding: "0px 8px",
-        },
-      },
-    },
-    {
-      title: "Bắt đầu trao đổi.",
-      description:
-        "Bắt đầu chọn truyện của bạn để gửi yêu cầu đến người muốn trao đổi, sau đó trò chuyện và xác nhận để hoàn tất.",
-      cover: (
-        <img
-          alt="select_tour"
-          src="https://cdn-icons-png.flaticon.com/512/10828/10828522.png"
-          className="max-w-[100px] mx-auto"
-        />
-      ),
-      placement: "topLeft",
-      target: () => ref3.current,
-      nextButtonProps: {
-        children: (
-          <Button type="primary" size="small">
-            Hoàn tất
-          </Button>
-        ),
-        style: {
-          marginInlineStart: "0px",
-          padding: "0px 8px",
-        },
-      },
-      prevButtonProps: {
-        children: <Button size="small">Quay lại</Button>,
-        style: {
-          marginInlineStart: "0px",
-          marginRight: "4px",
-          padding: "0px 8px",
-        },
-      },
-    },
-  ];
-
   const fetchExchangeNewsFeed = async () => {
     dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
     try {
@@ -158,10 +58,17 @@ export default function ExchangeNewsFeed() {
         );
       } else
         setPostList(
-          await publicAxios.get(`exchange-posts/available`).then((res) => {
-            console.log(res.data);
-            return res.data;
-          })
+          isLoggedIn
+            ? await privateAxios
+                .get(`exchange-posts/available/user`)
+                .then((res) => {
+                  console.log(res.data);
+                  return res.data;
+                })
+            : await publicAxios.get(`exchange-posts/available`).then((res) => {
+                console.log(res.data);
+                return res.data;
+              })
         );
 
       //Fetch logged in user's exchange comics list
@@ -255,7 +162,6 @@ export default function ExchangeNewsFeed() {
         <div className="w-full flex flex-col items-center justify-start gap-2 py-8">
           <ExchangeSearchBar
             isLoggedIn={isLoggedIn}
-            setBeginTour={setBeginTour}
             handleOpenCreatePost={handleOpenCreatePost}
             searchKey={searchKey}
             setSearchKey={setSearchKey}
@@ -285,7 +191,6 @@ export default function ExchangeNewsFeed() {
                     key={index}
                     post={post}
                     userExchangeComicsList={userExchangeComicsList}
-                    refs={[ref1, ref2, ref3]}
                     index={index}
                     isLoading={isLoading}
                     isSelectModalOpen={isSelectModalOpen}
@@ -310,11 +215,7 @@ export default function ExchangeNewsFeed() {
           </div>
         </div>
       </div>
-      <Tour
-        open={beginTour}
-        onClose={() => setBeginTour(false)}
-        steps={steps}
-      />
+
       <ChatModal isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} />
     </div>
   );

@@ -30,8 +30,15 @@ export default function ExchangeSearchBar({
       <button
         onClick={() => {
           if (!isLoggedIn)
-            notification.error({
+            notification.info({
+              key: "not-logged-in",
               message: "Bạn cần đăng nhập để thực hiện đăng bài",
+              description: (
+                <button className="w-full py-2 rounded-md text-white font-semibold bg-sky-600 duration-200 hover:bg-sky-700">
+                  Đăng nhập
+                </button>
+              ),
+              duration: 5,
             });
           else handleOpenCreatePost();
         }}

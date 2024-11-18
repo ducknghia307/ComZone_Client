@@ -66,8 +66,7 @@ export default function ChatSection({
             {currentRoom?.exchange && (
               <ExchangeSectionInChat
                 chatRoom={currentRoom}
-                setIsLoading={setIsLoading}
-                fetchChatRoomList={fetchChatRoomList}
+                setIsChatOpen={setIsChatOpen}
               />
             )}
           </div>

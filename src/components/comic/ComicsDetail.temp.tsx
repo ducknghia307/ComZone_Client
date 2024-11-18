@@ -17,6 +17,7 @@ import { message } from "antd";
 import { callbackUrl } from "../../redux/features/navigate/navigateSlice";
 import ChatModal from "../../pages/ChatModal";
 import { SellerFeedback } from "../../common/interfaces/seller-feedback.interface";
+import Loading from "../loading/Loading";
 
 export default function ComicsDetailTemp() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
@@ -182,6 +183,7 @@ export default function ComicsDetailTemp() {
   return (
     <>
       {contextHolder}
+      {isLoading && <Loading />}
       <div className="REM min-h-[200vh] bg-gray-100 pb-8">
         <div className="flex flex-col justify-start items-center gap-4 pt-4 pb-8 relative">
           <div className="w-full flex items-start justify-center gap-4 relative">

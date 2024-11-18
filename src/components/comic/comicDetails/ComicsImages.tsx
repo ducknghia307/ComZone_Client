@@ -34,12 +34,19 @@ export default function ComicsImages({
   const handleNext = () => {
     if (carouselRef.current) {
       carouselRef.current.next();
+      const currentIndex = imageList.indexOf(currentImage);
+      const nextIndex = (currentIndex + 1) % imageList.length;
+      setCurrentImage(imageList[nextIndex]);
     }
   };
 
   const handlePrev = () => {
     if (carouselRef.current) {
       carouselRef.current.previous();
+      const currentIndex = imageList.indexOf(currentImage);
+      const prevIndex =
+        (currentIndex - 1 + imageList.length) % imageList.length;
+      setCurrentImage(imageList[prevIndex]);
     }
   };
   const handleModalNext = () => {
@@ -55,14 +62,14 @@ export default function ComicsImages({
   };
 
   return (
-    <div className="min-w-[15em] w-[20em] gap-2">
+    <div className="xl:w-[30em] w-[15em] gap-2">
       <div className="w-full bg-white flex flex-col items-center justify-center rounded-xl py-2 drop-shadow-md top-4 sticky">
         <div
           className="w-full px-2 pb-4 flex justify-center cursor-pointer"
           onClick={() => setIsModalOpen(true)}
         >
           <span
-            className="w-full h-[30em] bg-cover bg-no-repeat bg-center rounded-lg"
+            className="w-full xl:h-[20em] h-[15em] bg-contain bg-no-repeat bg-center rounded-lg"
             style={{ backgroundImage: `url(${currentImage})` }}
           ></span>
         </div>
@@ -87,10 +94,8 @@ export default function ComicsImages({
             {imageList.map((img: string) => (
               <button
                 key={img}
-                className=" flex items-center w-full h-[5em] justify-center py-2"
+                className="flex items-center w-full h-[5em] justify-center py-2"
                 onClick={() => {
-                  console.log({ img });
-                  console.log({ imageList });
                   setCurrentImage(img);
                 }}
               >

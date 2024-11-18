@@ -35,12 +35,10 @@ export default function CreatePostModal({
 
     setLoading(true);
     try {
-      const response = await privateAxios.post("exchanges", {
+      await privateAxios.post("exchange-posts", {
         postContent,
         images: [],
       });
-      console.log(response.data);
-
       notification.success({
         key: "success",
         message: "Thành công",

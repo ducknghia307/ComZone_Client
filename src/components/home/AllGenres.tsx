@@ -12,7 +12,7 @@ import { useAppSelector } from "../../redux/hooks";
 const responsive = {
   superLargeDesktop: {
     breakpoint: { max: 4000, min: 1024 },
-    items: 5.5,
+    items: 5,
     slidesToSlide: 2,
   },
   desktop: {

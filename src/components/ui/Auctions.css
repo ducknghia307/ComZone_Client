@@ -1,33 +1,49 @@
 .section-title {
-    display: flex;
+    /* display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 60px;
-    margin-top: 30px;
+    justify-content: center; */
+    margin-bottom: 15px;
+    padding-top: 15px;
+    /* margin-left: 30px; */
+    background-color: #000;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
 .section-title .line {
     flex-grow: 1;
     height: 1px;
-    background-color: #000;
-    margin: 0 80px;
+    background-color: #CDCFD0;
+    /* margin: 0 80px; */
 }
 
 .section-title .title {
     color: #000;
 }
 
-.auction-cards {
+.big-cards {
     margin: 0 80px;
     position: relative;
+    border: 1px solid #000;
+    background-color: #fff;
+    border-radius: 10px;
+    /* padding: 20px; */
+    padding-bottom: 20px;
 }
 
 .auction-card {
     background-color: #fff;
-    padding: 20px;
     border-radius: 10px;
     max-width: 250px;
+    margin: 0px auto;
 }
+
+.auction-card:hover {
+    border: 1px solid #e0e0e0; /* Màu xám nhạt */
+    transition: border 0.3s ease; /* Hiệu ứng chuyển đổi mượt */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Thêm chút bóng để làm nổi bật */
+}
+
 
 .auction-card img {
     margin-bottom: 15px;

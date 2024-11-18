@@ -62,7 +62,7 @@ export default function ComicsImages({
   };
 
   return (
-    <div className="xl:w-[30em] w-[15em] gap-2">
+    <div className="xl:w-[30em] min-w-[15em] gap-2">
       <div className="w-full bg-white flex flex-col items-center justify-center rounded-xl py-2 drop-shadow-md top-4 sticky">
         <div
           className="w-full px-2 pb-4 flex justify-center cursor-pointer"
@@ -73,50 +73,47 @@ export default function ComicsImages({
             style={{ backgroundImage: `url(${currentImage})` }}
           ></span>
         </div>
-        <div className="flex justify-between items-center w-full max-w-[25rem] px-4">
-          {imageList.length > 4 && (
-            <Button
-              onClick={handlePrev}
-              icon={<LeftOutlined />}
-              shape="circle"
-              className="absolute left-4 z-10"
-            />
-          )}
+        <div className="w-full flex justify-center items-center px-4">
+          <Button
+            onClick={handlePrev}
+            icon={<LeftOutlined />}
+            shape="circle"
+            className="absolute left-4 z-10"
+          />
 
           <Carousel
             ref={carouselRef}
             responsive={responsive}
             infinite={false}
             className="w-full relative"
-            // renderButtonGroupOutside={true}
-            // customButtonGroup={<div />}
           >
-            {imageList.map((img: string) => (
-              <button
-                key={img}
-                className="flex items-center w-full h-[5em] justify-center py-2"
-                onClick={() => {
-                  setCurrentImage(img);
-                }}
-              >
-                <img
-                  src={img}
-                  alt=""
-                  className={`object-cover w-16 h-20 max-w-[5em] max-h-[5em] p-1 border rounded-sm 
+            <div className="w-full flex items-center gap-2">
+              {imageList.map((img: string) => (
+                <button
+                  key={img}
+                  className="flex items-center w-full h-[5em] justify-center py-2"
+                  onClick={() => {
+                    setCurrentImage(img);
+                  }}
+                >
+                  <img
+                    src={img}
+                    alt=""
+                    className={`object-cover w-16 h-20 max-w-[5em] max-h-[5em] p-1 border rounded-sm 
                   ${currentImage === img ? "border-black" : "hover:opacity-80"}
                  `}
-                />
-              </button>
-            ))}
+                  />
+                </button>
+              ))}
+            </div>
           </Carousel>
-          {imageList.length > 4 && (
-            <Button
-              onClick={handleNext}
-              icon={<RightOutlined />}
-              shape="circle"
-              className="absolute right-4 z-10"
-            />
-          )}
+
+          <Button
+            onClick={handleNext}
+            icon={<RightOutlined />}
+            shape="circle"
+            className="absolute right-4 z-10"
+          />
         </div>
       </div>
       <Modal

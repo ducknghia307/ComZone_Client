@@ -25,6 +25,7 @@ export default function ComicsDetailTemp() {
   const [seller, setSeller] = useState<UserInfo>();
   const [imageList, setImageList] = useState<string[]>([]);
   const [currentImage, setCurrentImage] = useState<string>("");
+  const [relatedComicsList, setRelatedComicsList] = useState<Comic[]>([]);
   const [sellerDetails, setSellerDetails] = useState();
   const [feedbackList, setFeedbackList] = useState<SellerFeedback[]>([]);
   const [totalFeedback, setTotalFeedback] = useState<number>(0);
@@ -77,6 +78,15 @@ export default function ComicsDetailTemp() {
           setFeedbackList(res.data[0]);
           setTotalFeedback(res.data[1]);
         }
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const fetchRelatedComicsList = async () => {
+    await publicAxios
+      .get("comics/status/AVAILABLE")
+      .then((res) => {
+        setRelatedComicsList(res.data);
       })
       .catch((err) => console.log(err));
   };
@@ -152,13 +162,14 @@ export default function ComicsDetailTemp() {
     fetchUserInfo();
     fetchCurrentComics();
     fetchSellerFeedback();
-  }, [id, seller]);
+    fetchRelatedComicsList();
+  }, [id]);
 
   useEffect(() => {
     if (userInfo) {
       checkIsInCart();
     }
-  }, [userInfo, id]);
+  }, [id]);
 
   const handleOpenChat = async (comics: Comic) => {
     if (!isLoggedIn) {
@@ -228,12 +239,13 @@ export default function ComicsDetailTemp() {
             <OtherComicsFromSeller
               seller={seller}
               comicsListFromSeller={comicsListFromSeller}
+              currentComics={currentComics}
             />
           </div>
 
           <div className="w-full max-w-[125em] px-8">
             <RecommendedComicsList
-              comicsList={comicsListFromSeller}
+              comicsList={relatedComicsList}
               fetchMoreData={fetchCurrentComics}
               hasMore={hasMore}
             />

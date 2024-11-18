@@ -11,31 +11,40 @@ import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import { privateAxios } from '../../middleware/axiosInstance';
 import { Comic } from '../../common/base.interface';
-import { IconButton, Typography } from '@mui/material';
+import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import BanComicModal from '../modal/BanComicModal';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 
-// Styling for table cells and rows
+// Styled Components for Moderator
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
+    backgroundColor: '#c66a7a', 
+    color: '#fff',
+    fontWeight: 'bold',
+    fontFamily: 'REM',
+    fontSize: '1rem',
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    color: '#000',
+    fontFamily: 'REM',
   },
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  backgroundColor: '#fff', // Background color for rows
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0,
+    backgroundColor: '#ffe3d842', // Alternate rows with light pink shade
   },
 }));
 
-export default function CustomizedTables() {
+const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
+  backgroundColor: '#fff',
+  color: '#000',
+}));
+
+const ManageComics: React.FC = () => {
   const [comics, setComics] = useState<Comic[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -67,22 +76,6 @@ export default function CustomizedTables() {
     setPage(0);
   };
 
-  const getConditionColor = (condition: string) => {
-    switch (condition) {
-      case "SEALED":
-        return { color: '#1e88e5', backgroundColor: '#e3f2fd', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' };
-      case "USED":
-        return { color: '#757575', backgroundColor: '#eeeeee', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' };
-    }
-  };
-
-  const getConditionText = (condition: string) => {
-    switch (condition) {
-      case "SEALED": return "Truyện Nguyên Seal";
-      case "USED": return "Truyện Đã Sử Dụng";
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "UNAVAILABLE":
@@ -102,50 +95,53 @@ export default function CustomizedTables() {
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "UNAVAILABLE": return "Không còn hàng";
-      case "AVAILABLE": return "Còn hàng";
-      case "AUCTION": return "Đấu giá";
-      case "EXCHANGE": return "Trao đổi";
-      case "EXCHANGE_OFFER": return "Đề nghị trao đổi";
-      case "SOLD": return "Đã bán";
-      case "REMOVED": return "Đã gỡ";
-      default: return "Không xác định";
-    }
-  };
-
   const handleOpenBanModal = (comicId: number) => {
     setSelectedComicId(comicId);
     setOpenBanModal(true);
-    console.log(comicId);
   };
 
   const handleBanComic = (reason: string) => {
     if (selectedComicId !== null) {
       console.log(`Banning comic ID: ${selectedComicId} for reason: ${reason}`);
-      // Call API to ban the comic with the reason
       // privateAxios.post(`/comics/${selectedComicId}/ban`, { reason });
     }
   };
 
   return (
-    <div>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM' }}>
-        Quản lí truyện tranh
+    <div style={{paddingBottom:'40px'}}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        {/* Search Box */}
+        <TextField
+          variant="outlined"
+          placeholder="Tìm kiếm..."
+          // value={searchTerm}
+          // onChange={handleSearch}
+          size="small"
+          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlinedIcon sx={{ color: '#fff' }} />
+              </InputAdornment>
+            ),
+            style: { color: '#fff' },
+          }}
+        />
+      </Box>
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color:'#71002b' }}>
+        Quản lý truyện tranh
       </Typography>
       <Paper>
         <TableContainer>
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell style={{ fontFamily: 'REM' }}>Ảnh Bìa</StyledTableCell>
-                <StyledTableCell style={{ fontFamily: 'REM' }}>Tên Truyện</StyledTableCell>
-                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Tác giả</StyledTableCell>
-                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Tình Trạng</StyledTableCell>
-                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Tập/Bộ</StyledTableCell>
-                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Trạng thái</StyledTableCell>
-                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Chỉnh Sửa</StyledTableCell>
+                <StyledTableCell>Ảnh Bìa</StyledTableCell>
+                <StyledTableCell>Tên Truyện</StyledTableCell>
+                <StyledTableCell align="right">Tác Giả</StyledTableCell>
+                <StyledTableCell align="right">Trạng Thái</StyledTableCell>
+                <StyledTableCell align="right">Tập/Bộ</StyledTableCell>
+                <StyledTableCell align="right">Chỉnh Sửa</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -158,33 +154,23 @@ export default function CustomizedTables() {
               ) : (
                 comics.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((comic) => (
                   <StyledTableRow key={comic.id}>
+                    <StyledTableCell>
+                      <img style={{ width: '80px', height: '120px' }} src={comic.coverImage} alt={comic.title} />
+                    </StyledTableCell>
+                    <StyledTableCell>{comic.title}</StyledTableCell>
+                    <StyledTableCell align="right">{comic.author}</StyledTableCell>
                     <StyledTableCell align="right">
-                      <img style={{ width: '100px', height: '140px' }} src={comic.coverImage} alt={comic.title} />
-                    </StyledTableCell>
-                    <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM' }}>
-                      {comic.title}
-                    </StyledTableCell>
-                    <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>{comic.author}</StyledTableCell>
-                    <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
-                      <span style={getConditionColor(comic.condition)}>
-                        {getConditionText(comic.condition)}
+                      <span style={getStatusColor(comic.status)}>
+                        {comic.status}
                       </span>
                     </StyledTableCell>
-                    <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
+                    <StyledTableCell align="right">
                       {comic.quantity > 1 ? 'Bộ Truyện' : 'Tập Truyện'}
                     </StyledTableCell>
-
-                    <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
-                      <span style={getStatusColor(comic.status)}>
-                        {getStatusText(comic.status)}
-                      </span>
-                    </StyledTableCell>
                     <StyledTableCell align="right">
-                      {(comic.status === "AVAILABLE" || comic.status === "AUCTION" || comic.status === "EXCHANGE" || comic.status === "EXCHANGE_OFFER") && (
-                        <IconButton color="error" onClick={() => handleOpenBanModal(comic.id)}>
-                          <DeleteOutlineOutlinedIcon />
-                        </IconButton>
-                      )}
+                      <IconButton color="error" onClick={() => handleOpenBanModal(comic.id)}>
+                        <DeleteOutlineOutlinedIcon />
+                      </IconButton>
                     </StyledTableCell>
                   </StyledTableRow>
                 ))
@@ -192,7 +178,7 @@ export default function CustomizedTables() {
             </TableBody>
           </Table>
         </TableContainer>
-        <TablePagination
+        <StyledTablePagination
           rowsPerPageOptions={[5, 10, 15]}
           component="div"
           count={comics.length}
@@ -209,4 +195,6 @@ export default function CustomizedTables() {
       />
     </div>
   );
-}
+};
+
+export default ManageComics;

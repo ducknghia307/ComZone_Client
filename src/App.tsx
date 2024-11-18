@@ -12,6 +12,10 @@ function App() {
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   const userId = useAppSelector((state) => state.auth.userId);
 
+  // set id admin để ẩn footer
+  const adminId = "eafd18c8-f5bc-4455-81bd-2487922e048e";
+  const modId = "c0a0d889-9074-4990-8d81-770fe30697ff";
+
   useEffect(() => {
     if (accessToken && userId) {
       connectSocket();
@@ -60,7 +64,7 @@ function App() {
         <div className="grow">
           <AppRouter />
         </div>
-        <Footer />
+        {userId !== adminId && userId !== modId && <Footer />}
       </div>
     </ConfigProvider>
   );

@@ -9,9 +9,11 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { IconButton, Typography } from '@mui/material';
+import { Box, IconButton, InputAdornment, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import BanUserModal from '../modal/BanUserModal';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 
 interface User {
   id: number;
@@ -22,22 +24,31 @@ interface User {
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
+    backgroundColor: '#c66a7a', // Màu nền tiêu đề bảng
+    color: '#fff', // Màu chữ tiêu đề
+    fontWeight: 'bold',
+    fontFamily: 'REM',
+    fontSize: '1rem',
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    color: '#000', // Màu chữ nội dung bảng
+    fontFamily: 'REM',
   },
 }));
 
+const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
+  backgroundColor: '#fff',
+  color: '#000',
+}));
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  backgroundColor: '#fff', // Màu nền hàng
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0,
+    backgroundColor: '#ffe3d842', // Màu nền hàng xen kẽ
   },
 }));
+
 
 const ManageUsers: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -53,7 +64,7 @@ const ManageUsers: React.FC = () => {
         const response = await privateAxios.get('/users');
         setUsers(response.data);
         console.log(response.data);
-        
+
       } catch (error) {
         console.error("Error fetching users data:", error);
       } finally {
@@ -85,6 +96,10 @@ const ManageUsers: React.FC = () => {
     }
   };
 
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "BANNED":
@@ -103,7 +118,27 @@ const ManageUsers: React.FC = () => {
 
   return (
     <div>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        {/* Search Box */}
+        <TextField
+          variant="outlined"
+          placeholder="Tìm kiếm..."
+          // value={searchTerm}
+          // onChange={handleSearch}
+          size="small"
+          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlinedIcon sx={{ color: '#fff' }} />
+              </InputAdornment>
+            ),
+            style: { color: '#fff' },
+          }}
+        />
+      </Box>
+
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color:'#71002b' }}>
         Quản lí người dùng
       </Typography>
       <Paper>
@@ -111,7 +146,7 @@ const ManageUsers: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-              <StyledTableCell style={{ fontFamily: 'REM' }}>Ảnh</StyledTableCell>
+                <StyledTableCell style={{ fontFamily: 'REM' }}>Ảnh</StyledTableCell>
                 <StyledTableCell style={{ fontFamily: 'REM' }}>Tên Người Dùng</StyledTableCell>
                 <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Email</StyledTableCell>
                 <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Trạng thái</StyledTableCell>
@@ -153,7 +188,7 @@ const ManageUsers: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <TablePagination
+        <StyledTablePagination
           rowsPerPageOptions={[5, 10, 15]}
           component="div"
           count={users.length}

@@ -8,7 +8,8 @@ import {
     PointElement,
 } from 'chart.js';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { Typography } from '@mui/material';
+import { AttachMoneyOutlined, PeopleOutline, BookOutlined, GavelOutlined, SwapHorizOutlined } from '@mui/icons-material';
+import { MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 
 // Register Chart.js components
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
@@ -35,26 +36,12 @@ const Dashboard = () => {
     const [comicsData, setComicsData] = useState([]);
     const [ordersData, setOrdersData] = useState([]);
     const [transactionsData, setTransactionsData] = useState([]);
-
-    //   useEffect(() => {
-    //     const fetchData = async () => {
-    //       try {
-    //         const [comicsRes, ordersRes, transactionsRes] = await Promise.all([
-    //           privateAxios.get('/comics'),
-    //           privateAxios.get('/orders'),
-    //           privateAxios.get('/transactions/all'),
-    //         ]);
-
-    //         setComicsData(comicsRes.data);
-    //         setOrdersData(ordersRes.data);
-    //         setTransactionsData(transactionsRes.data);
-    //       } catch (error) {
-    //         console.error('Error fetching data:', error);
-    //       }
-    //     };
-
-    //     fetchData();
-    //   }, []);
+    const [visibleDatasets, setVisibleDatasets] = useState({
+        comics: true,
+        orders: true,
+        transactions: true,
+    });
+    const [timeRange, setTimeRange] = useState('Year');
 
     useEffect(() => {
         // Simulate API call with mock data
@@ -63,129 +50,211 @@ const Dashboard = () => {
         setTransactionsData(mockData.transactions);
     }, []);
 
+    const totalRevenue = 4379000; // Mock total revenue
+    const totalUsers = 23 + 101 + 5; // Mock total users
+    const totalComics = comicsData.length;
+    const totalAuctions = ordersData.length;
+    const totalExchanges = transactionsData.length;
+
+    const filterDataByTimeRange = (data) => {
+        // Logic to filter data based on selected time range
+        const now = new Date();
+        if (timeRange === 'Week') {
+            const oneWeekAgo = new Date(now);
+            oneWeekAgo.setDate(now.getDate() - 7);
+            return data.filter(item => new Date(item.date) >= oneWeekAgo);
+        } else if (timeRange === 'Month') {
+            const oneMonthAgo = new Date(now);
+            oneMonthAgo.setMonth(now.getMonth() - 1);
+            return data.filter(item => new Date(item.date) >= oneMonthAgo);
+        } else {
+            return data; // Default is Year
+        }
+    };
+
     const createCombinedChartData = () => {
+        // Filter data based on time range
+        const filteredComics = filterDataByTimeRange(comicsData);
+        const filteredOrders = filterDataByTimeRange(ordersData);
+        const filteredTransactions = filterDataByTimeRange(transactionsData);
+
         // Extract unique dates from all datasets
-        const allDates = [...new Set([...mockData.comics, ...mockData.orders, ...mockData.transactions].map(item => item.date))];
+        const allDates = [...new Set([...filteredComics, ...filteredOrders, ...filteredTransactions].map(item => item.date))];
         allDates.sort();
 
         const comicsCounts = allDates.map(date => {
-            const found = comicsData.find(item => item.date === date);
+            const found = filteredComics.find(item => item.date === date);
             return found ? found.count : 0;
         });
 
         const ordersCounts = allDates.map(date => {
-            const found = ordersData.find(item => item.date === date);
+            const found = filteredOrders.find(item => item.date === date);
             return found ? found.count : 0;
         });
 
         const transactionsCounts = allDates.map(date => {
-            const found = transactionsData.find(item => item.date === date);
+            const found = filteredTransactions.find(item => item.date === date);
             return found ? found.count : 0;
         });
 
         return {
             labels: allDates,
             datasets: [
-                {
+                visibleDatasets.comics && {
                     label: 'Comics',
                     data: comicsCounts,
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     tension: 0.4,
                 },
-                {
+                visibleDatasets.orders && {
                     label: 'Orders',
                     data: ordersCounts,
                     borderColor: 'rgba(192, 75, 192, 1)',
                     backgroundColor: 'rgba(192, 75, 192, 0.2)',
                     tension: 0.4,
                 },
-                {
+                visibleDatasets.transactions && {
                     label: 'Transactions',
                     data: transactionsCounts,
                     borderColor: 'rgba(192, 192, 75, 1)',
                     backgroundColor: 'rgba(192, 192, 75, 0.2)',
                     tension: 0.4,
                 },
-            ],
+            ].filter(Boolean),
         };
     };
 
-    return (
-        // <div className="p-6">            
-        <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="space-y-4">
-                <h2 className="text-xl font-semibold REM">Biểu đồ tổng quan hoạt động</h2>
+    const toggleDatasetVisibility = (key) => {
+        setVisibleDatasets((prev) => ({
+            ...prev,
+            [key]: !prev[key],
+        }));
+    };
 
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 REM">
-                    <div className="space-y-2">
-                        <p className="font-medium">Chú thích biểu đồ:</p>
-                        <ul className="list-disc pl-6 space-y-1">
-                            <li><span className="text-[rgb(75,192,192)] font-medium">Đường xanh lá</span>: Số lượng truyện tranh được thêm mới theo thời gian</li>
-                            <li><span className="text-[rgb(192,75,192)] font-medium">Đường tím</span>: Số lượng đơn hàng được tạo</li>
-                            <li><span className="text-[rgb(192,192,75)] font-medium">Đường vàng</span>: Số lượng giao dịch thành công</li>
-                        </ul>
+    return (
+        <div>
+            {/* Summary Cards Section */}
+            <div className="mb-6 mt-6">
+                <div className="flex justify-between space-x-4">
+                    <div className="bg-blue-100 p-4 rounded-lg shadow-md w-full flex items-center space-x-4">
+                        <AttachMoneyOutlined className="text-blue-600 text-3xl" />
+                        <div>
+                            <h3 className="font-semibold">Doanh thu</h3>
+                            <p className="text-lg font-bold">{totalRevenue.toLocaleString()} VND</p>
+                        </div>
+                    </div>
+                    <div className="bg-green-100 p-4 rounded-lg shadow-md w-full flex items-center space-x-4">
+                        <PeopleOutline className="text-green-600 text-3xl" />
+                        <div>
+                            <h3 className="font-semibold">Người dùng</h3>
+                            <p className="text-lg font-bold">{totalUsers}</p>
+                        </div>
+                    </div>
+                    <div className="bg-yellow-100 p-4 rounded-lg shadow-md w-full flex items-center space-x-4">
+                        <BookOutlined className="text-yellow-600 text-3xl" />
+                        <div>
+                            <h3 className="font-semibold">Số truyện</h3>
+                            <p className="text-lg font-bold">{totalComics}</p>
+                        </div>
+                    </div>
+                    <div className="bg-purple-100 p-4 rounded-lg shadow-md w-full flex items-center space-x-4">
+                        <GavelOutlined className="text-purple-600 text-3xl" />
+                        <div>
+                            <h3 className="font-semibold">Số cuộc đấu giá</h3>
+                            <p className="text-lg font-bold">{totalAuctions}</p>
+                        </div>
+                    </div>
+                    <div className="bg-red-100 p-4 rounded-lg shadow-md w-full flex items-center space-x-4">
+                        <SwapHorizOutlined className="text-red-600 text-3xl" />
+                        <div>
+                            <h3 className="font-semibold">Số lượt trao đổi</h3>
+                            <p className="text-lg font-bold">{totalExchanges}</p>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="h-[400px] w-full">
-                    <Line
-                        data={createCombinedChartData()}
-                        options={{
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                    labels: {
-                                        font: {
-                                            size: 12,
-                                            family:'REM'
-                                        }
-                                    }
-                                },
-                                tooltip: {
-                                    mode: 'index',
-                                    intersect: false,
-                                }
-                            },
-                            scales: {
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Thời Gian',
-                                        font: {
-                                            weight: 'bold',
-                                            family:'REM'
-                                        }
+            {/* Chart Section */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-semibold">Biểu đồ tổng quan hoạt động</h2>
+                        <FormControl size="small">
+                            <InputLabel id="time-range-select-label">Thời gian</InputLabel>
+                            <Select
+                                labelId="time-range-select-label"
+                                value={timeRange}
+                                onChange={(e) => setTimeRange(e.target.value)}
+                                label="Time Range"
+                                sx={{width:'150px'}}
+                            >
+                                <MenuItem value="Week">Tuần</MenuItem>
+                                <MenuItem value="Month">Tháng</MenuItem>
+                                <MenuItem value="Year">Năm</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
+
+                    <div className="h-[400px] w-full">
+                        <Line
+                            data={createCombinedChartData()}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false, // Disable default legend
                                     },
-                                    grid: {
-                                        display: true,
-                                        drawBorder: true,
-                                    }
                                 },
-                                y: {
-                                    title: {
-                                        display: true,
-                                        text: 'Số Lượng',
-                                        font: {
-                                            weight: 'bold',
-                                            family:'REM' 
-                                        }
+                                scales: {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Thời Gian',
+                                        },
                                     },
-                                    beginAtZero: true,
-                                    grid: {
-                                        display: true,
-                                        drawBorder: true,
-                                    }
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Số Lượng',
+                                        },
+                                        beginAtZero: true,
+                                    },
                                 },
-                            },
-                        }}
-                    />
+                            }}
+                        />
+                    </div>
+
+                    {/* Custom legend */}
+                    <div className="flex justify-center mt-4">
+                        <div className="flex space-x-4">
+                            <div
+                                className={`flex items-center space-x-2 cursor-pointer ${visibleDatasets.comics ? '' : 'opacity-50'}`}
+                                onClick={() => toggleDatasetVisibility('comics')}
+                            >
+                                <div className="w-4 h-4 bg-[rgba(75,192,192,1)] border"></div>
+                                <span>Truyện</span>
+                            </div>
+                            <div
+                                className={`flex items-center space-x-2 cursor-pointer ${visibleDatasets.orders ? '' : 'opacity-50'}`}
+                                onClick={() => toggleDatasetVisibility('orders')}
+                            >
+                                <div className="w-4 h-4 bg-[rgba(192,75,192,1)] border"></div>
+                                <span>Đơn hàng</span>
+                            </div>
+                            <div
+                                className={`flex items-center space-x-2 cursor-pointer ${visibleDatasets.transactions ? '' : 'opacity-50'}`}
+                                onClick={() => toggleDatasetVisibility('transactions')}
+                            >
+                                <div className="w-4 h-4 bg-[rgba(192,192,75,1)] border"></div>
+                                <span>Giao dịch</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        // </div>
     );
 };
 

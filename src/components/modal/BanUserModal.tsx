@@ -35,7 +35,7 @@ const BanUserModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =>
         const reason = selectedReason === 'Khác' ? otherReason : selectedReason;
         onBan(reason);
         onClose();
-    };
+      };
 
     return (
         <Modal open={open} onClose={onClose}>

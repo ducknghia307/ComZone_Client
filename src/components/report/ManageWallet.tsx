@@ -1,128 +1,175 @@
 import React, { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Button, Box, IconButton, TablePagination, TextField, } from "@mui/material";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import "../ui/UserWallet.css";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TablePagination, tableCellClasses } from "@mui/material";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { BaseInterface, UserInfo } from "../../common/base.interface";
-import CurrencySplitter from "../../assistants/Spliter";
-import { useAppSelector } from "../../redux/hooks";
-const ManageWallet = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [showDepositForm, setShowDepositForm] = useState(false);
-  const [showWithdrawForm, setShowWithdrawForm] = useState(false);
+import { styled } from "@mui/material/styles";
+
+// Styled Components
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: '#c66a7a',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontFamily: 'REM',
+    fontSize: '1rem',
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    color: '#000',
+    fontFamily: 'REM',
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  backgroundColor: '#fff',
+  '&:nth-of-type(odd)': {
+    backgroundColor: '#ffe3d842',
+  },
+}));
+
+const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
+  backgroundColor: '#fff',
+  color: '#000',
+}));
+
+const ManageWallet: React.FC = () => {
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [userInfo, setUserInfo] = useState<UserInfo>();
-  const [transactions, setTransactions] = useState([]);
-  const userId = useAppSelector((state) => state.auth.userId);
-  console.log("userid", userId);
 
-  const fetchUserTransactions = async () => {
-    try {
-      const response = await privateAxios.get("/transactions/all");
-      const data = await response.data;
-      // Transform the API response data to match table columns
-      const formattedTransactions = data.map((transaction) => ({
-        date: new Date(transaction.createdAt).toLocaleDateString("vi-VN"),
-        userName: transaction.user?.name,
-        type: transaction.amount > 0 ? "Nạp Tiền" : "Rút Tiền",
-        amount: `${transaction.amount > 0 ? "+" : ""}${transaction.amount.toLocaleString("vi-VN")} đ`,
-        status: transaction.status,
-        note: transaction.note || "Không có ghi chú",
-      }));
-      setTransactions(formattedTransactions);
-      console.log("transactions", response.data);
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-    }
-  };
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await privateAxios.get("/transactions/all");
+        const formattedTransactions = response.data.map((transaction: any) => ({
+          date: new Date(transaction.createdAt).toLocaleDateString("vi-VN"),
+          userName: transaction.user?.name || "N/A",
+          type: transaction.amount > 0 ? "Nạp Tiền" : "Rút Tiền",
+          amount: `${transaction.amount > 0 ? "+" : ""}${transaction.amount.toLocaleString("vi-VN")} đ`,
+          status: transaction.status,
+          note: transaction.note || "Không có ghi chú",
+        }));
+        setTransactions(formattedTransactions);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTransactions();
+  }, []);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const paginatedTransactions = transactions.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-  useEffect(() => {
-    fetchUserTransactions()
-  }, []);
-
   const getStatusChipStyles = (status: string) => {
     switch (status) {
-      case 'SUCCESSFUL':
-        return { color: '#4caf50', backgroundColor: '#e8f5e9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
-      case 'PENDING':
-        return { color: '#ff9800', backgroundColor: '#fff3e0', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', };
-      case 'FAILED':
-        return { color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+      case "SUCCESSFUL":
+        return {
+          color: "#4caf50",
+          backgroundColor: "#e8f5e9",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      case "PENDING":
+        return {
+          color: "#ff9800",
+          backgroundColor: "#fff3e0",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      case "FAILED":
+        return {
+          color: "#e91e63",
+          backgroundColor: "#fce4ec",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      default:
+        return {
+          color: "#000",
+          backgroundColor: "#eee",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
     }
   };
 
   const translateStatus = (status: string) => {
     switch (status) {
-      case 'SUCCESSFUL': return 'Thành công';
-      case 'PENDING': return 'Đang xử lí';
-      case 'FAILED': return 'Thất bại';
-      default: return status;
+      case "SUCCESSFUL":
+        return "Thành công";
+      case "PENDING":
+        return "Đang xử lí";
+      case "FAILED":
+        return "Thất bại";
+      default:
+        return status;
     }
   };
 
   return (
-    <div className="wallet-container">
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM' }}>
-        Quản lý đấu giá
+    <div style={{ paddingBottom: "40px" }}>
+      <Typography
+        variant="h5"
+        sx={{ marginBottom: "20px", fontWeight: "bold", fontFamily: "REM", color: "#71002b" }}
+      >
+        Quản lý ví
       </Typography>
-      <TableContainer component={Paper} className="wallet-table-container">
-        <Table>
-          <TableHead>
-            <TableRow style={{ backgroundColor: "black" }}>
-              <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
-                Ngày giao dịch
-              </TableCell>
-              <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
-                Tên Người Dùng
-              </TableCell>
-              <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
-                Loại giao dịch
-              </TableCell>
-              <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
-                Số Tiền (đ)
-              </TableCell>
-              <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
-                Trạng Thái
-              </TableCell>
-              <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
-                Ghi Chú
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedTransactions.map((transaction, index) => (
-              <TableRow key={index}>
-                <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.date}</TableCell>
-                <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.userName}</TableCell>
-                <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.type}</TableCell>
-                <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.amount}</TableCell>
-                <TableCell sx={{ fontFamily: 'REM' }} align="center">
-                  <span style={getStatusChipStyles(transaction.status)}>
-                    {translateStatus(transaction.status)}
-                  </span>
-                </TableCell>
-                <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.note}</TableCell>
+      <Paper>
+        <TableContainer>
+          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Ngày giao dịch</StyledTableCell>
+                <StyledTableCell align="left">Tên Người Dùng</StyledTableCell>
+                <StyledTableCell align="left">Loại giao dịch</StyledTableCell>
+                <StyledTableCell align="right">Số Tiền</StyledTableCell>
+                <StyledTableCell align="right">Trạng Thái</StyledTableCell>
+                <StyledTableCell align="right">Ghi Chú</StyledTableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
+            </TableHead>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <StyledTableCell colSpan={6} align="center">
+                    Loading...
+                  </StyledTableCell>
+                </TableRow>
+              ) : (
+                transactions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((transaction, index) => (
+                  <StyledTableRow key={index}>
+                    <StyledTableCell>{transaction.date}</StyledTableCell>
+                    <StyledTableCell align="left">{transaction.userName}</StyledTableCell>
+                    <StyledTableCell align="left">{transaction.type}</StyledTableCell>
+                    <StyledTableCell align="right">{transaction.amount}</StyledTableCell>
+                    <StyledTableCell align="right">
+                      <span style={getStatusChipStyles(transaction.status)}>
+                        {translateStatus(transaction.status)}
+                      </span>
+                    </StyledTableCell>
+                    <StyledTableCell align="right">{transaction.note}</StyledTableCell>
+                  </StyledTableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <StyledTablePagination
           rowsPerPageOptions={[10, 20]}
           component="div"
           count={transactions.length}
@@ -131,10 +178,9 @@ const ManageWallet = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </TableContainer>
+      </Paper>
     </div>
-  )
-}
-
+  );
+};
 
 export default ManageWallet;

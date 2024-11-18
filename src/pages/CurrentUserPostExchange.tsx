@@ -26,7 +26,7 @@ const CurrentUserPostExchange = () => {
   const fetchUserExchangeRequest = async () => {
     try {
       setIsLoading(true);
-      const res = await privateAxios("/exchange-requests/user");
+      const res = await privateAxios("/comics/exchange/user");
       setExchangeList(res.data);
     } catch (error) {
       console.log("Error:", error);

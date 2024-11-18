@@ -1,6 +1,7 @@
 import { BaseInterface, Comic, UserInfo } from "../base.interface";
 
 export interface Exchange extends BaseInterface {
+  id: string;
   post: ExchangePostInterface;
   requestUser: UserInfo;
   status:

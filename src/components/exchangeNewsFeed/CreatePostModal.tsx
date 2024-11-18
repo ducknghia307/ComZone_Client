@@ -3,7 +3,7 @@ import TextArea from "antd/es/input/TextArea";
 import { useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
 import Loading from "../loading/Loading";
-import { PictureOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PictureOutlined } from "@ant-design/icons";
 import ActionConfirm from "../actionConfirm/ActionConfirm";
 
 export default function CreatePostModal({
@@ -20,7 +20,53 @@ export default function CreatePostModal({
 
   const [loading, setLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [previewChapterImages, setPreviewChapterImages] = useState<string[]>(
+    []
+  );
+  const handlePreviewChapterChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (e.target.files && e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+      if (previewChapterImages.length >= 4) {
+        notification.error({
+          message: "Error",
+          description: "You can only upload up to 4 preview images.",
+        });
+        return;
+      }
 
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+      setLoading(true);
+      try {
+        const res = await privateAxios.post("/file/upload/image", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        const newImageUrl = res.data.imageUrl;
+        const updatedImages = [...previewChapterImages, newImageUrl];
+        setPreviewChapterImages(updatedImages);
+        sessionStorage.setItem(
+          "previewChapterImages",
+          JSON.stringify(updatedImages)
+        );
+      } catch (error) {
+        console.error("Preview image upload failed:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+  const handleRemovePreviewChapterImage = (index: number) => {
+    const updatedImages = previewChapterImages.filter((_, i) => i !== index);
+    setPreviewChapterImages(updatedImages);
+    sessionStorage.setItem(
+      "previewChapterImages",
+      JSON.stringify(updatedImages)
+    );
+  };
   const handleSubmit = async () => {
     if (!postContent.trim()) {
       setPostContentError(true);
@@ -104,22 +150,38 @@ export default function CreatePostModal({
             Cần nhập nội dung bài đăng
           </p>
         )}
-        <div className="flex mt-4"></div>
-        <button
-          className=" h-20 w-20 p-4 border bg-gray-100 hover:opacity-75 duration-200 rounded-lg flex flex-col items-center justify-center gap-2"
-          onClick={() =>
-            document.getElementById("previewChapterUpload")?.click()
-          }
-        >
-          <PictureOutlined />
-          <p className="text-nowrap">Thêm ảnh</p>
-          <input
-            type="file"
-            // onChange={handlePreviewChapterChange}
-            className="hidden"
-            id="previewChapterUpload"
-          />
-        </button>
+        <div className="flex gap-2 mt-4">
+          {previewChapterImages.map((imgUrl, index) => (
+            <div key={index} className="relative group">
+              <img
+                src={imgUrl}
+                alt={`preview chapter ${index}`}
+                className="w-20 h-20 object-cover transition-opacity duration-200 ease-in-out group-hover:opacity-50 rounded-md border p-1"
+              />
+              <button
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                onClick={() => handleRemovePreviewChapterImage(index)}
+              >
+                <DeleteOutlined style={{ fontSize: 16 }} />
+              </button>
+            </div>
+          ))}
+          <button
+            className=" h-20 w-20 p-4 border bg-gray-100 hover:opacity-75 duration-200 rounded-lg flex flex-col items-center justify-center gap-2"
+            onClick={() =>
+              document.getElementById("previewChapterUpload")?.click()
+            }
+          >
+            <PictureOutlined />
+            <p className="text-nowrap">Thêm ảnh</p>
+            <input
+              type="file"
+              onChange={handlePreviewChapterChange}
+              className="hidden"
+              id="previewChapterUpload"
+            />
+          </button>
+        </div>
         <div className="w-full flex justify-end mt-4 flex-row gap-10">
           <button
             className="border-none hover:opacity-70 duration-200"

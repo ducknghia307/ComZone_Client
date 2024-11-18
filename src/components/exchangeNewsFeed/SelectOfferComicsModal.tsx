@@ -7,6 +7,7 @@ import {
   ExchangePostInterface,
 } from "../../common/interfaces/exchange.interface";
 import ActionConfirm from "../actionConfirm/ActionConfirm";
+import Loading from "../loading/Loading";
 
 export default function SelectOfferComicsModal({
   post,
@@ -24,6 +25,7 @@ export default function SelectOfferComicsModal({
   setIsChatOpen: Function;
   isLoading: boolean;
 }) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [requestSelectOptionValues, setRequestSelectOptionValues] = useState<
     { label: string; value: string; image: string }[]
   >([]);
@@ -91,20 +93,29 @@ export default function SelectOfferComicsModal({
   };
 
   const handleSubmitRequest = async () => {
+    setIsLoading(true);
+    const resExchange = await privateAxios.post("/exchanges", {
+      post: post.id,
+    });
+    console.log(resExchange.data.id);
+
     await privateAxios
       .post("exchange-comics", {
-        postId: post.id,
+        exchangeId: resExchange.data.id,
         requestUserComicsList: selectedRequestComicsList,
         postUserComicsList: selectedPostComicsList,
       })
       .then(async (res) => {
+        console.log(res);
+
         await privateAxios
           .post("chat-rooms", {
             secondUser: post.user.id,
-            exchange: res.data.exchange.id,
+            exchange: resExchange.data.id,
           })
-          .then((res) => {
-            sessionStorage.setItem("connectedChat", res.data.id);
+          .then((response) => {
+            sessionStorage.setItem("connectedChat", response.data.id);
+
             setIsChatOpen(true);
             handleModalClose();
           });
@@ -119,176 +130,181 @@ export default function SelectOfferComicsModal({
         });
         handleModalClose();
       });
+    setIsLoading(false);
   };
 
   return (
-    <Modal
-      open={isSelectModalOpen === post.id}
-      onCancel={(e) => handleModalClose(e)}
-      footer={null}
-      width={1000}
-      maskClosable={false}
-    >
-      <div className="w-full lg:h-[60vh] py-4 flex flex-col items-stretch justify-between gap-4">
-        <p className="text-[1.5em] font-semibold">CHỌN TRUYỆN ĐỂ TRAO ĐỔI</p>
-        <p className="inline">
-          Bạn sẽ chọn những truyện của bạn dùng để trao đổi, sau đó bạn có thể
-          chọn truyện của{" "}
-          <span className="font-semibold">
-            <Avatar src={post.user.avatar} />
-            &nbsp;{post.user.name}
-          </span>{" "}
-          để gửi yêu cầu trao đổi với họ.
-        </p>
+    <>
+      {isLoading && <Loading />}
+      <Modal
+        open={isSelectModalOpen === post.id}
+        onCancel={(e) => handleModalClose(e)}
+        footer={null}
+        width={1000}
+        maskClosable={false}
+      >
+        <div className="w-full lg:h-[60vh] py-4 flex flex-col items-stretch justify-between gap-4">
+          <p className="text-[1.5em] font-semibold">CHỌN TRUYỆN ĐỂ TRAO ĐỔI</p>
+          <p className="inline">
+            Bạn sẽ chọn những truyện của bạn dùng để trao đổi, sau đó bạn có thể
+            chọn truyện của{" "}
+            <span className="font-semibold">
+              <Avatar src={post.user.avatar} />
+              &nbsp;{post.user.name}
+            </span>{" "}
+            để gửi yêu cầu trao đổi với họ.
+          </p>
 
-        <div className="grow flex items-stretch justify-start gap-8">
-          {isSelectingMine && (
-            <div className="basis-1/2 flex flex-col items-stretch gap-4">
-              <p className="font-light italic">
-                Đầu tiên, hãy chọn từ danh sách truyện dùng để trao đổi của bạn:
-              </p>
-              <Select
-                mode="multiple"
-                style={{ width: "100%" }}
-                placeholder="Chọn truyện..."
-                virtual={true}
-                allowClear={true}
-                size="large"
-                value={selectedRequestComicsList}
-                options={requestSelectOptionValues}
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                optionRender={(option) => (
-                  <div className="h-max flex items-center gap-2">
-                    <img
-                      src={option.data.image}
-                      className="w-[2em] rounded-lg"
-                    />
-                    <p>{option.data.label}</p>
-                  </div>
-                )}
-                onSelect={(value: string) => {
-                  setSelectedRequestComicsList((prev) => [...prev, value]);
-                }}
-                onDeselect={(value: string) => {
-                  const filtered = selectedRequestComicsList.filter(
-                    (comics) => comics !== value
-                  );
-                  setSelectedRequestComicsList(filtered);
-                }}
-                onClear={() => setSelectedRequestComicsList([])}
-              />
-
-              <div
-                className={`${
-                  selectedPostComicsList.length === 0 && "hidden"
-                } flex items-center justify-between gap-2 text-lg`}
-              >
-                <p className="font-light">
-                  Tổng số truyện được chọn:{" "}
-                  <span className="font-semibold">
-                    {selectedPostComicsList.length}
-                  </span>
+          <div className="grow flex items-stretch justify-start gap-8">
+            {isSelectingMine && (
+              <div className="basis-1/2 flex flex-col items-stretch gap-4">
+                <p className="font-light italic">
+                  Đầu tiên, hãy chọn từ danh sách truyện dùng để trao đổi của
+                  bạn:
                 </p>
+                <Select
+                  mode="multiple"
+                  style={{ width: "100%" }}
+                  placeholder="Chọn truyện..."
+                  virtual={true}
+                  allowClear={true}
+                  size="large"
+                  value={selectedRequestComicsList}
+                  options={requestSelectOptionValues}
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  optionRender={(option) => (
+                    <div className="h-max flex items-center gap-2">
+                      <img
+                        src={option.data.image}
+                        className="w-[2em] rounded-lg"
+                      />
+                      <p>{option.data.label}</p>
+                    </div>
+                  )}
+                  onSelect={(value: string) => {
+                    setSelectedRequestComicsList((prev) => [...prev, value]);
+                  }}
+                  onDeselect={(value: string) => {
+                    const filtered = selectedRequestComicsList.filter(
+                      (comics) => comics !== value
+                    );
+                    setSelectedRequestComicsList(filtered);
+                  }}
+                  onClear={() => setSelectedRequestComicsList([])}
+                />
+
+                <div
+                  className={`${
+                    selectedPostComicsList.length === 0 && "hidden"
+                  } flex items-center justify-between gap-2 text-lg`}
+                >
+                  <p className="font-light">
+                    Tổng số truyện được chọn:{" "}
+                    <span className="font-semibold">
+                      {selectedPostComicsList.length}
+                    </span>
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {!isSelectingMine && (
-            <div className="basis-1/2 flex flex-col items-stretch gap-4">
-              <p className="font-light italic">
-                Chọn những truyện của{" "}
-                <span className="font-semibold">{post.user.name}</span> mà bạn
-                muốn để trao đổi.
-              </p>
-              <Select
-                mode="multiple"
-                style={{ width: "100%" }}
-                placeholder="Chọn truyện..."
-                virtual={true}
-                allowClear={true}
-                size="large"
-                value={selectedPostComicsList}
-                options={postSelectOptionValues}
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                optionRender={(option) => (
-                  <div className="h-max flex items-center gap-2">
-                    <img
-                      src={option.data.image}
-                      className="w-[2em] rounded-lg"
-                    />
-                    <p>{option.data.label}</p>
-                  </div>
-                )}
-                onSelect={(value: string) => {
-                  setSelectedPostComicsList((prev) => [...prev, value]);
-                }}
-                onDeselect={(value: string) => {
-                  const filtered = selectedPostComicsList.filter(
-                    (comics) => comics !== value
-                  );
-                  setSelectedPostComicsList(filtered);
-                }}
-                onClear={() => setSelectedPostComicsList([])}
-              />
-
-              <div
-                className={`${
-                  selectedPostComicsList.length === 0 && "hidden"
-                } flex items-center justify-between gap-2 text-lg`}
-              >
-                <p className="font-light">
-                  Tổng số truyện được chọn:{" "}
-                  <span className="font-semibold">
-                    {selectedPostComicsList.length}
-                  </span>
+            {!isSelectingMine && (
+              <div className="basis-1/2 flex flex-col items-stretch gap-4">
+                <p className="font-light italic">
+                  Chọn những truyện của{" "}
+                  <span className="font-semibold">{post.user.name}</span> mà bạn
+                  muốn để trao đổi.
                 </p>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center justify-end gap-8">
-          <button
-            onClick={(e) => {
-              if (!isSelectingMine) setIsSelectingMine(true);
-              else handleModalClose(e);
-            }}
-            className="p-2 hover:underline"
-          >
-            {isSelectingMine ? "Hủy bỏ" : "Quay lại"}
-          </button>
-          <button
-            disabled={
-              (isSelectingMine && selectedRequestComicsList.length === 0) ||
-              (!isSelectingMine && selectedPostComicsList.length === 0)
-            }
-            onClick={() => {
-              if (isSelectingMine) setIsSelectingMine(false);
-              else setIsConfirming(true);
-            }}
-            className="px-16 py-2 bg-sky-700 text-white rounded-md duration-200 hover:bg-sky-900 disabled:bg-gray-300"
-          >
-            {isSelectingMine ? "Tiếp theo" : "Hoàn tất"}
-          </button>
+                <Select
+                  mode="multiple"
+                  style={{ width: "100%" }}
+                  placeholder="Chọn truyện..."
+                  virtual={true}
+                  allowClear={true}
+                  size="large"
+                  value={selectedPostComicsList}
+                  options={postSelectOptionValues}
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  optionRender={(option) => (
+                    <div className="h-max flex items-center gap-2">
+                      <img
+                        src={option.data.image}
+                        className="w-[2em] rounded-lg"
+                      />
+                      <p>{option.data.label}</p>
+                    </div>
+                  )}
+                  onSelect={(value: string) => {
+                    setSelectedPostComicsList((prev) => [...prev, value]);
+                  }}
+                  onDeselect={(value: string) => {
+                    const filtered = selectedPostComicsList.filter(
+                      (comics) => comics !== value
+                    );
+                    setSelectedPostComicsList(filtered);
+                  }}
+                  onClear={() => setSelectedPostComicsList([])}
+                />
 
-          <ActionConfirm
-            isOpen={isConfirming}
-            setIsOpen={setIsConfirming}
-            title="Xác nhận gửi yêu cầu?"
-            description={
-              <p>Bạn đã chắc chắn muốn gửi yêu cầu với những truyện này?</p>
-            }
-            confirmCallback={() => handleSubmitRequest()}
-          />
+                <div
+                  className={`${
+                    selectedPostComicsList.length === 0 && "hidden"
+                  } flex items-center justify-between gap-2 text-lg`}
+                >
+                  <p className="font-light">
+                    Tổng số truyện được chọn:{" "}
+                    <span className="font-semibold">
+                      {selectedPostComicsList.length}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center justify-end gap-8">
+            <button
+              onClick={(e) => {
+                if (!isSelectingMine) setIsSelectingMine(true);
+                else handleModalClose(e);
+              }}
+              className="p-2 hover:underline"
+            >
+              {isSelectingMine ? "Hủy bỏ" : "Quay lại"}
+            </button>
+            <button
+              disabled={
+                (isSelectingMine && selectedRequestComicsList.length === 0) ||
+                (!isSelectingMine && selectedPostComicsList.length === 0)
+              }
+              onClick={() => {
+                if (isSelectingMine) setIsSelectingMine(false);
+                else setIsConfirming(true);
+              }}
+              className="px-16 py-2 bg-sky-700 text-white rounded-md duration-200 hover:bg-sky-900 disabled:bg-gray-300"
+            >
+              {isSelectingMine ? "Tiếp theo" : "Hoàn tất"}
+            </button>
+
+            <ActionConfirm
+              isOpen={isConfirming}
+              setIsOpen={setIsConfirming}
+              title="Xác nhận gửi yêu cầu?"
+              description={
+                <p>Bạn đã chắc chắn muốn gửi yêu cầu với những truyện này?</p>
+              }
+              confirmCallback={() => handleSubmitRequest()}
+            />
+          </div>
         </div>
-      </div>
-    </Modal>
+      </Modal>
+    </>
   );
 }

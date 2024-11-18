@@ -181,7 +181,7 @@ const Navbar = () => {
   };
 
   if (userInfo?.role === "ADMIN" || userInfo?.role === "MODERATOR") {
-    return null; // Không có navbar
+    return null;
   }
 
   return (
@@ -282,7 +282,7 @@ const Navbar = () => {
                 <>
                   <div className="flex flex-row justify-center items-center gap-6">
                     <Link
-                      to={"/exchange/waiting"}
+                      to={"/exchange/all"}
                       className=" items-center cursor-pointer duration-200 hover:opacity-50 ml-4 lg:flex hidden"
                     >
                       <svg

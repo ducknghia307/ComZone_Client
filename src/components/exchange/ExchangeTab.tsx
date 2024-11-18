@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface TabProps {
   label: string;
@@ -11,7 +11,7 @@ const Tab: React.FC<TabProps> = ({ label, path, isActive }) => {
   return (
     <Link
       to={`${path}`}
-      className={`flex items-center justify-between px-4 py-2 rounded-lg cursor-pointer 
+      className={`flex duration-200 items-center justify-between px-4 py-2 rounded-lg cursor-pointer 
       ${
         isActive
           ? "bg-blue-700 text-white"
@@ -24,36 +24,27 @@ const Tab: React.FC<TabProps> = ({ label, path, isActive }) => {
 };
 
 const ExchangeTab: React.FC = () => {
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
-
   const tabs = [
-    { label: "Đang chờ", path: "/exchange/waiting" },
-    { label: "Yêu cầu đã gửi", path: "/exchange/request-send" },
-    { label: "Đang trao đổi", path: "/exchange/dealing" },
-    { label: "Đang chờ giao hàng", path: "/exchange/delivering" },
-    { label: "Đã hoàn tất", path: "/exchange/successful" },
-    { label: "Đã hủy", path: "/exchange/cancel" },
+    { label: "Tất cả", path: "/exchange/all" },
+    { label: "Đang chờ", path: "/exchange/pending-request" },
+    { label: "Đã gửi", path: "/exchange/sent-request" },
+    { label: "Đang thực hiện", path: "/exchange/in-progress" },
+    { label: "Đang vận chuyển", path: "/exchange/in-delivery" },
+    { label: "Đã giao hàng", path: "/exchange/finished-delivery" },
+    { label: "Thành công", path: "/exchange/successful" },
+    { label: "Bị hủy", path: "/exchange/canceled" },
   ];
 
-  useEffect(() => {
-    const handlePathChange = () => {
-      setCurrentPath(window.location.pathname);
-    };
-
-    window.addEventListener("popstate", handlePathChange);
-    return () => {
-      window.removeEventListener("popstate", handlePathChange);
-    };
-  }, []);
+  const location = useLocation();
 
   return (
-    <div className="flex space-x-4 REM lg:w-2/3 w-full">
+    <div className="flex space-x-4 REM w-full">
       {tabs.map((tab, index) => (
         <Tab
           key={index}
           label={tab.label}
           path={tab.path}
-          isActive={currentPath === tab.path}
+          isActive={location.pathname === tab.path}
         />
       ))}
     </div>

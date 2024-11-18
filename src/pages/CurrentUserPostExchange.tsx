@@ -4,7 +4,7 @@ import { privateAxios } from "../middleware/axiosInstance";
 import { UserInfo } from "../common/base.interface";
 import ProfileTab from "../components/Profile/ProfileTab";
 import Loading from "../components/loading/Loading";
-import { ExchangeRequest } from "../common/interfaces/exchange-request.interface";
+import { ExchangeRequest } from "../common/interfaces/exchange.interface";
 import ExchangePost from "../components/exchangeNewsFeed/ExchangePost";
 
 const CurrentUserPostExchange = () => {

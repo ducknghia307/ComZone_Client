@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ExchangeOffer } from "../../../common/interfaces/exchange-offer.interface";
-import { ExchangeRequest } from "../../../common/interfaces/exchange-request.interface";
+import { ExchangeRequest } from "../../../common/interfaces/exchange.interface";
 import { Avatar, Tooltip } from "antd";
 import ActionButtons from "./ActionButtons";
 import CurrencySplitter from "../../../assistants/Spliter";

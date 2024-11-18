@@ -3,18 +3,18 @@ import { Button, notification, Tour } from "antd";
 import type { TourProps } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
-import { ExchangeRequest } from "../common/interfaces/exchange-request.interface";
+import { Exchange } from "../common/interfaces/exchange.interface";
 import Loading from "../components/loading/Loading";
 import ExchangeSearchBar from "../components/exchangeNewsFeed/ExchangeSearchBar";
 import CreatePostModal from "../components/exchangeNewsFeed/CreatePostModal";
-import SubscriptionModal from "../components/exchangeNewsFeed/SubscriptionModal";
 import "../components/ui/Exchange.css";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ExchangeNotFound from "../components/exchangeNewsFeed/ExchangeNotFound";
 import ChatModal from "./ChatModal";
 import EmptyExchangeList from "../components/exchangeNewsFeed/EmptyExchangeList";
 import { authSlice } from "../redux/features/auth/authSlice";
+import { Comic } from "../common/base.interface";
 
 export default function ExchangeNewsFeed() {
   const { isLoggedIn, isLoading, userId } = useAppSelector(
@@ -23,7 +23,11 @@ export default function ExchangeNewsFeed() {
   const dispatch = useAppDispatch();
   const [beginTour, setBeginTour] = useState(false);
 
-  const [exchangeList, setExchangeList] = useState<ExchangeRequest[]>([]);
+  const [exchangeList, setExchangeList] = useState<Exchange[]>([]);
+  const [userExchangeComicsList, setUserExchangeComicsList] = useState<Comic[]>(
+    []
+  );
+
   const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
   const [openSubscription, setOpenSubscription] = useState<boolean>(false);
   const [isSelectModalOpen, setIsSelectModalOpen] = useState<string>("");
@@ -33,6 +37,8 @@ export default function ExchangeNewsFeed() {
   const [searchKey, setSearchKey] = useState<string>(
     searchParams.get("search") || ""
   );
+
+  const navigate = useNavigate();
 
   const ref1 = useRef(null);
   const ref2 = useRef(null);
@@ -138,7 +144,7 @@ export default function ExchangeNewsFeed() {
       if (searchParams.get("search")) {
         setExchangeList(
           await publicAxios
-            .get(`exchange-requests/search`, {
+            .get(`exchanges/search`, {
               params: {
                 key: searchKey,
               },
@@ -149,13 +155,19 @@ export default function ExchangeNewsFeed() {
         );
       } else
         setExchangeList(
-          await publicAxios.get(`exchange-requests/available`).then((res) => {
+          await publicAxios.get(`exchanges/all/pending`).then((res) => {
             console.log(res.data);
             return res.data;
           })
         );
-      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+
+      //Fetch logged in user's exchange comics list
+      await privateAxios
+        .get("comics/exchange/user")
+        .then((res) => setUserExchangeComicsList(res.data))
+        .catch((err) => console.log(err));
     } catch (err) {
+      console.log(err);
     } finally {
       dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
     }
@@ -166,20 +178,24 @@ export default function ExchangeNewsFeed() {
   }, []);
 
   const handleOpenCreatePost = async () => {
-    const offeredList = await privateAxios
-      .get(`comics/exchange-offer/user`)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err));
-
-    if (!offeredList || offeredList.length === 0) {
-      notification.warning({
-        key: "a",
-        message: "Chưa được đăng bài",
-        description:
-          "Cần ít nhất 1 truyện dùng để trao đổi trước khi được đăng bài tìm trao đổi!",
-        duration: 5,
+    if (userExchangeComicsList.length === 0) {
+      notification.info({
+        key: "empty_exchange_comics",
+        message: "Bạn chưa có truyện để trao đổi!",
+        description: (
+          <p className="text-xs">
+            Bạn cần có ít nhất 1 truyện dùng để trao đổi trên hệ thống trước khi
+            thực hiện đăng bài.
+            <br />
+            <button
+              onClick={() => navigate("")}
+              className="text-sky-600 underline mt-2"
+            >
+              Thêm truyện ngay
+            </button>
+          </p>
+        ),
+        duration: 8,
       });
     } else {
       //FETCH USER'S EXCHANGE SUBSCRIPTION
@@ -207,26 +223,26 @@ export default function ExchangeNewsFeed() {
     fetchExchangeNewsFeed();
   }, [searchParams]);
 
-  const handleOpenChat = async (exchangeRequest: ExchangeRequest) => {
-    if (!isLoggedIn) {
-      alert("Chưa đăng nhập!");
-      return;
-    } else {
-      dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
-      await privateAxios
-        .post("chat-rooms", {
-          secondUser: exchangeRequest.user.id,
-          exchangeRequest: exchangeRequest.id,
-        })
-        .then((res) => {
-          sessionStorage.setItem("connectedChat", res.data.id);
-          setIsChatOpen(true);
-        })
-        .catch((err) => console.log(err))
-        .finally(() =>
-          dispatch(authSlice.actions.updateIsLoading({ isLoading: false }))
-        );
-    }
+  const handleOpenChat = async (exchange: Exchange) => {
+    // if (!isLoggedIn) {
+    //   alert("Chưa đăng nhập!");
+    //   return;
+    // } else {
+    //   dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
+    //   await privateAxios
+    //     .post("chat-rooms", {
+    //       secondUser: exchange.user.id,
+    //       exchange: exchange.id,
+    //     })
+    //     .then((res) => {
+    //       sessionStorage.setItem("connectedChat", res.data.id);
+    //       setIsChatOpen(true);
+    //     })
+    //     .catch((err) => console.log(err))
+    //     .finally(() =>
+    //       dispatch(authSlice.actions.updateIsLoading({ isLoading: false }))
+    //     );
+    // }
   };
 
   return (
@@ -252,18 +268,20 @@ export default function ExchangeNewsFeed() {
           <CreatePostModal
             openCreatePost={openCreatePost}
             setOpenCreatePost={setOpenCreatePost}
+            fetchExchangeNewsFeed={fetchExchangeNewsFeed}
           />
 
           <div className="w-full grid grid-cols-[repeat(auto-fill,50em)] items-stretch justify-center gap-8 py-4">
             {exchangeList && exchangeList.length > 0 ? (
-              exchangeList.map((exchangeRequest, index: number) => {
+              exchangeList.map((exchange, index: number) => {
                 const tourIndex = exchangeList.findIndex(
-                  (request) => request.user.id !== userId
+                  (request) => request.postUser.id !== userId
                 );
                 return (
                   <ExchangePost
                     key={index}
-                    exchangeRequest={exchangeRequest}
+                    exchange={exchange}
+                    userExchangeComicsList={userExchangeComicsList}
                     refs={[ref1, ref2, ref3]}
                     index={index}
                     isLoading={isLoading}
@@ -273,6 +291,7 @@ export default function ExchangeNewsFeed() {
                     isChatOpen={isChatOpen}
                     setIsChatOpen={setIsChatOpen}
                     tourIndex={tourIndex}
+                    navigate={navigate}
                   />
                 );
               })

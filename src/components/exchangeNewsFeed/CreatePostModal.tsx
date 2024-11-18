@@ -1,129 +1,67 @@
-import { message, Modal, notification } from "antd";
-import NewExchangeForm from "./NewExchangeForm";
+import { Modal, notification } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { useEffect, useState } from "react";
-import ComicListToExchange from "./ComicListToExchange";
-import { ExchangeElement } from "../../common/interfaces/exchange-post.interface";
-import { UserInfo } from "../../common/base.interface";
+import { useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
 import Loading from "../loading/Loading";
 import { PictureOutlined } from "@ant-design/icons";
+import ActionConfirm from "../actionConfirm/ActionConfirm";
 
 export default function CreatePostModal({
   openCreatePost,
   setOpenCreatePost,
+  fetchExchangeNewsFeed,
 }: {
   openCreatePost: boolean;
   setOpenCreatePost: (open: boolean) => void;
+  fetchExchangeNewsFeed: () => void;
 }) {
   const [postContent, setPostContent] = useState("");
   const [postContentError, setPostContentError] = useState(false);
-  const [comicList, setComicList] = useState<ExchangeElement[]>([]);
-  const [userInfo, setUserInfo] = useState<UserInfo>();
+
   const [loading, setLoading] = useState(false);
-  const fetchUserInfo = async () => {
-    try {
-      const res = await privateAxios("/users/profile");
-      setUserInfo(res.data);
-    } catch (error) {
-      console.log("Error:", error);
-    }
-  };
-
-  const handleDelete = (index: number) => {
-    const updatedComicList = comicList.filter((_, i) => i !== index);
-    setComicList(updatedComicList);
-
-    if (userInfo) {
-      const storedComics = JSON.parse(
-        sessionStorage.getItem("newComicData") || "{}"
-      );
-      const userComics = storedComics[userInfo.id] || [];
-      const newUserComics = userComics.filter((_: any, i: any) => i !== index);
-      storedComics[userInfo.id] = newUserComics;
-      sessionStorage.setItem("newComicData", JSON.stringify(storedComics));
-    }
-
-    message.success("Comic deleted successfully!");
-  };
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const handleSubmit = async () => {
-    if (comicList.length === 0) {
-      notification.error({
-        message: "Lỗi",
-        description:
-          "Bạn cần thêm ít nhất thông tin về 1 cuốn truyện bạn muốn trao đổi.",
-        duration: 2,
-      });
-
-      return;
-    }
     if (!postContent.trim()) {
       setPostContentError(true);
-      notification.error({
-        message: "Lỗi",
-        description: "Bạn phải nhập nội dung bài đăng",
-        duration: 2,
+      notification.info({
+        key: "empty_post_content",
+        message: "Thêm nội dung",
+        description: "Bạn phải nhập nội dung cho bài viết của bạn.",
+        duration: 5,
       });
       return;
     }
-    // if (!postContent.trim()) {
-    //   return;
-    // }
+
     setLoading(true);
     try {
-      const requestedComics = comicList.map((comic) => ({
-        title: comic.title,
-        author: comic.author,
-        coverImage: comic.coverImage,
-        edition: comic.edition,
-        condition: comic.condition,
-        quantity: comic.quantity,
-      }));
-
-      const payload = {
-        requestedComics,
-        postContent: postContent,
-      };
-
-      const response = await privateAxios.post("/exchange-requests", payload);
+      const response = await privateAxios.post("exchanges", {
+        postContent,
+        images: [],
+      });
       console.log(response.data);
 
       notification.success({
+        key: "success",
         message: "Thành công",
         description: "Đăng bài để trao đổi truyện thành công!",
+        duration: 5,
       });
-      if (userInfo) {
-        const storedComics = JSON.parse(
-          sessionStorage.getItem("newComicData") || "{}"
-        );
-        delete storedComics[userInfo.id];
 
-        sessionStorage.setItem("newComicData", JSON.stringify(storedComics));
-      }
       setOpenCreatePost(false);
+      fetchExchangeNewsFeed();
     } catch (error) {
       console.error("Error posting exchange request:", error);
       notification.error({
-        message: "Error",
-        description: "Something went wrong, please try again.",
+        key: "error",
+        message: "Đã xảy ra lỗi!",
+        description: "Vui lòng thử lại sau.",
+        duration: 5,
       });
     } finally {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
-  useEffect(() => {
-    if (userInfo) {
-      const storedComics = JSON.parse(
-        sessionStorage.getItem("newComicData") || "{}"
-      );
-      const userComics = storedComics[userInfo.id] || [];
-      setComicList(userComics);
-    }
-  }, [openCreatePost, userInfo]);
 
   return (
     <>
@@ -140,26 +78,7 @@ export default function CreatePostModal({
         <h2 className="text-xl font-medium my-4">
           ĐĂNG BÀI TÌM KIẾM TRUYỆN ĐỂ TRAO ĐỔI
         </h2>
-        {/* {userInfo && (
-          <ComicListToExchange
-            comicList={comicList}
-            setComicList={setComicList}
-            userInfo={userInfo}
-            handleDelete={handleDelete}
-          />
-        )}
-        {comicList.length === 0 && (
-          <p className="text-red-500 text-xs mt-1">
-            Bạn cần thêm ít nhất thông tin về 1 cuốn truyện bạn muốn trao đổi
-          </p>
-        )}
-        {userInfo && (
-          <NewExchangeForm
-            comicList={comicList.length}
-            setComicList={setComicList}
-            userInfo={userInfo}
-          />
-        )} */}
+
         <div className="flex flex-row gap-1 mt-4">
           <h2>Nội dung bài viết:</h2>
           <p className="text-red-500">*</p>
@@ -170,13 +89,17 @@ export default function CreatePostModal({
             setPostContent(e.target.value);
             setPostContentError(false);
           }}
-          placeholder="Hãy viết gì đó ở đây..."
-          autoSize={{ minRows: 3, maxRows: 5 }}
-          className="mt-2 p-3"
+          placeholder="Mô tả truyện mà bạn đang tìm kiếm để trao đổi..."
+          autoSize={{ minRows: 3, maxRows: 10 }}
+          className="font-light mt-2 p-3"
         />
-        <p className="text-sm italic text-green-600 mt-2">
-          Hãy mô tả chi tiết truyện của bạn. Việc mô tả càng chi tiết sẽ giúp
-          người khác hiểu rõ hơn về điều bạn mong muốn.
+        <p
+          className={`${
+            postContent.trim().length > 0 && "invisible"
+          } text-xs font-light italic text-green-600 mt-2`}
+        >
+          Việc mô tả chi tiết sẽ giúp người khác hiểu rõ hơn về truyện bạn đang
+          tìm kiếm.
         </p>
         {postContentError && (
           <p className="text-red-500 text-xs mt-1">
@@ -201,18 +124,25 @@ export default function CreatePostModal({
         </button>
         <div className="w-full flex justify-end mt-4 flex-row gap-10">
           <button
-            className="border-none font-semibold hover:opacity-70 duration-200"
+            className="border-none hover:opacity-70 duration-200"
             onClick={() => setOpenCreatePost(false)}
           >
-            HỦY BỎ
+            Hủy bỏ
           </button>
           <button
-            className="px-12 py-2 bg-black rounded-md text-white font-bold hover:opacity-70 duration-200 "
-            onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || postContent.trim().length === 0}
+            onClick={() => setIsConfirming(true)}
+            className="px-12 py-2 bg-black rounded-md text-white font-bold hover:opacity-70 duration-200 disabled:bg-gray-300"
           >
             HOÀN TẤT
           </button>
+
+          <ActionConfirm
+            isOpen={isConfirming}
+            setIsOpen={setIsConfirming}
+            title="Xác nhận đăng bài?"
+            confirmCallback={() => handleSubmit()}
+          />
         </div>
       </Modal>
     </>

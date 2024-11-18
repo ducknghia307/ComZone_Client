@@ -4,7 +4,7 @@ import { UserInfo } from "../../../common/base.interface";
 import CurrencySplitter from "../../../assistants/Spliter";
 import { WalletOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { ExchangeRequest } from "../../../common/interfaces/exchange-request.interface";
+import { ExchangeRequest } from "../../../common/interfaces/exchange.interface";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import Loading from "../../loading/Loading";
 

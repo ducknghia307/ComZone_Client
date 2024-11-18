@@ -65,11 +65,14 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
       const timeRemaining = endTimestamp - now; // Calculate remaining time
 
       if (timeRemaining <= 0) {
-        clearInterval(timer);
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         setAuctionEnded(true); // Đấu giá đã kết thúc
-        declareWinner(); // Call declareWinner when countdown ends
+
         onBidActionDisabled?.(true); // Notify parent component to disable bidding
+        // setTimeout(() => {
+        //   declareWinner(); // Declare winner after 3 seconds
+        // }, 3000);
+
         return;
       }
 
@@ -83,13 +86,15 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
       const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
       setTimeLeft({ days, hours, minutes, seconds });
+      if (timeRemaining > 0) {
+        requestAnimationFrame(updateTimeLeft); // Request next frame to update time
+      }
     };
 
     // Set loading to false once the countdown setup starts
+    updateTimeLeft();
 
-    const timer = setInterval(updateTimeLeft, 1000);
     setLoading(false);
-    return () => clearInterval(timer); // Cleanup the interval on unmount
   }, [auctionData.endTime, auction.id]);
 
   return (
@@ -154,10 +159,10 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
               {unit === "days"
                 ? "Ngày"
                 : unit === "hours"
-                  ? "Giờ"
-                  : unit === "minutes"
-                    ? "Phút"
-                    : "Giây"}
+                ? "Giờ"
+                : unit === "minutes"
+                ? "Phút"
+                : "Giây"}
             </span>
           </div>
         ))}

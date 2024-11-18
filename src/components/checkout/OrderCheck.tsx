@@ -5,7 +5,7 @@ import { Address, Comic } from "../../common/base.interface";
 
 interface SellerGroup {
   sellerName: string;
-  comics: { comic: Comic; quantity: number }[];
+  comics: { comic: Comic; quantity: number; currentPrice?: number }[];
   delivery?: {
     cost: number;
     estDeliveryTime: Date;
@@ -48,10 +48,11 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
             ?.estDeliveryTime || new Date();
 
         const sellerTotalPrice =
-          seller.comics.reduce(
-            (acc, { comic }) => acc + Number(comic.price),
-            0
-          ) + deliveryFee;
+          seller.comics.reduce((acc, { comic, currentPrice }) => {
+            const price = currentPrice || comic.price; // Use currentPrice if available, otherwise fallback to comic.price
+            return acc + Number(price);
+          }, 0) + deliveryFee;
+
         // const orderNote = notes[sellerId] || "";
         return (
           <div key={sellerId} className="bg-white w-full px-8 py-4 rounded-lg">
@@ -132,7 +133,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {seller.comics.map(({ comic }) => (
+                {seller.comics.map(({ comic, currentPrice }) => (
                   <tr key={comic.id} className="px-2 py-4 text-sm">
                     <td className="flex flex-row items-center my-2 gap-4 w-full max-w-[35rem]">
                       <img
@@ -144,7 +145,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                     </td>
                     <td className="max-w-[12rem] ">
                       <h4 className="text-end font-light">
-                        {CurrencySplitter(comic.price)}đ
+                        {CurrencySplitter(currentPrice || comic.price)}đ
                       </h4>
                     </td>
                     <td className="max-w-[12rem] ">
@@ -152,7 +153,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                     </td>
                     <td className="max-w-[12rem] ">
                       <h4 className="text-end font-light">
-                        {CurrencySplitter(comic.price)}đ
+                        {CurrencySplitter(currentPrice || comic.price)}đ
                       </h4>
                     </td>
                   </tr>

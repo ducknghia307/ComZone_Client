@@ -16,7 +16,12 @@ import Loading from "../components/loading/Loading";
 
 interface SellerGroup {
   sellerName: string;
-  comics: { comic: Comic; quantity: number }[];
+  comics: {
+    comic: Comic;
+    quantity: number;
+    currentPrice?: number;
+    auctionId?: string;
+  }[];
   delivery?: {
     cost: number;
     estDeliveryTime: Date;
@@ -49,6 +54,8 @@ const Checkout = () => {
   const [deliveryDetails, setDeliveryDetails] = useState<SellerGroupDetails[]>(
     []
   );
+  console.log("zzzzzzzz", groupedSelectedComics);
+
   const [notes, setNotes] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const [modal, contextHolder] = Modal.useModal();
@@ -151,10 +158,10 @@ const Checkout = () => {
     (total, sellerGroup) => {
       return (
         total +
-        sellerGroup.comics.reduce(
-          (sellerTotal, { comic }) => Number(sellerTotal) + Number(comic.price),
-          0
-        )
+        sellerGroup.comics.reduce((sellerTotal, { comic, currentPrice }) => {
+          const price = currentPrice || comic?.price; // Use auction price if available
+          return sellerTotal + Number(price);
+        }, 0)
       );
     },
     0
@@ -182,7 +189,7 @@ const Checkout = () => {
         const sellerGroup = groupedSelectedComics[sellerId];
 
         const sellerTotalPrice = sellerGroup.comics.reduce(
-          (total, { comic }) => total + Number(comic.price),
+          (total, { comic }) => total + Number(comic?.price),
           0
         );
         const sellerDeliveryPrice =
@@ -241,16 +248,31 @@ const Checkout = () => {
 
         const orderId = orderResponse.data.id;
 
-        for (const { comic } of sellerGroup.comics) {
+        for (const { comic, currentPrice, auctionId } of sellerGroup.comics) {
+          console.log("1", auctionId);
+
+          const price = currentPrice || comic?.price;
           const orderItemPayload = {
             comics: comic.id,
             order: orderId,
+            price,
           };
 
           console.log("Order Item Payload:", orderItemPayload);
 
           await privateAxios.post("/order-items", orderItemPayload);
           orderedComicIds.push(comic.id);
+          if (auctionId) {
+            try {
+              // Call the API to mark auction as completed and set the winner to the current user
+              await privateAxios.patch(
+                `/auction/${auctionId}/status/completed`
+              );
+              console.log(`Auction ${auctionId} marked as completed.`);
+            } catch (error) {
+              console.error(`Failed to update auction ${auctionId}:`, error);
+            }
+          }
         }
 
         if (selectedPaymentMethod === "wallet") {

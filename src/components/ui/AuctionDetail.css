@@ -202,6 +202,16 @@
   outline: none;
   height: 50px;
 }
+.highest-bid-message {
+  font-size: 1.2rem;
+  color: #28a745; /* Green color to indicate success */
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #d4edda; /* Light green background */
+  margin-bottom: 10px;
+}
 
 .bid-row .bid-button {
   background-color: #000;
@@ -215,7 +225,10 @@
   height: 50px;
   border-radius: 0px;
 }
-
+.error-message {
+  font-size: 1rem;
+  color: red;
+}
 .publisher {
   margin-top: 20px;
   font-size: 16px;

@@ -37,7 +37,7 @@ export default function ExchangeSectionInChat({
       exchangeResponse?.exchange.id || ""
     );
     setIsChatOpen(false);
-    navigate("/exchange");
+    navigate("/exchange/all");
   };
 
   if (!exchange) return;

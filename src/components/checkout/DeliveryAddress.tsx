@@ -5,6 +5,7 @@ import { Address, UserInfo } from "../../common/base.interface";
 import AddressList from "./AddressList";
 import { privateAxios } from "../../middleware/axiosInstance";
 import PhoneSplitter from "../../assistants/PhoneSplitter";
+import { useLocation } from "react-router-dom";
 interface DeliveryAddressProps {
   selectedAddress: Address | null;
   setSelectedAddress: (address: Address | null) => void;
@@ -24,6 +25,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAddress, setNewAddress] = useState(false);
   const [handleModal, setHandleModal] = useState<boolean>();
+  const location = useLocation();
   const showModal = () => {
     setIsModalOpen(true);
     setNewAddress(false);
@@ -66,7 +68,9 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   return (
     <div className="w-full bg-white px-8 py-4 rounded-lg">
       <div className="flex flex-row justify-between w-full">
-        <h2 className="font-bold">THÔNG TIN NHẬN HÀNG</h2>
+        {location.pathname === "/checkout" && (
+          <h2 className="font-bold">THÔNG TIN NHẬN HÀNG</h2>
+        )}
         <div
           className="flex flex-row gap-1 items-center cursor-pointer"
           onClick={showModal}

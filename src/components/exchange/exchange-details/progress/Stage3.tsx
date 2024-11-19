@@ -34,7 +34,7 @@ export default function Stage3({ currentStage }: { currentStage: number }) {
           currentStage >= stage && "opacity-50"
         }`}
       >
-        Đặt cọc
+        Thanh toán
       </p>
     </div>
   );

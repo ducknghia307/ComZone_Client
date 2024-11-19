@@ -11,6 +11,8 @@ import ActionButtons from "../components/exchange/exchange-details/information-c
 import ProgressSection from "../components/exchange/exchange-details/progress/ProgressSection";
 import Loading from "../components/loading/Loading";
 import ExchangeInformation from "../components/exchange/exchange-details/ExchangeInformation";
+import { Address } from "../common/base.interface";
+import { Delivery } from "../common/interfaces/delivery.interface";
 
 const ExchangeDetail: React.FC = () => {
   const { id } = useParams();
@@ -22,6 +24,9 @@ const ExchangeDetail: React.FC = () => {
   const [secondCurrentStage, setSecondCurrentStage] = useState<number>(0);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
   const firstUser = exchangeData
     ? exchangeData?.isRequestUser
@@ -49,12 +54,23 @@ const ExchangeDetail: React.FC = () => {
 
   const fetchExchangeDetails = async () => {
     setIsLoading(true);
+
     try {
       const response = await privateAxios(`exchange-comics/exchange/${id}`);
       const exchangeDetails: ExchangeDetails = response.data;
       console.log("exchange details:", exchangeDetails);
       setExchangeData(exchangeDetails);
+      const first = exchangeDetails
+        ? exchangeDetails?.isRequestUser
+          ? exchangeDetails?.exchange.requestUser
+          : exchangeDetails?.exchange.post.user
+        : null;
 
+      const second = exchangeDetails
+        ? exchangeDetails?.isRequestUser
+          ? exchangeDetails?.exchange.post.user
+          : exchangeDetails?.exchange.requestUser
+        : null;
       //FETCH STAGE 0
       if (exchangeDetails.exchange.status === "PENDING") return;
 
@@ -76,14 +92,43 @@ const ExchangeDetail: React.FC = () => {
 
         //FETCH STAGE 2 (second user)
         const secondConfirmationResponse = await publicAxios(
-          `exchange-confirmation/user/${secondUser?.id}/exchange/${exchangeDetails.exchange.id}`
+          `exchange-confirmation/user/${second?.id}/exchange/${exchangeDetails.exchange.id}`
         );
+        console.log("second:", secondConfirmationResponse);
+
         if (secondConfirmationResponse) {
           const secondConfirmation: ExchangeConfirmation =
             secondConfirmationResponse.data;
           if (secondConfirmation.dealingConfirm) {
             setSecondCurrentStage(2);
           }
+        }
+
+        //FETCH STAGE 3 (first user)
+        const deliveriesResponse = await privateAxios(
+          `deliveries/exchange/${exchangeDetails.exchange.id}`
+        );
+        const deliveries: Delivery[] = deliveriesResponse.data;
+        console.log(deliveries);
+
+        if (deliveries.length > 0) {
+          if (
+            deliveries.some(
+              (delivery) =>
+                (delivery.from && delivery.from.user.id === first?.id) ||
+                (delivery.to && delivery.to.user.id === first?.id)
+            )
+          )
+            setFirstCurrentStage(3);
+
+          if (
+            deliveries.some(
+              (delivery) =>
+                (delivery.from && delivery.from.user.id === second?.id) ||
+                (delivery.to && delivery.to.user.id === second?.id)
+            )
+          )
+            setSecondCurrentStage(3);
         }
       }
     } catch (error) {
@@ -92,10 +137,27 @@ const ExchangeDetail: React.FC = () => {
       setIsLoading(false);
     }
   };
+  const fetchUserAddress = async () => {
+    try {
+      const response = await privateAxios("/user-addresses/user");
 
+      const data = response.data;
+
+      const sortedAddresses = data.sort((a: Address, b: Address) => {
+        return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
+      });
+      console.log(sortedAddresses);
+
+      setSelectedAddress(sortedAddresses[0] || null);
+      setAddresses(sortedAddresses);
+    } catch {
+      console.log("...");
+    }
+  };
   useEffect(() => {
     if (id) {
       fetchExchangeDetails();
+      fetchUserAddress();
     }
   }, [id]);
 
@@ -105,6 +167,7 @@ const ExchangeDetail: React.FC = () => {
         <Loading />
       </div>
     );
+  console.log("a", selectedAddress);
 
   return (
     <div className="REM min-h-[80vh] w-full flex items-stretch justify-between gap-4 px-4 py-4">
@@ -114,13 +177,20 @@ const ExchangeDetail: React.FC = () => {
           firstCurrentStage={firstCurrentStage}
           secondCurrentStage={secondCurrentStage}
           fetchExchangeDetails={fetchExchangeDetails}
+          selectedAddress={selectedAddress}
+          setSelectedAddress={setSelectedAddress}
+          addresses={addresses}
+          setAddresses={setAddresses}
+          fetchUserAddress={fetchUserAddress}
         />
 
         <ActionButtons
           exchangeDetails={exchangeData}
           currentStage={firstCurrentStage}
+          anotherStage={secondCurrentStage}
           oppositeCurrentStage={secondCurrentStage}
           fetchExchangeDetails={fetchExchangeDetails}
+          selectedAddress={selectedAddress}
         />
 
         <ProgressSection

@@ -21,6 +21,8 @@ const Exchange = () => {
         return <TableExchange />;
       case "successful":
         return <TableExchange />;
+      case "rejected":
+        return <TableExchange />;
       case "canceled":
         return <TableExchange />;
       default:

@@ -62,17 +62,13 @@ export default function ComicsImages({
   };
 
   return (
-    <div className="xl:w-[30em] min-w-[15em] gap-2">
-      <div className="w-full bg-white flex flex-col items-center justify-center rounded-xl py-2 drop-shadow-md top-4 sticky">
-        <div
-          className="w-full px-2 pb-4 flex justify-center cursor-pointer"
+    <div className="w-full min-w-[15em] gap-2">
+      <div className="w-full bg-white flex flex-col items-center justify-center gap-4 rounded-xl py-2 drop-shadow-md top-1 sticky">
+        <img
+          src={currentImage}
+          className="w-full h-[20em] 2xl:h-[30em] bg-contain cursor-pointer px-2 rounded-lg"
           onClick={() => setIsModalOpen(true)}
-        >
-          <span
-            className="w-full xl:h-[20em] h-[15em] bg-contain bg-no-repeat bg-center rounded-lg"
-            style={{ backgroundImage: `url(${currentImage})` }}
-          ></span>
-        </div>
+        />
         <div className="w-full flex justify-center items-center px-4">
           <Button
             onClick={handlePrev}

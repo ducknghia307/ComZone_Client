@@ -109,7 +109,7 @@ export default function ChatModal({
     fetchChatRoomList();
     connectSessionChatRoom();
     scrollDown();
-  }, [isChatOpen, accessToken, userId, isLoggedIn]);
+  }, [isChatOpen, accessToken]);
 
   const fetchMessageList = async () => {
     if (!currentRoomIdRef || !currentRoomIdRef.current) return;

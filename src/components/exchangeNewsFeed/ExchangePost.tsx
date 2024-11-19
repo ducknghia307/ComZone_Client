@@ -198,6 +198,18 @@ export default function ExchangePost({
         </div>
 
         <p className="pl-2 py-4">{post.postContent}</p>
+
+        {post.images && (
+          <div className="flex items-center gap-2">
+            {post.images.map((image) => (
+              <img
+                key={image}
+                src={image}
+                className="rounded-lg w-[10em] h-[15em] object-cover border border-gray-300"
+              />
+            ))}
+          </div>
+        )}
       </div>
       <Modal
         open={isModalOpen}

@@ -1,12 +1,12 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { Button, Modal, notification } from "antd";
-import { UserInfo } from "../../../common/base.interface";
-import CurrencySplitter from "../../../assistants/Spliter";
+import { UserInfo } from "../../../../common/base.interface";
+import CurrencySplitter from "../../../../assistants/Spliter";
 import { WalletOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { ExchangeRequest } from "../../../common/interfaces/exchange.interface";
-import { privateAxios } from "../../../middleware/axiosInstance";
-import Loading from "../../loading/Loading";
+import { ExchangeRequest } from "../../../../common/interfaces/exchange.interface";
+import { privateAxios } from "../../../../middleware/axiosInstance";
+import Loading from "../../../loading/Loading";
 
 interface ModalProp {
   isModalVisible: boolean;

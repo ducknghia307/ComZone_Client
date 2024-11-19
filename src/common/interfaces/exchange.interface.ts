@@ -39,3 +39,46 @@ export interface ExchangeResponse {
   requestUserList: ExchangeComics[];
   postUserList: ExchangeComics[];
 }
+
+export interface UserExchangeList extends Exchange {
+  myComics: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+    comics: Comic;
+  }[];
+  othersComics: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+    comics: Comic;
+  }[];
+}
+
+export interface ExchangeDetails {
+  exchange: Exchange;
+  isRequestUser: boolean;
+  requestUserList: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+    comics: Comic;
+  }[];
+  postUserList: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+    comics: Comic;
+  }[];
+}
+
+export interface ExchangeConfirmation extends BaseInterface {
+  exchange: Exchange;
+  user: UserInfo;
+  dealingConfirm: boolean;
+  deliveryConfirm: boolean;
+}

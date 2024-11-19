@@ -190,7 +190,7 @@ const TableExchange: React.FC = () => {
       );
       console.log(response.data);
 
-      const transformedData = response.data.map(
+      const transformedData = (response.data || []).map(
         (item: UserExchangeList, index: number) => ({
           key: item.id,
           index: index + 1,
@@ -201,10 +201,11 @@ const TableExchange: React.FC = () => {
           compensationAmount: item.compensationAmount,
           status: item.status,
           createdAt: item.createdAt,
-          myComics: item.myComics.map((c) => c.comics),
-          othersComics: item.othersComics.map((c) => c.comics),
+          myComics: item.myComics?.map((c) => c.comics) || [],
+          othersComics: item.othersComics?.map((c) => c.comics) || [],
         })
       );
+
       console.log(transformedData);
       setData(transformedData);
     } catch (error) {

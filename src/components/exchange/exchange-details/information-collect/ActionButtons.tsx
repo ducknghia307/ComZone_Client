@@ -1,16 +1,23 @@
+import { Address } from "../../../../common/base.interface";
 import { ExchangeDetails } from "../../../../common/interfaces/exchange.interface";
 import AcceptOrRejectButtons from "./buttons/1.AcceptOrRejectButtons";
+import ConfirmActionButton from "./buttons/ConfirmActionButton";
+import ConfirmDeliveryButton from "./buttons/ConfirmDeliveryButton";
 
 export default function ActionButtons({
   exchangeDetails,
   currentStage,
   oppositeCurrentStage,
+  anotherStage,
   fetchExchangeDetails,
+  selectedAddress,
 }: {
   exchangeDetails: ExchangeDetails;
   currentStage: number;
+  anotherStage: number;
   oppositeCurrentStage: number;
   fetchExchangeDetails: Function;
+  selectedAddress: Address | null;
 }) {
   if (currentStage > oppositeCurrentStage)
     return (
@@ -18,6 +25,7 @@ export default function ActionButtons({
         Đang đợi người đối diện thực hiện...
       </div>
     );
+  console.log(selectedAddress);
 
   return (
     <div className="relative w-full flex flex-col items-stretch justify-center px-2 mt-1">
@@ -34,21 +42,31 @@ export default function ActionButtons({
         ))}
 
       {currentStage === 1 &&
+        anotherStage === 1 &&
         (exchangeDetails.isRequestUser ? null : (
           <button className="w-full py-2 rounded-lg border border-gray-500 font-light cursor-default">
             Đang chờ người yêu cầu trao đổi xác nhận...
           </button>
         ))}
+      {currentStage === 1 &&
+        anotherStage === 2 &&
+        (!exchangeDetails.isRequestUser ? (
+          <ConfirmActionButton
+            exchangeDetail={exchangeDetails}
+            fetchExchangeDetails={fetchExchangeDetails}
+          />
+        ) : (
+          <button className="w-full py-2 rounded-lg border border-gray-500 font-light cursor-default">
+            Đang chờ người yêu cầu trao đổi xác nhận...
+          </button>
+        ))}
 
-      {currentStage === 3 && (
-        <div className="flex items-stretch gap-2">
-          <button className="basis-1/3 min-w-max py-2 rounded-lg bg-red-700 text-white hover:opacity-80 duration-200">
-            Gặp vấn đề khi nhận hàng
-          </button>
-          <button className="grow py-2 rounded-lg bg-gray-600  text-white hover:opacity-80 duration-200">
-            Đã nhận thành công
-          </button>
-        </div>
+      {currentStage === 2 && (
+        <ConfirmDeliveryButton
+          exchangeId={exchangeDetails.exchange.id}
+          selectedAddress={selectedAddress}
+          fetchExchangeDetails={fetchExchangeDetails}
+        />
       )}
     </div>
   );

@@ -6,17 +6,28 @@ import SubmitDeliveryInfo from "./SubmitDeliveryInfo";
 import PlaceDeposit from "./PlaceDeposit";
 import DeliveryProcessInfo from "./DeliveryProcessInfo";
 import SuccessfulExchange from "./SuccessfulExchange";
+import { Address } from "../../../../common/base.interface";
 
 export default function InformationCollectSection({
   exchangeDetails,
   firstCurrentStage,
   secondCurrentStage,
   fetchExchangeDetails,
+  selectedAddress,
+  setSelectedAddress,
+  addresses,
+  setAddresses,
+  fetchUserAddress,
 }: {
   exchangeDetails: ExchangeDetails;
   firstCurrentStage: number;
   secondCurrentStage: number;
   fetchExchangeDetails: Function;
+  selectedAddress: Address | null;
+  setSelectedAddress: (address: Address | null) => void;
+  addresses: Address[];
+  setAddresses: (list: Address[]) => void;
+  fetchUserAddress: () => void;
 }) {
   const theOther = exchangeDetails.isRequestUser
     ? exchangeDetails.exchange.post.user
@@ -76,10 +87,10 @@ export default function InformationCollectSection({
         };
       case 3:
         return {
-          title: "Đặt cọc",
+          title: "Thanh toán",
           subTitle: (
             <p className="leading-relaxed">
-              Hoàn tất quá trình đặt cọc để xác nhận hoàn tất trao đổi. Quá
+              Hoàn tất quá trình thanh toán để xác nhận hoàn tất trao đổi. Quá
               trình giao hàng sẽ tự động bắt đầu ngay sau khi ghi nhận được đầy
               đủ tiền cọc từ hai bên.
             </p>
@@ -122,7 +133,15 @@ export default function InformationCollectSection({
           />
         )}
 
-      {caughtProgress && firstCurrentStage === 2 && <SubmitDeliveryInfo />}
+      {caughtProgress && firstCurrentStage === 2 && (
+        <SubmitDeliveryInfo
+          selectedAddress={selectedAddress}
+          setSelectedAddress={setSelectedAddress}
+          addresses={addresses}
+          setAddresses={setAddresses}
+          fetchUserAddress={fetchUserAddress}
+        />
+      )}
       {caughtProgress && firstCurrentStage === 3 && <PlaceDeposit />}
       {caughtProgress && firstCurrentStage === 4 && <DeliveryProcessInfo />}
       {caughtProgress && firstCurrentStage === 5 && <SuccessfulExchange />}

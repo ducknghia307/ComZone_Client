@@ -28,7 +28,7 @@ const ExchangeTab: React.FC = () => {
     { label: "Tất cả", path: "/exchange/all" },
     { label: "Đang chờ", path: "/exchange/pending-request" },
     { label: "Đã gửi", path: "/exchange/sent-request" },
-    { label: "Đang thực hiện", path: "/exchange/in-progress" },
+    { label: "Đang trao đổi", path: "/exchange/in-progress" },
     { label: "Đang vận chuyển", path: "/exchange/in-delivery" },
     { label: "Đã giao hàng", path: "/exchange/finished-delivery" },
     { label: "Thành công", path: "/exchange/successful" },
@@ -38,7 +38,7 @@ const ExchangeTab: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className="flex space-x-4 REM w-full">
+    <div className="flex justify-center space-x-4 REM w-full">
       {tabs.map((tab, index) => (
         <Tab
           key={index}

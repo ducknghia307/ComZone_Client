@@ -1,15 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag } from "antd";
+import { Avatar, Table, Tag, Tooltip } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { Exchange } from "../../common/interfaces/exchange.interface";
+import {
+  Exchange,
+  UserExchangeList,
+} from "../../common/interfaces/exchange.interface";
 import { useLocation, useNavigate } from "react-router-dom";
-import dateFormat from "../../assistants/date.format";
 import { useAppSelector } from "../../redux/hooks";
+import { Comic, UserInfo } from "../../common/base.interface";
+import moment from "moment/min/moment-with-locales";
+import Loading from "../loading/Loading";
+
+moment.locale("vi");
 
 const TableExchange: React.FC = () => {
   const { userId } = useAppSelector((state) => state.auth);
+
   const [data, setData] = useState<Exchange[]>([]);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname
@@ -17,36 +28,84 @@ const TableExchange: React.FC = () => {
     .pop()
     ?.toUpperCase()
     .replace(/-/g, "_");
-  console.log(path);
 
-  // Define handleRowClick above columns definition
   const handleRowClick = (id: string) => {
     navigate(`/exchange/detail/${id}`);
   };
 
   const columns: TableColumnsType<Exchange> = [
     {
-      title: "ID",
-      dataIndex: "id",
-      render: (id: string, record: Exchange) => (
-        <span>
-          <p
-            className="cursor-pointer hover:opacity-70 duration-200"
-            onClick={() => handleRowClick(record.id)} // Use handleRowClick here
-          >
-            {id.slice(-6)}
-          </p>
-          <br />
-          <span className="text-gray-500 italic text-xs">
-            Ngày tạo: {dateFormat(record.createdAt, "dd/mm/yy")}
-          </span>
-        </span>
-      ),
+      title: "No",
+      dataIndex: "index",
+      render: (no: number) => <p className="">{no}</p>,
     },
     {
-      title: "Người yêu cầu",
-      dataIndex: "requestUser",
-      render: (user: string) => <span>{user}</span>,
+      title: "Người dùng",
+      dataIndex: "user",
+      render: (user: UserInfo) => (
+        <span className="w-full flex items-center justify-start gap-2">
+          <Avatar src={user.avatar} /> {user.name}
+        </span>
+      ),
+      align: "center",
+    },
+    {
+      title: "Truyện của người khác",
+      dataIndex: "othersComics",
+      render: (othersComics: Comic[], record: Exchange) => {
+        const maxShown = 10;
+        return (
+          <div className="flex flex-col items-start gap-2">
+            {othersComics.slice(0, maxShown).map((comics) => (
+              <span className="flex items-center gap-2">
+                <Avatar src={comics.coverImage} shape="square" size={32} />
+                <Tooltip
+                  title={<p className="text-black">{comics.title}</p>}
+                  color="white"
+                >
+                  <p className="text-start cursor-default text-xs line-clamp-2">
+                    {comics.title}
+                  </p>
+                </Tooltip>
+              </span>
+            ))}
+            {othersComics.length > maxShown && (
+              <button
+                onClick={() => handleRowClick(record.id)}
+                className="font-light text-xs p-1 rounded-md bg-black text-white mx-auto duration-200 hover:bg-gray-700"
+              >
+                + {othersComics.length - maxShown} truyện khác
+              </button>
+            )}
+          </div>
+        );
+      },
+      align: "center",
+    },
+    {
+      title: "Truyện của bạn",
+      dataIndex: "myComics",
+      render: (myComics: Comic[]) => (
+        <Avatar.Group shape="square" size={40} max={{ count: 4 }}>
+          {myComics.map((comics) => (
+            <Tooltip
+              title={<p className="text-black">{comics.title}</p>}
+              color="white"
+            >
+              <Avatar src={comics.coverImage} />
+            </Tooltip>
+          ))}
+        </Avatar.Group>
+      ),
+      align: "center",
+    },
+    {
+      title: "Thời gian",
+      dataIndex: "createdAt",
+      render: (createdAt: Date) => (
+        <p className="text-xs font-light">{moment(createdAt).calendar()}</p>
+      ),
+      align: "center",
     },
     {
       title: "Trạng thái",
@@ -61,13 +120,16 @@ const TableExchange: React.FC = () => {
             break;
           case "DEALING":
             color = "blue";
-            translatedStatus = "Đang xử lý";
+            translatedStatus = "Đang trao đổi";
             break;
           case "DELIVERING":
             color = "yellow";
             translatedStatus = "Đang giao hàng";
             break;
           case "DELIVERED":
+            color = "green";
+            translatedStatus = "Đã giao hàng thành công";
+            break;
           case "SUCCESSFUL":
             color = "green";
             translatedStatus = "Thành công";
@@ -87,16 +149,28 @@ const TableExchange: React.FC = () => {
 
         return <Tag color={color}>{translatedStatus}</Tag>;
       },
+      align: "center",
     },
     {
-      title: "Tiền cọc",
-      dataIndex: "depositAmount",
-      render: (amount: number) => (amount ? `${amount} VND` : "N/A"),
-    },
-    {
-      title: "Tiền bù",
-      dataIndex: "compensationAmount",
-      render: (amount: number) => (amount ? `${amount} VND` : "N/A"),
+      render: (record: Exchange) => (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleRowClick(record.id)}
+            className="px-2 py-1 rounded-md border border-gray-300 text-xs flex items-center gap-1"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="12"
+              height="12"
+              fill="currentColor"
+            >
+              <path d="M2 4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4ZM4 5V19H20V5H4ZM6 7H8V9H6V7ZM8 11H6V13H8V11ZM6 15H8V17H6V15ZM18 7H10V9H18V7ZM10 15H18V17H10V15ZM18 11H10V13H18V11Z"></path>
+            </svg>
+            Chi tiết
+          </button>
+        </div>
+      ),
     },
   ];
 
@@ -109,25 +183,34 @@ const TableExchange: React.FC = () => {
   };
 
   const fetchData = async () => {
+    setIsLoading(true);
     try {
       const response = await privateAxios(
         `/exchanges/user/status?status=${path}`
       );
-      console.log(response);
+      console.log(response.data);
 
-      const transformedData = response.data.map((item: any) => ({
-        key: item.id,
-        requestUser:
-          userId === item.requestUser.id ? "Bạn" : item.rerequestUser.name,
-        depositAmount: item.depositAmount,
-        compensationAmount: item.compensationAmount,
-        id: item.id,
-        status: item.status,
-        createdAt: item.createdAt,
-      }));
+      const transformedData = response.data.map(
+        (item: UserExchangeList, index: number) => ({
+          key: item.id,
+          index: index + 1,
+          id: item.id,
+          user:
+            item.requestUser.id === userId ? item.post.user : item.requestUser,
+          depositAmount: item.depositAmount,
+          compensationAmount: item.compensationAmount,
+          status: item.status,
+          createdAt: item.createdAt,
+          myComics: item.myComics.map((c) => c.comics),
+          othersComics: item.othersComics.map((c) => c.comics),
+        })
+      );
+      console.log(transformedData);
       setData(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -136,13 +219,16 @@ const TableExchange: React.FC = () => {
   }, [location]);
 
   return (
-    <Table<Exchange>
-      columns={columns}
-      dataSource={data}
-      onChange={onChange}
-      pagination={{ pageSize: 20 }}
-      showSorterTooltip={{ target: "sorter-icon" }}
-    />
+    <div className="w-full min-h-[80vh]">
+      {isLoading && <Loading />}
+      <Table<Exchange>
+        columns={columns}
+        dataSource={data}
+        onChange={onChange}
+        pagination={{ pageSize: 20, hideOnSinglePage: true }}
+        showSorterTooltip={{ target: "sorter-icon" }}
+      />
+    </div>
   );
 };
 

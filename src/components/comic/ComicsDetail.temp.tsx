@@ -196,7 +196,7 @@ export default function ComicsDetailTemp() {
       {contextHolder}
       {isLoading && <Loading />}
       <div className="REM min-h-[200vh] bg-gray-100 pb-8">
-        <div className="flex flex-col justify-start items-center gap-4 pt-4 pb-8 relative">
+        <div className="flex flex-col justify-start items-center gap-4 px-2 pt-4 pb-8 relative">
           <div className="w-full flex items-start justify-center gap-4 relative">
             <div className="w-2/3 max-w-[80em] flex flex-col justify-end gap-4 relative">
               <div className="w-full flex justify-center gap-4">
@@ -220,7 +220,7 @@ export default function ComicsDetailTemp() {
                 />
               </div>
             </div>
-            <div className="w-[25%] min-w-[20em] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-4 sticky">
+            <div className="w-[25%] min-w-[20em] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-1 sticky">
               <ComicsSeller
                 seller={seller}
                 comics={currentComics}

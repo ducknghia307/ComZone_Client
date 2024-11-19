@@ -7,10 +7,10 @@ import {
   ProvinceDrop,
   Ward,
   WardDrop,
-} from "../../../common/base.interface";
-import { privateAxios } from "../../../middleware/axiosInstance";
+} from "../../../../common/base.interface";
+import { privateAxios } from "../../../../middleware/axiosInstance";
 import { ExchangeOffer } from "../../../common/interfaces/exchange-offer.interface";
-import Loading from "../../loading/Loading";
+import Loading from "../../../loading/Loading";
 
 interface DeliveryAddressModalProps {
   isDeliveryModal: boolean;

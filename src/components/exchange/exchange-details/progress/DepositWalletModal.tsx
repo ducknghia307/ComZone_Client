@@ -1,10 +1,10 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
-import CurrencySplitter from "../../../assistants/Spliter";
+import CurrencySplitter from "../../../../assistants/Spliter";
 import { Modal } from "antd";
 import TickCircle from "../../../assets/tick-circle.png";
 import ZaloPay from "../../../assets/zalopay.png";
 import VNPay from "../../../assets/vnpay.png";
-import { privateAxios } from "../../../middleware/axiosInstance";
+import { privateAxios } from "../../../../middleware/axiosInstance";
 interface DepositModalProp {
   isDepositModal: boolean;
   setIsDepositModal: Dispatch<SetStateAction<boolean>>;

@@ -31,7 +31,7 @@ export default function ActionConfirm({
       width={500}
       centered
     >
-      <div className="flex flex-col items-stretch justify-start gap-4 px-2 py-2 REM">
+      <div className="flex flex-col items-stretch justify-start gap-4 REM">
         <p className="font-semibold text-lg">{title}</p>
         {description || null}
         {extraWarning && (
@@ -49,7 +49,7 @@ export default function ActionConfirm({
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-8  mt-4">
+        <div className="flex items-center justify-end gap-8 mt-4">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -66,7 +66,7 @@ export default function ActionConfirm({
               setIsOpen(false);
               confirmCallback();
             }}
-            className="px-12 py-2 rounded-lg font-semibold bg-gray-900 text-white duration-200 hover:bg-gray-700"
+            className="px-12 py-2 rounded-lg font-semibold bg-sky-900 text-white duration-200 hover:bg-sky-800"
           >
             XÁC NHẬN
           </button>

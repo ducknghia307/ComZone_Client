@@ -1,0 +1,131 @@
+import { Avatar } from "antd";
+import { ExchangeDetails } from "../../../../common/interfaces/exchange.interface";
+import ViewBothComicsLists from "./ViewBothComicsLists";
+import SubmitAmounts from "./SubmitAmounts";
+import SubmitDeliveryInfo from "./SubmitDeliveryInfo";
+import PlaceDeposit from "./PlaceDeposit";
+import DeliveryProcessInfo from "./DeliveryProcessInfo";
+import SuccessfulExchange from "./SuccessfulExchange";
+
+export default function InformationCollectSection({
+  exchangeDetails,
+  firstCurrentStage,
+  secondCurrentStage,
+  fetchExchangeDetails,
+}: {
+  exchangeDetails: ExchangeDetails;
+  firstCurrentStage: number;
+  secondCurrentStage: number;
+  fetchExchangeDetails: Function;
+}) {
+  const theOther = exchangeDetails.isRequestUser
+    ? exchangeDetails.exchange.post.user
+    : exchangeDetails.exchange.requestUser;
+
+  const caughtProgress = firstCurrentStage <= secondCurrentStage;
+
+  const getTitle = () => {
+    switch (firstCurrentStage) {
+      case 0:
+        return {
+          title: "Xác nhận danh sách truyện hai bên dùng để trao đổi",
+          subTitle: exchangeDetails.isRequestUser ? (
+            <p>
+              <Avatar src={theOther.avatar} />{" "}
+              <span className="font-semibold">{theOther.name}</span> có thể bù
+              thêm tiền để thực hiện trao đổi với bạn, sau khi xác nhận danh
+              sách truyện dùng để trao đổi của cả hai.
+            </p>
+          ) : (
+            <p>
+              Bạn có thể bù thêm tiền để thực hiện trao đổi với{" "}
+              <Avatar src={theOther.avatar} />{" "}
+              <span className="font-semibold">{theOther.name}</span>, sau khi
+              xác nhận danh sách truyện dùng để trao đổi của cả hai.
+            </p>
+          ),
+        };
+      case 1:
+        return {
+          title: "Xác nhận tiền bù và tiền cọc",
+          subTitle: exchangeDetails.isRequestUser ? (
+            <p className="leading-relaxed">
+              Bạn sẽ tiến hành xác nhận tiền bù và tiền cọc cho cuộc trao đổi
+              này, dựa trên những truyện mà bạn đã chọn để trao đổi.
+              <br />
+              Mức tiền sẽ được gửi đến và xác nhận bởi{" "}
+              <span className="font-semibold">{theOther.name}</span>.
+            </p>
+          ) : (
+            <p>
+              Mức tiền bù và tiền cọc sẽ được đưa ra từ người yêu cầu trao đổi,
+              sau đó sẽ được xác nhận bởi chính bạn để hoàn tất quá trình xác
+              nhận.
+            </p>
+          ),
+        };
+      case 2:
+        return {
+          title: "Điền thông tin giao hàng",
+          subTitle: (
+            <p className="leading-relaxed">
+              Điền thông tin địa điểm bạn sẽ bàn giao truyện để giao và bạn sẽ
+              nhận truyện được trao đổi.
+            </p>
+          ),
+        };
+      case 3:
+        return {
+          title: "Đặt cọc",
+          subTitle: (
+            <p className="leading-relaxed">
+              Hoàn tất quá trình đặt cọc để xác nhận hoàn tất trao đổi. Quá
+              trình giao hàng sẽ tự động bắt đầu ngay sau khi ghi nhận được đầy
+              đủ tiền cọc từ hai bên.
+            </p>
+          ),
+        };
+      case 4:
+        return {
+          title: "Đang giao hàng",
+          subTitle: (
+            <p className="leading-relaxed">Đang trên đường giao và nhận hàng</p>
+          ),
+        };
+    }
+  };
+  return (
+    <div className="w-full flex flex-col items-stretch gap-8 mt-4">
+      <div>
+        <p className="text-lg font-semibold uppercase">{getTitle()?.title}</p>
+        <div className="text-xs font-light italic">{getTitle()?.subTitle}</div>
+      </div>
+
+      {caughtProgress && firstCurrentStage === 0 && (
+        <ViewBothComicsLists
+          requestComicsList={exchangeDetails.requestUserList.map(
+            (item) => item.comics
+          )}
+          postComicsList={exchangeDetails.postUserList.map(
+            (item) => item.comics
+          )}
+          isRequestUser={exchangeDetails.isRequestUser}
+        />
+      )}
+
+      {caughtProgress &&
+        firstCurrentStage === 1 &&
+        exchangeDetails.isRequestUser && (
+          <SubmitAmounts
+            exchangeId={exchangeDetails.exchange.id}
+            fetchExchangeDetails={fetchExchangeDetails}
+          />
+        )}
+
+      {caughtProgress && firstCurrentStage === 2 && <SubmitDeliveryInfo />}
+      {caughtProgress && firstCurrentStage === 3 && <PlaceDeposit />}
+      {caughtProgress && firstCurrentStage === 4 && <DeliveryProcessInfo />}
+      {caughtProgress && firstCurrentStage === 5 && <SuccessfulExchange />}
+    </div>
+  );
+}

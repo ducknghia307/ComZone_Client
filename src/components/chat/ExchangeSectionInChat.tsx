@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ChatRoom } from "../../common/interfaces/chat-room.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { ExchangeResponse } from "../../common/interfaces/exchange.interface";
-import styles from "./exchangeComponents/style.module.css";
+import styles from "./style.module.css";
 import { useNavigate } from "react-router-dom";
 
 export default function ExchangeSectionInChat({

@@ -83,7 +83,7 @@ export default function CreatePostModal({
     try {
       await privateAxios.post("exchange-posts", {
         postContent,
-        images: [],
+        images: previewChapterImages,
       });
       notification.success({
         key: "success",

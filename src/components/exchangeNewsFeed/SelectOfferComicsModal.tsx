@@ -94,24 +94,20 @@ export default function SelectOfferComicsModal({
 
   const handleSubmitRequest = async () => {
     setIsLoading(true);
-    const resExchange = await privateAxios.post("/exchanges", {
-      post: post.id,
-    });
-    console.log(resExchange.data.id);
 
     await privateAxios
       .post("exchange-comics", {
-        exchangeId: resExchange.data.id,
+        postId: post.id,
         requestUserComicsList: selectedRequestComicsList,
         postUserComicsList: selectedPostComicsList,
       })
       .then(async (res) => {
-        console.log(res);
+        console.log(res.data);
 
         await privateAxios
           .post("chat-rooms", {
             secondUser: post.user.id,
-            exchange: resExchange.data.id,
+            exchange: res.data.exchange.id,
           })
           .then((response) => {
             sessionStorage.setItem("connectedChat", response.data.id);

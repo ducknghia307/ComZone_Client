@@ -13,6 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Modal } from "antd";
 import TotalSummary from "../components/checkout/TotalSummary";
 import Loading from "../components/loading/Loading";
+import socket from "../services/socket";
 
 interface SellerGroup {
   sellerName: string;
@@ -37,6 +38,7 @@ interface SellerGroupDetails {
 }
 
 const Checkout = () => {
+  const [user, setUser] = useState<UserInfo>();
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userWalletBalance, setUserWalletBalance] = useState<number>(0);
@@ -54,8 +56,6 @@ const Checkout = () => {
   const [deliveryDetails, setDeliveryDetails] = useState<SellerGroupDetails[]>(
     []
   );
-  console.log("zzzzzzzz", groupedSelectedComics);
-
   const [notes, setNotes] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const [modal, contextHolder] = Modal.useModal();
@@ -65,6 +65,8 @@ const Checkout = () => {
       setIsLoading(true);
       const response = await privateAxios("/users/profile");
       const data = await response.data;
+      setUser(data);
+
       setUserWalletBalance(Number(data.balance));
     } catch {
       setIsLoading(false);
@@ -189,9 +191,13 @@ const Checkout = () => {
         const sellerGroup = groupedSelectedComics[sellerId];
 
         const sellerTotalPrice = sellerGroup.comics.reduce(
-          (total, { comic }) => total + Number(comic?.price),
+          (total, { comic, currentPrice }) => {
+            const price = currentPrice || comic?.price; // Use currentPrice if available, otherwise fallback to regular price
+            return total + Number(price);
+          },
           0
         );
+
         const sellerDeliveryPrice =
           deliveryDetails.find((d) => d.sellerId === sellerId)?.deliveryFee ||
           0;
@@ -238,19 +244,22 @@ const Checkout = () => {
           })
           .catch((err) => console.log(err));
 
+        const orderType = sellerGroup.comics.some(({ auctionId }) => auctionId)
+          ? "AUCTION"
+          : "TRADITIONAL";
+
         const orderResponse = await privateAxios.post("/orders", {
           totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
           paymentMethod: selectedPaymentMethod,
           deliveryId: newDelivery.id,
           addressId: selectedAddress?.id,
           note: notes[sellerId] || "",
+          type: orderType,
         });
 
         const orderId = orderResponse.data.id;
 
         for (const { comic, currentPrice, auctionId } of sellerGroup.comics) {
-          console.log("1", auctionId);
-
           const price = currentPrice || comic?.price;
           const orderItemPayload = {
             comics: comic.id,
@@ -263,15 +272,11 @@ const Checkout = () => {
           await privateAxios.post("/order-items", orderItemPayload);
           orderedComicIds.push(comic.id);
           if (auctionId) {
-            try {
-              // Call the API to mark auction as completed and set the winner to the current user
-              await privateAxios.patch(
-                `/auction/${auctionId}/status/completed`
-              );
-              console.log(`Auction ${auctionId} marked as completed.`);
-            } catch (error) {
-              console.error(`Failed to update auction ${auctionId}:`, error);
-            }
+            socket.emit("updateAuctionStatus", {
+              auctionId,
+              currentPrice,
+              user,
+            });
           }
         }
 

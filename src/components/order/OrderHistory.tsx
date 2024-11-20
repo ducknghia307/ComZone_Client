@@ -19,6 +19,7 @@ interface Order {
   imgUrl: string;
   totalPrice: string;
   items: Item[];
+  type: string;
 }
 interface Item {
   comics: Comic;
@@ -31,7 +32,9 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [openModal, setOpenModal] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [selectedSellerName, setSelectedSellerName] = useState<string | null>(null);
+  const [selectedSellerName, setSelectedSellerName] = useState<string | null>(
+    null
+  );
   const [selectedSellerId, setSelectedSellerId] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
@@ -71,27 +74,63 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     switch (status) {
       case "PENDING":
         return {
-          color: '#f89b28', backgroundColor: '#fff2c9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
+          color: "#f89b28",
+          backgroundColor: "#fff2c9",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+          fontFamily: "REM",
         };
       case "PACKAGING":
         return {
-          color: '#ff6b1c', backgroundColor: '#ffe8db', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
+          color: "#ff6b1c",
+          backgroundColor: "#ffe8db",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+          fontFamily: "REM",
         };
       case "DELIVERING":
         return {
-          color: '#52a7bf', backgroundColor: '#daf4ff', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
+          color: "#52a7bf",
+          backgroundColor: "#daf4ff",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+          fontFamily: "REM",
         };
       case "DELIVERED":
         return {
-          color: '#ffffff', backgroundColor: '#4CAF50', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
+          color: "#ffffff",
+          backgroundColor: "#4CAF50",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+          fontFamily: "REM",
         };
       case "COMPLETED":
         return {
-          color: '#395f18', backgroundColor: '#fef6c7', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
+          color: "#395f18",
+          backgroundColor: "#fef6c7",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+          fontFamily: "REM",
         };
       case "CANCELED":
         return {
-          color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM"
+          color: "#e91e63",
+          backgroundColor: "#fce4ec",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+          fontFamily: "REM",
         };
       default:
         return "#000";
@@ -117,7 +156,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     }
   };
 
-  const handleOpenModal = (sellerName: string, sellerId: string, userId: string, orderId: string) => {
+  const handleOpenModal = (
+    sellerName: string,
+    sellerId: string,
+    userId: string,
+    orderId: string
+  ) => {
     setSelectedSellerName(sellerName);
     setSelectedSellerId(sellerId);
     setSelectedUserId(userId);
@@ -154,7 +198,6 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
     );
   };
 
-
   return (
     <div>
       <div className="status-tabs">
@@ -169,8 +212,9 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         ].map((status) => (
           <span
             key={status}
-            className={`status-tab REM ${selectedStatus === status ? "active" : ""
-              }`}
+            className={`status-tab REM ${
+              selectedStatus === status ? "active" : ""
+            }`}
             onClick={() => setSelectedStatus(status)}
             style={{ whiteSpace: "nowrap" }}
           >
@@ -262,10 +306,19 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
 
                   {/* Tên và giá sản phẩm */}
                   <div>
-                    <Typography sx={{ fontSize: "20px", fontWeight: "500", fontFamily: "REM" }}>
+                    <Typography
+                      sx={{
+                        fontSize: "20px",
+                        fontWeight: "500",
+                        fontFamily: "REM",
+                      }}
+                    >
                       {item.comics.title}
                     </Typography>
-                    <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>x1</Typography>
+                    <Typography>{item.type}</Typography>
+                    <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
+                      x1
+                    </Typography>
                   </div>
 
                   <div
@@ -276,10 +329,15 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                     }}
                   >
                     <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
-                      {Number(item.comics.price).toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      })}
+                      {order.type === "AUCTION"
+                        ? Number(order.totalPrice).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })
+                        : Number(item.comics.price).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
                     </Typography>
                   </div>
                 </div>
@@ -296,8 +354,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                 alignItems: "center",
               }}
             >
-              <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>Thành tiền: </Typography>
-              <Typography sx={{ fontSize: "28px", color: "#f77157", fontFamily: "REM" }}>
+              <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
+                Thành tiền:{" "}
+              </Typography>
+              <Typography
+                sx={{ fontSize: "28px", color: "#f77157", fontFamily: "REM" }}
+              >
                 {Number(order.totalPrice).toLocaleString("vi-VN", {
                   style: "currency",
                   currency: "VND",
@@ -311,8 +373,8 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                 display: "flex",
                 justifyContent: "flex-end",
                 gap: "10px",
-                paddingBottom:'20px',
-                paddingRight: '20px'
+                paddingBottom: "20px",
+                paddingRight: "20px",
               }}
             >
               {order.status === "COMPLETED" ? (
@@ -371,7 +433,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                       fontFamily: "REM",
                     }}
                     onClick={() =>
-                      handleOpenModal(order.items[0].comics.sellerId.name || "N/A", order.items[0].comics.sellerId.id, order.user.id,order.id.toString())
+                      handleOpenModal(
+                        order.items[0].comics.sellerId.name || "N/A",
+                        order.items[0].comics.sellerId.id,
+                        order.user.id,
+                        order.id.toString()
+                      )
                     }
                   >
                     Đã Nhận Được Hàng

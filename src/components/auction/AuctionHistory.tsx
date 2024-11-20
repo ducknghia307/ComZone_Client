@@ -69,7 +69,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
         };
       // case 'UPCOMING':
       //     return { color: '#6226EF', backgroundColor: '#EDE7F6', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
-      case "PROCESSING":
+      case "UPCOMING":
         return {
           color: "#ff9800",
           backgroundColor: "#fff3e0",

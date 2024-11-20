@@ -8,7 +8,6 @@ import { useAppSelector } from "../../redux/hooks";
 
 interface CountdownFlipNumbersProps {
   auction: { id: string; status: string; endTime: string };
-
   onBidActionDisabled: (disabled: boolean) => void; // Optional prop to notify parent component
 }
 
@@ -25,9 +24,11 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
   const auctionData = useAppSelector((state: any) => state.auction.auctionData);
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [loading, setLoading] = useState(true); // Loading state
+  // console.log(auction.endTime);
 
   const formatEndTime = (endTime: string) => {
     const date = new Date(endTime);
+
     return date.toLocaleString("vi-VN", {
       timeZone: "Asia/Ho_Chi_Minh",
       weekday: "short",
@@ -41,67 +42,62 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
     });
   };
 
-  const declareWinner = async () => {
-    if (auction.status === "ONGOING") {
-      try {
-        const response = await publicAxios.get(
-          `/auction/declare-winner/${auction.id}`
-        );
+  // const declareWinner = async () => {
+  //   if (auction.status === "ONGOING") {
+  //     try {
+  //       const response = await publicAxios.get(
+  //         `/auction/declare-winner/${auction.id}`
+  //       );
 
-        console.log("Winner Declared:", response.data);
-      } catch (error) {
-        console.error("Error declaring winner:", error);
-      }
-    }
-  };
+  //       console.log("Winner Declared:", response.data);
+  //     } catch (error) {
+  //       console.error("Error declaring winner:", error);
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
-    setLoading(true);
-    // Ensure endTime is in valid timestamp format (milliseconds)
-    const endTimestamp = new Date(auctionData.endTime).getTime();
+    console.log("Auction Data Updated:", auctionData.endTime); // Log to check if it updates
+    const endTimestamp = new Date(auctionData.endTime).getTime(); // Lấy thời gian kết thúc mới
 
+    // Function to update time left
     const updateTimeLeft = () => {
       const now = Date.now();
-      const timeRemaining = endTimestamp - now; // Calculate remaining time
+      const timeRemaining = endTimestamp - now; // Tính thời gian còn lại
 
       if (timeRemaining <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        setAuctionEnded(true); // Đấu giá đã kết thúc
+        setAuctionEnded(true);
+        onBidActionDisabled?.(true);
+      } else {
+        const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor(
+          (timeRemaining % (1000 * 60 * 60)) / (1000 * 60)
+        );
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
-        onBidActionDisabled?.(true); // Notify parent component to disable bidding
-        // setTimeout(() => {
-        //   declareWinner(); // Declare winner after 3 seconds
-        // }, 3000);
-
-        return;
-      }
-
-      const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-      const hours = Math.floor(
-        (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      const minutes = Math.floor(
-        (timeRemaining % (1000 * 60 * 60)) / (1000 * 60)
-      );
-      const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-
-      setTimeLeft({ days, hours, minutes, seconds });
-      if (timeRemaining > 0) {
-        requestAnimationFrame(updateTimeLeft); // Request next frame to update time
+        setTimeLeft({ days, hours, minutes, seconds });
       }
     };
 
-    // Set loading to false once the countdown setup starts
-    updateTimeLeft();
-
+    // Start the countdown using setInterval
+    const intervalId = setInterval(updateTimeLeft, 1000);
     setLoading(false);
-  }, [auctionData.endTime, auction.id]);
+    // Cleanup the interval when the component unmounts or auctionData.endTime changes
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [auctionData.endTime]); // Re-run when auctionData.endTime changes
+  // Chỉ lắng nghe thay đổi từ auctionData.endTime
 
   return (
     <div>
       {loading ? (
         <Loading />
-      ) : auctionEnded ? (
+      ) : auctionEnded || auctionData.status === "COMPLETED" ? (
         <p
           style={{
             fontFamily: "REM",

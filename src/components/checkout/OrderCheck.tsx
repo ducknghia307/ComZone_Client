@@ -137,7 +137,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                   <tr key={comic.id} className="px-2 py-4 text-sm">
                     <td className="flex flex-row items-center my-2 gap-4 w-full max-w-[35rem]">
                       <img
-                        src={comic.coverImage}
+                        src={comic?.coverImage}
                         alt={comic.title}
                         className="h-32 w-auto"
                       />

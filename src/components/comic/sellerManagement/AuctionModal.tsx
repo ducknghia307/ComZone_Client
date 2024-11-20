@@ -46,7 +46,6 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
   const startTime = dayjs(form.getFieldValue("startTime"));
   // Handle form submission
   const handleSubmit = async (values: AuctionFormValues) => {
-    console.log("11", comic.id);
     try {
       const response = await privateAxios.post("/auction", {
         ...values,

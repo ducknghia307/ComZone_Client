@@ -4,8 +4,10 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 export default function ComicsDescription({
   currentComics,
+  fontSize = "1rem",
 }: {
   currentComics?: Comic;
+  fontSize?: string;
 }) {
   const [isShowingLess, toggleIsShowingLess] = useState<boolean>(false);
   const descriptionLines = currentComics?.description.split("\n");
@@ -18,13 +20,14 @@ export default function ComicsDescription({
   return (
     <div className="relative w-full flex flex-col gap-2 bg-white px-4 py-4 rounded-xl drop-shadow-md">
       <p
-        style={{ fontFamily: "REM", fontWeight: "600" }}
+        style={{ fontFamily: "REM", fontWeight: "600", fontSize }}
         className="text-base pb-1"
       >
         Mô tả truyện
       </p>
 
       <div
+        style={{ fontSize }}
         className={`font-light ${
           isShowingLess ? "max-h-40 overflow-hidden" : "max-h-fit"
         } leading-relaxed`}

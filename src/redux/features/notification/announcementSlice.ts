@@ -1,18 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const annoucementSlice = createSlice({
+const announcementSlice = createSlice({
   name: "announcement",
   initialState: {
     auctionAnnounce: null, // Initialize auctionData as an empty object
   },
   reducers: {
-    auctionAnnoucement(state, action) {
+    auctionAnnouncement(state, action) {
       state.auctionAnnounce = action.payload;
       console.log(action.payload);
     },
   },
 });
 
-export const { auctionAnnoucement } = annoucementSlice.actions;
+export const { auctionAnnouncement } = announcementSlice.actions;
 
-export default annoucementSlice.reducer;
+export default announcementSlice.reducer;

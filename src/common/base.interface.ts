@@ -81,17 +81,17 @@ export interface Auction {
   id: string;
   shopName: string;
   productName: string;
-  status: "UPCOMING" | "PROCESSING" | "ONGOING" | "SUCCESSFUL" | "FAILED";
+  status: "UPCOMING" | "ONGOING" | "SUCCESSFUL" | "FAILED" | "COMPLETED";
   imgUrl: string;
   currentPrice?: number;
   userBid?: number;
-  finalPrice?: number;  
+  finalPrice?: number;
   isWin?: boolean;
-  reservePrice: number; 
-  priceStep: number; 
-  startTime: string; 
-  endTime: string; 
-  comics: Comic; 
+  reservePrice: number;
+  priceStep: number;
+  startTime: string;
+  endTime: string;
+  comics: Comic;
   maxPrice: number;
 }
 
@@ -148,13 +148,13 @@ export interface OrderDetailData {
   deliveryStatus: string;
   items?: Array<{
     comics: {
-        coverImage: string;
-        title: string;
-        author: string;
-        price: number;
-        volumeType: string;
+      coverImage: string;
+      title: string;
+      author: string;
+      price: number;
+      volumeType: string;
     };
-}>;
+  }>;
 }
 
 export interface SellerDetails extends BaseInterface {

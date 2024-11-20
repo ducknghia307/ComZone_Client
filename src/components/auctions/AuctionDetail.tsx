@@ -18,10 +18,36 @@ import Loading from "../loading/Loading";
 import ConfettiExplosion from "react-confetti-explosion";
 import { Modal } from "antd";
 import { io } from "socket.io-client";
-import { auctionAnnoucement } from "../../redux/features/notification/announcementSlice";
+import { auctionAnnouncement } from "../../redux/features/notification/announcementSlice";
 import AuctionPublisher from "./AuctionPublisher";
 import { Auction } from "../../common/base.interface";
+import { AuctionResult } from "./AuctionResult";
 
+interface Comic {
+  id: string;
+  title: string;
+  coverImage: string;
+  previewChapter: string[];
+  sellerId: {
+    id: string;
+    name: string;
+  };
+  condition: string;
+}
+
+interface AuctionData {
+  id: string;
+  currentPrice: number;
+  priceStep: number;
+  status: string;
+  winner: {
+    id: string;
+  } | null;
+}
+
+interface auctionAnnounce {
+  id: string;
+}
 const ComicAuction = () => {
   const { id } = useParams<Record<string, string>>();
   const [comic, setComic] = useState<any>(null);
@@ -31,7 +57,6 @@ const ComicAuction = () => {
   const auctionData = useAppSelector((state: any) => state.auction.auctionData);
   const [previewChapter, setPreviewChapter] = useState<string[]>([]);
   const [bidAmount, setBidAmount] = useState<string>("");
-  const [auctionEnded, setAuctionEnded] = useState(false);
   const [isBidDisabled, setIsBidDisabled] = useState(false);
   const userId = useAppSelector((state) => state.auth.userId);
   const highestBid = useAppSelector((state) => state.auction.highestBid);
@@ -40,15 +65,14 @@ const ComicAuction = () => {
   const [isHighest, setIsHighest] = useState<boolean | null>(null);
   const [error, setError] = useState<string>("");
   console.log("auctiondata", auctionData);
-
   const navigate = useNavigate();
-  const auctionAnnouce = useAppSelector(
+  const auctionAnnounce = useAppSelector(
     (state) => state.annoucement.auctionAnnounce
   );
   const handleBidActionDisabled = (disabled: boolean) => {
     setIsBidDisabled(disabled);
   };
-  const handleBuy = (auctionData: Auction) => {
+  const handleBuy = (auctionData: Auction, price: any) => {
     if (!auctionData) return;
     sessionStorage.setItem(
       "selectedComics",
@@ -58,7 +82,7 @@ const ComicAuction = () => {
           comics: [
             {
               comic: auctionData.comics,
-              currentPrice: auctionData.maxPrice,
+              currentPrice: price,
               auctionId: auctionData.id,
               quantity: 1,
             },
@@ -66,13 +90,12 @@ const ComicAuction = () => {
         },
       })
     );
-
     navigate("/checkout");
   };
 
   const handleModalClose = () => {
     privateAxios
-      .post(`/announcements/${auctionAnnouce?.id}/read`)
+      .post(`/announcements/${auctionAnnounce?.id}/read`)
       .then(() => {
         console.log("Announcement marked as read.");
       })
@@ -94,7 +117,7 @@ const ComicAuction = () => {
   }, [auctionData]);
 
   useEffect(() => {
-    if (highestBid?.user.id === userId) {
+    if (highestBid?.user?.id === userId) {
       setIsHighest(true);
     } else {
       setIsHighest(false);
@@ -110,12 +133,17 @@ const ComicAuction = () => {
     }
 
     socket.on("notification", (data) => {
-      dispatch(auctionAnnoucement(data));
+      dispatch(auctionAnnouncement(data));
+    });
+    socket.on("auctionUpdated", (data) => {
+      dispatch(setAuctionData(data));
+      dispatch(setHighestBid(data.bids[0].price));
     });
     // Clean up the listener on component unmount
     return () => {
       if (socket) {
         socket.off("notification");
+        socket.off("auctionUpdated");
       }
     };
   }, [userId, socket, dispatch]);
@@ -123,10 +151,10 @@ const ComicAuction = () => {
   const fetchUnreadAnnouncementForAuction = async () => {
     try {
       const response = await privateAxios.get(
-        `/announcements/auction/${auctionData.id}/unread`
+        `/announcements/auction/${auctionData?.id}/unread`
       );
       if (response.data !== "") {
-        dispatch(auctionAnnoucement(response.data));
+        dispatch(auctionAnnouncement(response.data));
       }
     } catch (error) {
       console.error("Failed to fetch unread announcement:", error);
@@ -143,7 +171,6 @@ const ComicAuction = () => {
         setPreviewChapter(comicData.previewChapter || []);
         dispatch(setAuctionData(response.data));
         const responseBid = await publicAxios.get(`/bids/auction/${id}`);
-        console.log("res", responseBid);
         dispatch(setHighestBid(responseBid.data[0]));
       } catch (error) {
         console.error("Error fetching comic details:", error);
@@ -154,7 +181,7 @@ const ComicAuction = () => {
     fetchComicDetails();
   }, [id]);
   useEffect(() => {
-    if (auctionData.status === "PROCESSING") {
+    if (auctionData?.status === "SUCCESSFUL") {
       if (auctionData.winner?.id === userId) {
         setWinner(true);
       } else {
@@ -165,11 +192,11 @@ const ComicAuction = () => {
     }
   }, [auctionData?.status, auctionData?.winner, userId]);
 
-  // useEffect(() => {
-  //   if (userId) {
-  //     setIsModalVisible(true);
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (userId) {
+      setIsModalVisible(true);
+    }
+  }, [userId]);
 
   useEffect(() => {
     socket.on("bidUpdate", (data: any) => {
@@ -219,48 +246,13 @@ const ComicAuction = () => {
 
     socket.emit("placeBid", bidPayload);
   };
-  const AuctionResult = ({ isWinner }: { isWinner: boolean | null }) => {
-    if (isWinner === null) {
-      return null; // Không hiển thị gì nếu không có thông tin winner
-    }
-
-    return (
-      <div
-        className="auction-result"
-        style={{
-          backgroundColor: isWinner ? "#d4edda" : "#f8d7da",
-          color: isWinner ? "#155724" : "#721c24",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            margin: 0,
-            lineHeight: "50px",
-            textAlign: "center",
-            transform: "translateX(100%)",
-            animation: "scroll-left 10s linear infinite",
-            fontSize: "18px",
-            fontWeight: "500",
-            fontFamily: "REM",
-          }}
-        >
-          {isWinner
-            ? "🎉 Bạn đã đấu giá thành công! Vui lòng tiến hành thanh toán để hoàn tất!"
-            : "😞 Bạn đã đấu giá thất bại."}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="auction-wrapper" style={{ position: "relative" }}>
       <AuctionResult isWinner={winner} />
-      {auctionAnnouce && auctionAnnouce.auction.id === id && (
+      {auctionAnnounce && auctionAnnounce.auction.id === id && (
         <>
-          {auctionAnnouce.status === "SUCCESSFUL" && (
+          {auctionAnnounce.status === "SUCCESSFUL" && (
             <div
               style={{
                 position: "absolute",
@@ -278,7 +270,7 @@ const ComicAuction = () => {
             </div>
           )}
           <Modal
-            title={`${auctionAnnouce?.title}`}
+            title={`${auctionAnnounce?.title}`}
             open={isModalVisible}
             onOk={handleModalClose}
             onCancel={handleModalClose}
@@ -306,12 +298,13 @@ const ComicAuction = () => {
                 fontSize: "20px",
                 fontWeight: "bold",
                 textAlign: "center",
-                color: auctionAnnouce.status === "SUCCESSFUL" ? "green" : "red",
+                color:
+                  auctionAnnounce.status === "SUCCESSFUL" ? "green" : "red",
                 lineHeight: "1.5",
               }}
             >
-              {auctionAnnouce?.message}{" "}
-              {auctionAnnouce.status === "SUCCESSFUL" ? "🎊" : ""}
+              {auctionAnnounce?.message}{" "}
+              {auctionAnnounce.status === "SUCCESSFUL" ? "🎊" : ""}
             </Typography>
           </Modal>
         </>
@@ -356,7 +349,7 @@ const ComicAuction = () => {
             </div>
 
             <div className="small-images">
-              {[comic.coverImage, ...previewChapter].map((img, index) => (
+              {[comic?.coverImage, ...previewChapter].map((img, index) => (
                 <img
                   key={index}
                   src={img}
@@ -440,26 +433,28 @@ const ComicAuction = () => {
           </div>
 
           <div className="shop-info">
-            <p
-              style={{
-                fontSize: "17px",
-                paddingTop: "10px",
-                fontFamily: "REM",
-                fontWeight: "400",
-              }}
-            >
-              Giá đấu tối thiểu tiếp theo:{" "}
-              {auctionData && (
-                <span style={{ fontWeight: "bold" }}>
-                  {(
-                    auctionData.currentPrice + auctionData.priceStep
-                  ).toLocaleString("vi-VN")}
-                  đ
-                </span>
-              )}
-            </p>
+            {auctionData.status === "ONGOING" && (
+              <p
+                style={{
+                  fontSize: "17px",
+                  paddingTop: "10px",
+                  fontFamily: "REM",
+                  fontWeight: "400",
+                }}
+              >
+                Giá đấu tối thiểu tiếp theo:{" "}
+                {auctionData && (
+                  <span style={{ fontWeight: "bold" }}>
+                    {(
+                      auctionData.currentPrice + auctionData.priceStep
+                    ).toLocaleString("vi-VN")}
+                    đ
+                  </span>
+                )}
+              </p>
+            )}
             {isHighest ? (
-              <div className="highest-bid-message">
+              <div className="highest-bid-message REM">
                 Bạn đang là người có giá cao nhất!
               </div>
             ) : (
@@ -528,19 +523,38 @@ const ComicAuction = () => {
                   justifyContent: "center",
                 }}
               >
-                <Button
-                  variant="contained"
-                  style={{
-                    color: "#fff",
-                    backgroundColor: "#000",
-                    fontWeight: "500",
-                    fontSize: "18px",
-                    fontFamily: "REM",
-                  }}
-                  onClick={() => handleBuy(auctionData)}
-                >
-                  Mua ngay với {auctionData.maxPrice.toLocaleString("vi-VN")}₫
-                </Button>
+                {auctionData.status === "ONGOING" ? (
+                  <Button
+                    variant="contained"
+                    style={{
+                      color: "#fff",
+                      backgroundColor: "#000",
+                      fontWeight: "500",
+                      fontSize: "18px",
+                      fontFamily: "REM",
+                    }}
+                    onClick={() => handleBuy(auctionData, auctionData.maxPrice)}
+                  >
+                    Mua ngay với {auctionData.maxPrice.toLocaleString("vi-VN")}₫
+                  </Button>
+                ) : auctionData.winner?.id === userId &&
+                  auctionData.status === "SUCCESSFUL" ? (
+                  <Button
+                    variant="contained"
+                    style={{
+                      color: "#fff",
+                      backgroundColor: "#000",
+                      fontWeight: "500",
+                      fontSize: "18px",
+                      fontFamily: "REM",
+                    }}
+                    onClick={() =>
+                      handleBuy(auctionData, auctionData.currentPrice)
+                    }
+                  >
+                    Thanh toán ngay
+                  </Button>
+                ) : null}
               </div>
             </div>
           </div>

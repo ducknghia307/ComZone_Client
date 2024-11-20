@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { 
-  Box, 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemButton, 
+import {
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
   ListItemText,
   ListItemIcon,
   Typography,
   Avatar,
   Divider,
   IconButton,
+  Button,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AirplayOutlinedIcon from '@mui/icons-material/AirplayOutlined';
@@ -18,6 +19,9 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import ViewHeadlineOutlinedIcon from '@mui/icons-material/ViewHeadlineOutlined';
 import { privateAxios } from "../../middleware/axiosInstance";
 import adminImage from '../../assets/settings.png';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import { LogoutUser } from "../../redux/features/auth/authActionCreators";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -28,7 +32,9 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState();
   const currentUrl = window.location.pathname;
-  const drawerWidth = isCollapsed ? '5%' : '16%';
+  const dispatch = useAppDispatch();
+  const { accessToken } = useAppSelector((state) => state.auth);
+  const drawerWidth = isCollapsed ? '5%' : 'auto';
 
   const fetchUserInfo = async () => {
     try {
@@ -42,6 +48,15 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
   useEffect(() => {
     fetchUserInfo();
   }, []);
+
+  const handleLogout = async () => {
+    await dispatch(LogoutUser());
+    window.location.href = "/";
+    // window.location.reload();
+  };
+  useEffect(() => {
+    fetchUserInfo();
+  }, [accessToken]);
 
   const menuItems = [
     {
@@ -74,30 +89,33 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       }}
     >
       {/* Header with Toggle Button */}
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: isCollapsed ? 'center' : 'space-between',
           padding: isCollapsed ? 1 : 3,
           minHeight: 64
         }}
       >
         {!isCollapsed && (
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              fontFamily: 'REM', 
+          <Typography
+            variant="h6"
+            sx={{
+              fontFamily: 'REM',
               fontWeight: 'bold',
               color: '#fff',
-              letterSpacing: '0.05em'
+              letterSpacing: '0.05em',
+              whiteSpace: 'nowrap',
+              textAlign: 'center',
+              flex: 1
             }}
           >
             ADMIN PANEL
           </Typography>
         )}
         <IconButton onClick={onToggleCollapse} sx={{ color: '#fff' }}>
-          <ViewHeadlineOutlinedIcon />  
+          <ViewHeadlineOutlinedIcon />
         </IconButton>
       </Box>
 
@@ -115,10 +133,10 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
               border: '3px solid rgba(255, 255, 255, 0.2)',
             }}
           />
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              mt: 2, 
+          <Typography
+            variant="h6"
+            sx={{
+              mt: 2,
               fontFamily: 'REM',
               color: '#fff',
               fontSize: '1rem'
@@ -134,7 +152,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       {/* Menu Items */}
       <List sx={{ px: isCollapsed ? 1 : 2, pt: 2 }}>
         {menuItems.map((item) => (
-          <ListItem key={item.title} disablePadding sx={{whiteSpace:'nowrap'}}>
+          <ListItem key={item.title} disablePadding sx={{ whiteSpace: 'nowrap' }}>
             <ListItemButton
               sx={{
                 borderRadius: '8px',
@@ -160,7 +178,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
                 {item.icon}
               </ListItemIcon>
               {!isCollapsed && (
-                <ListItemText 
+                <ListItemText
                   primary={item.title}
                   sx={{
                     '& .MuiTypography-root': {
@@ -176,6 +194,43 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           </ListItem>
         ))}
       </List>
+      <ListItem disablePadding sx={{ whiteSpace: 'nowrap', position: 'absolute', bottom: '20px', width: '100%', padding:'0 20px' }}>
+        <ListItemButton
+          sx={{
+            borderRadius: '8px',
+            justifyContent: isCollapsed ? 'center' : 'flex-start',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            },
+            minHeight: 48,
+            px: isCollapsed ? 1 : 3,
+          }}
+          onClick={handleLogout}
+        >
+          <ListItemIcon
+            sx={{
+              minWidth: isCollapsed ? 0 : '40px',
+              color: '#fff',
+              justifyContent: 'center',
+            }}
+          >
+            <LogoutOutlinedIcon />
+          </ListItemIcon>
+          {!isCollapsed && (
+            <ListItemText
+              primary="Logout"
+              sx={{
+                '& .MuiTypography-root': {
+                  fontFamily: 'REM',
+                  fontWeight: 'bold',
+                  color: '#fff',
+                  fontSize: '0.95rem',
+                },
+              }}
+            />
+          )}
+        </ListItemButton>
+      </ListItem>
     </Drawer>
   );
 };

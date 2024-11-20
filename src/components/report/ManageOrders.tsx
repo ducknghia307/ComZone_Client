@@ -34,10 +34,10 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  backgroundColor: '#fff', // Background color for rows
-  '&:nth-of-type(odd)': {
-    backgroundColor: '#ffe3d842', // Alternate rows with light pink shade
-  },
+  backgroundColor: '#fff',
+  // '&:nth-of-type(odd)': {
+  //   backgroundColor: '#ffe3d842',
+  // },
 }));
 
 const ManageOrders: React.FC = () => {
@@ -221,27 +221,27 @@ const ManageOrders: React.FC = () => {
   };
 
   return (
-    <div style={{paddingBottom:'40px'}}>
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-      {/* Search Box */}
-      <TextField
-        variant="outlined"
-        placeholder="Tìm kiếm..."
-        // value={searchTerm}
-        // onChange={handleSearch}
-        size="small"
-        sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchOutlinedIcon sx={{ color: '#fff' }} />
-            </InputAdornment>
-          ),
-          style: { color: '#fff' },
-        }}
-      />
-    </Box>
-    <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color:'#71002b' }}>
+    <div style={{ paddingBottom: '40px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        {/* Search Box */}
+        <TextField
+          variant="outlined"
+          placeholder="Tìm kiếm..."
+          // value={searchTerm}
+          // onChange={handleSearch}
+          size="small"
+          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlinedIcon sx={{ color: '#fff' }} />
+              </InputAdornment>
+            ),
+            style: { color: '#fff' },
+          }}
+        />
+      </Box>
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color: '#71002b' }}>
         Quản lý đơn hàng
       </Typography>
       <Paper>
@@ -286,7 +286,7 @@ const ManageOrders: React.FC = () => {
                           <span>{order.totalPrice} đ</span>
                         </StyledTableCell>
                         <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
-                          {order.paymentMethod}
+                          {order.paymentMethod === 'WALLET' ? 'Ví Comzone' : order.paymentMethod}
                         </StyledTableCell>
                         <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
                           <span style={getStatusColor(order.status, order.deliveryStatus)}>

@@ -140,7 +140,9 @@ import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalance
 import MultipleStopOutlinedIcon from "@mui/icons-material/MultipleStopOutlined";
 import GavelOutlinedIcon from '@mui/icons-material/GavelOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { LogoutUser } from "../../redux/features/auth/authActionCreators";
+import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
@@ -150,7 +152,9 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState();
   const currentUrl = window.location.pathname;
-  const drawerWidth = isCollapsed ? '5%' : '16%';
+  const dispatch = useAppDispatch();
+  const { accessToken } = useAppSelector((state) => state.auth);
+  const drawerWidth = isCollapsed ? '5%' : 'auto';
 
   const fetchUserInfo = async () => {
     try {
@@ -162,14 +166,13 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
   };
 
   const handleLogout = async () => {
-    try {
-      await privateAxios.post('/auth/logout');
-      // quay về /login sau khi logout
-      navigate('/');
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
+    await dispatch(LogoutUser());
+    window.location.href = "/";
+    // window.location.reload();
   };
+  useEffect(() => {
+    fetchUserInfo();
+  }, [accessToken]);
 
   useEffect(() => {
     fetchUserInfo();
@@ -193,20 +196,20 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       title: "Quản Lý Đấu Giá",
       path: "/mod/auctions",
       icon: <GavelOutlinedIcon sx={{ color: 'inherit' }} />
-    }, {
-      title: "Quản Lý Trao Đổi",
-      path: "/mod/exchanges",
-      icon: <MultipleStopOutlinedIcon sx={{ color: 'inherit' }} />
+    // }, {
+    //   title: "Quản Lý Trao Đổi",
+    //   path: "/mod/exchanges",
+    //   icon: <MultipleStopOutlinedIcon sx={{ color: 'inherit' }} />
     },
-    // {
-    //   title: "Quản Lý Đánh Giá",
-    //   path: "/mod/feedbacks",
-    //   icon: <EventNoteOutlinedIcon sx={{ color: 'inherit' }} />
-    // },
     {
       title: "Quản Lý Ví",
       path: "/mod/deposits",
       icon: <AccountBalanceWalletOutlinedIcon sx={{ color: 'inherit' }} />
+    },
+    {
+      title: "Quản Lý Đánh Giá",
+      path: "/mod/feedbacks",
+      icon: <EventNoteOutlinedIcon sx={{ color: 'inherit' }} />
     },
   ];
 
@@ -224,6 +227,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           borderRight: 'none',
           transition: 'width 0.3s ease',
           overflowX: 'hidden',
+          overflowY: 'auto'
         },
       }}
     >
@@ -234,7 +238,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           alignItems: 'center',
           justifyContent: isCollapsed ? 'center' : 'space-between',
           padding: isCollapsed ? 1 : 3,
-          minHeight: 64
+          minHeight: 64,
         }}
       >
         {!isCollapsed && (
@@ -244,10 +248,13 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
               fontFamily: 'REM',
               fontWeight: 'bold',
               color: '#fff',
-              letterSpacing: '0.05em'
+              letterSpacing: '0.05em',
+              whiteSpace: 'nowrap',
+              textAlign: 'center',
+              flex: 1
             }}
           >
-            MOD PANEL
+            MODERATOR
           </Typography>
         )}
         <IconButton onClick={onToggleCollapse} sx={{ color: '#fff' }}>
@@ -269,7 +276,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
               border: '3px solid rgba(255, 255, 255, 0.2)',
             }}
           />
-          <Typography
+          {/* <Typography
             variant="h6"
             sx={{
               mt: 2,
@@ -279,7 +286,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
             }}
           >
             {userInfo?.name || 'Admin'}
-          </Typography>
+          </Typography> */}
         </Box>
       )}
 
@@ -299,7 +306,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
                 },
                 backgroundColor: currentUrl === item.path ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
                 transition: 'all 0.2s ease-in-out',
-                minHeight: 48,
+                minHeight: 35,
                 px: isCollapsed ? 1 : 3,
               }}
               onClick={() => navigate(item.path)}
@@ -330,36 +337,43 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           </ListItem>
         ))}
       </List>
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: '20px', 
-          width: '100%',
-          px: 2, 
-        }}
-      >
-        <Button
-          variant="contained"
-          fullWidth
-          startIcon={<LogoutOutlinedIcon />}
+      <ListItem disablePadding sx={{ whiteSpace: 'nowrap', position: 'absolute', bottom: '10px', width: '100%', padding:'0 20px' }}>
+        <ListItemButton
           sx={{
-            background: '#c66a7a', 
-            color: '#fff',
-            fontWeight: 'bold',
-            textTransform: 'none',
-            padding: '10px', 
-            borderRadius: '10px',
+            borderRadius: '8px',
+            justifyContent: isCollapsed ? 'center' : 'flex-start',
             '&:hover': {
-              backgroundColor: '#b85a6c',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
             },
-            transition: 'background-color 0.3s ease',
+            minHeight: 35,
+            px: isCollapsed ? 1 : 3,
           }}
           onClick={handleLogout}
         >
-          Logout
-        </Button>
-      </Box>
-
+          <ListItemIcon
+            sx={{
+              minWidth: isCollapsed ? 0 : '40px',
+              color: '#fff',
+              justifyContent: 'center',
+            }}
+          >
+            <LogoutOutlinedIcon />
+          </ListItemIcon>
+          {!isCollapsed && (
+            <ListItemText
+              primary="Logout"
+              sx={{
+                '& .MuiTypography-root': {
+                  fontFamily: 'REM',
+                  fontWeight: 'bold',
+                  color: '#fff',
+                  fontSize: '0.95rem',
+                },
+              }}
+            />
+          )}
+        </ListItemButton>
+      </ListItem>
     </Drawer>
   );
 };

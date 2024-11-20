@@ -14,126 +14,233 @@ import { MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 // Register Chart.js components
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
-const mockData = {
-    comics: [
-        { date: "2024-10-01", count: 10 },
-        { date: "2024-10-05", count: 15 },
-        { date: "2024-10-12", count: 28 }
-    ],
-    orders: [
-        { date: "2024-09-03", count: 5 },
-        { date: "2024-09-10", count: 8 },
-        { date: "2024-09-17", count: 12 }
-    ],
-    transactions: [
-        { date: "2024-11-01", count: 2 },
-        { date: "2024-11-05", count: 4 },
-        { date: "2024-11-10", count: 6 }
-    ]
-};
-
 const Dashboard = () => {
     const [comicsData, setComicsData] = useState([]);
     const [ordersData, setOrdersData] = useState([]);
     const [transactionsData, setTransactionsData] = useState([]);
+    const [totalComics, setTotalComics] = useState(0);
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [totalAuctions, setTotalAuctions] = useState(0);
+    const [totalTransactions, setTotalTransactions] = useState(0);
+    const [totalOrders, setTotalOrders] = useState(0);
     const [visibleDatasets, setVisibleDatasets] = useState({
         comics: true,
         orders: true,
         transactions: true,
     });
-    const [timeRange, setTimeRange] = useState('Year');
+    const [timeRange, setTimeRange] = useState('Week');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Simulate API call with mock data
-        setComicsData(mockData.comics);
-        setOrdersData(mockData.orders);
-        setTransactionsData(mockData.transactions);
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const comicsResponse = await privateAxios.get('/comics');
+                const usersResponse = await privateAxios.get('/users');
+                const auctionsResponse = await privateAxios.get('/auction');
+                const transactionsResponse = await privateAxios.get('/transactions/all');
+                const ordersResponse = await privateAxios.get('/orders');
+
+                // Calculate totals
+                setTotalComics(comicsResponse.data.length);
+                setTotalUsers(usersResponse.data.length);
+                setTotalAuctions(auctionsResponse.data.length);
+
+                // Filter and calculate pending transactions
+                const successfulTransactions = transactionsResponse.data.filter(
+                    (transaction) => transaction.status === "PENDING"
+                );
+                const totalRevenue = successfulTransactions.reduce(
+                    (sum, transaction) => sum + (transaction.amount || 0),
+                    0
+                );
+
+                // Filter and calculate pending orders
+                const successfulOrders = ordersResponse.data.filter(
+                    (order) => order.status === "PENDING"
+                );
+
+                // Process data for the chart
+                const processedComicsData = processTimelineData(comicsResponse.data);
+                const processedTransactionsData = processTimelineData(successfulTransactions);
+                const processedOrdersData = processTimelineData(successfulOrders);
+
+                // Set data to state
+                setComicsData(processedComicsData);
+                setTransactionsData(processedTransactionsData);
+                setOrdersData(processedOrdersData);
+                setTotalTransactions(totalRevenue);
+                setTotalOrders(successfulOrders.length);
+
+            } catch (err) {
+                setError(err.message);
+                console.error('Error fetching dashboard data:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
 
-    const totalRevenue = 4379000; // Mock total revenue
-    const totalUsers = 23 + 101 + 5; // Mock total users
-    const totalComics = comicsData.length;
-    const totalAuctions = ordersData.length;
-    const totalExchanges = transactionsData.length;
+    const processTimelineData = (data) => {
+        if (!data || data.length === 0) return [];
+
+        const sortedData = [...data].sort((a, b) =>
+            new Date(a.createdAt) - new Date(b.createdAt)
+        );
+
+        const cumulativeTotals = new Map();
+        let runningTotal = 0;
+
+        sortedData.forEach(item => {
+            const date = new Date(item.createdAt).toISOString().split('T')[0];
+            runningTotal += 1;
+            cumulativeTotals.set(date, runningTotal);
+        });
+
+        const result = [];
+        const startDate = new Date(sortedData[0]?.createdAt);
+        const endDate = new Date(sortedData[sortedData.length - 1]?.createdAt);
+
+        let currentDate = new Date(startDate);
+        let lastKnownTotal = 0;
+
+        while (currentDate <= endDate) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const total = cumulativeTotals.get(dateStr) || lastKnownTotal;
+            lastKnownTotal = total;
+
+            result.push({
+                date: dateStr,
+                count: total,
+            });
+
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return result;
+    };
+
+    const aggregateByMonth = (data) => {
+        if (!data || data.length === 0) return [];
+    
+        const monthlyTotals = {};
+        data.forEach(({ date, count }) => {
+            const month = date.slice(0, 7); // Extract "YYYY-MM"
+            monthlyTotals[month] = (monthlyTotals[month] || 0) + count;
+        });
+    
+        return Object.entries(monthlyTotals).map(([month, total]) => ({
+            date: month, // Use "YYYY-MM" as the label
+            count: total, // Aggregated total for the month
+        }));
+    };
+    
 
     const filterDataByTimeRange = (data) => {
-        // Logic to filter data based on selected time range
+        if (!data || data.length === 0) return [];
+
         const now = new Date();
+        let startDate;
+
         if (timeRange === 'Week') {
-            const oneWeekAgo = new Date(now);
-            oneWeekAgo.setDate(now.getDate() - 7);
-            return data.filter(item => new Date(item.date) >= oneWeekAgo);
+            startDate = new Date(now);
+            startDate.setDate(now.getDate() - 6);
         } else if (timeRange === 'Month') {
-            const oneMonthAgo = new Date(now);
-            oneMonthAgo.setMonth(now.getMonth() - 1);
-            return data.filter(item => new Date(item.date) >= oneMonthAgo);
-        } else {
-            return data; // Default is Year
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        } else if (timeRange === 'Year') {
+            return aggregateByMonth(data);
         }
+
+        const filteredData = data.filter(item => new Date(item.date) >= startDate);
+        const result = [];
+        let currentDate = new Date(startDate);
+        let lastKnownTotal = 0;
+
+        while (currentDate <= now) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const foundItem = filteredData.find(item => item.date === dateStr);
+            const total = foundItem ? foundItem.count : lastKnownTotal;
+            lastKnownTotal = total;
+
+            result.push({
+                date: dateStr,
+                count: total,
+            });
+
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return result;
     };
 
     const createCombinedChartData = () => {
-        // Filter data based on time range
         const filteredComics = filterDataByTimeRange(comicsData);
         const filteredOrders = filterDataByTimeRange(ordersData);
         const filteredTransactions = filterDataByTimeRange(transactionsData);
 
-        // Extract unique dates from all datasets
-        const allDates = [...new Set([...filteredComics, ...filteredOrders, ...filteredTransactions].map(item => item.date))];
-        allDates.sort();
-
-        const comicsCounts = allDates.map(date => {
-            const found = filteredComics.find(item => item.date === date);
-            return found ? found.count : 0;
-        });
-
-        const ordersCounts = allDates.map(date => {
-            const found = filteredOrders.find(item => item.date === date);
-            return found ? found.count : 0;
-        });
-
-        const transactionsCounts = allDates.map(date => {
-            const found = filteredTransactions.find(item => item.date === date);
-            return found ? found.count : 0;
-        });
+        const allDates = [...new Set([
+            ...filteredComics.map(item => item.date),
+            ...filteredOrders.map(item => item.date),
+            ...filteredTransactions.map(item => item.date)
+        ])].sort();
 
         return {
             labels: allDates,
             datasets: [
                 visibleDatasets.comics && {
-                    label: 'Comics',
-                    data: comicsCounts,
+                    label: 'Truyện',
+                    data: allDates.map(date => {
+                        const found = filteredComics.find(item => item.date === date);
+                        return found ? found.count : 0;
+                    }),
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.4,
+                    tension: 0,
                 },
                 visibleDatasets.orders && {
-                    label: 'Orders',
-                    data: ordersCounts,
+                    label: 'Đơn hàng',
+                    data: allDates.map(date => {
+                        const found = filteredOrders.find(item => item.date === date);
+                        return found ? found.count : 0;
+                    }),
                     borderColor: 'rgba(192, 75, 192, 1)',
                     backgroundColor: 'rgba(192, 75, 192, 0.2)',
-                    tension: 0.4,
+                    tension: 0,
                 },
                 visibleDatasets.transactions && {
-                    label: 'Transactions',
-                    data: transactionsCounts,
+                    label: 'Giao dịch',
+                    data: allDates.map(date => {
+                        const found = filteredTransactions.find(item => item.date === date);
+                        return found ? found.count : 0;
+                    }),
                     borderColor: 'rgba(192, 192, 75, 1)',
                     backgroundColor: 'rgba(192, 192, 75, 0.2)',
-                    tension: 0.4,
+                    tension: 0,
                 },
             ].filter(Boolean),
         };
     };
 
     const toggleDatasetVisibility = (key) => {
-        setVisibleDatasets((prev) => ({
+        setVisibleDatasets(prev => ({
             ...prev,
             [key]: !prev[key],
         }));
     };
 
+    if (loading) {
+        return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="text-red-500 text-center">Error: {error}</div>;
+    }
+
     return (
-        <div>
+        <div className="pb-6">
             {/* Summary Cards Section */}
             <div className="mb-6 mt-6">
                 <div className="flex justify-between space-x-4">
@@ -141,7 +248,7 @@ const Dashboard = () => {
                         <AttachMoneyOutlined className="text-blue-600 text-3xl" />
                         <div>
                             <h3 className="font-semibold">Doanh thu</h3>
-                            <p className="text-lg font-bold">{totalRevenue.toLocaleString()} VND</p>
+                            <p className="text-lg font-bold">{totalTransactions.toLocaleString()} VND</p>
                         </div>
                     </div>
                     <div className="bg-green-100 p-4 rounded-lg shadow-md w-full flex items-center space-x-4">
@@ -168,8 +275,8 @@ const Dashboard = () => {
                     <div className="bg-red-100 p-4 rounded-lg shadow-md w-full flex items-center space-x-4">
                         <SwapHorizOutlined className="text-red-600 text-3xl" />
                         <div>
-                            <h3 className="font-semibold">Số lượt trao đổi</h3>
-                            <p className="text-lg font-bold">{totalExchanges}</p>
+                            <h3 className="font-semibold">Đơn hàng chờ xử lí</h3>
+                            <p className="text-lg font-bold">{totalOrders}</p>
                         </div>
                     </div>
                 </div>
@@ -187,7 +294,7 @@ const Dashboard = () => {
                                 value={timeRange}
                                 onChange={(e) => setTimeRange(e.target.value)}
                                 label="Time Range"
-                                sx={{width:'150px'}}
+                                className="w-36"
                             >
                                 <MenuItem value="Week">Tuần</MenuItem>
                                 <MenuItem value="Month">Tháng</MenuItem>
@@ -196,7 +303,7 @@ const Dashboard = () => {
                         </FormControl>
                     </div>
 
-                    <div className="h-[400px] w-full">
+                    <div className="h-96 w-full">
                         <Line
                             data={createCombinedChartData()}
                             options={{
@@ -204,7 +311,7 @@ const Dashboard = () => {
                                 maintainAspectRatio: false,
                                 plugins: {
                                     legend: {
-                                        display: false, // Disable default legend
+                                        display: false,
                                     },
                                 },
                                 scales: {

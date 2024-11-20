@@ -31,11 +31,16 @@ const BanComicModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =
         }
     };
 
-    const handleBan = () => {
+    const [loading, setLoading] = React.useState(false);
+
+    const handleBan = async () => {
+        setLoading(true); // Bật trạng thái loading
         const reason = selectedReason === 'Khác' ? otherReason : selectedReason;
-        onBan(reason);
+        await onBan(reason); // Gọi hàm xử lý cập nhật trạng thái
+        setLoading(false); // Tắt trạng thái loading
         onClose();
     };
+
 
     return (
         <Modal open={open} onClose={onClose}>
@@ -69,9 +74,14 @@ const BanComicModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =
                     )}
                 </FormControl>
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                    <Button onClick={handleBan} sx={{color:'#fff', backgroundColor:'#000'}}>
-                        Cấm Bán Truyện
+                    <Button
+                        onClick={handleBan}
+                        sx={{ color: '#fff', backgroundColor: '#000', '&:hover': { backgroundColor: '#333' } }}
+                        disabled={loading} // Disable khi đang loading
+                    >
+                        {loading ? 'Đang cập nhật...' : 'Cấm Bán Truyện'}
                     </Button>
+
                 </Box>
             </Box>
         </Modal>

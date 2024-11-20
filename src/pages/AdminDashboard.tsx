@@ -32,19 +32,21 @@ const ModUsers: React.FC = () => {
         //     </Grid>
         // </div>
         <div className="w-full">
-            <Grid 
+            <Grid  
                 container 
                 sx={{
-                    padding: '30px 40px',
-                    '& .MuiGrid2-root': { // Target Grid items
-                        paddingLeft: '24px',
-                        // paddingRight: '24px',
+                    // padding: '30px 40px',
+                    '& .MuiGrid2-root': {
+                        paddingLeft: '12px',
+                        paddingRight: '24px',
+                        // margin:'auto'
+                        paddingTop:'20px',
                     },
                     backgroundColor: '#fedddb24'
                 }}
             >
                 <Grid 
-                    size={isCollapsed ? 0.5 : 2} 
+                    size={isCollapsed ? 0.5 : 2.5} 
                     className="account-menu2"
                     sx={{
                         paddingLeft: '0 !important',
@@ -56,7 +58,7 @@ const ModUsers: React.FC = () => {
                     />
                 </Grid>
                 <Grid 
-                    size={isCollapsed ? 11.5 : 10} 
+                    size={isCollapsed ? 11.5 : 9.5} 
                     sx={{
                         height: '100vh',
                     }}

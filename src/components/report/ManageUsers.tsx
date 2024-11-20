@@ -137,6 +137,21 @@ const ManageUsers: React.FC = () => {
     }
   };
 
+  const getRoleStyle = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return { color: '#d32f2f', backgroundColor: '#fdecea', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '14px' };
+      case "MODERATOR":
+        return { color: '#3f51b5', backgroundColor: '#e8eaf6', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '14px' };
+      case "SELLER":
+        return { color: '#ff9800', backgroundColor: '#fff3e0', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '14px' };
+      case "MEMBER":
+        return { color: '#2196f3', backgroundColor: '#e3f2fd', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '14px' };
+      default:
+        return { color: '#000', backgroundColor: '#fff', padding: '8px 20px', borderRadius: '8px', fontWeight: 'normal', fontSize: '14px' };
+    }
+  };
+
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -172,6 +187,7 @@ const ManageUsers: React.FC = () => {
                 <StyledTableCell>Ảnh</StyledTableCell>
                 <StyledTableCell>Tên Người Dùng</StyledTableCell>
                 <StyledTableCell align="right">Email</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Vai trò</StyledTableCell>
                 <StyledTableCell align="right">Trạng Thái</StyledTableCell>
                 <StyledTableCell align="right">Chỉnh Sửa</StyledTableCell>
               </TableRow>
@@ -197,6 +213,11 @@ const ManageUsers: React.FC = () => {
                       </StyledTableCell>
                       <StyledTableCell>{user.name}</StyledTableCell>
                       <StyledTableCell align="right">{user.email}</StyledTableCell>
+                      <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM' }}>
+                      <span style={getRoleStyle(user.role)}>
+                        {user.role}
+                      </span>
+                    </StyledTableCell>
                       <StyledTableCell align="right">
                         <span style={getStatusColor(user.status)}>{getStatusText(user.status)}</span>
                       </StyledTableCell>

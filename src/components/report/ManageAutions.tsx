@@ -122,6 +122,8 @@ const ManageAuctions: React.FC = () => {
         return { color: '#4caf50', backgroundColor: '#e8f5e9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
       case 'UPCOMING':
         return { color: '#6226EF', backgroundColor: '#EDE7F6', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+      case 'COMPLETED':
+        return { color: '#009688', backgroundColor: '#e0f2f1', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
       case 'PROCESSING':
         return { color: '#ff9800', backgroundColor: '#fff3e0', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', };
       case 'ONGOING':
@@ -137,6 +139,8 @@ const ManageAuctions: React.FC = () => {
     switch (status) {
       case 'SUCCESSFUL':
         return 'Thành công';
+      case "COMPLETED":
+        return "Hoàn thành";
       case 'UPCOMING':
         return 'Sắp diễn ra';
       case 'PROCESSING':
@@ -157,7 +161,7 @@ const ManageAuctions: React.FC = () => {
   };
 
   return (
-    <div style={{paddingBottom:'40px'}}>
+    <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         {/* Search Box */}
         <TextField
@@ -177,7 +181,7 @@ const ManageAuctions: React.FC = () => {
           }}
         />
       </Box>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color:'#71002b' }}>
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color: '#71002b' }}>
         Quản lý đấu giá
       </Typography>
       <Paper>

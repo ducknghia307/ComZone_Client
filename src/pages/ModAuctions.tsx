@@ -32,7 +32,7 @@ const ModAuctions: React.FC = () => {
                 }}
             >
                 <Grid
-                    size={isCollapsed ? 0.5 : 2}
+                    size={isCollapsed ? 0.5 : 2.5}
                     className="account-menu2"
                     sx={{
                         paddingLeft: '0 !important', // Remove left padding from sidebar
@@ -45,7 +45,7 @@ const ModAuctions: React.FC = () => {
                     />
                 </Grid>
                 <Grid
-                    size={isCollapsed ? 11.5 : 10}
+                    size={isCollapsed ? 11.5 : 9.5}
                     sx={{
                         height: '100vh',
                     }}

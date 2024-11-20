@@ -88,6 +88,8 @@ const AuctionDetailMod = ({ open, onCancel, comic, auctionData, onSuccess, onClo
                 return { color: '#4caf50', backgroundColor: '#e8f5e9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
             case 'PROCESSING':
                 return { color: '#ff9800', backgroundColor: '#fff3e0', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', };
+            case 'COMPLETED':
+                return { color: '#009688', backgroundColor: '#e0f2f1', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
             case 'ONGOING':
                 return { color: '#2196f3', backgroundColor: '#e3f2fd', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
             case 'FAILED':
@@ -101,6 +103,8 @@ const AuctionDetailMod = ({ open, onCancel, comic, auctionData, onSuccess, onClo
         switch (status) {
             case 'SUCCESSFUL':
                 return 'Thành công';
+            case "COMPLETED":
+                return "Hoàn thành";
             case 'PROCESSING':
                 return 'Đang xử lí';
             case 'ONGOING':

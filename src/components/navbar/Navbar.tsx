@@ -30,6 +30,7 @@ const Navbar = () => {
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [chatUnreadCount, setChatUnreadCount] = useState<number>(0);
   const navigate = useNavigate();
+  const location1 = useLocation();
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -180,7 +181,22 @@ const Navbar = () => {
     setChatUnreadCount(value);
   };
 
-  if (userInfo?.role === "ADMIN" || userInfo?.role === "MODERATOR") {
+  // if (userInfo?.role === "ADMIN" || userInfo?.role === "MODERATOR") {
+  //   return null;
+  // }
+
+  const adminAndModPaths = [
+    "/admin/dashboard",
+    "/admin/users",
+    "/mod/users",
+    "/mod/comics",
+    "/mod/orders",
+    "/mod/auctions",
+    "/mod/deposits",
+    "/mod/feedbacks",
+  ];
+
+  if (adminAndModPaths.includes(location1.pathname)) {
     return null;
   }
 
@@ -192,10 +208,10 @@ const Navbar = () => {
             {(window.location.pathname === "/signin" ||
               window.location.pathname === "/signup" ||
               window.location.pathname === "/forgot") && (
-              <Link to={"/"}>
-                <img className="h-16 w-auto ml-2 " src={Logo} alt="ComZone" />
-              </Link>
-            )}
+                <Link to={"/"}>
+                  <img className="h-16 w-auto ml-2 " src={Logo} alt="ComZone" />
+                </Link>
+              )}
             <div className="px-4 max-w-64">
               {window.location.pathname !== "/signin" &&
                 window.location.pathname !== "/signup" &&
@@ -402,35 +418,31 @@ const Navbar = () => {
             window.location.pathname !== "/forgot" && (
               <div className="hidden lg:flex md:flex lg:w-full lg:ml-20 lg:mb-0 mb-2 mt-2 lg:text-base md:text-sm">
                 <Link
-                  className={`text-black px-6 hover:text-black ${
-                    location.pathname === "/" ? "font-bold" : ""
-                  }`}
+                  className={`text-black px-6 hover:text-black ${location.pathname === "/" ? "font-bold" : ""
+                    }`}
                   to="/"
                 >
                   <li>TRANG CHỦ</li>
                 </Link>
                 <Link
-                  className={`text-black px-6 hover:text-black ${
-                    location.pathname === "/auctions" ? "font-bold" : ""
-                  }`}
+                  className={`text-black px-6 hover:text-black ${location.pathname === "/auctions" ? "font-bold" : ""
+                    }`}
                   to="/auctions"
                 >
                   <li>CÁC CUỘC ĐẤU GIÁ</li>
                 </Link>
                 <Link
-                  className={`text-black px-6 hover:text-black ${
-                    location.pathname === "/genres" ? "font-bold" : ""
-                  }`}
+                  className={`text-black px-6 hover:text-black ${location.pathname === "/genres" ? "font-bold" : ""
+                    }`}
                   to="/genres"
                 >
                   <li>TẤT CẢ THỂ LOẠI</li>
                 </Link>
                 <Link
-                  className={`text-black px-6 hover:text-black ${
-                    location.pathname === "/exchange-news-feed"
+                  className={`text-black px-6 hover:text-black ${location.pathname === "/exchange-news-feed"
                       ? "font-bold"
                       : ""
-                  }`}
+                    }`}
                   to="/exchange-news-feed"
                 >
                   <li>TRAO ĐỔI TRUYỆN</li>
@@ -492,36 +504,32 @@ const Navbar = () => {
               </div>
               <div className="flex flex-col items-center w-full">
                 <Link
-                  className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
-                    location.pathname === "/" ? "font-bold" : ""
-                  }`}
+                  className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${location.pathname === "/" ? "font-bold" : ""
+                    }`}
                   to="/"
                   onClick={toggleMenu}
                 >
                   TRANG CHỦ
                 </Link>
                 <Link
-                  className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
-                    location.pathname === "/auctions" ? "font-bold" : ""
-                  }`}
+                  className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${location.pathname === "/auctions" ? "font-bold" : ""
+                    }`}
                   to="/auctions"
                   onClick={toggleMenu}
                 >
                   CÁC CUỘC ĐẤU GIÁ
                 </Link>
                 <Link
-                  className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
-                    location.pathname === "/genres" ? "font-bold" : ""
-                  }`}
+                  className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${location.pathname === "/genres" ? "font-bold" : ""
+                    }`}
                   to="/genres"
                   onClick={toggleMenu}
                 >
                   TẤT CẢ THỂ LOẠI
                 </Link>
                 <Link
-                  className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${
-                    location.pathname === "/exchange" ? "font-bold" : ""
-                  }`}
+                  className={`text-black px-6 py-2 hover:text-black flex lg:hidden md:hidden ${location.pathname === "/exchange" ? "font-bold" : ""
+                    }`}
                   to="/exchange"
                   onClick={toggleMenu}
                 >
@@ -544,9 +552,8 @@ const Navbar = () => {
                   TRỞ THÀNH NGƯỜI BÁN
                 </Link>
                 <Link
-                  className={`text-black px-6 py-2 hover:text-black ${
-                    location.pathname === "/cart" ? "font-bold" : ""
-                  }`}
+                  className={`text-black px-6 py-2 hover:text-black ${location.pathname === "/cart" ? "font-bold" : ""
+                    }`}
                   to="/cart"
                   onClick={toggleMenu}
                 >

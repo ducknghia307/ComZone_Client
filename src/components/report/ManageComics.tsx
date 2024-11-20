@@ -19,7 +19,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 // Styled Components for Moderator
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#c66a7a', 
+    backgroundColor: '#c66a7a',
     color: '#fff',
     fontWeight: 'bold',
     fontFamily: 'REM',
@@ -33,9 +33,9 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  backgroundColor: '#fff', // Background color for rows
+  backgroundColor: '#fff',
   '&:nth-of-type(odd)': {
-    backgroundColor: '#ffe3d842', // Alternate rows with light pink shade
+    backgroundColor: '#ffe3d842',
   },
 }));
 
@@ -95,20 +95,48 @@ const ManageComics: React.FC = () => {
     }
   };
 
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case "UNAVAILABLE": return "Không khả dụng";
+      case "AVAILABLE": return "Có sẵn";
+      case "AUCTION": return "Đang đấu giá";
+      case "EXCHANGE": return "Trao đổi";
+      case "EXCHANGE_OFFER": return "Đề xuất trao đổi";
+      case "SOLD": return "Đã bán";
+      case "REMOVED": return "Đã gỡ";
+      default: return status;
+    }
+  };
+
   const handleOpenBanModal = (comicId: number) => {
     setSelectedComicId(comicId);
     setOpenBanModal(true);
   };
 
-  const handleBanComic = (reason: string) => {
+  const handleBanComic = async (reason: string) => {
     if (selectedComicId !== null) {
-      console.log(`Banning comic ID: ${selectedComicId} for reason: ${reason}`);
-      // privateAxios.post(`/comics/${selectedComicId}/ban`, { reason });
+      try {
+        await privateAxios.patch(`/comics/${selectedComicId}/status`, {
+          status: 'REMOVED', // Trạng thái mới là REMOVED
+        });
+        console.log(`Comic ID: ${selectedComicId} đã được chuyển sang REMOVED với lý do: ${reason}`);
+
+        // Cập nhật danh sách sau khi cấm
+        setComics((prevComics) =>
+          prevComics.map((comic) =>
+            comic.id === selectedComicId ? { ...comic, status: 'REMOVED' } : comic
+          )
+        );
+      } catch (error) {
+        console.error('Lỗi khi cập nhật trạng thái:', error);
+      } finally {
+        setOpenBanModal(false); // Đóng modal sau khi hoàn tất
+      }
     }
   };
 
   return (
-    <div style={{paddingBottom:'40px'}}>
+    <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         {/* Search Box */}
         <TextField
@@ -128,7 +156,7 @@ const ManageComics: React.FC = () => {
           }}
         />
       </Box>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color:'#71002b' }}>
+      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color: '#71002b' }}>
         Quản lý truyện tranh
       </Typography>
       <Paper>
@@ -161,7 +189,7 @@ const ManageComics: React.FC = () => {
                     <StyledTableCell align="right">{comic.author}</StyledTableCell>
                     <StyledTableCell align="right">
                       <span style={getStatusColor(comic.status)}>
-                        {comic.status}
+                        {translateStatus(comic.status)}
                       </span>
                     </StyledTableCell>
                     <StyledTableCell align="right">

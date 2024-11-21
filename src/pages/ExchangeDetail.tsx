@@ -119,7 +119,7 @@ const ExchangeDetail: React.FC = () => {
               (delivery.to && delivery.to.user.id === first?.id)
           );
           if (firstUserDelivery) {
-            setFirstCurrentStage(4);
+            setFirstCurrentStage(3);
             setFirstAddress(
               deliveries[0].from.user.id === first?.id
                 ? deliveries[0].from.name
@@ -133,7 +133,7 @@ const ExchangeDetail: React.FC = () => {
               (delivery.to && delivery.to.user.id === second?.id)
           );
           if (secondUserDelivery) {
-            setSecondCurrentStage(4);
+            setSecondCurrentStage(3);
             setSecondAddress(
               deliveries[0].from.user.id === second?.id
                 ? deliveries[0].from.name

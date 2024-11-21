@@ -166,7 +166,15 @@ export default function InformationCollectSection({
           fetchExchangeDetails={fetchExchangeDetails}
         />
       )}
-      {caughtProgress && firstCurrentStage === 4 && <DeliveryProcessInfo />}
+      {caughtProgress && firstCurrentStage === 4 && (
+        <DeliveryProcessInfo
+          exchangeDetails={exchangeDetails}
+          firstUserName={firstUserName}
+          secondUserName={secondUserName}
+          firstAddress={firstAddress}
+          secondAddress={secondAddress}
+        />
+      )}
       {caughtProgress && firstCurrentStage === 5 && <SuccessfulExchange />}
     </div>
   );

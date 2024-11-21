@@ -18,6 +18,8 @@ export default function InformationCollectSection({
   addresses,
   setAddresses,
   fetchUserAddress,
+  firstAddress,
+  secondAddress,
 }: {
   exchangeDetails: ExchangeDetails;
   firstCurrentStage: number;
@@ -28,13 +30,20 @@ export default function InformationCollectSection({
   addresses: Address[];
   setAddresses: (list: Address[]) => void;
   fetchUserAddress: () => void;
+  firstAddress: string;
+  secondAddress: string;
 }) {
   const theOther = exchangeDetails.isRequestUser
     ? exchangeDetails.exchange.post.user
     : exchangeDetails.exchange.requestUser;
 
   const caughtProgress = firstCurrentStage <= secondCurrentStage;
-
+  const firstUserName = exchangeDetails.isRequestUser
+    ? exchangeDetails.exchange.requestUser.name
+    : exchangeDetails.exchange.post.user.name;
+  const secondUserName = !exchangeDetails.isRequestUser
+    ? exchangeDetails.exchange.requestUser.name
+    : exchangeDetails.exchange.post.user.name;
   const getTitle = () => {
     switch (firstCurrentStage) {
       case 0:
@@ -98,9 +107,14 @@ export default function InformationCollectSection({
         };
       case 4:
         return {
-          title: "Đang giao hàng",
+          title: "Giao hàng & nhận hàng",
           subTitle: (
-            <p className="leading-relaxed">Đang trên đường giao và nhận hàng</p>
+            <p className="leading-relaxed max-w-1/2">
+              Quá trình giao hàng sẽ tự động bắt đầu sau khi hệ thống ghi nhận
+              được giao dịch thanh toán của cả hai. <br />
+              Hãy đảm bảo bạn đã hoàn thành việc đóng gói trước khi nhân viên
+              giao hàng đến.
+            </p>
           ),
         };
     }
@@ -143,7 +157,14 @@ export default function InformationCollectSection({
         />
       )}
       {caughtProgress && firstCurrentStage === 3 && (
-        <PlaceDeposit exchangeDetails={exchangeDetails} />
+        <PlaceDeposit
+          exchangeDetails={exchangeDetails}
+          firstAddress={firstAddress}
+          secondAddress={secondAddress}
+          firstUserName={firstUserName}
+          secondUserName={secondUserName}
+          fetchExchangeDetails={fetchExchangeDetails}
+        />
       )}
       {caughtProgress && firstCurrentStage === 4 && <DeliveryProcessInfo />}
       {caughtProgress && firstCurrentStage === 5 && <SuccessfulExchange />}

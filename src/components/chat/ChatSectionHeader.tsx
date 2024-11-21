@@ -18,11 +18,14 @@ export default function ChatSectionHeader({
         <span className="text">
           <p className="text-xl font-semibold">{chatRoom?.secondUser.name}</p>
           <p className="text-xs font-light">
-            {chatRoom?.secondUser.last_active
-              ? `Hoạt động ${moment(
-                  chatRoom?.secondUser.last_active
-                ).fromNow()}`
-              : ""}
+            {chatRoom?.secondUser.isActive ? (
+              <span className="flex items-center gap-2">
+                <span className="p-[0.2em] bg-green-700 rounded-full" />
+                <p>Đang hoạt động</p>
+              </span>
+            ) : (
+              `Hoạt động ${moment(chatRoom?.secondUser.last_active).fromNow()}`
+            )}
           </p>
         </span>
       </div>

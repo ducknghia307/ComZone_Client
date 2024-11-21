@@ -249,9 +249,10 @@ const Checkout = () => {
           : "TRADITIONAL";
 
         const orderResponse = await privateAxios.post("/orders", {
+          sellerId: sellerId,
+          deliveryId: newDelivery.id,
           totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
           paymentMethod: selectedPaymentMethod,
-          deliveryId: newDelivery.id,
           addressId: selectedAddress?.id,
           note: notes[sellerId] || "",
           type: orderType,
@@ -278,18 +279,6 @@ const Checkout = () => {
               user,
             });
           }
-        }
-
-        if (selectedPaymentMethod === "wallet") {
-          const resTransactions = await privateAxios.post("/transactions", {
-            order: orderId,
-            amount: sellerTotalPrice,
-          });
-          console.log(resTransactions.data);
-          const resResult = await privateAxios.patch(
-            `/transactions/post/${resTransactions.data.id}`
-          );
-          console.log(resResult.data);
         }
       }
 

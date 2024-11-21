@@ -1,14 +1,23 @@
-import { Checkbox, Modal } from "antd";
+import { Checkbox, Modal, notification } from "antd";
 import { useEffect, useState } from "react";
 import { privateAxios } from "../../../../../middleware/axiosInstance";
 import CurrencySplitter from "../../../../../assistants/Spliter";
+import Loading from "../../../../loading/Loading";
 
-export default function PayButton({ total }: { total: number }) {
+export default function PayButton({
+  total,
+  exchangeId,
+  fetchExchangeDetails,
+}: {
+  total: number;
+  exchangeId: string;
+  fetchExchangeDetails: Function;
+}) {
   const [userBalance, setUserBalance] = useState(0);
   const [isHidingBalance, setIsHidingBalance] = useState(true);
   const [isConfirming, setIsConfirming] = useState(false);
   const [checked, setChecked] = useState(false);
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const fetchUserBalance = async () => {
     await privateAxios
       .get("users/profile")
@@ -19,12 +28,48 @@ export default function PayButton({ total }: { total: number }) {
       .catch((err) => console.log(err));
   };
 
+  const handledPayment = async () => {
+    setIsLoading(true);
+    await privateAxios
+      .post("/deposits/exchange", {
+        exchange: exchangeId,
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log("error:", err);
+        notification.error({
+          message: "Giao dịch không thành công",
+          duration: 2,
+        });
+      });
+    await privateAxios
+      .patch(`/exchanges/pay/${exchangeId}`)
+      .then((res) => {
+        console.log(res.data);
+        notification.success({ message: "Thanh toán thành công", duration: 2 });
+        setIsLoading(false);
+        fetchExchangeDetails();
+        setIsConfirming(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        notification.error({
+          message: "Thanh toán không thành công",
+          duration: 2,
+        });
+        setIsLoading(false);
+      });
+  };
+
   useEffect(() => {
     fetchUserBalance();
   }, [total]);
 
   return (
     <>
+      {isLoading && <Loading />}
       <button
         onClick={() => setIsConfirming(true)}
         className="bg-sky-700 py-2 text-white text-xs font-semibold rounded-md duration-200 hover:bg-sky-900"
@@ -105,10 +150,16 @@ export default function PayButton({ total }: { total: number }) {
           </div>
 
           <div className="flex self-stretch gap-2">
-            <button className="basis-1/3 hover:underline">Quay lại</button>
+            <button
+              className="basis-1/3 hover:underline"
+              onClick={() => setIsConfirming(false)}
+            >
+              Quay lại
+            </button>
             <button
               disabled={!checked || userBalance < total}
               className="basis-2/3 py-2 bg-sky-700 text-white font-semibold rounded-md duration-200 hover:bg-sky-800 disabled:bg-gray-300"
+              onClick={handledPayment}
             >
               THANH TOÁN
             </button>

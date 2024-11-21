@@ -284,7 +284,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                 style={{
                   backgroundColor: "#000000",
                   color: "#FFFFFF",
-                  fontSize: "16px",
+                  fontSize: "15px",
                 }}
                 onClick={() => navigate(`/auctiondetail/${auction.id}`)}
               >
@@ -310,8 +310,8 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                   style={{
                     backgroundColor: "green",
                     color: "#FFFFFF",
-                    fontSize: "16px",
-                    marginTop: "12px",
+                    fontSize: "17px",
+                    marginLeft: "10px",
                   }}
                   onClick={() => handleBuy(auction)} // Pass the auction to handleBuy
                 >

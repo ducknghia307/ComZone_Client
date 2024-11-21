@@ -66,6 +66,7 @@ const ComicAuction = () => {
   const [isHighest, setIsHighest] = useState<boolean | null>(null);
   const [error, setError] = useState<string>("");
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [hasDeposited, setHasDeposited] = useState(false);
   console.log("auctiondata", auctionData);
   const navigate = useNavigate();
   const auctionAnnounce = useAppSelector(
@@ -74,6 +75,10 @@ const ComicAuction = () => {
   const handleBidActionDisabled = (disabled: boolean) => {
     setIsBidDisabled(disabled);
   };
+  const handleDepositSuccess = () => {
+    setHasDeposited(true);
+  };
+
   const handleBuy = (auctionData: Auction, price: any) => {
     if (!auctionData) return;
     sessionStorage.setItem(
@@ -172,6 +177,7 @@ const ComicAuction = () => {
         setMainImage(comicData.coverImage);
         setPreviewChapter(comicData.previewChapter || []);
         dispatch(setAuctionData(response.data));
+
         const responseBid = await publicAxios.get(`/bids/auction/${id}`);
         dispatch(setHighestBid(responseBid.data[0]));
       } catch (error) {
@@ -463,28 +469,39 @@ const ComicAuction = () => {
                 )}
               </p>
             )}
-            <div style={{ paddingTop: "15px", paddingBottom: '20px', display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <p style={{ fontSize: "17px", fontFamily: "REM", fontWeight: "400" }}>
-                Số tiền cần cọc:{" "}
-                <span style={{ fontWeight: "bold" }}>
-                  10.000đ
-                </span>
-
-              </p>
-              <Chip 
-                label="Đặt cọc tại đây"
-                onClick={handleOpenDepositModal}
+            {!hasDeposited ? (
+              <div
                 style={{
-                  backgroundColor: '#fff',
-                  color: '#000',
-                  fontFamily: 'REM',
-                  border: '1px solid black',
-                  boxShadow: '2px 2px '
+                  paddingTop: "15px",
+                  paddingBottom: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "20px",
                 }}
-              />
-            </div>
-
-            {isHighest ? (
+              >
+                <p
+                  style={{
+                    fontSize: "17px",
+                    fontFamily: "REM",
+                    fontWeight: "400",
+                  }}
+                >
+                  Số tiền cần cọc:{" "}
+                  <span style={{ fontWeight: "bold" }}>10.000đ</span>
+                </p>
+                <Chip
+                  label="Đặt cọc tại đây"
+                  onClick={handleOpenDepositModal}
+                  style={{
+                    backgroundColor: "#fff",
+                    color: "#000",
+                    fontFamily: "REM",
+                    border: "1px solid black",
+                    boxShadow: "2px 2px",
+                  }}
+                />
+              </div>
+            ) : isHighest ? (
               <div className="highest-bid-message REM">
                 Bạn đang là người có giá cao nhất!
               </div>
@@ -600,6 +617,7 @@ const ComicAuction = () => {
         open={isDepositModalOpen}
         onClose={handleCloseDepositModal}
         depositAmount={10000}
+        onDepositSuccess={handleDepositSuccess}
       />
     </div>
   );

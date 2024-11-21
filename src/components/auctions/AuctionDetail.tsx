@@ -22,6 +22,7 @@ import { auctionAnnouncement } from "../../redux/features/notification/announcem
 import AuctionPublisher from "./AuctionPublisher";
 import { Auction } from "../../common/base.interface";
 import { AuctionResult } from "./AuctionResult";
+import ModalDeposit from "../modal/ModalDeposit";
 
 interface Comic {
   id: string;
@@ -64,6 +65,7 @@ const ComicAuction = () => {
   const [winner, setWinner] = useState<boolean | null>(null);
   const [isHighest, setIsHighest] = useState<boolean | null>(null);
   const [error, setError] = useState<string>("");
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   console.log("auctiondata", auctionData);
   const navigate = useNavigate();
   const auctionAnnounce = useAppSelector(
@@ -245,6 +247,14 @@ const ComicAuction = () => {
     };
 
     socket.emit("placeBid", bidPayload);
+  };
+
+  const handleOpenDepositModal = () => {
+    setIsDepositModalOpen(true);
+  };
+
+  const handleCloseDepositModal = () => {
+    setIsDepositModalOpen(false);
   };
 
   return (
@@ -453,6 +463,27 @@ const ComicAuction = () => {
                 )}
               </p>
             )}
+            <div style={{ paddingTop: "15px", paddingBottom: '20px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <p style={{ fontSize: "17px", fontFamily: "REM", fontWeight: "400" }}>
+                Số tiền cần cọc:{" "}
+                <span style={{ fontWeight: "bold" }}>
+                  10.000đ
+                </span>
+
+              </p>
+              <Chip 
+                label="Đặt cọc tại đây"
+                onClick={handleOpenDepositModal}
+                style={{
+                  backgroundColor: '#fff',
+                  color: '#000',
+                  fontFamily: 'REM',
+                  border: '1px solid black',
+                  boxShadow: '2px 2px '
+                }}
+              />
+            </div>
+
             {isHighest ? (
               <div className="highest-bid-message REM">
                 Bạn đang là người có giá cao nhất!
@@ -565,6 +596,11 @@ const ComicAuction = () => {
           <ComicsDescription currentComics={comic} fontSize="1rem" />
         </div>
       </Grid>
+      <ModalDeposit
+        open={isDepositModalOpen}
+        onClose={handleCloseDepositModal}
+        depositAmount={10000}
+      />
     </div>
   );
 };

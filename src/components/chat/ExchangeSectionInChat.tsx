@@ -45,7 +45,7 @@ export default function ExchangeSectionInChat({
   const currentBadgeColor = () => {
     switch (exchange.status) {
       case "PENDING":
-        return "sky-500";
+        return "orange-600";
 
       case "DEALING":
       case "DELIVERING":

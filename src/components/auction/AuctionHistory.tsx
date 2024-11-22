@@ -126,7 +126,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   };
   console.log("123", auctions);
 
-  const handleBuy = (auction: Auction) => {
+  const handleBuy = (auction: Auction, type: string) => {
     if (!auction) return;
 
     sessionStorage.setItem(
@@ -138,7 +138,9 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
             {
               comic: auction.comics,
               currentPrice: auction.currentPrice,
+              auctionId: auction.id,
               quantity: 1,
+              type,
             },
           ],
         },
@@ -306,14 +308,16 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
             auction.winner?.id === userId ? (
               <div>
                 <Button
+                  size="large"
                   variant="contained"
                   style={{
                     backgroundColor: "green",
                     color: "#FFFFFF",
                     fontSize: "17px",
+
                     marginLeft: "10px",
                   }}
-                  onClick={() => handleBuy(auction)} // Pass the auction to handleBuy
+                  onClick={() => handleBuy(auction, "currentPrice")}
                 >
                   <ShoppingCartOutlined className="mr-2" />
                   <Typography>Thanh toán</Typography>

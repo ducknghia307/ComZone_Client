@@ -22,6 +22,7 @@ interface SellerGroup {
     quantity: number;
     currentPrice?: number;
     auctionId?: string;
+    type: string;
   }[];
   delivery?: {
     cost: number;
@@ -108,7 +109,6 @@ const Checkout = () => {
       setDeliveryDetails([]);
       setSellerDetailsGroup([]);
       setTotalDeliveryPrice(0);
-
       await Promise.all(
         Object.keys(groupedSelectedComics).map(async (sellerId) => {
           const sellerDetails = await privateAxios.get(
@@ -116,6 +116,7 @@ const Checkout = () => {
           );
 
           setSellerDetailsGroup((prev) => [...prev, sellerDetails.data]);
+          console.log("1", groupedSelectedComics[sellerId].comics);
 
           const sellerAddress = {
             district: sellerDetails.data.district.id,
@@ -259,7 +260,7 @@ const Checkout = () => {
 
         const orderId = orderResponse.data.id;
 
-        for (const { comic, currentPrice, auctionId } of sellerGroup.comics) {
+        for (const { comic, currentPrice, auctionId, type } of sellerGroup.comics) {
           const price = currentPrice || comic?.price;
           const orderItemPayload = {
             comics: comic.id,
@@ -276,6 +277,7 @@ const Checkout = () => {
               auctionId,
               currentPrice,
               user,
+              type,
             });
             privateAxios.patch(`/deposits/auction/${auctionId}/refund-winner`);
           }

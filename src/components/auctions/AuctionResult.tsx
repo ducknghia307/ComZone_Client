@@ -2,7 +2,7 @@ export const AuctionResult = ({ isWinner }: { isWinner: boolean | null }) => {
   if (isWinner === null) {
     return null;
   }
-console.log(isWinner);
+  console.log(isWinner);
 
   return (
     <div
@@ -28,8 +28,8 @@ console.log(isWinner);
         }}
       >
         {isWinner
-          ? "🎉 Bạn đã đấu giá thành công! Vui lòng tiến hành thanh toán để hoàn tất!"
-          : "😞 Bạn đã đấu giá thất bại."}
+          ? "🎉 Bạn đã đấu giá thành công! Vui lòng tiến hành thanh toán để hoàn tất và hoàn cọc!"
+          : "😞 Bạn đã đấu giá thất bại. Cọc đã được hoàn trả"}
       </div>
     </div>
   );

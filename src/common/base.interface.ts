@@ -117,6 +117,7 @@ export interface Comic {
   genres?: Genre[];
   sellerId: UserInfo;
   onSaleSince?: Date;
+  type: string;
 }
 
 export interface OrderDetailData {

@@ -24,11 +24,9 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
   const auctionData = useAppSelector((state: any) => state.auction.auctionData);
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [loading, setLoading] = useState(true); // Loading state
-  // console.log(auction.endTime);
 
   const formatEndTime = (endTime: string) => {
     const date = new Date(endTime);
-
     return date.toLocaleString("vi-VN", {
       timeZone: "Asia/Ho_Chi_Minh",
       weekday: "short",
@@ -42,28 +40,13 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
     });
   };
 
-  // const declareWinner = async () => {
-  //   if (auction.status === "ONGOING") {
-  //     try {
-  //       const response = await publicAxios.get(
-  //         `/auction/declare-winner/${auction.id}`
-  //       );
-
-  //       console.log("Winner Declared:", response.data);
-  //     } catch (error) {
-  //       console.error("Error declaring winner:", error);
-  //     }
-  //   }
-  // };
-
   useEffect(() => {
-    console.log("Auction Data Updated:", auctionData.endTime); // Log to check if it updates
-    const endTimestamp = new Date(auctionData.endTime).getTime(); // Lấy thời gian kết thúc mới
+    const endTimestamp = new Date(auctionData.endTime).getTime();
 
     // Function to update time left
     const updateTimeLeft = () => {
       const now = Date.now();
-      const timeRemaining = endTimestamp - now; // Tính thời gian còn lại
+      const timeRemaining = endTimestamp - now;
 
       if (timeRemaining <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -86,12 +69,12 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
     // Start the countdown using setInterval
     const intervalId = setInterval(updateTimeLeft, 1000);
     setLoading(false);
+
     // Cleanup the interval when the component unmounts or auctionData.endTime changes
     return () => {
       clearInterval(intervalId);
     };
-  }, [auctionData.endTime]); // Re-run when auctionData.endTime changes
-  // Chỉ lắng nghe thay đổi từ auctionData.endTime
+  }, [auctionData.endTime]);
 
   return (
     <div>
@@ -108,7 +91,7 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
         >
           Phiên đấu giá đã kết thúc
         </p>
-      ) : (
+      ) : auctionData.status === "UPCOMING" ? (
         <p
           style={{
             fontFamily: "REM",
@@ -116,53 +99,64 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
             paddingBottom: "15px",
           }}
         >
-          KẾT THÚC VÀO: {formatEndTime(auctionData.endTime)}
+          Sắp diễn ra
         </p>
+      ) : (
+        <>
+          <p
+            style={{
+              fontFamily: "REM",
+              fontSize: "20px",
+              paddingBottom: "15px",
+            }}
+          >
+            KẾT THÚC VÀO: {formatEndTime(auctionData.endTime)}
+          </p>
+          <Grid className="countdown" sx={{ gap: "15px" }}>
+            {["days", "hours", "minutes", "seconds"].map((unit) => (
+              <div key={unit} className="time-box">
+                <div
+                  className="flip-wrapper"
+                  style={{
+                    borderRadius: "5px",
+                    overflow: "hidden",
+                    width: "54px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <FlipNumbers
+                    height={45}
+                    width={16}
+                    play
+                    color="#000"
+                    background="#fff"
+                    numbers={timeLeft[unit as keyof typeof timeLeft]
+                      .toString()
+                      .padStart(2, "0")}
+                    numberStyle={{
+                      fontSize: "22px",
+                      fontFamily: "REM",
+                      fontWeight: "500",
+                    }}
+                  />
+                </div>
+                <span className="label1">
+                  {unit === "days"
+                    ? "Ngày"
+                    : unit === "hours"
+                    ? "Giờ"
+                    : unit === "minutes"
+                    ? "Phút"
+                    : "Giây"}
+                </span>
+              </div>
+            ))}
+          </Grid>
+        </>
       )}
-      <Grid className="countdown" sx={{ gap: "15px" }}>
-        {["days", "hours", "minutes", "seconds"].map((unit, index) => (
-          <div key={unit} className="time-box">
-            <div
-              className="flip-wrapper"
-              style={{
-                borderRadius: "5px",
-                overflow: "hidden",
-                width: "54px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "#fff",
-              }}
-            >
-              <FlipNumbers
-                height={45}
-                width={16}
-                play
-                color="#000"
-                background="#fff"
-                numbers={timeLeft[unit as keyof typeof timeLeft]
-                  .toString()
-                  .padStart(2, "0")}
-                numberStyle={{
-                  fontSize: "22px",
-                  fontFamily: "REM",
-                  fontWeight: "500",
-                }}
-              />
-            </div>
-            {/* <span className="label1">{unit === "days" ? "Ngày" : unit}</span> */}
-            <span className="label1">
-              {unit === "days"
-                ? "Ngày"
-                : unit === "hours"
-                ? "Giờ"
-                : unit === "minutes"
-                ? "Phút"
-                : "Giây"}
-            </span>
-          </div>
-        ))}
-      </Grid>
     </div>
   );
 };

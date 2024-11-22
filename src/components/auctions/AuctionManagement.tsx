@@ -58,7 +58,7 @@ const AuctionManagement = () => {
     const [selectedAuction, setSelectedAuction] = useState<Auction | null>(null);
 
     useEffect(() => {
-        privateAxios.get("/auction")
+        privateAxios.get("/auction/seller")
             .then((response) => {
                 console.log("Auctions:", response.data);
                 setAuctions(response.data);

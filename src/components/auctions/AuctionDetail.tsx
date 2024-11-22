@@ -84,7 +84,7 @@ const ComicAuction = () => {
       duration: 5,
     });
   };
-  const handleBuy = (auctionData: Auction, price: any) => {
+  const handleBuy = (auctionData: Auction, price: any, type: string) => {
     if (!auctionData) return;
     sessionStorage.setItem(
       "selectedComics",
@@ -97,6 +97,7 @@ const ComicAuction = () => {
               currentPrice: price,
               auctionId: auctionData.id,
               quantity: 1,
+              type,
             },
           ],
         },
@@ -110,12 +111,12 @@ const ComicAuction = () => {
       .post(`/announcements/${auctionAnnounce?.id}/read`)
       .then(() => {
         console.log("Announcement marked as read.");
+        // fetchComicDetails();
       })
       .catch((error) => {
         console.error("Error marking announcement as read:", error);
       });
     console.log("winner", auctionData?.winner?.id);
-
     if (auctionAnnounce?.status === "SUCCESSFUL") {
       setWinner(true);
       console.log("123");
@@ -137,10 +138,8 @@ const ComicAuction = () => {
         console.log("RESPONSE", response.data);
 
         if (response.data) {
-          console.log("1");
           setHasDeposited(true); // Set true if deposit exists
         } else {
-          console.log("2");
           setHasDeposited(false); // Revert to false if no deposit
         }
       } catch (error) {
@@ -220,7 +219,7 @@ const ComicAuction = () => {
       }
     };
     fetchComicDetails();
-  }, [id]);
+  }, [id, auctionAnnounce, dispatch]);
   useEffect(() => {
     if (auctionData?.status === "SUCCESSFUL") {
       if (auctionData.winner?.id === userId) {
@@ -541,7 +540,7 @@ const ComicAuction = () => {
               </div>
             ) : isHighest ? (
               <div className="highest-bid-message REM">
-                Bạn đang là người có giá cao nhất!
+                Bạn là người có giá cao nhất!
               </div>
             ) : (
               <div className="bid-row">
@@ -656,7 +655,7 @@ const ComicAuction = () => {
                   justifyContent: "center",
                 }}
               >
-                {auctionData.status === "ONGOING" ? (
+                {auctionData.status === "ONGOING" && hasDeposited ? (
                   <Button
                     variant="contained"
                     style={{
@@ -666,7 +665,9 @@ const ComicAuction = () => {
                       fontSize: "18px",
                       fontFamily: "REM",
                     }}
-                    onClick={() => handleBuy(auctionData, auctionData.maxPrice)}
+                    onClick={() =>
+                      handleBuy(auctionData, auctionData.maxPrice, "maxPrice")
+                    }
                   >
                     Mua ngay với {auctionData.maxPrice.toLocaleString("vi-VN")}₫
                   </Button>
@@ -682,7 +683,11 @@ const ComicAuction = () => {
                       fontFamily: "REM",
                     }}
                     onClick={() =>
-                      handleBuy(auctionData, auctionData?.currentPrice)
+                      handleBuy(
+                        auctionData,
+                        auctionData?.currentPrice,
+                        "currentPrice"
+                      )
                     }
                   >
                     Thanh toán ngay

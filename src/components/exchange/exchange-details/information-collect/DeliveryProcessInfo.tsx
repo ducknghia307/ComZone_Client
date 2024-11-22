@@ -5,6 +5,7 @@ import moment from "moment/min/moment-with-locales";
 import { ExchangeDetails } from "../../../../common/interfaces/exchange.interface";
 import { privateAxios } from "../../../../middleware/axiosInstance";
 import { Delivery } from "../../../../common/interfaces/delivery.interface";
+import SuccessfulOrFailedButton from "./buttons/SuccessfulOrFailedButton";
 moment.locale("vi");
 export default function DeliveryProcessInfo({
   firstUserName,
@@ -12,57 +13,62 @@ export default function DeliveryProcessInfo({
   secondUserName,
   firstAddress,
   secondAddress,
+  fetchExchangeDetails,
+  setIsLoading,
 }: {
   exchangeDetails: ExchangeDetails;
   firstUserName: string;
   secondUserName: string;
   firstAddress: string;
   secondAddress: string;
+  fetchExchangeDetails: Function;
+  setIsLoading: (param: boolean) => void;
 }) {
-  const [deliveryDetails, setDeliveryDetails] = useState<{
-    fee: number;
-    estTime: Date;
-  }>();
-  const [total, setTotal] = useState(0);
+  const [userDelivery, setUserDelivery] = useState<Delivery>();
+
+  const status = exchangeDetails.exchange.status;
 
   const exchange = exchangeDetails.exchange;
 
-  const fetchDeliveryFeeAndDeliveryTime = async () => {
+  const fetchUserDelivery = async () => {
     await privateAxios
       .get(`deliveries/exchange/from-user/${exchange.id}`)
-      .then(async (res) => {
-        const userDelivery: Delivery = res.data;
-        await privateAxios
-          .get(`deliveries/details/${userDelivery.id}`)
-          .then((res) => {
-            setDeliveryDetails({
-              fee: res.data.deliveryFee,
-              estTime: res.data.estDeliveryTime,
-            });
-
-            setTotal(
-              exchange.depositAmount! +
-                res.data.deliveryFee +
-                (exchangeDetails.isRequestUser
-                  ? 0
-                  : exchange.compensationAmount)
-            );
-          })
-          .catch((err) => console.log(err));
-      });
+      .then((res) => {
+        console.log(res.data);
+        setUserDelivery(res.data);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {
-    fetchDeliveryFeeAndDeliveryTime();
+    fetchUserDelivery();
   }, [exchangeDetails]);
-  const deliveryStatus = "Đang giao hàng"; // Thay đổi trạng thái tại đây
-  const [status, setStatus] = useState<string>("DELIVERED");
+
+  const getDeliveryStatus = () => {
+    if (userDelivery && userDelivery.overallStatus) {
+      switch (userDelivery?.overallStatus) {
+        case "PICKING":
+          return "Đang nhận hàng từ người gửi";
+        case "DELIVERING":
+          return "Đang giao hàng";
+        case "DELIVERED":
+          return "Đã giao hàng";
+        case "FAILED":
+          return "Giao hàng thất bại";
+      }
+    }
+  };
+
   const formatDate =
-    moment(deliveryDetails?.estTime)
+    moment(userDelivery?.estimatedDeliveryTime)
       .format("dddd DD/MM")
       .charAt(0)
       .toUpperCase() +
-    moment(deliveryDetails?.estTime).format("dddd DD/MM/yyyy").slice(1);
+    moment(userDelivery?.estimatedDeliveryTime)
+      .format("dddd DD/MM/yyyy")
+      .slice(1);
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg REM overflow-hidden">
       <h2 className="text-lg font-bold text-gray-700 mb-4">
@@ -82,24 +88,63 @@ export default function DeliveryProcessInfo({
             <p className="font-light">{secondAddress}</p>
           </div>
         </div>
-        <div className="w-1/2 flex flex-col gap-4">
-          <div className="mb-4">
+        <div className="w-1/2 flex flex-col gap-8">
+          <div className="flex items-center gap-4">
+            <h3 className="font-semibold text-gray-800">
+              Mã vận đơn: &emsp;{" "}
+              <span className="font-light">
+                {userDelivery?.deliveryTrackingCode}
+              </span>
+            </h3>
+            <button
+              onClick={() =>
+                window
+                  .open(
+                    `https://tracking.ghn.dev/?order_code=${userDelivery?.deliveryTrackingCode}`,
+                    "_blank"
+                  )
+                  ?.focus()
+              }
+              className="flex items-center gap-2 px-2 py-1 rounded-md border border-gray-400 text-xs duration-200 hover:bg-gray-100"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="currentColor"
+              >
+                <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"></path>
+              </svg>
+              Theo dõi giao hàng
+            </button>
+          </div>
+
+          <div className="flex items-center gap-4">
             <h3 className="font-semibold text-gray-800">Trạng thái:</h3>
             <p className="text-blue-600 font-medium p-2 bg-blue-200 w-fit rounded-md">
-              {deliveryStatus}
+              {getDeliveryStatus()}
             </p>
           </div>
 
-          <div className="mb-4">
+          <div
+            className={`${
+              (userDelivery?.overallStatus === "DELIVERED" ||
+                userDelivery?.overallStatus === "FAILED") &&
+              "hidden"
+            } flex items-center gap-4`}
+          >
             <h3 className="font-semibold text-gray-800">Thời gian dự kiến:</h3>
             <p className="font-light">{formatDate}</p>
           </div>
         </div>
       </div>
-      {status === "DELIVERED" ? (
-        <button className="w-full bg-sky-700 text-white font-semibold py-2 rounded-md hover:opacity-70 duration-200">
-          Đã giao hàng
-        </button>
+
+      {userDelivery?.overallStatus === "DELIVERED" ? (
+        <SuccessfulOrFailedButton
+          exchangeId={exchangeDetails.exchange.id}
+          fetchExchangeDetails={fetchExchangeDetails}
+        />
       ) : (
         <div className="mt-5 r">
           <p className="w-full text-center text-sm font-light italic pb-4">

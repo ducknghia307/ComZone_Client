@@ -79,77 +79,94 @@ const ExchangeDetail: React.FC = () => {
       if (exchangeDetails.exchange.status === "DEALING") {
         setFirstCurrentStage(1);
         setSecondCurrentStage(1);
+      }
 
-        //FETCH STAGE 2 (first user)
-        const confirmationResponse = await privateAxios(
-          `exchange-confirmation/user/exchange/${exchangeDetails.exchange.id}`
-        );
-        if (confirmationResponse) {
-          const confirmation: ExchangeConfirmation = confirmationResponse.data;
-          if (confirmation.dealingConfirm) {
-            setFirstCurrentStage(2);
-          }
+      //FETCH STAGE 2 (first user)
+      const confirmationResponse = await privateAxios(
+        `exchange-confirmation/user/exchange/${exchangeDetails.exchange.id}`
+      );
+      const firstConfirmation: ExchangeConfirmation = confirmationResponse.data;
+      if (firstConfirmation) {
+        if (firstConfirmation.dealingConfirm) {
+          setFirstCurrentStage(2);
         }
+      }
 
-        //FETCH STAGE 2 (second user)
-        const secondConfirmationResponse = await publicAxios(
-          `exchange-confirmation/user/${second?.id}/exchange/${exchangeDetails.exchange.id}`
-        );
-        console.log("second:", secondConfirmationResponse);
-
-        if (secondConfirmationResponse) {
-          const secondConfirmation: ExchangeConfirmation =
-            secondConfirmationResponse.data;
-          if (secondConfirmation.dealingConfirm) {
-            setSecondCurrentStage(2);
-          }
+      //FETCH STAGE 2 (second user)
+      const secondConfirmationResponse = await publicAxios(
+        `exchange-confirmation/user/${second?.id}/exchange/${exchangeDetails.exchange.id}`
+      );
+      const secondConfirmation: ExchangeConfirmation =
+        secondConfirmationResponse.data;
+      if (secondConfirmation) {
+        if (secondConfirmation.dealingConfirm) {
+          setSecondCurrentStage(2);
         }
+      }
 
-        //FETCH STAGE 3
-        const deliveriesResponse = await privateAxios(
-          `deliveries/exchange/${exchangeDetails.exchange.id}`
+      //FETCH STAGE 3
+      const deliveriesResponse = await privateAxios(
+        `deliveries/exchange/${exchangeDetails.exchange.id}`
+      );
+      const deliveries: Delivery[] = deliveriesResponse.data;
+      console.log("bbbbbbb", deliveries);
+
+      if (deliveries.length > 0) {
+        const firstUserDelivery = deliveries.find(
+          (delivery) =>
+            (delivery.from && delivery.from.user.id === first?.id) ||
+            (delivery.to && delivery.to.user.id === first?.id)
         );
-        const deliveries: Delivery[] = deliveriesResponse.data;
-        console.log("bbbbbbb", deliveries);
-
-        if (deliveries.length > 0) {
-          const firstUserDelivery = deliveries.find(
-            (delivery) =>
-              (delivery.from && delivery.from.user.id === first?.id) ||
-              (delivery.to && delivery.to.user.id === first?.id)
+        if (firstUserDelivery) {
+          setFirstCurrentStage(3);
+          setFirstAddress(
+            deliveries[0].from.user.id === first?.id
+              ? deliveries[0].from.name
+              : deliveries[0].to.name
           );
-          if (firstUserDelivery) {
-            setFirstCurrentStage(3);
-            setFirstAddress(
-              deliveries[0].from.user.id === first?.id
-                ? deliveries[0].from.name
-                : deliveries[0].to.name
-            );
-          }
-
-          const secondUserDelivery = deliveries.find(
-            (delivery) =>
-              (delivery.from && delivery.from.user.id === second?.id) ||
-              (delivery.to && delivery.to.user.id === second?.id)
-          );
-          if (secondUserDelivery) {
-            setSecondCurrentStage(3);
-            setSecondAddress(
-              deliveries[0].from.user.id === second?.id
-                ? deliveries[0].from.name
-                : deliveries[0].to.name
-            );
-          }
         }
-        //FETCH STAGE 4 ()
-        const selfTransactionsResponse = await privateAxios(
-          `transactions/exchange/self/${exchangeDetails.exchange.id}`
+
+        const secondUserDelivery = deliveries.find(
+          (delivery) =>
+            (delivery.from && delivery.from.user.id === second?.id) ||
+            (delivery.to && delivery.to.user.id === second?.id)
         );
-        if (selfTransactionsResponse.data) setFirstCurrentStage(4);
-        const otherTransactionsResponse = await privateAxios(
-          `transactions/exchange/other/${exchangeDetails.exchange.id}`
-        );
-        if (otherTransactionsResponse.data) setSecondCurrentStage(4);
+        if (secondUserDelivery) {
+          setSecondCurrentStage(3);
+          setSecondAddress(
+            deliveries[0].from.user.id === second?.id
+              ? deliveries[0].from.name
+              : deliveries[0].to.name
+          );
+        }
+      }
+
+      //FETCH STAGE 4
+      const selfTransactionsResponse = await privateAxios(
+        `transactions/exchange/self/${exchangeDetails.exchange.id}`
+      );
+      if (selfTransactionsResponse.data) setFirstCurrentStage(4);
+      const otherTransactionsResponse = await privateAxios(
+        `transactions/exchange/other/${exchangeDetails.exchange.id}`
+      );
+      if (otherTransactionsResponse.data) setSecondCurrentStage(4);
+
+      //FETCH STAGE 5
+      if (firstConfirmation) {
+        if (firstConfirmation.deliveryConfirm) {
+          setFirstCurrentStage(5);
+        }
+      }
+      if (secondConfirmation) {
+        if (secondConfirmation.deliveryConfirm) {
+          setSecondCurrentStage(5);
+        }
+      }
+
+      //FETCH STAGE 6
+      if (exchangeDetails?.exchange.status === "SUCCESSFUL") {
+        setFirstCurrentStage(6);
+        setSecondCurrentStage(6);
       }
     } catch (error) {
       console.error("Error fetching exchange details:", error);
@@ -157,6 +174,7 @@ const ExchangeDetail: React.FC = () => {
       setIsLoading(false);
     }
   };
+
   const fetchUserAddress = async () => {
     try {
       const response = await privateAxios("/user-addresses/user");
@@ -187,7 +205,6 @@ const ExchangeDetail: React.FC = () => {
         <Loading />
       </div>
     );
-  console.log("a", selectedAddress);
 
   return (
     <div className="REM min-h-[80vh] w-full flex items-stretch justify-between gap-4 px-4 py-4">
@@ -204,6 +221,7 @@ const ExchangeDetail: React.FC = () => {
           fetchUserAddress={fetchUserAddress}
           firstAddress={firstAddress}
           secondAddress={secondAddress}
+          setIsLoading={setIsLoading}
         />
 
         <ActionButtons

@@ -52,7 +52,6 @@ const Checkout = () => {
   const [sellerDetailsGroup, setSellerDetailsGroup] = useState<
     SellerDetails[] | []
   >([]);
-  const [totalDeliveryPrice, setTotalDeliveryPrice] = useState<number>(0);
   const [deliveryDetails, setDeliveryDetails] = useState<SellerGroupDetails[]>(
     []
   );
@@ -107,7 +106,6 @@ const Checkout = () => {
       setIsLoading(true);
       setDeliveryDetails([]);
       setSellerDetailsGroup([]);
-      setTotalDeliveryPrice(0);
 
       await Promise.all(
         Object.keys(groupedSelectedComics).map(async (sellerId) => {
@@ -138,9 +136,6 @@ const Checkout = () => {
                   estDeliveryTime: res.data.estDeliveryTime,
                 };
                 setDeliveryDetails((prev) => [...prev, newDeliveryDetails]);
-                setTotalDeliveryPrice(
-                  (prev) => prev + newDeliveryDetails.deliveryFee
-                );
               })
               .catch((err) => console.log(err));
         })
@@ -168,6 +163,10 @@ const Checkout = () => {
     },
     0
   );
+
+  const totalDeliveryPrice = deliveryDetails.reduce((prev, current) => {
+    return prev + current.deliveryFee;
+  }, 0);
 
   const totalQuantity = Object.values(groupedSelectedComics).reduce(
     (total, sellerGroup) =>
@@ -252,7 +251,7 @@ const Checkout = () => {
           sellerId: sellerId,
           deliveryId: newDelivery.id,
           totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
-          paymentMethod: selectedPaymentMethod,
+          paymentMethod: selectedPaymentMethod.toUpperCase(),
           addressId: selectedAddress?.id,
           note: notes[sellerId] || "",
           type: orderType,

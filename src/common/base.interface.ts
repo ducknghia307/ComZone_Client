@@ -10,7 +10,6 @@ export interface UserInfo {
   createdAt: string;
   email: string;
   id: string;
-  is_verified: boolean;
   name: string;
   phone: string | null;
   avatar: string;
@@ -20,6 +19,7 @@ export interface UserInfo {
   balance: number;
   nonWithdrawableAmount: number;
   last_active?: Date | null;
+  isActive: boolean;
   follower_count?: number;
 }
 

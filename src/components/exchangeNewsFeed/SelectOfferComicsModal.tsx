@@ -83,7 +83,7 @@ export default function SelectOfferComicsModal({
   const handleModalClose = (
     e?: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    e && e.stopPropagation();
+    if (e) e.stopPropagation();
     setIsConfirming(false);
     setIsSelectingMine(true);
     setPostSelectOptionValues([]);
@@ -153,7 +153,7 @@ export default function SelectOfferComicsModal({
 
           <div className="grow flex items-stretch justify-start gap-8">
             {isSelectingMine && (
-              <div className="basis-1/2 flex flex-col items-stretch gap-4">
+              <div className="basis-full flex flex-col items-stretch gap-4 max-h-64 overflow-y-auto">
                 <p className="font-light italic">
                   Đầu tiên, hãy chọn từ danh sách truyện dùng để trao đổi của
                   bạn:
@@ -180,6 +180,9 @@ export default function SelectOfferComicsModal({
                       />
                       <p>{option.data.label}</p>
                     </div>
+                  )}
+                  labelRender={(option) => (
+                    <div className="font-light">{option.label}</div>
                   )}
                   onSelect={(value: string) => {
                     setSelectedRequestComicsList((prev) => [...prev, value]);
@@ -209,7 +212,7 @@ export default function SelectOfferComicsModal({
             )}
 
             {!isSelectingMine && (
-              <div className="basis-1/2 flex flex-col items-stretch gap-4">
+              <div className="basis-full flex flex-col items-stretch gap-4">
                 <p className="font-light italic">
                   Chọn những truyện của{" "}
                   <span className="font-semibold">{post.user.name}</span> mà bạn

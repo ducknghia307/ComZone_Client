@@ -168,7 +168,7 @@ export default function PlaceDeposit({
           </div>
 
           <div
-            className={`flex items-center justify-between text-xs font-light px-4 ${
+            className={`relative flex items-center justify-between text-xs font-light px-4 ${
               exchangeDetails.exchange.compensationAmount === 0 && "opacity-30"
             }`}
           >
@@ -179,6 +179,12 @@ export default function PlaceDeposit({
               )}{" "}
               đ
             </p>
+
+            {exchangeDetails.isRequestUser && (
+              <p className="absolute bottom-0 left-0 translate-y-full translate-x-4 italic text-green-700">
+                Bạn sẽ nhận được số tiền bù sau khi trao đổi thành công.
+              </p>
+            )}
           </div>
         </div>
 

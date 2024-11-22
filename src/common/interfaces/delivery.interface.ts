@@ -18,5 +18,6 @@ export interface Delivery extends BaseInterface {
   deliveryFee?: number;
   estimatedDeliveryTime?: Date;
   status?: string;
+  overallStatus?: "PICKING" | "DELIVERING" | "DELIVERED" | "FAILED";
   note?: string;
 }

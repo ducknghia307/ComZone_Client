@@ -20,6 +20,7 @@ export default function InformationCollectSection({
   fetchUserAddress,
   firstAddress,
   secondAddress,
+  setIsLoading,
 }: {
   exchangeDetails: ExchangeDetails;
   firstCurrentStage: number;
@@ -32,6 +33,7 @@ export default function InformationCollectSection({
   fetchUserAddress: () => void;
   firstAddress: string;
   secondAddress: string;
+  setIsLoading: (param: boolean) => void;
 }) {
   const theOther = exchangeDetails.isRequestUser
     ? exchangeDetails.exchange.post.user
@@ -117,13 +119,43 @@ export default function InformationCollectSection({
             </p>
           ),
         };
+      case 5:
+        return {
+          title: "Trao đổi hoàn tất",
+          subTitle: (
+            <p className="leading-relaxed max-w-1/2">
+              Quá trình hoàn cọc và chuyển giao tiền bù sẽ tự động diễn ra sau
+              khi hệ thống ghi nhận xác nhận nhận hàng thành công từ hai bên.
+            </p>
+          ),
+        };
     }
   };
   return (
     <div className="w-full flex flex-col items-stretch gap-8 mt-4">
-      <div>
-        <p className="text-lg font-semibold uppercase">{getTitle()?.title}</p>
-        <div className="text-xs font-light italic">{getTitle()?.subTitle}</div>
+      <div className="flex items-start justify-between gap-16">
+        <div className="basis-2/3">
+          <p className="text-lg font-semibold uppercase">{getTitle()?.title}</p>
+          <div className="text-xs font-light italic">
+            {getTitle()?.subTitle}
+          </div>
+        </div>
+
+        <button
+          onClick={() => fetchExchangeDetails()}
+          className="min-w-fit flex items-center gap-2 px-2 py-1 rounded-lg border border-gray-300 duration-200 hover:bg-gray-100"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="currentColor"
+          >
+            <path d="M5.46257 4.43262C7.21556 2.91688 9.5007 2 12 2C17.5228 2 22 6.47715 22 12C22 14.1361 21.3302 16.1158 20.1892 17.7406L17 12H20C20 7.58172 16.4183 4 12 4C9.84982 4 7.89777 4.84827 6.46023 6.22842L5.46257 4.43262ZM18.5374 19.5674C16.7844 21.0831 14.4993 22 12 22C6.47715 22 2 17.5228 2 12C2 9.86386 2.66979 7.88416 3.8108 6.25944L7 12H4C4 16.4183 7.58172 20 12 20C14.1502 20 16.1022 19.1517 17.5398 17.7716L18.5374 19.5674Z"></path>
+          </svg>
+          <p className="text-xs font-semibold">Cập nhật</p>
+        </button>
       </div>
 
       {caughtProgress && firstCurrentStage === 0 && (
@@ -173,9 +205,12 @@ export default function InformationCollectSection({
           secondUserName={secondUserName}
           firstAddress={firstAddress}
           secondAddress={secondAddress}
+          fetchExchangeDetails={fetchExchangeDetails}
+          setIsLoading={setIsLoading}
         />
       )}
       {caughtProgress && firstCurrentStage === 5 && <SuccessfulExchange />}
+      {caughtProgress && firstCurrentStage === 6 && <SuccessfulExchange />}
     </div>
   );
 }

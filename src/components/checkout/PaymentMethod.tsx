@@ -74,11 +74,8 @@ const PaymentMethod = ({
         const resWalletDes = await privateAxios.post("/wallet-deposits", {
           amount: selectedAmount,
         });
-        const resTransactions = await privateAxios.post("/transactions", {
-          walletDeposit: resWalletDes.data.id,
-        });
         const resZalopay = await privateAxios.post("/zalopay/checkout", {
-          transaction: resTransactions.data.id,
+          walletDeposit: resWalletDes.data.id,
         });
         // const response = await privateAxios.post("/zalopay/checkout", {
         //   type: "DEPOSIT",
@@ -89,11 +86,8 @@ const PaymentMethod = ({
         const resWalletDes = await privateAxios.post("/wallet-deposits", {
           amount: selectedAmount,
         });
-        const resTransactions = await privateAxios.post("/transactions", {
-          walletDeposit: resWalletDes.data.id,
-        });
         const resVNpay = await privateAxios.post("/vnpay/checkout", {
-          transaction: resTransactions.data.id,
+          walletDeposit: resWalletDes.data.id,
         });
         console.log(resVNpay);
 

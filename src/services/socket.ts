@@ -4,9 +4,8 @@ import { makeStore } from "../redux/store";
 
 const { store } = makeStore();
 
-const socket = io("http://localhost:3000", {
-  autoConnect: false,
-  query: {},
+const socket = io(import.meta.env.VITE_SERVER_BASE_URL, {
+  autoConnect: false, // Delay connection until explicitly connected
 });
 
 export const connectSocket = () => {

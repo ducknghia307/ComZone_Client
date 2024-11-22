@@ -109,6 +109,7 @@ const Checkout = () => {
       setDeliveryDetails([]);
       setSellerDetailsGroup([]);
       setTotalDeliveryPrice(0);
+
       await Promise.all(
         Object.keys(groupedSelectedComics).map(async (sellerId) => {
           const sellerDetails = await privateAxios.get(
@@ -260,7 +261,12 @@ const Checkout = () => {
 
         const orderId = orderResponse.data.id;
 
-        for (const { comic, currentPrice, auctionId, type } of sellerGroup.comics) {
+        for (const {
+          comic,
+          currentPrice,
+          auctionId,
+          type,
+        } of sellerGroup.comics) {
           const price = currentPrice || comic?.price;
           const orderItemPayload = {
             comics: comic.id,
@@ -281,18 +287,6 @@ const Checkout = () => {
             });
             privateAxios.patch(`/deposits/auction/${auctionId}/refund-winner`);
           }
-        }
-
-        if (selectedPaymentMethod === "wallet") {
-          const resTransactions = await privateAxios.post("/transactions", {
-            order: orderId,
-            amount: sellerTotalPrice,
-          });
-          console.log(resTransactions.data);
-          const resResult = await privateAxios.patch(
-            `/transactions/post/${resTransactions.data.id}`
-          );
-          console.log(resResult.data);
         }
       }
 

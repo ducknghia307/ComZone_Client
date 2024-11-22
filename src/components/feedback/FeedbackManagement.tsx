@@ -9,7 +9,8 @@ interface Feedback {
     createdAt: string;
     comment: string;
     rating: number;
-    attachedImages: string[]; // Assuming images are URLs
+    attachedImages: string[];
+    isApprove: boolean;
 }
 
 const FeedbackManagement = () => {
@@ -23,8 +24,10 @@ const FeedbackManagement = () => {
     useEffect(() => {
         privateAxios.get("/seller-feedback")
             .then((response) => {
-                console.log("Feedbacks:", response.data);
-                setFeedbacks(response.data);
+                console.log("All Feedbacks:", response.data);
+                const approvedFeedbacks = response.data.filter((feedback: Feedback) => feedback.isApprove);
+                console.log("Feedbacks approves:", approvedFeedbacks);
+                setFeedbacks(approvedFeedbacks);
                 setLoading(false);
             })
             .catch((error) => {

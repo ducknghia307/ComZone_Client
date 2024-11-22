@@ -132,6 +132,26 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           display: "inline-block",
           fontFamily: "REM",
         };
+      case "SUCCESSFUL":
+        return {
+          color: "#4caf50",
+          backgroundColor: "#e8f5e9",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+          fontFamily: "REM",
+        };
+      case "FAILED":
+        return {
+          color: "#ffffff",
+          backgroundColor: "#d32f2f",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+          fontFamily: "REM",
+        };
       default:
         return "#000";
     }
@@ -147,10 +167,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         return "Đang giao hàng";
       case "DELIVERED":
         return "Đã giao thành công";
-      case "COMPLETED":
+      case "SUCCESSFUL":
         return "Hoàn tất";
       case "CANCELED":
         return "Bị hủy";
+      case "FAILED":
+        return "Thất bại";
       default:
         return "Tất cả";
     }
@@ -212,9 +234,8 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         ].map((status) => (
           <span
             key={status}
-            className={`status-tab REM ${
-              selectedStatus === status ? "active" : ""
-            }`}
+            className={`status-tab REM ${selectedStatus === status ? "active" : ""
+              }`}
             onClick={() => setSelectedStatus(status)}
             style={{ whiteSpace: "nowrap" }}
           >
@@ -331,13 +352,13 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                     <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
                       {order.type === "AUCTION"
                         ? Number(order.totalPrice).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })
+                          style: "currency",
+                          currency: "VND",
+                        })
                         : Number(item.comics.price).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })}
+                          style: "currency",
+                          currency: "VND",
+                        })}
                     </Typography>
                   </div>
                 </div>

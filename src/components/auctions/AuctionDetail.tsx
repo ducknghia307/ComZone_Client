@@ -92,7 +92,7 @@ const ComicAuction = () => {
   //   (state) => state.annoucement.auctionAnnounce
   // );
   const auctionAnnounce: AuctionAnnounce | null = useAppSelector(
-    (state: any) => state.announcement.auctionAnnounce
+    (state: any) => state.announcement?.auctionAnnounce
   );
   
   const handleBidActionDisabled = (disabled: boolean) => {

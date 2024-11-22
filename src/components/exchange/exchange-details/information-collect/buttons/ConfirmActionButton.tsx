@@ -21,7 +21,7 @@ export default function ConfirmActionButton({
     try {
       if (type === "accept") {
         const resDealing = await privateAxios.post(
-          "/exchange-confirmation/dealing",
+          "exchange-confirmation/dealing",
           {
             exchangeId: exchangeDetail.exchange.id,
             compensationAmount: exchangeDetail.exchange.compensationAmount,
@@ -32,16 +32,17 @@ export default function ConfirmActionButton({
 
         notification.success({
           message: "Thành công",
-          description: "Thương lượng đã được chấp nhận.",
+          description: "Mức tiền đã được chấp nhận thành công.",
         });
         fetchExchangeDetails();
       } else if (type === "reject") {
-        await privateAxios.post("/exchange-confirmation/reject", {
-          exchangeId: exchangeDetail.exchange.id,
-        });
+        await privateAxios.patch(
+          `exchange-confirmation/reject/deals/${exchangeDetail.exchange.id}`
+        );
+
         notification.warning({
           message: "Đã từ chối",
-          description: "Thương lượng đã bị từ chối.",
+          description: `Mức tiền đã bị từ chối.\nBạn có thể thử giao tiếp với nhau để thống nhất được mức tiền vừa ý cho cả hai bên.`,
         });
       }
     } catch (error) {
@@ -63,10 +64,10 @@ export default function ConfirmActionButton({
       <ActionConfirm
         isOpen={isRejecting}
         setIsOpen={setIsRejecting}
-        title="Xác nhận từ chối thương lượn?"
+        title="Xác nhận từ chối mức tiền?"
         description={
           <p className="text-xs text-red-600">
-            Bạn có chắc chắn muốn từ chối thương lượng này không?
+            Bạn có chắc chắn muốn từ chối mức tiền này không?
             <br />
             <span>Thao tác này không thể hoàn tác.</span>
           </p>
@@ -83,15 +84,12 @@ export default function ConfirmActionButton({
       <ActionConfirm
         isOpen={isAccepting}
         setIsOpen={setIsAccepting}
-        title="Xác nhận thương lượng"
+        title="Xác nhận mức tiền này?"
         description={
           <p className="text-xs">
-            Bạn có chắc chắn muốn từ chối thương lượng này không?
+            Bạn có chắc chắn muốn xác nhận mức tiền này không?
             <br />
-            <span className="text-red-600">
-              Lưu ý: Sau khi chấp nhận, hệ thống sẽ ghi nhận từ chối thương
-              lượng của bạn.
-            </span>
+            Mức tiền sẽ không thể thay đổi sau khi được xác nhận.
           </p>
         }
         confirmCallback={() => handleConfirm("accept")}

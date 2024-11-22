@@ -424,8 +424,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                                             fontSize: '18px', fontWeight: 'bold', backgroundColor: '#fff', color: '#000', padding: '18px 25px', fontFamily: "REM", border: '2px solid black',
                                         }}
                                     />
-                                    <InfoRow label="Tổng tiền" value={`${orderDetail.totalPrice.toLocaleString()} đ`} />
-                                    <InfoRow label="Phí vận chuyển" value={`${orderDetail.deliveryFee.toLocaleString()} đ`} />
+                                    <InfoRow label="Tổng tiền" value={`${orderDetail.totalPrice} đ`} />
+                                    <InfoRow label="Phí vận chuyển" value={`${orderDetail.deliveryFee} đ`} />
                                     <InfoRow label="Phương thức thanh toán" value={orderDetail.paymentMethod === 'WALLET' ? 'Ví Comzone' : orderDetail.paymentMethod} />
                                     <InfoRow
                                         label="Trạng thái thanh toán"

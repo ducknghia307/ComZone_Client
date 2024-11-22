@@ -22,7 +22,7 @@ export default function InformationCollectSection({
   exchangeDetails: ExchangeDetails;
   firstCurrentStage: number;
   secondCurrentStage: number;
-  fetchExchangeDetails: Function;
+  fetchExchangeDetails: () => void;
   selectedAddress: Address | null;
   setSelectedAddress: (address: Address | null) => void;
   addresses: Address[];
@@ -142,7 +142,9 @@ export default function InformationCollectSection({
           fetchUserAddress={fetchUserAddress}
         />
       )}
-      {caughtProgress && firstCurrentStage === 3 && <PlaceDeposit />}
+      {caughtProgress && firstCurrentStage === 3 && (
+        <PlaceDeposit exchangeDetails={exchangeDetails} />
+      )}
       {caughtProgress && firstCurrentStage === 4 && <DeliveryProcessInfo />}
       {caughtProgress && firstCurrentStage === 5 && <SuccessfulExchange />}
     </div>

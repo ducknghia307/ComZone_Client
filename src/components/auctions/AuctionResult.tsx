@@ -1,7 +1,8 @@
 export const AuctionResult = ({ isWinner }: { isWinner: boolean | null }) => {
   if (isWinner === null) {
-    return null; // Không hiển thị gì nếu không có thông tin winner
+    return null;
   }
+console.log(isWinner);
 
   return (
     <div

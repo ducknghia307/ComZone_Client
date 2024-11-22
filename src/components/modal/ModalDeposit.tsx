@@ -1,11 +1,19 @@
 import React from "react";
 import { Modal, Button, Typography } from "@mui/material";
+import { privateAxios } from "../../middleware/axiosInstance";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import {
+  callbackUrl,
+  navigateSlice,
+} from "../../redux/features/navigate/navigateSlice";
+import { useNavigate } from "react-router-dom";
 
 interface ModalDepositProps {
   open: boolean;
   onClose: () => void;
   depositAmount: number;
-  onDepositSuccess: () => void; // Thêm prop để xử lý khi đặt cọc thành công
+  onDepositSuccess: () => void;
+  auctionId: string;
 }
 
 const ModalDeposit: React.FC<ModalDepositProps> = ({
@@ -13,21 +21,42 @@ const ModalDeposit: React.FC<ModalDepositProps> = ({
   onClose,
   depositAmount,
   onDepositSuccess,
+  auctionId,
 }) => {
-  const handleConfirm = () => {
-    // Gọi API đặt cọc
-    fakeDepositApiCall(depositAmount)
-      .then(() => {
-        console.log("Deposit successful");
-        onDepositSuccess(); // Cập nhật trạng thái ở component cha
-        onClose(); // Đóng modal
-      })
-      .catch((error) => {
-        console.error("Deposit failed:", error);
-        alert("Đặt cọc thất bại. Vui lòng thử lại!");
-      });
-  };
+  console.log(auctionId);
 
+  const dispatch = useAppDispatch();
+  const userId = useAppSelector((state) => state.auth.userId);
+  const navigate = useNavigate();
+  const handleConfirm = () => {
+    if (userId) {
+      // Make the real API call to place the deposit
+      depositApiCall(auctionId)
+        .then(() => {
+          console.log("Deposit successful");
+          onDepositSuccess();
+          onClose();
+        })
+        .catch((error) => {
+          console.error("Deposit failed:", error);
+          alert("Đặt cọc thất bại. Vui lòng thử lại!");
+        });
+    } else {
+      alert("Please log in");
+      dispatch(callbackUrl({ navigateUrl: location.pathname }));
+      navigate("/signin");
+    }
+  };
+  const depositApiCall = async (auctionId: string) => {
+    try {
+      const response = await privateAxios.post(
+        `/deposits/auction/${auctionId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error("Deposit failed");
+    }
+  };
   return (
     <Modal
       open={open}
@@ -147,16 +176,6 @@ const ModalDeposit: React.FC<ModalDepositProps> = ({
       </div>
     </Modal>
   );
-};
-
-// Mô phỏng API đặt cọc
-const fakeDepositApiCall = (amount: number) => {
-  return new Promise<void>((resolve, reject) => {
-    setTimeout(() => {
-      if (Math.random() > 0.2) resolve(); // 80% thành công
-      else reject(new Error("Failed to deposit"));
-    }, 1000); // Giả lập thời gian xử lý
-  });
 };
 
 export default ModalDeposit;

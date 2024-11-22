@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../sidebar/Sidebar"
+import Sidebar from "../sidebar/Sidebar";
 import Genres from "../genres/Genres";
+import { publicAxios } from "../../middleware/axiosInstance";
 
 const ComicFilter = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -9,10 +10,11 @@ const ComicFilter = () => {
 
   useEffect(() => {
     // Fetch all comics once on component mount
-    fetch("http://localhost:3000/comics")
-      .then((response) => response.json())
-      .then((data) => {
-        setComics(data);
+    publicAxios
+      .get("/comics")
+      .then((response) => {
+        // Assuming the response contains an array of comics
+        setComics(response.data); // Assuming `response.data` contains the comics
       })
       .catch((error) => console.error("Error fetching comics:", error));
   }, []);
@@ -24,7 +26,6 @@ const ComicFilter = () => {
   const handleAuthorSelection = (selectedAuthors) => {
     setSelectedAuthors(selectedAuthors);
   };
-
   // Filter comics based on selected genres and authors
   const filteredComics = comics.filter((comic) => {
     const matchGenre = selectedGenres.length

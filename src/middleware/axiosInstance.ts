@@ -29,8 +29,9 @@ const publicAxios = axios.create({
 // Request interceptor for privateAxios
 privateAxios.interceptors.request.use(
   (config) => {
-    // Always get the latest state
     const state = store.getState();
+    console.log(state);
+
     const accessToken = state.auth.accessToken;
     if (accessToken) {
       config.headers["Authorization"] = "Bearer " + accessToken;

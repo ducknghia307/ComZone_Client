@@ -277,6 +277,7 @@ const Checkout = () => {
               currentPrice,
               user,
             });
+            privateAxios.patch(`/deposits/auction/${auctionId}/refund-winner`);
           }
         }
 

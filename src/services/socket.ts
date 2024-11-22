@@ -1,19 +1,34 @@
 import { io } from "socket.io-client";
 import { privateAxios } from "../middleware/axiosInstance";
+import { makeStore } from "../redux/store";
+
+const { store } = makeStore();
 
 const socket = io("http://localhost:3000", {
-  autoConnect: false, // Delay connection until explicitly connected
+  autoConnect: false,
+  query: {},
 });
 
 export const connectSocket = () => {
-  if (!socket.connected) {
-    socket.connect(); // Only connect if not already connected
+  const state = store.getState();
+  const user = state.auth.userId;
+
+  if (user) {
+    console.log(socket.io);
+    
+    socket.io.opts.query = { user };
+    if (!socket.connected) {
+      socket.connect();
+    }
   }
 };
 
 socket.on("connect", () => {
   console.log("Socket connected:", socket.id);
-  privateAxios.patch("users/active-status/online");
+
+  privateAxios
+    .patch("users/active-status/online")
+    .catch((error) => console.error("Error updating active status:", error));
 });
 
 socket.on("disconnect", () => {

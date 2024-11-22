@@ -16,13 +16,13 @@ import CountdownFlipNumbers from "./CountDown";
 import CountUp from "react-countup";
 import Loading from "../loading/Loading";
 import ConfettiExplosion from "react-confetti-explosion";
-import { Modal } from "antd";
-import { io } from "socket.io-client";
+import { Modal, notification } from "antd";
 import { auctionAnnouncement } from "../../redux/features/notification/announcementSlice";
 import AuctionPublisher from "./AuctionPublisher";
 import { Auction } from "../../common/base.interface";
 import { AuctionResult } from "./AuctionResult";
 import ModalDeposit from "../modal/ModalDeposit";
+import { Popconfirm } from "antd";
 
 interface Comic {
   id: string;
@@ -77,8 +77,13 @@ const ComicAuction = () => {
   };
   const handleDepositSuccess = () => {
     setHasDeposited(true);
+    notification.success({
+      key: "success",
+      message: "Thành công",
+      description: "Cọc tiền thành công!",
+      duration: 5,
+    });
   };
-
   const handleBuy = (auctionData: Auction, price: any) => {
     if (!auctionData) return;
     sessionStorage.setItem(
@@ -109,15 +114,43 @@ const ComicAuction = () => {
       .catch((error) => {
         console.error("Error marking announcement as read:", error);
       });
-    if (auctionData.winner?.id === userId) {
+    console.log("winner", auctionData?.winner?.id);
+
+    if (auctionAnnounce?.status === "SUCCESSFUL") {
       setWinner(true);
+      console.log("123");
     } else {
       setWinner(false);
+      console.log("456");
     }
     setIsModalVisible(false);
   };
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const checkDepositStatus = async () => {
+      try {
+        const response = await privateAxios.get(
+          `deposits/auction/user/${auctionData?.id}`
+        );
+        console.log("RESPONSE", response.data);
+
+        if (response.data) {
+          console.log("1");
+          setHasDeposited(true); // Set true if deposit exists
+        } else {
+          console.log("2");
+          setHasDeposited(false); // Revert to false if no deposit
+        }
+      } catch (error) {
+        console.error("Error checking deposit status:", error);
+        setHasDeposited(false); // Handle errors gracefully
+      }
+    };
+
+    checkDepositStatus();
+  }, [auctionData]);
 
   useEffect(() => {
     fetchUnreadAnnouncementForAuction();
@@ -245,6 +278,7 @@ const ComicAuction = () => {
       return; // Prevent further execution if bid is too low
     }
     setError("");
+    setBidAmount("");
 
     const bidPayload = {
       auctionId: auctionData.id,
@@ -449,7 +483,7 @@ const ComicAuction = () => {
           </div>
 
           <div className="shop-info">
-            {auctionData.status === "ONGOING" && (
+            {auctionData.status === "ONGOING" && hasDeposited && (
               <p
                 style={{
                   fontSize: "17px",
@@ -487,7 +521,11 @@ const ComicAuction = () => {
                   }}
                 >
                   Số tiền cần cọc:{" "}
-                  <span style={{ fontWeight: "bold" }}>10.000đ</span>
+                  <span style={{ fontWeight: "bold" }}>
+                    {typeof auctionData?.depositAmount === "number" &&
+                      auctionData?.depositAmount.toLocaleString("vi-VN")}
+                    đ
+                  </span>
                 </p>
                 <Chip
                   label="Đặt cọc tại đây"
@@ -515,15 +553,62 @@ const ComicAuction = () => {
                   onChange={handleBidInputChange}
                   disabled={isBidDisabled}
                 />
-                <Button
-                  variant="contained"
-                  className="bid-button"
-                  onClick={handlePlaceBid}
-                  sx={{ fontFamily: "REM" }}
-                  disabled={isBidDisabled}
+                <Popconfirm
+                  title={
+                    <Typography style={{ fontSize: "18px", fontWeight: "500" }}>
+                      Bạn có chắc chắn muốn ra giá{" "}
+                      <span style={{ fontWeight: "bold" }}>
+                        {parseFloat(bidAmount).toLocaleString("vi-VN")}₫
+                      </span>{" "}
+                      không?
+                    </Typography>
+                  }
+                  onConfirm={handlePlaceBid}
+                  onCancel={() => console.log("Bid canceled")}
+                  okText="Xác nhận"
+                  cancelText="Hủy"
+                  overlayStyle={{
+                    width: "450px",
+                    borderRadius: "12px",
+                    padding: "20px",
+                  }}
+                  okButtonProps={{
+                    style: {
+                      backgroundColor: "#000",
+                      color: "#fff",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      padding: "15px 30px",
+                      borderRadius: "10px",
+                      marginRight: "15px",
+                    },
+                  }}
+                  cancelButtonProps={{
+                    style: {
+                      backgroundColor: "#fff",
+                      color: "#000",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      padding: "15px 30px",
+                      border: "2px solid #000",
+                      borderRadius: "10px",
+                    },
+                  }}
                 >
-                  RA GIÁ
-                </Button>
+                  <Button
+                    variant="contained"
+                    className="bid-button"
+                    sx={{
+                      width: "250px",
+                      height: "60px",
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                    }}
+                    disabled={isBidDisabled || !bidAmount || error !== ""}
+                  >
+                    RA GIÁ
+                  </Button>
+                </Popconfirm>
               </div>
             )}
 
@@ -597,7 +682,7 @@ const ComicAuction = () => {
                       fontFamily: "REM",
                     }}
                     onClick={() =>
-                      handleBuy(auctionData, auctionData.currentPrice)
+                      handleBuy(auctionData, auctionData?.currentPrice)
                     }
                   >
                     Thanh toán ngay
@@ -616,8 +701,9 @@ const ComicAuction = () => {
       <ModalDeposit
         open={isDepositModalOpen}
         onClose={handleCloseDepositModal}
-        depositAmount={10000}
+        depositAmount={auctionData?.depositAmount}
         onDepositSuccess={handleDepositSuccess}
+        auctionId={auctionData?.id}
       />
     </div>
   );

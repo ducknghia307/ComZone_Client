@@ -9,11 +9,9 @@ const auctionSlice = createSlice({
   reducers: {
     setAuctionData(state, action) {
       state.auctionData = action.payload;
-      console.log(action.payload);
     },
     setHighestBid(state, action) {
       state.highestBid = action.payload;
-      console.log(action.payload);
     },
   },
 });

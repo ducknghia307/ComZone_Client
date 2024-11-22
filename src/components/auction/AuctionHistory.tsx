@@ -17,7 +17,7 @@ interface AuctionHistoryProps {
 const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   const [selectedAuctionStatus, setSelectedAuctionStatus] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [auctions, setAuctions] = useState([]);
+  const [auctions, setAuctions] = useState<Auction[]>([]);
   const userId = useAppSelector((state) => state.auth.userId);
   console.log("userid", userId);
 
@@ -67,8 +67,6 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           fontWeight: "bold",
           display: "inline-block",
         };
-      // case 'UPCOMING':
-      //     return { color: '#6226EF', backgroundColor: '#EDE7F6', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
       case "UPCOMING":
         return {
           color: "#ff9800",
@@ -174,7 +172,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
     // Map through the filtered auctions and render each auction
     return filteredAuctions.map((auction: Auction) => {
       const isWin =
-        auction.status === "SUCCESSFUL" && auction.winner.id === userId;
+        auction.status === "SUCCESSFUL" && auction.winner?.id === userId;
 
       return (
         <div

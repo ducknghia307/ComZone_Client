@@ -14,6 +14,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import OrderDetailMod from './OrderDetailMod';
 import AuctionDetailMod from '../modal/AuctionDetailMod';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import { Auction, UserInfo } from '../../common/base.interface';
 interface Order {
   id: number;
   customerName: string;
@@ -22,6 +23,11 @@ interface Order {
   totalAmount: number;
   status: string;
 }
+
+interface SelectedAuction extends Auction {
+  sellerInfo: UserInfo;
+}
+
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -44,13 +50,13 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const ManageAuctions: React.FC = () => {
-  const [auctions, setAuctions] = useState<Order[]>([]);
+  const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAuction, setSelectedAuction] = useState(null);
+  const [selectedAuction, setSelectedAuction] = useState<SelectedAuction | null>(null);
 
   const openOrderDetail = (orderId: string) => {
     setSelectedOrderId(orderId);
@@ -101,7 +107,7 @@ const ManageAuctions: React.FC = () => {
     setSelectedAuction(null);
   };
 
-  const handleEditClick = (auction) => {
+  const handleEditClick = (auction: Auction) => {
     setSelectedAuction({
       ...auction,
       sellerInfo: auction.comics.sellerId || {},
@@ -156,7 +162,7 @@ const ManageAuctions: React.FC = () => {
     }
   };
 
-  const truncateText = (text, maxLength) => {
+  const truncateText = (text: string, maxLength: number): string => {
     return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
   };
 
@@ -192,8 +198,8 @@ const ManageAuctions: React.FC = () => {
                 <StyledTableCell style={{ fontFamily: 'REM' }}>Người Bán</StyledTableCell>
                 <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Tên Truyện</StyledTableCell>
                 <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Trạng Thái Đấu Giá</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Thời Gian Bắt Đầu</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Thời Gian Kết Thúc</StyledTableCell>
+                {/* <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Thời Gian Bắt Đầu</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Thời Gian Kết Thúc</StyledTableCell> */}
                 <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Giá Khởi Điểm</StyledTableCell>
                 <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Bước Giá</StyledTableCell>
                 <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Giá Hiện Tại</StyledTableCell>
@@ -222,12 +228,12 @@ const ManageAuctions: React.FC = () => {
                           {translateStatus(auction.status)}
                         </span>
                       </StyledTableCell>
-                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
+                      {/* <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                         {new Date(auction.startTime).toLocaleString()}
                       </StyledTableCell>
                       <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                         {new Date(auction.endTime).toLocaleString()}
-                      </StyledTableCell>
+                      </StyledTableCell> */}
                       <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
                         {auction.reservePrice.toLocaleString()} đ
                       </StyledTableCell>
@@ -235,7 +241,7 @@ const ManageAuctions: React.FC = () => {
                         {auction.priceStep.toLocaleString()} đ
                       </StyledTableCell>
                       <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
-                        {auction.currentPrice.toLocaleString()} đ
+                        {auction.currentPrice?.toLocaleString()} đ
                       </StyledTableCell>
                       <StyledTableCell align="left">
                         <IconButton color="default" onClick={() => handleEditClick(auction)}>
@@ -262,6 +268,7 @@ const ManageAuctions: React.FC = () => {
 
       {selectedAuction && (
         <AuctionDetailMod
+          // onClose={onclose}
           open={isModalOpen}
           onCancel={handleModalClose}
           comic={selectedAuction.comics}

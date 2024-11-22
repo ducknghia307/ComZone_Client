@@ -184,9 +184,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                                         border: '2px solid black',
                                     }}
                                 />
-                                <InfoRow label="Họ tên" value={order.fromName} />
-                                <InfoRow label="Số điện thoại" value={order.fromPhone} />
-                                <InfoRow label="Địa chỉ" value={order.fromAddress} />
+                                <InfoRow label="Họ tên" value={order.delivery.from.name} />
+                                <InfoRow label="Số điện thoại" value={order.delivery.from.phone} />
+                                <InfoRow label="Địa chỉ" value={order.delivery.from.address} />
                             </Box>
 
                             <Divider orientation="vertical" flexItem />

@@ -188,6 +188,7 @@ const Navbar = () => {
   const adminAndModPaths = [
     "/admin/dashboard",
     "/admin/users",
+    "/admin/subscription",
     "/mod/users",
     "/mod/comics",
     "/mod/orders",

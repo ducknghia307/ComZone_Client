@@ -22,6 +22,7 @@ import adminImage from '../../assets/settings.png';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { UserInfo } from "../../common/base.interface";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -30,7 +31,7 @@ interface SidebarProps {
 
 const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState();
+  const [userInfo, setUserInfo] = useState<UserInfo | null>();
   const currentUrl = window.location.pathname;
   const dispatch = useAppDispatch();
   const { accessToken } = useAppSelector((state) => state.auth);
@@ -68,6 +69,11 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       title: "Quản Lý Người Dùng",
       path: "/admin/users",
       icon: <PersonOutlineOutlinedIcon sx={{ color: 'inherit' }} />
+    },
+    {
+      title: "Gói Đăng Ký",
+      path: "/admin/subscription",
+      icon: <ViewHeadlineOutlinedIcon sx={{ color: 'inherit' }} />
     }
   ];
 
@@ -194,7 +200,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           </ListItem>
         ))}
       </List>
-      <ListItem disablePadding sx={{ whiteSpace: 'nowrap', position: 'absolute', bottom: '20px', width: '100%', padding:'0 20px' }}>
+      <ListItem disablePadding sx={{ whiteSpace: 'nowrap', position: 'absolute', bottom: '20px', width: '100%', padding: '0 20px' }}>
         <ListItemButton
           sx={{
             borderRadius: '8px',

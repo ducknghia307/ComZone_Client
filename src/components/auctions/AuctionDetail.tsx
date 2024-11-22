@@ -46,9 +46,24 @@ interface AuctionData {
   } | null;
 }
 
-interface auctionAnnounce {
+interface AuctionAnnounce {
   id: string;
+  title: string;
+  status: "SUCCESSFUL" | "FAILED";
+  message: string;
+  auction: {
+    id: string;
+  };
 }
+
+interface HighestBid {
+  user: {
+    id: string;
+  };
+  price: number; // Assuming there's a price field
+  timestamp?: string; // Add other fields as necessary
+}
+
 const ComicAuction = () => {
   const { id } = useParams<Record<string, string>>();
   const [comic, setComic] = useState<any>(null);
@@ -60,7 +75,11 @@ const ComicAuction = () => {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [isBidDisabled, setIsBidDisabled] = useState(false);
   const userId = useAppSelector((state) => state.auth.userId);
-  const highestBid = useAppSelector((state) => state.auction.highestBid);
+  // const highestBid = useAppSelector((state) => state.auction.highestBid);
+  const highestBid: HighestBid | null = useAppSelector(
+    (state: any) => state.auction.highestBid
+  );
+  
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [winner, setWinner] = useState<boolean | null>(null);
   const [isHighest, setIsHighest] = useState<boolean | null>(null);
@@ -69,9 +88,13 @@ const ComicAuction = () => {
   const [hasDeposited, setHasDeposited] = useState(false);
   console.log("auctiondata", auctionData);
   const navigate = useNavigate();
-  const auctionAnnounce = useAppSelector(
-    (state) => state.annoucement.auctionAnnounce
+  // const auctionAnnounce = useAppSelector(
+  //   (state) => state.annoucement.auctionAnnounce
+  // );
+  const auctionAnnounce: AuctionAnnounce | null = useAppSelector(
+    (state: any) => state.announcement.auctionAnnounce
   );
+  
   const handleBidActionDisabled = (disabled: boolean) => {
     setIsBidDisabled(disabled);
   };

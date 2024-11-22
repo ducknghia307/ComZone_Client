@@ -7,12 +7,12 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import TvOutlinedIcon from "@mui/icons-material/TvOutlined";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import MultipleStopOutlinedIcon from "@mui/icons-material/MultipleStopOutlined";
-import { Button, MenuItem, TextField, Typography } from "@mui/material";
 import UserWallet from "../wallet/UserWallet";
 import ExchangeHistory from "../exchangeNewsFeed/ExchangeHistory";
 import OrderHistory from "../order/OrderHistory";
 import AuctionHistory from "../auction/AuctionHistory";
 import ProfileUser from "../../pages/ProfileUser";
+import { Auction } from "../../common/base.interface";
 
 const AccountUser: React.FC = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("purchase");
@@ -66,97 +66,64 @@ const AccountUser: React.FC = () => {
       price: "29.000đ",
       imgUrl:
         "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg",
-    },
-    {
-      id: 2,
-      status: "packing",
-      shopName: "Abc Shop",
-      productName: "One Piece - Tập 101",
-      price: "39.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/catalog/product/o/n/one_piece_-_tap_101_-_ban_bia_ao_bia_gap_bia_1__1.jpg?_gl=1*t4s1ch*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODQ4OTc1OC4zNi4xLjE3Mjg0ODk3ODcuMzEuMC4xNTg5MzI2OQ..",
-    },
-    {
-      id: 3,
-      status: "delivering",
-      shopName: "Abc Shop",
-      productName: "Naruto - Tập 50",
-      price: "49.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/flashmagazine/images/page_images/naruto_tap_50_thuy_lao_tu_chien_tai_ban_2022/2024_04_05_09_50_39_1-390x510.jpg?_gl=1*m22ao5*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODQ4OTc1OC4zNi4xLjE3Mjg0ODk4MTIuNi4wLjE1ODkzMjY5",
-    },
-    {
-      id: 4,
-      status: "delivered",
-      shopName: "Abc Shop",
-      productName: "Attack on Titan - Tập 24",
-      price: "59.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/flashmagazine/images/page_images/_24___attack_on_titan_24/2023_04_14_15_19_24_1-390x510.jpg",
-    },
-    {
-      id: 5,
-      status: "completed",
-      shopName: "Abc Shop",
-      productName: "Doraemon - Tập 15",
-      price: "19.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/flashmagazine/images/page_images/doraemon___chu_meo_may_den_tu_tuong_lai___tap_15_tai_ban_2023/2024_06_08_10_37_33_1-390x510.jpg?_gl=1*9asfdx*_gcl_aw*R0NMLjE3Mjc0MDg5MjAuQ2owS0NRandqTlMzQmhDaEFSSXNBT3hCTTZwTjY4WmNMSXBUQnczMVhwdjFZQTk4NWJKdTB5aE53T1QxbGZsUW1XM2hOMlBHcmZkMldzVWFBb2RBRUFMd193Y0I.*_gcl_au*MTkzMjkyODY0Mi4xNzI3NDA4NzU2*_ga*MTQ0NDAwMTIyMS4xNzI3NDA4NzU2*_ga_460L9JMC2G*MTcyODQ4OTc1OC4zNi4xLjE3Mjg0ODk4OTkuMi4wLjE1ODkzMjY5",
-    },
-    {
-      id: 6,
-      status: "cancelled",
-      shopName: "Abc Shop",
-      productName: "Dragon Ball - Tập 24",
-      price: "99.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/catalog/product/2/4/24_3b445abed5484fbca9eb0cf899682_1.jpg",
+      totalPrice: "29.000đ",
+      items: [],
+      type: "normal",
     },
   ];
 
-  const auctions = [
+  const auctions: Auction[] = [
     {
-      id: 1,
-      status: "ongoing",
+      id: "1",
       shopName: "Tạp Hóa Truyện",
       productName: "Thám Tử Lừng Danh Conan - Tập 102",
-      currentPrice: "29.000đ",
-      userBid: "300.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg",
-    },
-    {
-      id: 2,
-      status: "completed",
-      shopName: "Abc Shop",
-      productName: "One Piece - Tập 101",
-      userBid: "39.000đ",
-      finalPrice: "50.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/catalog/product/o/n/one_piece_-_tap_101_-_ban_bia_ao_bia_gap_bia_1__1.jpg",
-      isWin: true,
-    },
-    {
-      id: 3,
-      status: "completed",
-      shopName: "Abc Shop",
-      productName: "Naruto - Tập 50",
-      userBid: "49.000đ",
-      finalPrice: "59.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/flashmagazine/images/page_images/naruto_tap_50_thuy_lao_tu_chien_tai_ban_2022/2024_04_05_09_50_39_1-390x510.jpg",
+      status: "ONGOING",
+      imgUrl: "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg",
+      currentPrice: 29000,
+      userBid: 20000,
+      finalPrice: 50000,
       isWin: false,
-    },
-    {
-      id: 1,
-      status: "canceled",
-      shopName: "Tạp Hóa Truyện",
-      productName: "Attack On Titan - Tập 24",
-      currentPrice: "129.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/flashmagazine/images/page_images/_24___attack_on_titan_24/2023_04_14_15_19_24_1-390x510.jpg",
+      reservePrice: 10000,
+      priceStep: 2000,
+      startTime: "2024-11-01T10:00:00Z",
+      endTime: "2024-11-30T10:00:00Z",
+      comics: {
+        id: "comic1",
+        createdAt: "2024-10-01T12:00:00Z",
+        updatedAt: "2024-10-05T15:00:00Z",
+        deletedAt: null,
+        title: "Thám Tử Lừng Danh Conan - Tập 102",
+        author: "Gosho Aoyama",
+        description: "The latest volume of Detective Conan",
+        coverImage: "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg",
+        condition: "SEALED",
+        edition: "REGULAR",
+        page: 200,
+        publishedDate: "2024-09-01",
+        price: 29000,
+        status: "AVAILABLE",
+        quantity: 100,
+        previewChapter: ["Chapter 1", "Chapter 2"],
+        sellerId: {
+          createdAt: "2024-01-01T00:00:00Z",
+          email: "seller@example.com",
+          id: "seller1",
+          is_verified: true,
+          name: "Tạp Hóa Truyện",
+          phone: "0123456789",
+          avatar: "https://example.com/avatar.jpg",
+          refresh_token: "refresh-token",
+          role: "SELLER",
+          updatedAt: "2024-10-01T00:00:00Z",
+          balance: 100000,
+          nonWithdrawableAmount: 5000,
+        },
+        onSaleSince: new Date(),
+      },
+      maxPrice: 100000,
     },
   ];
+  
 
   const renderContent = () => {
     switch (selectedMenuItem) {
@@ -196,41 +163,36 @@ const AccountUser: React.FC = () => {
           <div className="menu-section">
             <ul>
               <li
-                className={`menu-item ${
-                  selectedMenuItem === "purchase" ? "active" : ""
-                }`}
+                className={`menu-item ${selectedMenuItem === "purchase" ? "active" : ""
+                  }`}
                 onClick={() => handleMenuItemClick("purchase")}
               >
                 <ShoppingBagOutlinedIcon /> Lịch Sử Mua Hàng
               </li>
               <li
-                className={`menu-item ${
-                  selectedMenuItem === "profile" ? "active" : ""
-                }`}
+                className={`menu-item ${selectedMenuItem === "profile" ? "active" : ""
+                  }`}
                 onClick={() => handleMenuItemClick("profile")}
               >
                 <PersonOutlinedIcon /> Hồ Sơ Của Tôi
               </li>
               <li
-                className={`menu-item ${
-                  selectedMenuItem === "auction" ? "active" : ""
-                }`}
+                className={`menu-item ${selectedMenuItem === "auction" ? "active" : ""
+                  }`}
                 onClick={() => handleMenuItemClick("auction")}
               >
                 <TvOutlinedIcon /> Lịch Sử Đấu Giá
               </li>
               <li
-                className={`menu-item ${
-                  selectedMenuItem === "wallet" ? "active" : ""
-                }`}
+                className={`menu-item ${selectedMenuItem === "wallet" ? "active" : ""
+                  }`}
                 onClick={() => handleMenuItemClick("wallet")}
               >
                 <AccountBalanceWalletOutlinedIcon /> Ví Của Tôi
               </li>
               <li
-                className={`menu-item ${
-                  selectedMenuItem === "exchange" ? "active" : ""
-                }`}
+                className={`menu-item ${selectedMenuItem === "exchange" ? "active" : ""
+                  }`}
                 onClick={() => handleMenuItemClick("exchange")}
               >
                 <MultipleStopOutlinedIcon /> Lịch Sử Trao Đổi

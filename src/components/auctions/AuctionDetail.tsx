@@ -219,7 +219,7 @@ const ComicAuction = () => {
       }
     };
     fetchComicDetails();
-  }, [id, auctionAnnounce, dispatch]);
+  }, [id, auctionAnnounce?.id, dispatch]);
   useEffect(() => {
     if (auctionData?.status === "SUCCESSFUL") {
       if (auctionData.winner?.id === userId) {

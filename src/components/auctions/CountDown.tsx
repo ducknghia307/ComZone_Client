@@ -99,7 +99,7 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
             paddingBottom: "15px",
           }}
         >
-          Sắp diễn ra
+          SẮP DIỄN RA: {formatEndTime(auctionData.startTime)}
         </p>
       ) : (
         <>

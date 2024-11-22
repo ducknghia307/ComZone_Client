@@ -241,13 +241,13 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                           {auction.currentPrice?.toLocaleString("vi-VN")} đ
                         </span>
                       </Typography>
-                      <Typography
+                      {/* <Typography
                         sx={{ fontSize: "20px", marginTop: "8px" }}
                         variant="body2"
                       >
                         Bạn đã đặt giá:{" "}
                         <span style={{ color: "#FF7F00" }}>1.100.000 đ</span>
-                      </Typography>
+                      </Typography> */}
                     </div>
                   )}
 

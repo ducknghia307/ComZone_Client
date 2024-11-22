@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ActionConfirm from "../../../../actionConfirm/ActionConfirm";
 import { privateAxios } from "../../../../../middleware/axiosInstance";
 import { notification } from "antd";
@@ -17,10 +17,10 @@ export default function AcceptOrRejectButtons({
   const navigate = useNavigate();
 
   const handleConfirm = async (type: "accept" | "reject") => {
-    await privateAxios
-      .patch(`exchanges/${type}/${exchangeId}`)
-      .then(() => {
-        if (type === "accept") {
+    if (type === "accept") {
+      await privateAxios
+        .patch(`exchanges/accept/${exchangeId}`)
+        .then(() => {
           fetchExchangeDetails();
           notification.success({
             key: "accept-success",
@@ -33,16 +33,21 @@ export default function AcceptOrRejectButtons({
             ),
             duration: 8,
           });
-        } else {
+        })
+        .catch((err) => console.log(err));
+    } else {
+      await privateAxios
+        .patch(`exchange-comics/rejected/${exchangeId}`)
+        .then(() => {
           navigate("/exchange/all");
           notification.info({
             key: "reject-info",
             message: "Bạn đã từ chối yêu cầu trao đổi này.",
             duration: 5,
           });
-        }
-      })
-      .catch((err) => console.log(err));
+        })
+        .catch((err) => console.log(err));
+    }
   };
 
   return (
@@ -82,8 +87,8 @@ export default function AcceptOrRejectButtons({
             Bạn có chắc chắn muốn từ chối yêu cầu trao đổi này không?
             <br />
             <span className="text-red-600">
-              Lưu ý: Sau khi chấp nhận, hệ thống sẽ tự động từ chốt tất cả những
-              yêu cầu của bạn từ bài viết này.
+              Lưu ý: Sau khi chấp nhận, hệ thống sẽ tự động từ chối tất cả những
+              yêu cầu trao đổi bạn nhận được từ bài viết này.
             </span>
           </p>
         }

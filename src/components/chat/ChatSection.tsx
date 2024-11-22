@@ -30,26 +30,26 @@ export default function ChatSection({
   currentRoom: ChatRoom | undefined;
   currentRoomIdRef: MutableRefObject<string>;
   currentMessList: MessageGroup[];
-  fetchChatRoomList: Function;
-  handleSendMessage: Function;
+  fetchChatRoomList: () => void;
+  handleSendMessage: () => void;
   messageInput: string;
-  setMessageInput: Function;
-  updateIsRead: Function;
+  setMessageInput: () => void;
+  updateIsRead: () => void;
   lastMessageRef: any;
   isLoading: boolean;
-  setIsLoading: Function;
-  setIsChatOpen: Function;
+  setIsLoading: () => void;
+  setIsChatOpen: () => void;
   sentComicsList: Comic[];
-  setSentComicsList: Function;
-  handleSendMessageAsComics: Function;
+  setSentComicsList: () => void;
+  handleSendMessageAsComics: () => void;
   sentImage: File | undefined;
-  setSentImage: Function;
-  handleSendMessageAsImage: Function;
+  setSentImage: () => void;
+  handleSendMessageAsImage: () => void;
 }) {
   return (
     <div
       onClick={() => {
-        if (currentRoom) updateIsRead(currentRoom);
+        if (currentRoom) updateIsRead();
       }}
       className={`w-full flex flex-col items-stretch justify-between gap-2`}
     >

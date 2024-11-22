@@ -52,7 +52,6 @@ const Checkout = () => {
   const [sellerDetailsGroup, setSellerDetailsGroup] = useState<
     SellerDetails[] | []
   >([]);
-  const [totalDeliveryPrice, setTotalDeliveryPrice] = useState<number>(0);
   const [deliveryDetails, setDeliveryDetails] = useState<SellerGroupDetails[]>(
     []
   );
@@ -107,7 +106,6 @@ const Checkout = () => {
       setIsLoading(true);
       setDeliveryDetails([]);
       setSellerDetailsGroup([]);
-      setTotalDeliveryPrice(0);
 
       await Promise.all(
         Object.keys(groupedSelectedComics).map(async (sellerId) => {
@@ -138,9 +136,6 @@ const Checkout = () => {
                   estDeliveryTime: res.data.estDeliveryTime,
                 };
                 setDeliveryDetails((prev) => [...prev, newDeliveryDetails]);
-                setTotalDeliveryPrice(
-                  (prev) => prev + newDeliveryDetails.deliveryFee
-                );
               })
               .catch((err) => console.log(err));
         })
@@ -168,6 +163,10 @@ const Checkout = () => {
     },
     0
   );
+
+  const totalDeliveryPrice = deliveryDetails.reduce((prev, current) => {
+    return prev + current.deliveryFee;
+  }, 0);
 
   const totalQuantity = Object.values(groupedSelectedComics).reduce(
     (total, sellerGroup) =>
@@ -249,9 +248,10 @@ const Checkout = () => {
           : "TRADITIONAL";
 
         const orderResponse = await privateAxios.post("/orders", {
-          totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
-          paymentMethod: selectedPaymentMethod,
+          sellerId: sellerId,
           deliveryId: newDelivery.id,
+          totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
+          paymentMethod: selectedPaymentMethod.toUpperCase(),
           addressId: selectedAddress?.id,
           note: notes[sellerId] || "",
           type: orderType,
@@ -278,18 +278,6 @@ const Checkout = () => {
               user,
             });
           }
-        }
-
-        if (selectedPaymentMethod === "wallet") {
-          const resTransactions = await privateAxios.post("/transactions", {
-            order: orderId,
-            amount: sellerTotalPrice,
-          });
-          console.log(resTransactions.data);
-          const resResult = await privateAxios.patch(
-            `/transactions/post/${resTransactions.data.id}`
-          );
-          console.log(resResult.data);
         }
       }
 

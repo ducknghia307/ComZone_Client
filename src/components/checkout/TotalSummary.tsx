@@ -1,4 +1,3 @@
-import React from "react";
 import CurrencySplitter from "../../assistants/Spliter";
 
 export default function TotalSummary({

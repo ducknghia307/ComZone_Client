@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react";
 import DeliveryAddress from "../../../checkout/DeliveryAddress";
-import { privateAxios } from "../../../../middleware/axiosInstance";
 import { Address } from "../../../../common/base.interface";
 interface DeliveryAddressProps {
   selectedAddress: Address | null;

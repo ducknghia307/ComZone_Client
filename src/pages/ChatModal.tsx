@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { io, Socket } from "socket.io-client";
 import { Modal, notification } from "antd";
 import ChatRoomList from "../components/chat/ChatRoomList";
@@ -40,7 +42,7 @@ export default function ChatModal({
   const socketRef = useRef<Socket>();
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3000/chat");
+    socketRef.current = io(`${import.meta.env.VITE_SERVER_BASE_URL}chat`);
 
     if (socketRef.current) {
       socketRef.current.on("new-message", (newMessage: Message) => {
@@ -187,7 +189,7 @@ export default function ChatModal({
       if (!sentImage) return;
       setIsLoading(true);
 
-      var formData = new FormData();
+      const formData = new FormData();
       formData.append("image", sentImage);
       await publicAxios
         .post("file/upload/image", formData, {

@@ -7,11 +7,7 @@ export default function Stage4({
 }) {
   const stage = 5;
   return (
-    <div
-      className={`relative flex items-center px-4 py-2 ${
-        currentStage === 4 && "text-green-600"
-      }`}
-    >
+    <div className={"relative flex items-center px-4 py-2"}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"

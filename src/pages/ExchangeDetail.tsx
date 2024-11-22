@@ -22,7 +22,8 @@ const ExchangeDetail: React.FC = () => {
 
   const [firstCurrentStage, setFirstCurrentStage] = useState<number>(0);
   const [secondCurrentStage, setSecondCurrentStage] = useState<number>(0);
-
+  const [firstAddress, setFirstAddress] = useState<string>("");
+  const [secondAddress, setSecondAddress] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -104,32 +105,51 @@ const ExchangeDetail: React.FC = () => {
           }
         }
 
-        //FETCH STAGE 3 (first user)
+        //FETCH STAGE 3
         const deliveriesResponse = await privateAxios(
           `deliveries/exchange/${exchangeDetails.exchange.id}`
         );
         const deliveries: Delivery[] = deliveriesResponse.data;
-        console.log(deliveries);
+        console.log("bbbbbbb", deliveries);
 
         if (deliveries.length > 0) {
-          if (
-            deliveries.some(
-              (delivery) =>
-                (delivery.from && delivery.from.user.id === first?.id) ||
-                (delivery.to && delivery.to.user.id === first?.id)
-            )
-          )
+          const firstUserDelivery = deliveries.find(
+            (delivery) =>
+              (delivery.from && delivery.from.user.id === first?.id) ||
+              (delivery.to && delivery.to.user.id === first?.id)
+          );
+          if (firstUserDelivery) {
             setFirstCurrentStage(3);
+            setFirstAddress(
+              deliveries[0].from.user.id === first?.id
+                ? deliveries[0].from.name
+                : deliveries[0].to.name
+            );
+          }
 
-          if (
-            deliveries.some(
-              (delivery) =>
-                (delivery.from && delivery.from.user.id === second?.id) ||
-                (delivery.to && delivery.to.user.id === second?.id)
-            )
-          )
+          const secondUserDelivery = deliveries.find(
+            (delivery) =>
+              (delivery.from && delivery.from.user.id === second?.id) ||
+              (delivery.to && delivery.to.user.id === second?.id)
+          );
+          if (secondUserDelivery) {
             setSecondCurrentStage(3);
+            setSecondAddress(
+              deliveries[0].from.user.id === second?.id
+                ? deliveries[0].from.name
+                : deliveries[0].to.name
+            );
+          }
         }
+        //FETCH STAGE 4 ()
+        const selfTransactionsResponse = await privateAxios(
+          `transactions/exchange/self/${exchangeDetails.exchange.id}`
+        );
+        if (selfTransactionsResponse.data) setFirstCurrentStage(4);
+        const otherTransactionsResponse = await privateAxios(
+          `transactions/exchange/other/${exchangeDetails.exchange.id}`
+        );
+        if (otherTransactionsResponse.data) setSecondCurrentStage(4);
       }
     } catch (error) {
       console.error("Error fetching exchange details:", error);
@@ -182,6 +202,8 @@ const ExchangeDetail: React.FC = () => {
           addresses={addresses}
           setAddresses={setAddresses}
           fetchUserAddress={fetchUserAddress}
+          firstAddress={firstAddress}
+          secondAddress={secondAddress}
         />
 
         <ActionButtons

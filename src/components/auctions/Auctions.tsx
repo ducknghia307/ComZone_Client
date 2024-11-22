@@ -7,7 +7,6 @@ import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import Loading from "../loading/Loading";
 import { useAppSelector } from "../../redux/hooks";
-import { Genre } from "../../common/base.interface";
 
 const renderer = ({ days, hours, minutes, seconds }: any) => {
   return (
@@ -78,25 +77,14 @@ const AllAuctions = ({
     navigate(`/auctiondetail/${comicId}`);
   };
 
-  const params = new URLSearchParams(location.search);
-  const searchQuery = params.get("query");
-
-  // Lọc comics dựa trên query từ URL
-  // const filteredComics = comics.filter((comic) => {
-  //     const genreMatch = filteredGenres.length > 0 ? comic.genres && comic.genres.some((genre: any) => filteredGenres.includes(genre.name)) : true;
-  //     const authorMatch = filteredAuthors.length > 0 ? filteredAuthors.includes(comic.author) : true;
-  //     const titleMatch = searchQuery ? comic.title.toLowerCase().includes(searchQuery.toLowerCase()) : true;
-  //     const conditionMatch = filteredConditions.length > 0 ? filteredConditions.includes(comic.condition) : true;
-  //     return genreMatch && authorMatch && titleMatch && conditionMatch;
-  // });
-
-  const filteredComics = ongoingComics.filter((comic) => {
-    const genreMatch =
-      filteredGenres.length === 0 ||
-      (comic.comics.genres &&
-        comic.comics.genres.some((genre: Genre) =>
-          filteredGenres.includes(genre.name)
-        ));
+  const filteredComics = (comics: any[]) => {
+    return comics.filter((comic) => {
+      const genreMatch =
+        filteredGenres.length === 0 ||
+        (comic.comics.genres &&
+          comic.comics.genres.some((genre) =>
+            filteredGenres.includes(genre.name)
+          ));
 
       const authorMatch =
         filteredAuthors.length === 0 ||

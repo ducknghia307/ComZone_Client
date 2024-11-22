@@ -6,6 +6,7 @@ const { store } = makeStore();
 
 const socket = io(import.meta.env.VITE_SERVER_BASE_URL, {
   autoConnect: false, // Delay connection until explicitly connected
+  query: {},
 });
 
 export const connectSocket = () => {
@@ -14,7 +15,7 @@ export const connectSocket = () => {
 
   if (user) {
     console.log(socket.io);
-    
+
     socket.io.opts.query = { user };
     if (!socket.connected) {
       socket.connect();

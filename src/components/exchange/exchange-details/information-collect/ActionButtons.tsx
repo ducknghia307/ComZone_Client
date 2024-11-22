@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Address } from "../../../../common/base.interface";
 import { ExchangeDetails } from "../../../../common/interfaces/exchange.interface";
 import AcceptOrRejectButtons from "./buttons/1.AcceptOrRejectButtons";
-import ConfirmActionButton from "./buttons/ConfirmActionButton";
+import ConfirmDealsButton from "./buttons/ConfirmDealsButton";
 import ConfirmDeliveryButton from "./buttons/ConfirmDeliveryButton";
 
 export default function ActionButtons({
@@ -51,7 +52,7 @@ export default function ActionButtons({
       {currentStage === 1 &&
         anotherStage === 2 &&
         (!exchangeDetails.isRequestUser ? (
-          <ConfirmActionButton
+          <ConfirmDealsButton
             exchangeDetail={exchangeDetails}
             fetchExchangeDetails={fetchExchangeDetails}
           />

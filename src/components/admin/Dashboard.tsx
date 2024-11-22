@@ -1,11 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { AttachMoneyOutlined, PeopleOutline, BookOutlined, GavelOutlined, SwapHorizOutlined } from '@mui/icons-material';
+import {
+    AttachMoneyOutlined,
+    PeopleOutline,
+    BookOutlined,
+    GavelOutlined,
+    SwapHorizOutlined
+} from '@mui/icons-material';
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    ChartData
+} from 'chart.js';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { privateAxios } from '../../middleware/axiosInstance';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+// Định nghĩa các kiểu dữ liệu
+interface Transaction {
+    status: string;
+    amount: number;
+    createdAt: string;
+}
+
+interface Order {
+    status: string;
+    createdAt: string;
+}
+
+interface DataItem {
+    createdAt: string;
+}
 
 const Dashboard = () => {
     const [totalComics, setTotalComics] = useState(0);
@@ -14,8 +46,11 @@ const Dashboard = () => {
     const [totalTransactions, setTotalTransactions] = useState(0);
     const [totalOrders, setTotalOrders] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [chartData, setChartData] = useState({});
+    const [error, setError] = useState<string | null>(null);
+    const [chartData, setChartData] = useState<ChartData<'line'>>({
+        labels: [],
+        datasets: [],
+    });
     const [filter, setFilter] = useState('week');
 
     useEffect(() => {
@@ -26,6 +61,8 @@ const Dashboard = () => {
                 const usersResponse = await privateAxios.get('/users');
                 const auctionsResponse = await privateAxios.get('/auction');
                 const transactionsResponse = await privateAxios.get('/transactions/all');
+                console.log("transactionsResponse", transactionsResponse);
+                
                 const ordersResponse = await privateAxios.get('/orders');
 
                 setTotalComics(comicsResponse.data.length);
@@ -33,22 +70,23 @@ const Dashboard = () => {
                 setTotalAuctions(auctionsResponse.data.length);
 
                 const successfulTransactions = transactionsResponse.data.filter(
-                    (transaction) => transaction.status === "SUCCESSFUL"
+                    (transaction: Transaction) => transaction.status === "SUCCESSFUL"
                 );
+
                 const totalRevenue = successfulTransactions.reduce(
-                    (sum, transaction) => sum + (transaction.amount || 0),
+                    (sum: number, transaction: Transaction) => sum + (transaction.amount || 0),
                     0
                 );
 
                 const successfulOrders = ordersResponse.data.filter(
-                    (order) => order.status === "PENDING"
+                    (order: Order) => order.status === "PENDING"
                 );
 
                 setTotalTransactions(totalRevenue);
                 setTotalOrders(successfulOrders.length);
 
-                // Process data for chart based on filter
-                let dateRange;
+                // Xử lý dữ liệu biểu đồ
+                let dateRange: string[];
                 if (filter === 'week') {
                     dateRange = Array.from({ length: 7 }, (_, i) => {
                         const date = new Date();
@@ -61,7 +99,7 @@ const Dashboard = () => {
                         date.setDate(date.getDate() - i);
                         return date.toLocaleDateString('vi-VN');
                     }).reverse();
-                } else if (filter === 'year') {
+                } else {
                     dateRange = Array.from({ length: 12 }, (_, i) => {
                         const date = new Date();
                         date.setMonth(date.getMonth() - i);
@@ -69,35 +107,34 @@ const Dashboard = () => {
                     }).reverse();
                 }
 
-                const comicsData = processDataForChart(comicsResponse.data, dateRange);
-                const transactionsData = processDataForChart(transactionsResponse.data, dateRange);
-                const ordersData = processDataForChart(ordersResponse.data, dateRange);
+                const comicsData = processDataForChart(comicsResponse.data as DataItem[], dateRange);
+                const transactionsData = processDataForChart(transactionsResponse.data as DataItem[], dateRange);
+                const ordersData = processDataForChart(ordersResponse.data as DataItem[], dateRange);
 
                 setChartData({
                     labels: dateRange,
                     datasets: [
                         {
-                            label: 'Comics',
+                            label: 'Truyện',
                             data: comicsData,
                             borderColor: 'rgba(75, 192, 192, 1)',
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         },
                         {
-                            label: 'Transactions',
+                            label: 'Giao Dịch',
                             data: transactionsData,
                             borderColor: 'rgba(153, 102, 255, 1)',
                             backgroundColor: 'rgba(153, 102, 255, 0.2)',
                         },
                         {
-                            label: 'Orders',
+                            label: 'Đơn Hàng',
                             data: ordersData,
                             borderColor: 'rgba(255, 159, 64, 1)',
                             backgroundColor: 'rgba(255, 159, 64, 0.2)',
                         },
                     ],
                 });
-
-            } catch (err) {
+            } catch (err: any) {
                 setError(err.message);
                 console.error('Error fetching dashboard data:', err);
             } finally {
@@ -108,11 +145,14 @@ const Dashboard = () => {
         fetchData();
     }, [filter]);
 
-    const processDataForChart = (data, dateRange) => {
+    const processDataForChart = (data: DataItem[], dateRange: string[]) => {
         const counts = dateRange.map(() => 0);
         data.forEach(item => {
             const createdAt = new Date(item.createdAt).toLocaleDateString('vi-VN');
-            const dateStr = filter === 'year' ? new Date(item.createdAt).toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' }) : createdAt;
+            const dateStr =
+                filter === 'year'
+                    ? new Date(item.createdAt).toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' })
+                    : createdAt;
             const dayIndex = dateRange.indexOf(dateStr);
             if (dayIndex !== -1) {
                 counts[dayIndex]++;
@@ -197,7 +237,6 @@ const Dashboard = () => {
                 <Line data={chartData} options={{ plugins: { legend: { position: 'bottom' } } }} />
             </div>
         </div>
-
     );
 };
 

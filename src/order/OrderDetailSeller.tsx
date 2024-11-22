@@ -410,9 +410,9 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                                             border: '2px solid black',
                                         }}
                                     />
-                                    <InfoRow label="Họ tên" value={orderDetail.toName} />
-                                    <InfoRow label="Số điện thoại" value={orderDetail.toPhone} />
-                                    <InfoRow label="Địa chỉ" value={orderDetail.toAddress} />
+                                    <InfoRow label="Họ tên" value={orderDetail.delivery.to.name} />
+                                    <InfoRow label="Số điện thoại" value={orderDetail.delivery.to.phone} />
+                                    <InfoRow label="Địa chỉ" value={orderDetail.delivery.to.address} />
                                 </Box>
 
                                 <Divider orientation="vertical" flexItem />
@@ -469,7 +469,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                                                     <TableCell>{item.comics.title}</TableCell>
                                                     <TableCell>{item.comics.author || 'N/A'}</TableCell>
                                                     <TableCell>{item.comics.price.toLocaleString()} đ</TableCell>
-                                                    <TableCell>{item.comics.volumeType || 'N/A'}</TableCell>
+                                                    <TableCell>{item.comics.quantity > 1 ? "Bộ truyện" : "Tập truyện"}</TableCell>
                                                 </TableRow>
                                             ))
                                         ) : (

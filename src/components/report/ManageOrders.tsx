@@ -13,14 +13,34 @@ import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/mat
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import OrderDetailMod from './OrderDetailMod';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import { OrderDetailData } from '../../common/base.interface';
+
+interface Delivery {
+  deliveryTrackingCode: string;
+  from: { name: string };
+  to: { name: string };
+  deliveryStatus?: string;
+}
+
+interface Item {
+  id: number;
+  name: string;
+  quantity: number;
+  price: number;
+}
 
 interface Order {
-  id: number;
+  id: string;
   customerName: string;
   product: string;
   quantity: number;
   totalAmount: number;
   status: string;
+  delivery: Delivery;
+  items: Item[];
+  deliveryStatus: string;
+  totalPrice: number;
+  paymentMethod: string;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -41,7 +61,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const ManageOrders: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderDetailData[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -193,8 +213,6 @@ const ManageOrders: React.FC = () => {
           display: 'inline-block',
           fontFamily: "REM"
         };
-      default:
-        return "#000";
     }
   };
 

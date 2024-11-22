@@ -253,7 +253,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
               <div className="status-content-detail">
                 <StoreOutlinedIcon style={{ fontSize: 28 }} />
                 <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
-                  {order.items[0].comics.sellerId.name || "N/A"}
+                  {order.items[0]?.comics.sellerId.name || "N/A"}
                 </Typography>
                 <div style={{ marginLeft: "20px" }} className="chat-button">
                   <ChatOutlinedIcon />

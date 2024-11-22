@@ -15,7 +15,7 @@ interface ModalFeedbackSellerProps {
     sellerId: string;
     userId: string;
     orderId: string; // Thêm orderId để cập nhật trạng thái
-    onStatusUpdate: (orderId: number, newStatus: string) => void; // Callback để cập nhật trạng thái
+    onStatusUpdate: (orderId: string, newStatus: string) => void; // Callback để cập nhật trạng thái
 }
 
 const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose, sellerName, sellerId, userId, orderId, onStatusUpdate }) => {

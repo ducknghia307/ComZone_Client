@@ -42,6 +42,7 @@ import ModFeedbacks from "../../pages/ModFeedbacks";
 
 import AdminUsers from "../../pages/AdminUsers";
 import AdminDashboard from "../../pages/AdminDashboard";
+import AdminSubscription from "../../pages/AdminSubscription";
 import Exchange from "../../pages/Exchange";
 import ExchangeDetail from "../../pages/ExchangeDetail";
 
@@ -128,6 +129,7 @@ const AppRouter = () => {
 
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/subscription" element={<AdminSubscription />} />
       </Routes>
     </div>
   );

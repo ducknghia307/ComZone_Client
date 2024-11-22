@@ -5,13 +5,19 @@ import { privateAxios } from '../../middleware/axiosInstance';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ModalFeedback from '../modal/ModalFeedback';
 import { StarTwoTone } from '@ant-design/icons';
+interface Feedback {
+    createdAt: string;
+    comment: string;
+    rating: number;
+    attachedImages: string[]; // Assuming images are URLs
+}
 
 const FeedbackManagement = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [feedbacks, setFeedbacks] = useState([]);
+    const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [selectedFeedback, setSelectedFeedback] = useState(null);
+    const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
@@ -27,7 +33,7 @@ const FeedbackManagement = () => {
             });
     }, []);
 
-    const openModal = (feedback) => {
+    const openModal = (feedback: Feedback) => {
         setSelectedFeedback(feedback);
         setIsModalOpen(true);
     };

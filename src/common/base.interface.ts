@@ -11,7 +11,7 @@ export interface UserInfo {
   email: string;
   id: string;
   name: string;
-  phone: string | null;
+  phone: number;
   avatar: string;
   refresh_token: string;
   role: string | null;
@@ -21,6 +21,7 @@ export interface UserInfo {
   last_active?: Date | null;
   isActive: boolean;
   follower_count?: number;
+  address: string;
 }
 
 //address
@@ -81,9 +82,9 @@ export interface Auction {
   id: string;
   shopName: string;
   productName: string;
-  status: "UPCOMING" | "ONGOING" | "SUCCESSFUL" | "FAILED" | "COMPLETED";
+  status: string;
   imgUrl: string;
-  currentPrice?: number;
+  currentPrice: number;
   userBid?: number;
   finalPrice?: number;
   isWin?: boolean;
@@ -93,6 +94,10 @@ export interface Auction {
   endTime: string;
   comics: Comic;
   maxPrice: number;
+  winner?: {
+    id: string;
+    name: string;
+  };
 }
 
 //comic
@@ -117,7 +122,13 @@ export interface Comic {
   genres?: Genre[];
   sellerId: UserInfo;
   onSaleSince?: Date;
-  type: string;
+  comics: {
+    title: string;
+    genres: Genre[];
+    author: string;
+    condition: "SEALED" | "USED";
+    coverImage: string;
+  };
 }
 
 export interface OrderDetailData {
@@ -147,7 +158,7 @@ export interface OrderDetailData {
   };
   cancelReason: string;
   deliveryStatus: string;
-  items?: Array<{
+  items: Array<{
     comics: {
       coverImage: string;
       title: string;
@@ -156,6 +167,33 @@ export interface OrderDetailData {
       volumeType: string;
     };
   }>;
+  delivery: Delivery;
+}
+
+export interface Delivery {
+  createdAt: string;
+  deletedAt: string | null;
+  deliveryFee: number | null;
+  deliveryTrackingCode: string | null;
+  estimatedDeliveryTime: string | null;
+  from: {
+    id: string;
+    createdAt: string;
+    note: string | null;
+    status: string | null;
+    name: string;
+    phone: string;
+    address:string;
+  };
+  to: {
+    id: string;
+    createdAt: string;
+    note: string | null;
+    status: string | null;
+    name: string;
+    phone: string;
+    address:string;
+  };
 }
 
 export interface SellerDetails extends BaseInterface {

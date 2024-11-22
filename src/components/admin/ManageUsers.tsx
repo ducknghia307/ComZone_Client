@@ -13,26 +13,27 @@ import { Box, IconButton, InputAdornment, Menu, MenuItem, TextField, Typography 
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import BanUserModal from '../modal/BanUserModal';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 
 interface User {
   id: number;
   name: string;
   email: string;
   status: string;
+  role: string;
+  avatar: string;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#c66a7a', // Màu nền tiêu đề bảng
-    color: '#fff', // Màu chữ tiêu đề
+    backgroundColor: '#c66a7a',
+    color: '#fff',
     fontWeight: 'bold',
     fontFamily: 'REM',
     fontSize: '1rem',
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    color: '#000', // Màu chữ nội dung bảng
+    color: '#000',
     fontFamily: 'REM',
   },
 }));
@@ -43,9 +44,9 @@ const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  backgroundColor: '#fff', // Màu nền hàng
+  backgroundColor: '#fff',
   '&:nth-of-type(odd)': {
-    backgroundColor: '#ffe3d842', // Màu nền hàng xen kẽ
+    backgroundColor: '#ffe3d842',
   },
 }));
 
@@ -88,17 +89,28 @@ const ManageUsers: React.FC = () => {
     setOpenBanModal(true);
   };
 
-  const handleBanUser = (reason: string) => {
+  const handleBanUser = async (reason: string) => {
     if (selectedUserId !== null) {
-      console.log(`Banning user ID: ${selectedUserId} for reason: ${reason}`);
-      // Call API to ban the user with the reason
-      // privateAxios.post(`/users/${selectedUserId}/ban`, { reason });
+      try {
+        const response = await privateAxios.patch(`/users/${selectedUserId}/ban`, { reason });
+        if (response.status === 200) {
+          setUsers((prevUsers) =>
+            prevUsers.map((user) =>
+              user.id === selectedUserId ? { ...user, status: 'BANNED' } : user
+            )
+          );
+        }
+      } catch (error) {
+        console.error('Error banning user:', error);
+      } finally {
+        setOpenBanModal(false);
+      }
     }
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  // const handleMenuClose = () => {
+  //   setAnchorEl(null);
+  // };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -130,7 +142,7 @@ const ManageUsers: React.FC = () => {
         return { color: '#000', backgroundColor: '#fff', padding: '8px 20px', borderRadius: '8px', fontWeight: 'normal', fontSize: '14px' };
     }
   };
-  
+
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -211,7 +223,12 @@ const ManageUsers: React.FC = () => {
         </TableContainer>
         <StyledTablePagination
           rowsPerPageOptions={[5, 10, 15]}
-          component="div"
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
           count={users.length}
           rowsPerPage={rowsPerPage}
           page={page}

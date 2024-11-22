@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TablePagination, tableCellClasses } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TablePagination, tableCellClasses, Box, TextField, InputAdornment } from "@mui/material";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { styled } from "@mui/material/styles";
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 
 // Styled Components
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -35,7 +36,7 @@ const ManageWallet: React.FC = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -123,7 +124,23 @@ const ManageWallet: React.FC = () => {
   };
 
   return (
-    <div style={{ paddingBottom: "40px" }}>
+    <div style={{ paddingBottom: '40px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <TextField
+          variant="outlined"
+          placeholder="Tìm kiếm..."
+          size="small"
+          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlinedIcon sx={{ color: '#fff' }} />
+              </InputAdornment>
+            ),
+            style: { color: '#fff' },
+          }}
+        />
+      </Box>
       <Typography
         variant="h5"
         sx={{ marginBottom: "20px", fontWeight: "bold", fontFamily: "REM", color: "#71002b" }}
@@ -170,8 +187,13 @@ const ManageWallet: React.FC = () => {
           </Table>
         </TableContainer>
         <StyledTablePagination
-          rowsPerPageOptions={[10, 20]}
-          component="div"
+          rowsPerPageOptions={[5, 10, 15]}
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
           count={transactions.length}
           rowsPerPage={rowsPerPage}
           page={page}

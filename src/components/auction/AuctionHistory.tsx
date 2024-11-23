@@ -103,6 +103,15 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           fontWeight: "bold",
           display: "inline-block",
         };
+      case "COMPLETED":
+        return {
+          color: '#009688',
+          backgroundColor: '#e0f2f1',
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
     }
   };
 
@@ -148,7 +157,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
     navigate("/checkout");
   };
   const getAuctionResultColor = (isWin: boolean) => {
-    return isWin ? "#D6FFD8" : "red"; // Xanh lá cho win, xám cho lose
+    return isWin ? "#D6FFD8" : "rgb(255 173 201)"; // Xanh lá cho win, đỏ cho lose
   };
 
   const renderAuctionContent = () => {
@@ -162,8 +171,8 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
       selectedAuctionStatus === "all"
         ? auctions
         : auctions.filter(
-            (auction: Auction) => auction.status === selectedAuctionStatus
-          );
+          (auction: Auction) => auction.status === selectedAuctionStatus
+        );
 
     if (filteredAuctions.length === 0) {
       return <Typography>Không có dữ liệu đấu giá phù hợp.</Typography>;
@@ -174,6 +183,23 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
       const isWin =
         auction.status === "SUCCESSFUL" && auction.winner?.id === userId;
 
+      const statusText = isWin
+        ? "Đấu giá thành công"
+        : auction.status === "SUCCESSFUL"
+          ? "Đấu giá thất bại"
+          : translateStatus(auction.status);
+
+      const statusStyles = isWin
+        ? getStatusChipStyles("SUCCESSFUL")
+        : auction.status === "SUCCESSFUL"
+          ? getStatusChipStyles("FAILED")
+          : getStatusChipStyles(auction.status);
+
+      const borderColor =
+        auction.status === "COMPLETED"
+          ? "transparent" // No border for COMPLETED auctions
+          : getAuctionResultColor(isWin);
+
       return (
         <div
           key={auction.id}
@@ -183,10 +209,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
             marginBottom: "20px",
             padding: "16px",
             boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-            borderLeft:
-              isWin || auction.isWin === false
-                ? `5px solid ${getAuctionResultColor(isWin)}`
-                : "none",
+            borderLeft: `5px solid ${borderColor}`,
           }}
         >
           <div
@@ -206,9 +229,9 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
             </div>
 
             {/* Chip màu cho trạng thái đấu giá */}
-            <div style={getStatusChipStyles(auction.status)}>
+            <div style={statusStyles}>
               <Typography sx={{ fontSize: "16px", fontWeight: "bold" }}>
-                {translateStatus(auction.status)}
+                {statusText}
               </Typography>
             </div>
           </div>
@@ -303,7 +326,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
               </Button>
             )}
             {auction.status === "SUCCESSFUL" &&
-            auction.winner?.id === userId ? (
+              auction.winner?.id === userId ? (
               <div>
                 <Button
                   size="large"
@@ -321,13 +344,13 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                   <Typography>Thanh toán</Typography>
                 </Button>
               </div>
-            ) : auction.status === "SUCCESSFUL" ? (
-              <Typography
-                sx={{ fontSize: "20px", marginTop: "8px", color: "#E91E63" }}
-                variant="body2"
-              >
-                Đấu giá thất bại
-              </Typography>
+              // ) : auction.status === "SUCCESSFUL" ? (
+              //   <Typography
+              //     sx={{ fontSize: "20px", marginTop: "8px", color: "#E91E63" }}
+              //     variant="body2"
+              //   >
+              //     Đấu giá thất bại
+              //   </Typography>
             ) : null}
           </div>
         </div>
@@ -339,9 +362,8 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
     <div>
       <div className="status-auction-tabs">
         <span
-          className={`status-auction-tab ${
-            selectedAuctionStatus === "all" ? "active" : ""
-          }`}
+          className={`status-auction-tab ${selectedAuctionStatus === "all" ? "active" : ""
+            }`}
           onClick={() => setSelectedAuctionStatus("all")}
         >
           Tất cả
@@ -353,33 +375,29 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                     Sắp diễn ra
                 </span> */}
         <span
-          className={`status-auction-tab ${
-            selectedAuctionStatus === "PROCESSING" ? "active" : ""
-          }`}
+          className={`status-auction-tab ${selectedAuctionStatus === "PROCESSING" ? "active" : ""
+            }`}
           onClick={() => setSelectedAuctionStatus("PROCESSING")}
         >
           Đang xử lí
         </span>
         <span
-          className={`status-auction-tab ${
-            selectedAuctionStatus === "ONGOING" ? "active" : ""
-          }`}
+          className={`status-auction-tab ${selectedAuctionStatus === "ONGOING" ? "active" : ""
+            }`}
           onClick={() => setSelectedAuctionStatus("ONGOING")}
         >
           Đang diễn ra
         </span>
         <span
-          className={`status-auction-tab ${
-            selectedAuctionStatus === "SUCCESSFUL" ? "active" : ""
-          }`}
+          className={`status-auction-tab ${selectedAuctionStatus === "SUCCESSFUL" ? "active" : ""
+            }`}
           onClick={() => setSelectedAuctionStatus("SUCCESSFUL")}
         >
           Kết Thúc
         </span>
         <span
-          className={`status-auction-tab ${
-            selectedAuctionStatus === "FAILED" ? "active" : ""
-          }`}
+          className={`status-auction-tab ${selectedAuctionStatus === "FAILED" ? "active" : ""
+            }`}
           onClick={() => setSelectedAuctionStatus("FAILED")}
         >
           Bị Hủy

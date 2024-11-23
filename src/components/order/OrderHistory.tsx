@@ -7,11 +7,12 @@ import "../ui/OrderHistory.css";
 // import ModalOrder from "../modal/ModalOrder";
 import { privateAxios } from "../../middleware/axiosInstance";
 import OrderDetailsModal from "../modal/OrderDetailModal";
-import { Comic } from "../../common/base.interface";
+import { Comic, UserInfo } from "../../common/base.interface";
 import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
+import GavelIcon from '@mui/icons-material/Gavel';
 
 interface Order {
-  id: number;
+  id: string;
   status: string;
   shopName: string;
   productName: string;
@@ -20,6 +21,7 @@ interface Order {
   totalPrice: string;
   items: Item[];
   type: string;
+  user?: UserInfo;
 }
 interface Item {
   comics: Comic;
@@ -69,6 +71,43 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
 
     fetchOrdersWithItems();
   }, []);
+
+  const cornerRibbonStyle = {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    width: '120px', // giảm kích thước
+    height: '120px', // giảm kích thước
+    overflow: 'hidden',
+    zIndex: 1,
+  };
+
+  const ribbonContentStyle = {
+    position: 'absolute' as const,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '150px', // giảm độ rộng của text container
+    transform: 'rotate(-45deg)',
+    top: '20px', // điều chỉnh vị trí lên cao hơn
+    left: '-35px', // điều chỉnh vị trí sang trái
+    backgroundColor: '#f77157',
+    color: 'white',
+    padding: '4px 0', // giảm padding
+    fontFamily: 'REM',
+    fontSize: '12px', // giảm font size
+    fontWeight: 'bold',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+  };
+
+  const orderCardStyle = {
+    position: 'relative' as const,
+    marginBottom: '20px',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    overflow: 'hidden',
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -229,8 +268,9 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           "PACKAGING",
           "DELIVERING",
           "DELIVERED",
-          "COMPLETED",
+          "SUCCESSFUL",
           "CANCELED",
+          "FAILED"
         ].map((status) => (
           <span
             key={status}
@@ -263,13 +303,16 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           <div
             key={order.id}
             className="status-detail"
-            style={{
-              marginBottom: "20px",
-              backgroundColor: "#fff",
-              borderRadius: "8px",
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-            }}
+            style={orderCardStyle}
           >
+            {order.type === 'AUCTION' && (
+              <div style={cornerRibbonStyle}>
+                <div style={ribbonContentStyle}>
+                  <GavelIcon sx={{ fontSize: 16, marginRight: '4px' }} />
+                  Đấu giá
+                </div>
+              </div>
+            )}
             <div className="status-content" style={{ padding: "10px 30px" }}>
               <div className="status-content-detail">
                 <StoreOutlinedIcon style={{ fontSize: 28 }} />
@@ -457,7 +500,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                       handleOpenModal(
                         order.items[0].comics.sellerId.name || "N/A",
                         order.items[0].comics.sellerId.id,
-                        order.user.id,
+                        order.user?.id || "",
                         order.id.toString()
                       )
                     }
@@ -507,10 +550,10 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         <ModalFeedbackSeller
           open={openModal}
           onClose={handleCloseModal}
-          sellerName={selectedSellerName}
-          sellerId={selectedSellerId} // Truyền sellerId
-          userId={selectedUserId}
-          orderId={selectedOrderId} // Truyền orderId
+          sellerName={selectedSellerName || ""}
+          sellerId={selectedSellerId || ""}
+          userId={selectedUserId || ""}
+          orderId={selectedOrderId || ""} // Truyền orderId
           onStatusUpdate={handleStatusUpdate} // Truyền callback
         />
       </div>

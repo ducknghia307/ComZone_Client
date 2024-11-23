@@ -39,6 +39,26 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                 return {
                     color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '4px 12px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM", fontSize: '16px'
                 };
+            case "SUCCESSFUL":
+                return {
+                    color: "#4caf50",
+                    backgroundColor: "#e8f5e9",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                    fontFamily: "REM",
+                };
+            case "FAILED":
+                return {
+                    color: "#ffffff",
+                    backgroundColor: "#d32f2f",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                    fontFamily: "REM",
+                };
             default:
                 return {};
         }
@@ -52,12 +72,19 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
             case "DELIVERED": return "Đã giao thành công";
             case "COMPLETED": return "Hoàn tất";
             case "CANCELED": return "Bị hủy";
+            case "SUCCESSFUL":
+                return "Hoàn tất";
+            case "FAILED":
+                return "Thất bại";
             default: return "Tất cả";
         }
     };
 
-    const InfoRow = ({ label, value, isPaid }: { label: string; value: string | number; isPaid?: boolean; }) => {
+    const InfoRow = ({ label, value, paymentMethod }: { label: string; value: string | number; paymentMethod?: string; }) => {
         const theme = useTheme();
+
+        const paymentStatusColor =
+        paymentMethod === "WALLET" ? "#32CD32" : paymentMethod === "COD" ? "#ff9800" : "#000";
 
         return (
             <Box
@@ -86,9 +113,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                     variant="body1"
                     sx={{
                         paddingLeft: 2,
-                        color: isPaid !== undefined
-                            ? (isPaid ? '#32CD32' : '#ff9800')
-                            : '#000',
+                        color: paymentMethod ? paymentStatusColor : '#000',
                         whiteSpace: 'normal',
                         wordWrap: 'break-word',
                         fontFamily: "REM"
@@ -203,8 +228,10 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                                 <InfoRow label="Phương thức thanh toán" value={order.paymentMethod === 'WALLET' ? 'Ví Comzone' : order.paymentMethod} />
                                 <InfoRow
                                     label="Trạng thái thanh toán"
-                                    value={order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
-                                    isPaid={order.isPaid}
+                                    value={
+                                        order.paymentMethod === "WALLET" ? "Đã thanh toán" : "Chưa thanh toán"
+                                    }
+                                    paymentMethod={order.paymentMethod}
                                 />
                             </Box>
                         </Stack>

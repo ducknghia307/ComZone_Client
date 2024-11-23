@@ -151,11 +151,7 @@ export interface OrderDetailData {
   isPaid: boolean;
   status: string;
   note: string;
-  user: {
-    email: string;
-    name: string;
-    avatar: string;
-  };
+  user?: UserInfo;
   cancelReason: string;
   deliveryStatus: string;
   items: Array<{

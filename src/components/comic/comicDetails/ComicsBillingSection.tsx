@@ -28,7 +28,7 @@ export default function ComicsBillingSection({
         </div>
         <div className="w-full flex flex-col items-start justify-between">
           <p>Tạm tính:</p>
-          <p className="font-medium text-[3em] flex items-start gap-1">
+          <p className="font-semibold text-[2em] flex items-start gap-1">
             {currentComics?.price ? CurrencySplitter(currentComics?.price) : ""}
             <span className="font-light text-[0.5em] underline">đ</span>
           </p>

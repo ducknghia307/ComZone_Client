@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+import { useState } from "react";
 import ActionConfirm from "../../../../actionConfirm/ActionConfirm";
 import { privateAxios } from "../../../../../middleware/axiosInstance";
 import { notification } from "antd";
-import { useNavigate } from "react-router-dom";
 import { ExchangeDetails } from "../../../../../common/interfaces/exchange.interface";
 
-export default function ConfirmActionButton({
+export default function ConfirmDealsButton({
   exchangeDetail,
   fetchExchangeDetails,
 }: {
@@ -15,41 +15,39 @@ export default function ConfirmActionButton({
   const [isRejecting, setIsRejecting] = useState<boolean>(false);
   const [isAccepting, setIsAccepting] = useState<boolean>(false);
 
-  const navigate = useNavigate();
-
   const handleConfirm = async (type: "accept" | "reject") => {
     try {
       if (type === "accept") {
-        const resDealing = await privateAxios.post(
-          "exchange-confirmation/dealing",
-          {
-            exchangeId: exchangeDetail.exchange.id,
-            compensationAmount: exchangeDetail.exchange.compensationAmount,
-            depositAmount: exchangeDetail.exchange.depositAmount,
-          }
-        );
-        console.log(resDealing);
+        await privateAxios.post("exchange-confirmation/dealing", {
+          exchangeId: exchangeDetail.exchange.id,
+          compensationAmount: exchangeDetail.exchange.compensationAmount,
+          depositAmount: exchangeDetail.exchange.depositAmount,
+        });
 
         notification.success({
           message: "Thành công",
           description: "Mức tiền đã được chấp nhận thành công.",
+          duration: 5,
         });
-        fetchExchangeDetails();
       } else if (type === "reject") {
         await privateAxios.patch(
           `exchange-confirmation/reject/deals/${exchangeDetail.exchange.id}`
         );
 
-        notification.warning({
+        notification.info({
           message: "Đã từ chối",
           description: `Mức tiền đã bị từ chối.\nBạn có thể thử giao tiếp với nhau để thống nhất được mức tiền vừa ý cho cả hai bên.`,
+          duration: 8,
         });
       }
     } catch (error) {
       notification.error({
         message: "Lỗi",
         description: "Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại.",
+        duration: 5,
       });
+    } finally {
+      fetchExchangeDetails();
     }
   };
 
@@ -77,7 +75,7 @@ export default function ConfirmActionButton({
 
       <button
         onClick={() => setIsAccepting(true)}
-        className="grow py-2 rounded-lg bg-green-600  text-white hover:opacity-80 duration-200"
+        className="grow py-2 rounded-lg bg-green-700 text-white hover:bg-green-900 duration-200"
       >
         Chấp nhận mức tiền
       </button>

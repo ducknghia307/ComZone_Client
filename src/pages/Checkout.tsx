@@ -8,9 +8,9 @@ import {
   SellerDetails,
   UserInfo,
 } from "../common/base.interface";
-import { privateAxios } from "../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../middleware/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
-import { Modal } from "antd";
+import { Modal, notification } from "antd";
 import TotalSummary from "../components/checkout/TotalSummary";
 import Loading from "../components/loading/Loading";
 import socket from "../services/socket";
@@ -58,6 +58,8 @@ const Checkout = () => {
     []
   );
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [isInvalidOrder, setIsInvalidOrder] = useState<boolean>(false);
+
   const navigate = useNavigate();
   const [modal, contextHolder] = Modal.useModal();
 
@@ -109,15 +111,15 @@ const Checkout = () => {
       setDeliveryDetails([]);
       setSellerDetailsGroup([]);
       setTotalDeliveryPrice(0);
+      setIsInvalidOrder(false);
 
       await Promise.all(
         Object.keys(groupedSelectedComics).map(async (sellerId) => {
-          const sellerDetails = await privateAxios.get(
-            `/seller-details/user/${sellerId}`
+          const sellerDetails = await publicAxios.get(
+            `seller-details/user/${sellerId}`
           );
 
           setSellerDetailsGroup((prev) => [...prev, sellerDetails.data]);
-          console.log("1", groupedSelectedComics[sellerId].comics);
 
           const sellerAddress = {
             district: sellerDetails.data.district.id,
@@ -144,7 +146,17 @@ const Checkout = () => {
                   (prev) => prev + newDeliveryDetails.deliveryFee
                 );
               })
-              .catch((err) => console.log(err));
+              .catch((err) => {
+                console.log(err);
+                notification.error({
+                  key: "invalid-address",
+                  message: "Địa chỉ không phù hợp!",
+                  description:
+                    "Thông tin địa chỉ không hợp lệ hoặc ngoài vùng giao hàng của chúng tôi! Vui lòng sử dụng địa chỉ nhận hàng khác!",
+                  duration: 10,
+                });
+                setIsInvalidOrder(true);
+              });
         })
       )
         .catch((err) => console.log(err))
@@ -194,7 +206,7 @@ const Checkout = () => {
 
         const sellerTotalPrice = sellerGroup.comics.reduce(
           (total, { comic, currentPrice }) => {
-            const price = currentPrice || comic?.price; // Use currentPrice if available, otherwise fallback to regular price
+            const price = currentPrice || comic?.price;
             return total + Number(price);
           },
           0
@@ -319,9 +331,7 @@ const Checkout = () => {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    console.log("a", selectedAddress);
-  }, [selectedAddress]);
+
   return (
     <>
       {isLoading && <Loading />}
@@ -341,9 +351,8 @@ const Checkout = () => {
                 deliveryDetails={deliveryDetails}
                 notes={notes}
                 setNotes={setNotes}
-                // totalPrice={totalPrice}
-                // totalQuantity={totalQuantity}
               />
+
               {/* <DeliveryMethod /> */}
               <PaymentMethod
                 onMethodSelect={handlePaymentMethodSelect}
@@ -359,6 +368,7 @@ const Checkout = () => {
                 handleSubmit={handleSubmit}
                 navigate={navigate}
                 isConfirmDisabled={
+                  isInvalidOrder ||
                   !selectedAddress ||
                   (selectedPaymentMethod === "wallet" &&
                     userWalletBalance < totalPrice + totalDeliveryPrice)

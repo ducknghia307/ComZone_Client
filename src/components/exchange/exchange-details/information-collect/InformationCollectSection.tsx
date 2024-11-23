@@ -7,6 +7,7 @@ import PlaceDeposit from "./PlaceDeposit";
 import DeliveryProcessInfo from "./DeliveryProcessInfo";
 import SuccessfulExchange from "./SuccessfulExchange";
 import { Address } from "../../../../common/base.interface";
+import DealsInformation from "./DealsInformation";
 
 export default function InformationCollectSection({
   exchangeDetails,
@@ -33,19 +34,24 @@ export default function InformationCollectSection({
   fetchUserAddress: () => void;
   firstAddress: string;
   secondAddress: string;
-  setIsLoading: (param: boolean) => void;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const self = exchangeDetails.isRequestUser
+    ? exchangeDetails.exchange.requestUser
+    : exchangeDetails.exchange.post.user;
+
   const theOther = exchangeDetails.isRequestUser
     ? exchangeDetails.exchange.post.user
     : exchangeDetails.exchange.requestUser;
 
   const caughtProgress = firstCurrentStage <= secondCurrentStage;
-  const firstUserName = exchangeDetails.isRequestUser
-    ? exchangeDetails.exchange.requestUser.name
-    : exchangeDetails.exchange.post.user.name;
-  const secondUserName = !exchangeDetails.isRequestUser
-    ? exchangeDetails.exchange.requestUser.name
-    : exchangeDetails.exchange.post.user.name;
+  const firstUser = exchangeDetails.isRequestUser
+    ? exchangeDetails.exchange.requestUser
+    : exchangeDetails.exchange.post.user;
+
+  const secondUser = !exchangeDetails.isRequestUser
+    ? exchangeDetails.exchange.requestUser
+    : exchangeDetails.exchange.post.user;
   const getTitle = () => {
     switch (firstCurrentStage) {
       case 0:
@@ -136,7 +142,7 @@ export default function InformationCollectSection({
       <div className="flex items-start justify-between gap-16">
         <div className="basis-2/3">
           <p className="text-lg font-semibold uppercase">{getTitle()?.title}</p>
-          <div className="text-xs font-light italic">
+          <div className="text-md font-light italic">
             {getTitle()?.subTitle}
           </div>
         </div>
@@ -172,12 +178,20 @@ export default function InformationCollectSection({
 
       {caughtProgress &&
         firstCurrentStage === 1 &&
-        exchangeDetails.isRequestUser && (
+        (exchangeDetails.isRequestUser ? (
           <SubmitAmounts
             exchangeId={exchangeDetails.exchange.id}
+            self={self}
+            theOther={theOther}
             fetchExchangeDetails={fetchExchangeDetails}
           />
-        )}
+        ) : (
+          <DealsInformation
+            exchangeDetails={exchangeDetails}
+            self={self}
+            theOther={theOther}
+          />
+        ))}
 
       {caughtProgress && firstCurrentStage === 2 && (
         <SubmitDeliveryInfo
@@ -188,21 +202,23 @@ export default function InformationCollectSection({
           fetchUserAddress={fetchUserAddress}
         />
       )}
+
       {caughtProgress && firstCurrentStage === 3 && (
         <PlaceDeposit
           exchangeDetails={exchangeDetails}
           firstAddress={firstAddress}
           secondAddress={secondAddress}
-          firstUserName={firstUserName}
-          secondUserName={secondUserName}
+          firstUser={firstUser}
+          secondUser={secondUser}
           fetchExchangeDetails={fetchExchangeDetails}
+          setIsLoading={setIsLoading}
         />
       )}
       {caughtProgress && firstCurrentStage === 4 && (
         <DeliveryProcessInfo
           exchangeDetails={exchangeDetails}
-          firstUserName={firstUserName}
-          secondUserName={secondUserName}
+          firstUser={firstUser}
+          secondUser={secondUser}
           firstAddress={firstAddress}
           secondAddress={secondAddress}
           fetchExchangeDetails={fetchExchangeDetails}

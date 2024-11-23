@@ -75,7 +75,7 @@ export default function ConfirmDealsButton({
 
       <button
         onClick={() => setIsAccepting(true)}
-        className="grow py-2 rounded-lg bg-green-600  text-white hover:opacity-80 duration-200"
+        className="grow py-2 rounded-lg bg-green-700 text-white hover:bg-green-900 duration-200"
       >
         Chấp nhận mức tiền
       </button>

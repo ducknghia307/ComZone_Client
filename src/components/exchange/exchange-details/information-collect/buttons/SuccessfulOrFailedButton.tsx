@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { useState } from "react";
 import ActionConfirm from "../../../../actionConfirm/ActionConfirm";
 import { privateAxios } from "../../../../../middleware/axiosInstance";
 import { notification } from "antd";
-import { useNavigate } from "react-router-dom";
 
 export default function SuccessfulOrFailedButton({
   exchangeId,
@@ -29,7 +29,9 @@ export default function SuccessfulOrFailedButton({
       .catch((err) => console.log(err));
   };
 
-  const handleConfirmFailed = async () => {};
+  const handleConfirmFailed = async () => {
+    await privateAxios.patch(`exchange-confirmation/delivery/${exchangeId}`);
+  };
 
   return (
     <div className="flex items-stretch gap-2">

@@ -26,7 +26,7 @@ export default function ConfirmDeliveryButton({
       const resDeliveryInformation = await privateAxios.post(
         "/delivery-information",
         {
-          name: selectedAddress?.fullAddress,
+          name: selectedAddress?.fullName,
           phone: selectedAddress?.phone,
           provinceId: selectedAddress?.province.id,
           districtId: selectedAddress?.district.id,

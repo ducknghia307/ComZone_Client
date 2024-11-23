@@ -9,13 +9,11 @@ export default function ActionButtons({
   exchangeDetails,
   currentStage,
   oppositeCurrentStage,
-  anotherStage,
   fetchExchangeDetails,
   selectedAddress,
 }: {
   exchangeDetails: ExchangeDetails;
   currentStage: number;
-  anotherStage: number;
   oppositeCurrentStage: number;
   fetchExchangeDetails: Function;
   selectedAddress: Address | null;
@@ -43,14 +41,14 @@ export default function ActionButtons({
         ))}
 
       {currentStage === 1 &&
-        anotherStage === 1 &&
+        oppositeCurrentStage === 1 &&
         (exchangeDetails.isRequestUser ? null : (
           <button className="w-full py-2 rounded-lg border border-gray-500 font-light cursor-default">
             Đang chờ người yêu cầu trao đổi xác nhận...
           </button>
         ))}
       {currentStage === 1 &&
-        anotherStage === 2 &&
+        oppositeCurrentStage === 2 &&
         (!exchangeDetails.isRequestUser ? (
           <ConfirmDealsButton
             exchangeDetail={exchangeDetails}

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
@@ -6,7 +7,6 @@ import {
   ExchangeDetails,
 } from "../common/interfaces/exchange.interface";
 import InformationCollectSection from "../components/exchange/exchange-details/information-collect/InformationCollectSection";
-import { useAppSelector } from "../redux/hooks";
 import ActionButtons from "../components/exchange/exchange-details/information-collect/ActionButtons";
 import ProgressSection from "../components/exchange/exchange-details/progress/ProgressSection";
 import Loading from "../components/loading/Loading";
@@ -16,7 +16,6 @@ import { Delivery } from "../common/interfaces/delivery.interface";
 
 const ExchangeDetail: React.FC = () => {
   const { id } = useParams();
-  const { userId } = useAppSelector((state) => state.auth);
 
   const [exchangeData, setExchangeData] = useState<ExchangeDetails>();
 
@@ -109,7 +108,6 @@ const ExchangeDetail: React.FC = () => {
         `deliveries/exchange/${exchangeDetails.exchange.id}`
       );
       const deliveries: Delivery[] = deliveriesResponse.data;
-      console.log("bbbbbbb", deliveries);
 
       if (deliveries.length > 0) {
         const firstUserDelivery = deliveries.find(
@@ -188,8 +186,8 @@ const ExchangeDetail: React.FC = () => {
 
       setSelectedAddress(sortedAddresses[0] || null);
       setAddresses(sortedAddresses);
-    } catch {
-      console.log("...");
+    } catch (err) {
+      console.log(err);
     }
   };
   useEffect(() => {
@@ -199,15 +197,11 @@ const ExchangeDetail: React.FC = () => {
     }
   }, [id]);
 
-  if (!exchangeData || isLoading)
-    return (
-      <div className="h-[80vh]">
-        <Loading />
-      </div>
-    );
+  if (!exchangeData) return;
 
   return (
     <div className="REM min-h-[80vh] w-full flex items-stretch justify-between gap-4 px-4 py-4">
+      {isLoading && <Loading />}
       <div className="grow flex flex-col items-stretch justify-start gap-4 px-4 border-r border-gray-300">
         <InformationCollectSection
           exchangeDetails={exchangeData}
@@ -227,7 +221,6 @@ const ExchangeDetail: React.FC = () => {
         <ActionButtons
           exchangeDetails={exchangeData}
           currentStage={firstCurrentStage}
-          anotherStage={secondCurrentStage}
           oppositeCurrentStage={secondCurrentStage}
           fetchExchangeDetails={fetchExchangeDetails}
           selectedAddress={selectedAddress}

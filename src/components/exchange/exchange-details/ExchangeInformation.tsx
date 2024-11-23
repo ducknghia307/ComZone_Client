@@ -1,12 +1,11 @@
-import React from "react";
 import { ExchangeDetails } from "../../../common/interfaces/exchange.interface";
 import { Comic, UserInfo } from "../../../common/base.interface";
 import CurrencySplitter from "../../../assistants/Spliter";
+import DeliveryProgression from "./progress/DeliveryProgression";
 
 export default function ExchangeInformation({
   exchangeDetails,
   firstUser,
-  secondUser,
   firstComicsGroup,
   secondComicsGroup,
 }: {
@@ -25,42 +24,46 @@ export default function ExchangeInformation({
 
         <div className="flex items-center justify-between text-sm font-light">
           <p>Tổng số truyện của bạn:</p>
-          <p className="font-semibold">{secondComicsGroup?.length}</p>
+          <p className="font-semibold">{firstComicsGroup?.length}</p>
         </div>
         <div className="flex items-center justify-between text-sm font-light">
           <p>Tổng số truyện bạn có sau trao đổi:</p>
           <p className="font-semibold">{secondComicsGroup?.length}</p>
         </div>
 
-        <div className="flex items-center justify-between text-sm font-light mt-4">
-          <p>Giá trị tiền cọc:</p>
-          <p className="font-semibold">
-            {CurrencySplitter(exchangeDetails.exchange.depositAmount || 0)} đ
-          </p>
-        </div>
-        <div className="flex items-center justify-between text-sm font-light">
-          <p>Giá trị tiền bù:</p>
-          <p
-            className={`${
-              exchangeDetails.exchange.compensationAmount &&
-              exchangeDetails.exchange.compensationAmount > 0 &&
-              (exchangeDetails.isRequestUser
-                ? "text-green-600"
-                : "text-red-600")
-            } font-semibold`}
-          >
-            {exchangeDetails.exchange.compensationAmount &&
-              exchangeDetails.exchange.compensationAmount > 0 &&
-              (exchangeDetails.isRequestUser ? "+ " : "- ")}
-            {CurrencySplitter(exchangeDetails.exchange.compensationAmount || 0)}{" "}
-            đ
-          </p>
-        </div>
+        {exchangeDetails.exchange.depositAmount && (
+          <div className="flex items-center justify-between text-sm font-light mt-4">
+            <p>Giá trị tiền cọc:</p>
+            <p className="font-semibold">
+              {CurrencySplitter(exchangeDetails.exchange.depositAmount || 0)} đ
+            </p>
+          </div>
+        )}
+
+        {exchangeDetails.exchange.compensationAmount && (
+          <div className="flex items-center justify-between text-sm font-light">
+            <p>Giá trị tiền bù:</p>
+            <p
+              className={`${
+                exchangeDetails.exchange.compensateUser?.id === firstUser?.id
+                  ? "text-red-600"
+                  : "text-green-600"
+              } font-semibold`}
+            >
+              {exchangeDetails.exchange.compensationAmount &&
+                exchangeDetails.exchange.compensationAmount > 0 &&
+                (exchangeDetails.isRequestUser ? "+ " : "- ")}
+              {CurrencySplitter(exchangeDetails.exchange.compensationAmount)} đ
+            </p>
+          </div>
+        )}
       </div>
 
-      {exchangeDetails.exchange.status === "DELIVERING" && (
-        <div>
+      {(exchangeDetails.exchange.status === "DELIVERING" ||
+        exchangeDetails.exchange.status === "DELIVERED") && (
+        <div className="flex flex-col gap-8">
           <p className="text-lg font-semibold uppercase">THÔNG TIN GIAO HÀNG</p>
+          
         </div>
       )}
 

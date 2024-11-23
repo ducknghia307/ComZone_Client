@@ -83,7 +83,7 @@ export default function PlaceDeposit({
   return (
     <div className="w-ful flex flex-row gap-5 REM px-10">
       <div className="w-1/2 flex flex-col gap-4 mr-2 border-r pr-2">
-        <h2 className="text-lg font-bold">Địa chỉ </h2>
+        <h2 className="text-xl font-semibold">Địa chỉ </h2>
         <div className="w-full flex flex-col gap-2">
           <div className="flex flex-row gap-2 items-center">
             <svg
@@ -110,14 +110,15 @@ export default function PlaceDeposit({
                 ></path>{" "}
               </g>
             </svg>
-            <h2 className="text-base font-bold">Người gửi:</h2>
+            <h2 className="text-base font-semibold">Người gửi:</h2>
           </div>
-          <div className="mt-2 flex flex-col gap-2">
+          <div className="mt-2 flex flex-col gap-2 font-light">
             <p>
-              Tên người gửi: <span>{firstUser.name}</span>
+              Tên người gửi:{" "}
+              <span className="font-medium">{firstUser.name}</span>
             </p>
             <h2>
-              Địa chỉ: <span>{firstAddress}</span>
+              Địa chỉ: <span className="font-medium">{firstAddress}</span>
             </h2>
           </div>
         </div>
@@ -145,14 +146,15 @@ export default function PlaceDeposit({
                 </g>{" "}
               </g>
             </svg>
-            <h2 className="text-base font-bold">Người nhận:</h2>
+            <h2 className="text-base font-semibold">Người nhận:</h2>
           </div>
-          <div className="mt-2 flex flex-col gap-2">
+          <div className="mt-2 flex flex-col gap-2 font-light">
             <p>
-              Tên người nhận: <span>{secondUser.name}</span>
+              Tên người nhận:{" "}
+              <span className="font-medium">{secondUser.name}</span>
             </p>
             <h2>
-              Địa chỉ: <span>{secondAddress}</span>
+              Địa chỉ: <span className="font-medium">{secondAddress}</span>
             </h2>
           </div>
         </div>

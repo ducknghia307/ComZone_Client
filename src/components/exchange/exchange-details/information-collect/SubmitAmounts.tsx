@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Avatar, Checkbox, message } from "antd";
 import { useState } from "react";
 import CurrencySplitter from "../../../../assistants/Spliter";
@@ -43,7 +44,7 @@ export default function SubmitAmounts({
     <div className="w-full flex flex-col items-stretch">
       <div className="flex items-start gap-8">
         <div className="basis-1/2 flex flex-col gap-4">
-          <div className="">
+          <div>
             <p className="text-sm font-semibold">Mức tiền cọc:</p>
 
             <div className="relative">
@@ -159,7 +160,7 @@ export default function SubmitAmounts({
           </div>
         </div>
 
-        <div className="font-light text-sm text-red-600 my-4">
+        <div className="basis-1/3 grow font-light text-sm text-red-600">
           <p className="font-semibold pb-2">Lưu ý:</p>
           <ul className="list-disc px-8">
             <li>
@@ -232,13 +233,14 @@ export default function SubmitAmounts({
       <ActionConfirm
         isOpen={isConfirming}
         setIsOpen={setIsConfirming}
-        title="Xác nhận toàn bộ thông tin?"
+        title="Xác nhận mức tiền?"
         description={
           <p className="text-xs">
-            Bạn đã chắn chắn với những thông tin trên?
+            Bạn đã chắn chắn muốn gửi yêu cầu mức tiền như trên?
             <br />
             <span className="text-red-600">
-              Lưu ý: Sau khi hoàn tất, số tiền cọc không thể được thay đổi.
+              Lưu ý: Sau khi hoàn tất, các mức tiền đã được đưa ra sẽ không thể
+              thay đổi.
             </span>
           </p>
         }

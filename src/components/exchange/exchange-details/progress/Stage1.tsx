@@ -10,7 +10,7 @@ export default function Stage1({
   const stage = 1;
 
   return (
-    <div className="relative flex items-center pb-1">
+    <div className="relative flex flex-col items-center gap-2 pb-1">
       <Avatar.Group
         shape="square"
         size={40}
@@ -37,7 +37,7 @@ export default function Stage1({
       )}
 
       <p
-        className={`absolute bottom-[-50%] left-1/2 translate-x-[-50%] text-[0.7em] whitespace-nowrap ${
+        className={`text-[0.7em] whitespace-nowrap ${
           currentStage >= stage && "opacity-50"
         }`}
       >

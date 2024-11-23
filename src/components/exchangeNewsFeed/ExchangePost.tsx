@@ -92,7 +92,7 @@ export default function ExchangePost({
               <p className="font-light text-[0.7em] tracking-wider">
                 {checkTimeDisplay ? (
                   <span>
-                    {dateFormat(post.createdAt, "dd/mm/yy")} &#8226;{" "}
+                    {dateFormat(post.createdAt, "dd/mm/yyyy")} &#8226;{" "}
                     {dateFormat(post.createdAt, "HH:MM")}
                   </span>
                 ) : (

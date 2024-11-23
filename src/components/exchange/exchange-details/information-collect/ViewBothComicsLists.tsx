@@ -115,7 +115,11 @@ export default function ViewBothComicsLists({
         footer={null}
       >
         <div className="flex items-start">
-          <Image src={currentComics?.coverImage} className="rounded-lg" />
+          <Image
+            src={currentComics?.coverImage}
+            className="rounded-lg"
+            width={600}
+          />
 
           <div className="w-full flex flex-col items-stretch justify-start gap-2 text-center px-4">
             <p className="text-lg font-semibold uppercase">

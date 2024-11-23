@@ -205,6 +205,7 @@ export default function ComicsDetailTemp() {
                   setCurrentImage={setCurrentImage}
                   imageList={imageList}
                 />
+
                 <div className="grow min-w-[20em] flex flex-col gap-2">
                   <ComicsMainInfo currentComics={currentComics} />
                   <ComZonePros />

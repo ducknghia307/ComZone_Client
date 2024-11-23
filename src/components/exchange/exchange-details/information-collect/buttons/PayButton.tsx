@@ -86,6 +86,7 @@ export default function PayButton({
         open={isConfirming}
         onCancel={(e) => {
           e.stopPropagation();
+          setChecked(false);
           setIsConfirming(false);
         }}
         centered

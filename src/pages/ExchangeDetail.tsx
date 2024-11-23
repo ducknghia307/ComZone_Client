@@ -71,8 +71,16 @@ const ExchangeDetail: React.FC = () => {
           ? exchangeDetails?.exchange.post.user
           : exchangeDetails?.exchange.requestUser
         : null;
+
       //FETCH STAGE 0
       if (exchangeDetails.exchange.status === "PENDING") return;
+
+      //FETCH STAGE 6
+      if (exchangeDetails.exchange.status === "SUCCESSFUL") {
+        setFirstCurrentStage(6);
+        setSecondCurrentStage(6);
+        return;
+      }
 
       //FETCH STAGE 1
       if (exchangeDetails.exchange.status === "DEALING") {
@@ -119,8 +127,8 @@ const ExchangeDetail: React.FC = () => {
           setFirstCurrentStage(3);
           setFirstAddress(
             deliveries[0].from.user.id === first?.id
-              ? deliveries[0].from.name
-              : deliveries[0].to.name
+              ? deliveries[0].from.fullAddress!
+              : deliveries[0].to.fullAddress!
           );
         }
 
@@ -133,8 +141,8 @@ const ExchangeDetail: React.FC = () => {
           setSecondCurrentStage(3);
           setSecondAddress(
             deliveries[0].from.user.id === second?.id
-              ? deliveries[0].from.name
-              : deliveries[0].to.name
+              ? deliveries[0].from.fullAddress!
+              : deliveries[0].to.fullAddress!
           );
         }
       }
@@ -159,12 +167,6 @@ const ExchangeDetail: React.FC = () => {
         if (secondConfirmation.deliveryConfirm) {
           setSecondCurrentStage(5);
         }
-      }
-
-      //FETCH STAGE 6
-      if (exchangeDetails?.exchange.status === "SUCCESSFUL") {
-        setFirstCurrentStage(6);
-        setSecondCurrentStage(6);
       }
     } catch (error) {
       console.error("Error fetching exchange details:", error);
@@ -200,9 +202,9 @@ const ExchangeDetail: React.FC = () => {
   if (!exchangeData) return;
 
   return (
-    <div className="REM min-h-[80vh] w-full flex items-stretch justify-between gap-4 px-4 py-4">
+    <div className="REM min-h-[80vh] w-full flex justify-center gap-4 px-4 py-4">
       {isLoading && <Loading />}
-      <div className="grow flex flex-col items-stretch justify-start gap-4 px-4 border-r border-gray-300">
+      <div className="basis-2/3 flex flex-col items-stretch justify-start gap-4 px-4 border-r border-gray-300">
         <InformationCollectSection
           exchangeDetails={exchangeData}
           firstCurrentStage={firstCurrentStage}
@@ -226,6 +228,21 @@ const ExchangeDetail: React.FC = () => {
           selectedAddress={selectedAddress}
         />
 
+        <ExchangeInformation
+          exchangeDetails={exchangeData}
+          firstCurrentStage={firstCurrentStage}
+          secondCurrentStage={secondCurrentStage}
+          firstUser={firstUser}
+          secondUser={secondUser}
+          firstComicsGroup={firstComicsGroup?.map((item) => item.comics) || []}
+          secondComicsGroup={
+            secondComicsGroup?.map((item) => item.comics) || []
+          }
+          setIsLoading={setIsLoading}
+        />
+      </div>
+
+      <div className="basis-1/3 min-w-fit">
         <ProgressSection
           exchangeDetails={exchangeData}
           firstUser={firstUser || undefined}
@@ -234,18 +251,6 @@ const ExchangeDetail: React.FC = () => {
           secondUser={secondUser || undefined}
           secondComicsGroup={secondComicsGroup || []}
           secondCurrentStage={secondCurrentStage}
-        />
-      </div>
-
-      <div className="basis-1/3">
-        <ExchangeInformation
-          exchangeDetails={exchangeData}
-          firstUser={firstUser}
-          secondUser={secondUser}
-          firstComicsGroup={firstComicsGroup?.map((item) => item.comics) || []}
-          secondComicsGroup={
-            secondComicsGroup?.map((item) => item.comics) || []
-          }
         />
       </div>
     </div>

@@ -9,6 +9,7 @@ export interface DeliveryInformation extends BaseInterface {
   districtId: number;
   wardId: string;
   address: string;
+  fullAddress?: string;
 }
 export interface Delivery extends BaseInterface {
   exchange: Exchange;

@@ -1,11 +1,10 @@
-export default function Stage2({
+export default function Stage5({
   currentStage,
-  rotate,
 }: {
   currentStage: number;
   rotate?: boolean;
 }) {
-  const stage = 3;
+  const stage = 6;
 
   return (
     <div
@@ -21,7 +20,7 @@ export default function Stage2({
         fill="currentColor"
         className={`${currentStage >= stage && "opacity-20"}`}
       >
-        <path d="M17 2V4H20.0066C20.5552 4 21 4.44495 21 4.9934V21.0066C21 21.5552 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5551 3 21.0066V4.9934C3 4.44476 3.44495 4 3.9934 4H7V2H17ZM7 6H5V20H19V6H17V8H7V6ZM9 16V18H7V16H9ZM9 13V15H7V13H9ZM9 10V12H7V10H9ZM15 4H9V6H15V4Z"></path>
+        <path d="M11.602 13.7599L13.014 15.1719L21.4795 6.7063L22.8938 8.12051L13.014 18.0003L6.65 11.6363L8.06421 10.2221L10.189 12.3469L11.6025 13.7594L11.602 13.7599ZM11.6037 10.9322L16.5563 5.97949L17.9666 7.38977L13.014 12.3424L11.6037 10.9322ZM8.77698 16.5873L7.36396 18.0003L1 11.6363L2.41421 10.2221L3.82723 11.6352L3.82604 11.6363L8.77698 16.5873Z"></path>
       </svg>
 
       {currentStage >= stage && (
@@ -43,7 +42,7 @@ export default function Stage2({
           currentStage >= stage && "opacity-50"
         }`}
       >
-        Thông tin giao hàng
+        Hoàn tất
       </p>
     </div>
   );

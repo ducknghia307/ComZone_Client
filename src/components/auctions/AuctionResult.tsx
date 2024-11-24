@@ -28,7 +28,7 @@ export const AuctionResult = ({
           lineHeight: "50px",
           textAlign: "center",
           transform: "translateX(100%)",
-          animation: "scroll-left 20s linear infinite",
+          animation: "scroll-left 15s linear infinite",
           fontSize: "18px",
           fontWeight: "500",
           fontFamily: "REM",

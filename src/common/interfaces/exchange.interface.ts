@@ -14,6 +14,7 @@ export interface Exchange extends BaseInterface {
     | "CANCELED"
     | "REJECTED";
   depositAmount?: number;
+  compensateUser?: UserInfo;
   compensationAmount?: number;
 }
 

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { useEffect, useState } from "react";
 import CurrencySplitter from "../../../../assistants/Spliter";
 import { ExchangeDetails } from "../../../../common/interfaces/exchange.interface";
@@ -5,6 +7,7 @@ import { privateAxios } from "../../../../middleware/axiosInstance";
 import { Delivery } from "../../../../common/interfaces/delivery.interface";
 import moment from "moment/min/moment-with-locales";
 import PayButton from "./buttons/PayButton";
+import { UserInfo } from "../../../../common/base.interface";
 
 moment.locale("vi");
 
@@ -12,16 +15,18 @@ export default function PlaceDeposit({
   exchangeDetails,
   firstAddress,
   secondAddress,
-  firstUserName,
-  secondUserName,
+  firstUser,
+  secondUser,
   fetchExchangeDetails,
+  setIsLoading,
 }: {
   exchangeDetails: ExchangeDetails;
   firstAddress: string;
   secondAddress: string;
-  firstUserName: string;
-  secondUserName: string;
+  firstUser: UserInfo;
+  secondUser: UserInfo;
   fetchExchangeDetails: Function;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [deliveryDetails, setDeliveryDetails] = useState<{
     fee: number;
@@ -32,6 +37,8 @@ export default function PlaceDeposit({
   const exchange = exchangeDetails.exchange;
 
   const fetchDeliveryFeeAndDeliveryTime = async () => {
+    setIsLoading(true);
+
     await privateAxios
       .get(`deliveries/exchange/from-user/${exchange.id}`)
       .then(async (res) => {
@@ -47,12 +54,18 @@ export default function PlaceDeposit({
             setTotal(
               exchange.depositAmount! +
                 res.data.deliveryFee +
-                (exchangeDetails.isRequestUser
-                  ? 0
-                  : exchange.compensationAmount)
+                (exchangeDetails.exchange.compensateUser &&
+                exchangeDetails.exchange.compensateUser.id === firstUser.id
+                  ? exchange.compensationAmount
+                  : 0)
             );
           })
-          .catch((err) => console.log(err));
+          .catch((err) => console.log(err))
+          .finally(() => setIsLoading(false));
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsLoading(false);
       });
   };
 
@@ -70,7 +83,7 @@ export default function PlaceDeposit({
   return (
     <div className="w-ful flex flex-row gap-5 REM px-10">
       <div className="w-1/2 flex flex-col gap-4 mr-2 border-r pr-2">
-        <h2 className="text-lg font-bold">Địa chỉ </h2>
+        <h2 className="text-xl font-semibold">Địa chỉ </h2>
         <div className="w-full flex flex-col gap-2">
           <div className="flex flex-row gap-2 items-center">
             <svg
@@ -97,14 +110,15 @@ export default function PlaceDeposit({
                 ></path>{" "}
               </g>
             </svg>
-            <h2 className="text-base font-bold">Người gửi:</h2>
+            <h2 className="text-base font-semibold">Người gửi:</h2>
           </div>
-          <div className="mt-2 flex flex-col gap-2">
+          <div className="mt-2 flex flex-col gap-2 font-light">
             <p>
-              Tên người gửi: <span>{firstUserName}</span>
+              Tên người gửi:{" "}
+              <span className="font-medium">{firstUser.name}</span>
             </p>
             <h2>
-              Địa chỉ: <span>{firstAddress}</span>
+              Địa chỉ: <span className="font-medium">{firstAddress}</span>
             </h2>
           </div>
         </div>
@@ -132,14 +146,15 @@ export default function PlaceDeposit({
                 </g>{" "}
               </g>
             </svg>
-            <h2 className="text-base font-bold">Người nhận:</h2>
+            <h2 className="text-base font-semibold">Người nhận:</h2>
           </div>
-          <div className="mt-2 flex flex-col gap-2">
+          <div className="mt-2 flex flex-col gap-2 font-light">
             <p>
-              Tên người nhận: <span>{secondUserName}</span>
+              Tên người nhận:{" "}
+              <span className="font-medium">{secondUser.name}</span>
             </p>
             <h2>
-              Địa chỉ: <span>{secondAddress}</span>
+              Địa chỉ: <span className="font-medium">{secondAddress}</span>
             </h2>
           </div>
         </div>
@@ -167,25 +182,23 @@ export default function PlaceDeposit({
             </p>
           </div>
 
-          <div
-            className={`relative flex items-center justify-between text-xs font-light px-4 ${
-              exchangeDetails.exchange.compensationAmount === 0 && "opacity-30"
-            }`}
-          >
-            <p>Tổng tiền bù:</p>
-            <p className={`font-semibold`}>
-              {CurrencySplitter(
-                exchangeDetails.exchange.compensationAmount || 0
-              )}{" "}
-              đ
-            </p>
-
-            {exchangeDetails.isRequestUser && (
-              <p className="absolute bottom-0 left-0 translate-y-full translate-x-4 italic text-green-700">
-                Bạn sẽ nhận được số tiền bù sau khi trao đổi thành công.
-              </p>
+          {exchangeDetails.exchange.compensateUser &&
+            exchangeDetails.exchange.compensateUser.id === firstUser.id && (
+              <div
+                className={`relative flex items-center justify-between text-xs font-light px-4 ${
+                  exchangeDetails.exchange.compensationAmount === 0 &&
+                  "opacity-30"
+                }`}
+              >
+                <p>Tổng tiền bù:</p>
+                <p className="font-semibold">
+                  {CurrencySplitter(
+                    exchangeDetails.exchange.compensationAmount || 0
+                  )}{" "}
+                  đ
+                </p>
+              </div>
             )}
-          </div>
         </div>
 
         <div className="flex flex-col gap-2 pb-2 border-b border-gray-400">
@@ -224,6 +237,7 @@ export default function PlaceDeposit({
           total={total}
           exchangeId={exchangeDetails.exchange.id}
           fetchExchangeDetails={fetchExchangeDetails}
+          setIsLoading={setIsLoading}
         />
         <p className="text-[0.65em] font-light italic">
           Chúng tôi chỉ hỗ trợ hình thức thanh toán bằng Ví ComZone để đảm bảo

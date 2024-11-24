@@ -9,6 +9,7 @@ export interface DeliveryInformation extends BaseInterface {
   districtId: number;
   wardId: string;
   address: string;
+  fullAddress?: string;
 }
 export interface Delivery extends BaseInterface {
   exchange: Exchange;
@@ -18,6 +19,6 @@ export interface Delivery extends BaseInterface {
   deliveryFee?: number;
   estimatedDeliveryTime?: Date;
   status?: string;
-  overallStatus?: "PICKING" | "DELIVERING" | "DELIVERED" | "FAILED";
+  overallStatus?: "PICKING" | "DELIVERING" | "DELIVERED" | "FAILED" | "RETURN";
   note?: string;
 }

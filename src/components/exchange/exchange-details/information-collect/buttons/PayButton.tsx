@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Checkbox, Modal, notification } from "antd";
 import { useEffect, useState } from "react";
 import { privateAxios } from "../../../../../middleware/axiosInstance";
@@ -8,27 +9,33 @@ export default function PayButton({
   total,
   exchangeId,
   fetchExchangeDetails,
+  setIsLoading,
 }: {
   total: number;
   exchangeId: string;
   fetchExchangeDetails: Function;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [userBalance, setUserBalance] = useState(0);
   const [isHidingBalance, setIsHidingBalance] = useState(true);
   const [isConfirming, setIsConfirming] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const fetchUserBalance = async () => {
+    setIsLoading(true);
     await privateAxios
       .get("users/profile")
       .then((res) => {
         console.log(res.data.balance);
         setUserBalance(res.data.balance);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
   };
 
-  const handledPayment = async () => {
+  const handlePayment = async () => {
+    setIsConfirming(false);
+
     setIsLoading(true);
     await privateAxios
       .post("/deposits/exchange", {
@@ -43,15 +50,15 @@ export default function PayButton({
           message: "Giao dịch không thành công",
           duration: 2,
         });
-      });
+      })
+      .finally(() => setIsLoading(false));
+
     await privateAxios
       .patch(`/exchanges/pay/${exchangeId}`)
       .then((res) => {
         console.log(res.data);
-        notification.success({ message: "Thanh toán thành công", duration: 2 });
-        setIsLoading(false);
+        notification.success({ message: "Thanh toán thành công", duration: 5 });
         fetchExchangeDetails();
-        setIsConfirming(false);
       })
       .catch((err) => {
         console.log(err);
@@ -59,8 +66,8 @@ export default function PayButton({
           message: "Thanh toán không thành công",
           duration: 2,
         });
-        setIsLoading(false);
-      });
+      })
+      .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {
@@ -69,7 +76,6 @@ export default function PayButton({
 
   return (
     <>
-      {isLoading && <Loading />}
       <button
         onClick={() => setIsConfirming(true)}
         className="bg-sky-700 py-2 text-white text-xs font-semibold rounded-md duration-200 hover:bg-sky-900"
@@ -80,6 +86,7 @@ export default function PayButton({
         open={isConfirming}
         onCancel={(e) => {
           e.stopPropagation();
+          setChecked(false);
           setIsConfirming(false);
         }}
         centered
@@ -159,7 +166,7 @@ export default function PayButton({
             <button
               disabled={!checked || userBalance < total}
               className="basis-2/3 py-2 bg-sky-700 text-white font-semibold rounded-md duration-200 hover:bg-sky-800 disabled:bg-gray-300"
-              onClick={handledPayment}
+              onClick={handlePayment}
             >
               THANH TOÁN
             </button>

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import CurrencySplitter from "../../assistants/Spliter";
+import ActionConfirm from "../actionConfirm/ActionConfirm";
 
 export default function TotalSummary({
   totalQuantity,
@@ -15,6 +17,8 @@ export default function TotalSummary({
   isConfirmDisabled: boolean;
   navigate: any;
 }) {
+  const [isConfirming, setIsConfirming] = useState<boolean>(false);
+
   return (
     <div className="flex flex-col items-start gap-2 w-full bg-white rounded-lg px-4 py-4 drop-shadow-lg">
       <div className="w-full flex flex-col gap-2 pb-2 border-b border-black">
@@ -63,11 +67,23 @@ export default function TotalSummary({
 
         <button
           className="w-full py-2 font-bold text-white bg-gray-950 rounded-md border border-black duration-300 hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:bg-gray-300 disabled:border-none disabled:hover:text-white"
-          onClick={handleSubmit}
+          onClick={() => setIsConfirming(true)}
           disabled={isConfirmDisabled}
         >
           ĐẶT HÀNG
         </button>
+
+        <ActionConfirm
+          isOpen={isConfirming}
+          setIsOpen={setIsConfirming}
+          title="XÁC NHẬN ĐẶT HÀNG"
+          description={
+            <p className="text-sm">
+              Bạn sẽ nhận thông báo khi người bán xác nhận đơn hàng của bạn.
+            </p>
+          }
+          confirmCallback={() => handleSubmit()}
+        />
       </div>
     </div>
   );

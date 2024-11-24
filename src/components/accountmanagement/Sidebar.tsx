@@ -93,7 +93,7 @@ const Sidebar = () => {
           >
             <AccountBalanceWalletOutlinedIcon /> Ví Của Tôi
           </li>
-          <li
+          {/* <li
             className={`menu-item ${
               currentUrl === "/accountmanagement/exchange" ? "active" : ""
             }`}
@@ -103,7 +103,7 @@ const Sidebar = () => {
             }}
           >
             <MultipleStopOutlinedIcon /> Lịch Sử Trao Đổi
-          </li>
+          </li> */}
         </ul>
       </div>
     </div>

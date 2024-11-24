@@ -32,8 +32,8 @@ const ExchangeTab: React.FC = () => {
     { label: "Đang vận chuyển", path: "/exchange/in-delivery" },
     { label: "Đã giao hàng", path: "/exchange/finished-delivery" },
     { label: "Thành công", path: "/exchange/successful" },
-    { label: "Thất bại", path: "/exchange/rejected" },
-    { label: "Bị hủy", path: "/exchange/canceled" },
+    { label: "Thất bại", path: "/exchange/failed" },
+    { label: "Bị từ chối", path: "/exchange/rejected" },
   ];
 
   const location = useLocation();

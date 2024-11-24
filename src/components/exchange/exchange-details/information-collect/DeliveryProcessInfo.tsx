@@ -1,36 +1,39 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import React, { useEffect, useState } from "react";
-import Car from "../../../../assets/car.png";
 import { LinearProgress } from "@mui/material";
 import moment from "moment/min/moment-with-locales";
 import { ExchangeDetails } from "../../../../common/interfaces/exchange.interface";
 import { privateAxios } from "../../../../middleware/axiosInstance";
 import { Delivery } from "../../../../common/interfaces/delivery.interface";
 import SuccessfulOrFailedButton from "./buttons/SuccessfulOrFailedButton";
+import { UserInfo } from "../../../../common/base.interface";
+import FailedDeliveryButton from "./buttons/FailedDeliveryButton";
 moment.locale("vi");
+
 export default function DeliveryProcessInfo({
-  firstUserName,
   exchangeDetails,
-  secondUserName,
+  firstUser,
+  secondUser,
   firstAddress,
   secondAddress,
   fetchExchangeDetails,
   setIsLoading,
 }: {
   exchangeDetails: ExchangeDetails;
-  firstUserName: string;
-  secondUserName: string;
+  firstUser: UserInfo;
+  secondUser: UserInfo;
   firstAddress: string;
   secondAddress: string;
   fetchExchangeDetails: Function;
-  setIsLoading: (param: boolean) => void;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [userDelivery, setUserDelivery] = useState<Delivery>();
-
-  const status = exchangeDetails.exchange.status;
 
   const exchange = exchangeDetails.exchange;
 
   const fetchUserDelivery = async () => {
+    setIsLoading(true);
+
     await privateAxios
       .get(`deliveries/exchange/from-user/${exchange.id}`)
       .then((res) => {
@@ -49,13 +52,29 @@ export default function DeliveryProcessInfo({
     if (userDelivery && userDelivery.overallStatus) {
       switch (userDelivery?.overallStatus) {
         case "PICKING":
-          return "Đang nhận hàng từ người gửi";
+          return (
+            <p className="text-yellow-500 font-medium p-2 border border-yellow-500 w-fit rounded-md">
+              Đang nhận hàng từ người gửi
+            </p>
+          );
         case "DELIVERING":
-          return "Đang giao hàng";
+          return (
+            <p className="text-sky-600 font-medium p-2 border border-sky-600 w-fit rounded-md">
+              Đang giao hàng
+            </p>
+          );
         case "DELIVERED":
-          return "Đã giao hàng";
+          return (
+            <p className="text-green-600 font-medium p-2 border border-green-600 w-fit rounded-md">
+              Đã giao hàng thành công
+            </p>
+          );
         case "FAILED":
-          return "Giao hàng thất bại";
+          return (
+            <p className="text-red-600 font-medium p-2 border border-red-600 w-fit rounded-md">
+              Giao hàng thất bại
+            </p>
+          );
       }
     }
   };
@@ -66,7 +85,7 @@ export default function DeliveryProcessInfo({
       .charAt(0)
       .toUpperCase() +
     moment(userDelivery?.estimatedDeliveryTime)
-      .format("dddd DD/MM/yyyy")
+      .format("dddd, DD/MM/yyyy")
       .slice(1);
 
   return (
@@ -78,13 +97,13 @@ export default function DeliveryProcessInfo({
         <div className="w-1/2 flex flex-col">
           <div className="mb-4">
             <h3 className="font-semibold text-gray-800">Người gửi:</h3>
-            <p className="font-light">{firstUserName}</p>
+            <p className="font-light">{firstUser.name}</p>
             <p className="font-light">{firstAddress}</p>
           </div>
 
           <div className="mb-4">
             <h3 className="font-semibold text-gray-800">Người nhận:</h3>
-            <p className="font-light">{secondUserName}</p>
+            <p className="font-light">{secondUser.name}</p>
             <p className="font-light">{secondAddress}</p>
           </div>
         </div>
@@ -122,9 +141,8 @@ export default function DeliveryProcessInfo({
 
           <div className="flex items-center gap-4">
             <h3 className="font-semibold text-gray-800">Trạng thái:</h3>
-            <p className="text-blue-600 font-medium p-2 bg-blue-200 w-fit rounded-md">
-              {getDeliveryStatus()}
-            </p>
+
+            {getDeliveryStatus()}
           </div>
 
           <div
@@ -145,6 +163,8 @@ export default function DeliveryProcessInfo({
           exchangeId={exchangeDetails.exchange.id}
           fetchExchangeDetails={fetchExchangeDetails}
         />
+      ) : userDelivery?.overallStatus === "FAILED" ? (
+        <FailedDeliveryButton />
       ) : (
         <div className="mt-5 r">
           <p className="w-full text-center text-sm font-light italic pb-4">

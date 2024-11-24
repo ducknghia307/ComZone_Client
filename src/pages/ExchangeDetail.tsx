@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
@@ -6,7 +7,6 @@ import {
   ExchangeDetails,
 } from "../common/interfaces/exchange.interface";
 import InformationCollectSection from "../components/exchange/exchange-details/information-collect/InformationCollectSection";
-import { useAppSelector } from "../redux/hooks";
 import ActionButtons from "../components/exchange/exchange-details/information-collect/ActionButtons";
 import ProgressSection from "../components/exchange/exchange-details/progress/ProgressSection";
 import Loading from "../components/loading/Loading";
@@ -16,7 +16,6 @@ import { Delivery } from "../common/interfaces/delivery.interface";
 
 const ExchangeDetail: React.FC = () => {
   const { id } = useParams();
-  const { userId } = useAppSelector((state) => state.auth);
 
   const [exchangeData, setExchangeData] = useState<ExchangeDetails>();
 
@@ -72,8 +71,16 @@ const ExchangeDetail: React.FC = () => {
           ? exchangeDetails?.exchange.post.user
           : exchangeDetails?.exchange.requestUser
         : null;
+
       //FETCH STAGE 0
       if (exchangeDetails.exchange.status === "PENDING") return;
+
+      //FETCH STAGE 6
+      if (exchangeDetails.exchange.status === "SUCCESSFUL") {
+        setFirstCurrentStage(6);
+        setSecondCurrentStage(6);
+        return;
+      }
 
       //FETCH STAGE 1
       if (exchangeDetails.exchange.status === "DEALING") {
@@ -109,7 +116,6 @@ const ExchangeDetail: React.FC = () => {
         `deliveries/exchange/${exchangeDetails.exchange.id}`
       );
       const deliveries: Delivery[] = deliveriesResponse.data;
-      console.log("bbbbbbb", deliveries);
 
       if (deliveries.length > 0) {
         const firstUserDelivery = deliveries.find(
@@ -121,8 +127,8 @@ const ExchangeDetail: React.FC = () => {
           setFirstCurrentStage(3);
           setFirstAddress(
             deliveries[0].from.user.id === first?.id
-              ? deliveries[0].from.name
-              : deliveries[0].to.name
+              ? deliveries[0].from.fullAddress!
+              : deliveries[0].to.fullAddress!
           );
         }
 
@@ -135,8 +141,8 @@ const ExchangeDetail: React.FC = () => {
           setSecondCurrentStage(3);
           setSecondAddress(
             deliveries[0].from.user.id === second?.id
-              ? deliveries[0].from.name
-              : deliveries[0].to.name
+              ? deliveries[0].from.fullAddress!
+              : deliveries[0].to.fullAddress!
           );
         }
       }
@@ -162,12 +168,6 @@ const ExchangeDetail: React.FC = () => {
           setSecondCurrentStage(5);
         }
       }
-
-      //FETCH STAGE 6
-      if (exchangeDetails?.exchange.status === "SUCCESSFUL") {
-        setFirstCurrentStage(6);
-        setSecondCurrentStage(6);
-      }
     } catch (error) {
       console.error("Error fetching exchange details:", error);
     } finally {
@@ -188,8 +188,8 @@ const ExchangeDetail: React.FC = () => {
 
       setSelectedAddress(sortedAddresses[0] || null);
       setAddresses(sortedAddresses);
-    } catch {
-      console.log("...");
+    } catch (err) {
+      console.log(err);
     }
   };
   useEffect(() => {
@@ -199,16 +199,12 @@ const ExchangeDetail: React.FC = () => {
     }
   }, [id]);
 
-  if (!exchangeData || isLoading)
-    return (
-      <div className="h-[80vh]">
-        <Loading />
-      </div>
-    );
+  if (!exchangeData) return;
 
   return (
-    <div className="REM min-h-[80vh] w-full flex items-stretch justify-between gap-4 px-4 py-4">
-      <div className="grow flex flex-col items-stretch justify-start gap-4 px-4 border-r border-gray-300">
+    <div className="REM min-h-[80vh] w-full flex justify-center gap-4 px-4 py-4">
+      {isLoading && <Loading />}
+      <div className="basis-2/3 flex flex-col items-stretch justify-start gap-4 px-4 border-r border-gray-300">
         <InformationCollectSection
           exchangeDetails={exchangeData}
           firstCurrentStage={firstCurrentStage}
@@ -227,12 +223,26 @@ const ExchangeDetail: React.FC = () => {
         <ActionButtons
           exchangeDetails={exchangeData}
           currentStage={firstCurrentStage}
-          anotherStage={secondCurrentStage}
           oppositeCurrentStage={secondCurrentStage}
           fetchExchangeDetails={fetchExchangeDetails}
           selectedAddress={selectedAddress}
         />
 
+        <ExchangeInformation
+          exchangeDetails={exchangeData}
+          firstCurrentStage={firstCurrentStage}
+          secondCurrentStage={secondCurrentStage}
+          firstUser={firstUser}
+          secondUser={secondUser}
+          firstComicsGroup={firstComicsGroup?.map((item) => item.comics) || []}
+          secondComicsGroup={
+            secondComicsGroup?.map((item) => item.comics) || []
+          }
+          setIsLoading={setIsLoading}
+        />
+      </div>
+
+      <div className="basis-1/3 min-w-fit">
         <ProgressSection
           exchangeDetails={exchangeData}
           firstUser={firstUser || undefined}
@@ -241,18 +251,6 @@ const ExchangeDetail: React.FC = () => {
           secondUser={secondUser || undefined}
           secondComicsGroup={secondComicsGroup || []}
           secondCurrentStage={secondCurrentStage}
-        />
-      </div>
-
-      <div className="basis-1/3">
-        <ExchangeInformation
-          exchangeDetails={exchangeData}
-          firstUser={firstUser}
-          secondUser={secondUser}
-          firstComicsGroup={firstComicsGroup?.map((item) => item.comics) || []}
-          secondComicsGroup={
-            secondComicsGroup?.map((item) => item.comics) || []
-          }
         />
       </div>
     </div>

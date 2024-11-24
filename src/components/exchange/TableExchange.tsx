@@ -135,13 +135,12 @@ const TableExchange: React.FC = () => {
             translatedStatus = "Thành công";
             break;
           case "FAILED":
-          case "REJECTED":
             color = "red";
             translatedStatus = "Thất bại";
             break;
-          case "CANCELED":
-            color = "gray";
-            translatedStatus = "Đã hủy";
+          case "REJECTED":
+            color = "red";
+            translatedStatus = "Bị từ chối";
             break;
           default:
             color = "geekblue";

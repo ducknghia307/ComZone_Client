@@ -46,16 +46,6 @@ interface AuctionData {
   } | null;
 }
 
-interface AuctionAnnounce {
-  id: string;
-  title: string;
-  status: "SUCCESSFUL" | "FAILED";
-  message: string;
-  auction: {
-    id: string;
-  };
-}
-
 interface HighestBid {
   user: {
     id: string;
@@ -79,7 +69,7 @@ const ComicAuction = () => {
   const highestBid: HighestBid | null = useAppSelector(
     (state: any) => state.auction.highestBid
   );
-  
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [winner, setWinner] = useState<boolean | null>(null);
   const [isHighest, setIsHighest] = useState<boolean | null>(null);
@@ -88,13 +78,10 @@ const ComicAuction = () => {
   const [hasDeposited, setHasDeposited] = useState(false);
   console.log("auctiondata", auctionData);
   const navigate = useNavigate();
-  // const auctionAnnounce = useAppSelector(
-  //   (state) => state.annoucement.auctionAnnounce
-  // );
-  const auctionAnnounce: AuctionAnnounce | null = useAppSelector(
-    (state: any) => state.announcement?.auctionAnnounce
+  const auctionAnnounce = useAppSelector(
+    (state) => state.annoucement.auctionAnnounce
   );
-  
+
   const handleBidActionDisabled = (disabled: boolean) => {
     setIsBidDisabled(disabled);
   };
@@ -244,14 +231,23 @@ const ComicAuction = () => {
     fetchComicDetails();
   }, [id, auctionAnnounce?.id, dispatch]);
   useEffect(() => {
-    if (auctionData?.status === "SUCCESSFUL") {
+    if (!userId) {
+      // Người dùng chưa đăng nhập, không hiển thị kết quả
+      setWinner(null);
+      return;
+    }
+
+    if (
+      auctionData?.status === "SUCCESSFUL" ||
+      auctionData?.status === "COMPLETED"
+    ) {
       if (auctionData.winner?.id === userId) {
-        setWinner(true);
+        setWinner(true); // Người dùng là người thắng
       } else {
-        setWinner(false);
+        setWinner(false); // Người dùng không thắng
       }
     } else {
-      setWinner(null);
+      setWinner(null); // Trạng thái không xác định hoặc không liên quan
     }
   }, [auctionData?.status, auctionData?.winner, userId]);
 
@@ -321,7 +317,7 @@ const ComicAuction = () => {
 
   return (
     <div className="auction-wrapper" style={{ position: "relative" }}>
-      <AuctionResult isWinner={winner} />
+      <AuctionResult isWinner={winner} auctionStatus={auctionData?.status} />
       {auctionAnnounce && auctionAnnounce.auction.id === id && (
         <>
           {auctionAnnounce.status === "SUCCESSFUL" && (

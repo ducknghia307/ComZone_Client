@@ -48,21 +48,29 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
       const now = Date.now();
       const timeRemaining = endTimestamp - now;
 
+      const days = Math.max(
+        0,
+        Math.floor(timeRemaining / (1000 * 60 * 60 * 24))
+      );
+      const hours = Math.max(
+        0,
+        Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      );
+      const minutes = Math.max(
+        0,
+        Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60))
+      );
+      const seconds = Math.max(
+        0,
+        Math.floor((timeRemaining % (1000 * 60)) / 1000)
+      );
+
+      setTimeLeft({ days, hours, minutes, seconds });
+
+      // Handle auction end
       if (timeRemaining <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         setAuctionEnded(true);
         onBidActionDisabled?.(true);
-      } else {
-        const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-        );
-        const minutes = Math.floor(
-          (timeRemaining % (1000 * 60 * 60)) / (1000 * 60)
-        );
-        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-
-        setTimeLeft({ days, hours, minutes, seconds });
       }
     };
 
@@ -80,29 +88,20 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
     <div>
       {loading ? (
         <Loading />
-      ) : auctionEnded || auctionData.status === "COMPLETED" ? (
-        <p
-          style={{
-            fontFamily: "REM",
-            fontSize: "20px",
-            paddingBottom: "15px",
-            color: "red",
-          }}
-        >
-          Phiên đấu giá đã kết thúc
-        </p>
-      ) : auctionData.status === "UPCOMING" ? (
-        <p
-          style={{
-            fontFamily: "REM",
-            fontSize: "20px",
-            paddingBottom: "15px",
-          }}
-        >
-          SẮP DIỄN RA: {formatEndTime(auctionData.startTime)}
-        </p>
       ) : (
         <>
+          {auctionEnded && (
+            <p
+              style={{
+                fontFamily: "REM",
+                fontSize: "20px",
+                paddingBottom: "10px",
+                color: "red",
+              }}
+            >
+              Phiên đấu giá đã kết thúc vào {formatEndTime(auctionData.endTime)}
+            </p>
+          )}
           <p
             style={{
               fontFamily: "REM",
@@ -110,7 +109,8 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
               paddingBottom: "15px",
             }}
           >
-            KẾT THÚC VÀO: {formatEndTime(auctionData.endTime)}
+            {!auctionEnded &&
+              `KẾT THÚC VÀO: ${formatEndTime(auctionData.endTime)}`}
           </p>
           <Grid className="countdown" sx={{ gap: "15px" }}>
             {["days", "hours", "minutes", "seconds"].map((unit) => (

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import backgr from "../assets/bookshelf.jpg";
-import { useNavigate } from "react-router-dom";
 import { publicAxios } from "../middleware/axiosInstance";
 
 const ForgotPassword = () => {
@@ -11,7 +10,7 @@ const ForgotPassword = () => {
     confirmPassword: "",
   });
   const [stage, setStage] = useState("email"); // "email", "otp", or "newPassword"
-  const navigate = useNavigate();
+ 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;

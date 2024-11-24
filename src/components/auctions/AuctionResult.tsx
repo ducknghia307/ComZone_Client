@@ -1,8 +1,15 @@
-export const AuctionResult = ({ isWinner }: { isWinner: boolean | null }) => {
+export const AuctionResult = ({
+  isWinner,
+  auctionStatus,
+}: {
+  isWinner: boolean | null;
+  auctionStatus: string | undefined;
+}) => {
   if (isWinner === null) {
     return null;
   }
   console.log(isWinner);
+  console.log(auctionStatus);
 
   return (
     <div
@@ -21,14 +28,14 @@ export const AuctionResult = ({ isWinner }: { isWinner: boolean | null }) => {
           lineHeight: "50px",
           textAlign: "center",
           transform: "translateX(100%)",
-          animation: "scroll-left 10s linear infinite",
+          animation: "scroll-left 20s linear infinite",
           fontSize: "18px",
           fontWeight: "500",
           fontFamily: "REM",
         }}
       >
         {isWinner
-          ? "🎉 Bạn đã đấu giá thành công! Vui lòng tiến hành thanh toán để hoàn tất và hoàn cọc!"
+          ? "🎉 Chúc mừng bạn đã đấu giá thành công! "
           : "😞 Bạn đã đấu giá thất bại. Cọc đã được hoàn trả"}
       </div>
     </div>

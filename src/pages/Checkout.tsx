@@ -163,7 +163,7 @@ const Checkout = () => {
       return (
         total +
         sellerGroup.comics.reduce((sellerTotal, { comic, currentPrice }) => {
-          const price = currentPrice || comic?.price; // Use auction price if available
+          const price = currentPrice || comic?.price;
           return sellerTotal + Number(price);
         }, 0)
       );
@@ -250,6 +250,8 @@ const Checkout = () => {
           ? "AUCTION"
           : "TRADITIONAL";
 
+        console.log("orderType", orderType);
+
         const orderResponse = await privateAxios.post("/orders", {
           totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
           paymentMethod: selectedPaymentMethod,
@@ -285,7 +287,6 @@ const Checkout = () => {
               user,
               type,
             });
-            privateAxios.patch(`/deposits/auction/${auctionId}/refund-winner`);
           }
         }
       }

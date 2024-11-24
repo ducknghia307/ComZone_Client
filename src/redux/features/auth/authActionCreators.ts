@@ -3,8 +3,6 @@ import { revertAll } from "../../globalActions";
 import { AppDispatch } from "../../store"; // Assuming these types exist in your project
 import { AxiosError } from "axios";
 import { authSlice } from "./authSlice";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-
 // Define types for form values and responses
 interface FormValues {
   email: string;

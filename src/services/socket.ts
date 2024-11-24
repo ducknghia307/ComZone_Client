@@ -5,7 +5,7 @@ import { makeStore } from "../redux/store";
 const { store } = makeStore();
 
 const socket = io(import.meta.env.VITE_SERVER_BASE_URL, {
-  autoConnect: false, // Delay connection until explicitly connected
+  autoConnect: false,
   query: {},
 });
 
@@ -14,8 +14,6 @@ export const connectSocket = () => {
   const user = state.auth.userId;
 
   if (user) {
-    console.log(socket.io);
-
     socket.io.opts.query = { user };
     if (!socket.connected) {
       socket.connect();

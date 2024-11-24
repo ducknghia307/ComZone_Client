@@ -23,8 +23,6 @@ const ModalDeposit: React.FC<ModalDepositProps> = ({
   onDepositSuccess,
   auctionId,
 }) => {
-  console.log(auctionId);
-
   const dispatch = useAppDispatch();
   const userId = useAppSelector((state) => state.auth.userId);
   const navigate = useNavigate();

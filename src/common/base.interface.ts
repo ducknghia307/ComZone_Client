@@ -94,6 +94,8 @@ export interface Auction {
   endTime: string;
   comics: Comic;
   maxPrice: number;
+  isPaid?: boolean;
+  paymentDeadline?: string;
   winner?: {
     id: string;
     name: string;
@@ -179,7 +181,7 @@ export interface Delivery {
     status: string | null;
     name: string;
     phone: string;
-    address:string;
+    address: string;
   };
   to: {
     id: string;
@@ -188,7 +190,7 @@ export interface Delivery {
     status: string | null;
     name: string;
     phone: string;
-    address:string;
+    address: string;
   };
 }
 

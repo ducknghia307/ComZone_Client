@@ -174,13 +174,6 @@ const ComicAuction = () => {
   }, [highestBid, userId]);
 
   useEffect(() => {
-    if (socket && socket.connected) {
-      console.log("Socket connected, emitting joinRoom");
-      socket.emit("joinRoom", userId);
-    } else {
-      connectSocket(); // Ensure the socket is connected
-    }
-
     socket.on("notification", (data) => {
       dispatch(auctionAnnouncement(data));
     });
@@ -258,16 +251,19 @@ const ComicAuction = () => {
   }, [userId]);
 
   useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
     socket.on("bidUpdate", (data: any) => {
-      console.log("123123", data.placeBid.auction);
+      console.log("Received bid update:", data.placeBid.auction);
       dispatch(setHighestBid(data.placeBid));
       dispatch(setAuctionData(data.placeBid.auction));
     });
-
     return () => {
       socket.off("bidUpdate");
     };
-  }, [auctionData?.id, dispatch]);
+  }, [userId, auctionData?.id, dispatch]);
+
   if (loading) return <Loading />;
   if (!comic) return <p>Comic not found.</p>;
 

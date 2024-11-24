@@ -6,12 +6,6 @@ import { Modal } from "antd";
 import ZaloPay from "../../assets/zalopay.png";
 import VNPay from "../../assets/vnpay.png";
 import TickCircle from "../../assets/tick-circle.png";
-// import { useNavigate } from "react-router-dom";
-// interface Wallet extends BaseInterface {
-//   balance: number;
-//   nonWithdrawableAmount: number;
-//   status: number;
-// }
 
 const PaymentMethod = ({
   amount,
@@ -22,12 +16,10 @@ const PaymentMethod = ({
   balance: number;
   onMethodSelect: (method: string) => void;
 }) => {
-  // const [wallet, setWallet] = useState<Wallet>();
   const [selectedMethod, setSelectedMethod] = useState("wallet");
   const [hideBalance, setHideBalance] = useState(true);
   const [selectedWalletMethod, setSelectedWalletMethod] = useState<string>("");
   const [selectedAmount, setSelectedAmount] = useState<number>(0);
-  // const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   console.log(amount);
 
@@ -45,27 +37,11 @@ const PaymentMethod = ({
     setIsModalOpen(false);
   };
 
-  // const fetchUserWallet = async () => {
-  //   try {
-  //     const response = await privateAxios("/wallets/user");
-  //     const data = await response.data;
-  //     console.log(data);
-
-  //     setWallet(data);
-  //   } catch {
-  //     console.log("...");
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchUserWallet();
-  // }, []);
   useEffect(() => {
     onMethodSelect(selectedMethod);
   }, [selectedMethod]);
   const handlePayment = async () => {
     if (!selectedAmount) {
-      // Make sure an amount is selected
       return;
     }
 
@@ -77,9 +53,6 @@ const PaymentMethod = ({
         const resZalopay = await privateAxios.post("/zalopay/checkout", {
           walletDeposit: resWalletDes.data.id,
         });
-        // const response = await privateAxios.post("/zalopay/checkout", {
-        //   type: "DEPOSIT",
-        // });
         console.log(resZalopay);
         window.location.href = resZalopay.data.orderurl;
       } else if (selectedWalletMethod === "VNPay") {
@@ -128,7 +101,6 @@ const PaymentMethod = ({
               </span>
             </div>
             <div className="flex flex-row gap-1 items-center">
-              {/* <img src={Money} alt="" className="h-8 w-8" /> */}
               <h3 className="text-sm text-gray-500 ml-12">
                 Số dư ví:{" "}
                 {hideBalance ? "******" : <>{CurrencySplitter(balance || 0)}</>}{" "}
@@ -177,7 +149,6 @@ const PaymentMethod = ({
             Nạp thêm
           </button>
           <Modal
-            // title="NẠP TIỀN VÀO VÍ"
             className="REM "
             open={isModalOpen}
             onOk={handleOk}
@@ -242,7 +213,6 @@ const PaymentMethod = ({
                   onClick={() => setSelectedWalletMethod("ZaloPay")}
                 >
                   <div className="flex items-center ">
-                    {/* Display TickCircle if ZaloPay is selected */}
                     {selectedWalletMethod === "ZaloPay" && (
                       <img
                         src={TickCircle}
@@ -267,7 +237,6 @@ const PaymentMethod = ({
                   onClick={() => setSelectedWalletMethod("VNPay")}
                 >
                   <div className="flex items-center ">
-                    {/* Display TickCircle if VNPay is selected */}
                     {selectedWalletMethod === "VNPay" && (
                       <img
                         src={TickCircle}
@@ -306,7 +275,6 @@ const PaymentMethod = ({
         onClick={() => setSelectedMethod("cod")}
       >
         <div className="flex items-center">
-          {/* Cash on Delivery Icon */}
           <img
             src="https://images-ext-1.discordapp.net/external/8HO1TdE688wNSIPu1fBpZhwFmNdyGN_T5DHPy_KFu5w/https/cdn-icons-png.flaticon.com/512/5163/5163782.png?format=webp&quality=lossless&width=576&height=576"
             alt=""

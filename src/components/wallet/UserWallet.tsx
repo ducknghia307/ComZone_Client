@@ -1,5 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Button, Box, IconButton, TablePagination, TextField, } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Button,
+  Box,
+  IconButton,
+  TablePagination,
+  TextField,
+} from "@mui/material";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import "../ui/UserWallet.css";
@@ -9,6 +23,8 @@ import { privateAxios } from "../../middleware/axiosInstance";
 import { BaseInterface, UserInfo } from "../../common/base.interface";
 import CurrencySplitter from "../../assistants/Spliter";
 import { useAppSelector } from "../../redux/hooks";
+import { Transaction } from "../../common/interfaces/transaction.interface";
+import { fontSize } from "@mui/system";
 const UserWallet = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
@@ -35,26 +51,49 @@ const UserWallet = () => {
         params: { userId },
       });
       const data = await response.data;
-      // Transform the API response data to match table columns
-      const formattedTransactions = data.map((transaction) => ({
-        date: new Date(transaction.createdAt).toLocaleDateString("vi-VN"),
-        type: transaction.amount > 0 ? "Nạp Tiền" : "Rút Tiền",
-        amount: `${transaction.amount > 0 ? "+" : ""}${transaction.amount.toLocaleString("vi-VN")} đ`,
+      const formattedTransactions = data.map((transaction: Transaction) => ({
+        date: new Date(transaction.createdAt ?? new Date()).toLocaleDateString(
+          "vi-VN"
+        ),
+        type:
+          (transaction.walletDeposit &&
+            transaction.type === "ADD" &&
+            "Nạp tiền") ||
+          (transaction.walletDeposit &&
+            transaction.type === "SUBTRACT" &&
+            "Rút tiền") ||
+          "Thanh toán",
+        amount: `${
+          transaction.walletDeposit && transaction.type === "ADD" ? "+" : "-"
+        }${transaction.amount.toLocaleString("vi-VN")} đ`,
         status: transaction.status,
-        note: transaction.note || "Không có ghi chú",
+        note:
+          transaction.type === "SUBTRACT"
+            ? transaction.order
+              ? `Thanh toán đơn hàng ${transaction.order.id}`
+              : transaction.exchange
+              ? `Trao đổi đơn hàng ${transaction.exchange.id}`
+              : transaction.deposit
+              ? `Trao đổi đơn hàng ${transaction?.deposit.id}`
+              : "Thông tin giao dịch không có sẵn"
+            : transaction.type === "ADD" && transaction.walletDeposit
+            ? "Nạp tiền vào ví"
+            : transaction.type === "SUBTRACT" && transaction.walletDeposit
+            ? "Rút tiền từ ví"
+            : "Thông tin giao dịch không có sẵn",
       }));
       setTransactions(formattedTransactions);
-      console.log("transactions", response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
   };
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (newPage: any) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (event: any) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -65,28 +104,54 @@ const UserWallet = () => {
   );
   useEffect(() => {
     fetchUserInfo();
-    fetchUserTransactions()
+    fetchUserTransactions();
   }, []);
 
   const getStatusChipStyles = (status: string) => {
     switch (status) {
-      case 'SUCCESSFUL':
-        return { color: '#4caf50', backgroundColor: '#e8f5e9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
-      case 'PENDING':
-        return { color: '#ff9800', backgroundColor: '#fff3e0', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', };
-      case 'FAILED':
-        return { color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+      case "SUCCESSFUL":
+        return {
+          color: "#4caf50",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+          fontSize: "12px",
+        };
+      case "PENDING":
+        return {
+          color: "#ff9800",
+          backgroundColor: "#fff3e0",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      case "FAILED":
+        return {
+          color: "#e91e63",
+          backgroundColor: "#fce4ec",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
     }
   };
 
   const translateStatus = (status: string) => {
     switch (status) {
-      case 'SUCCESSFUL': return 'Thành công';
-      case 'PENDING': return 'Đang xử lí';
-      case 'FAILED': return 'Thất bại';
-      default: return status;
+      case "SUCCESSFUL":
+        return "Thành công";
+      case "PENDING":
+        return "Đang xử lí";
+      case "FAILED":
+        return "Thất bại";
+      default:
+        return status;
     }
   };
+  console.log(transactions);
 
   return (
     <div className="wallet-container">
@@ -182,7 +247,14 @@ const UserWallet = () => {
             </Box>
             <Button
               sx={{
-                marginTop: 3, display: "block", marginLeft: "auto", marginRight: "auto", color: "#fff", backgroundColor: "#000", padding: "5px 20px", fontSize: "16px",
+                marginTop: 3,
+                display: "block",
+                marginLeft: "auto",
+                marginRight: "auto",
+                color: "#fff",
+                backgroundColor: "#000",
+                padding: "5px 20px",
+                fontSize: "16px",
               }}
             >
               TIẾN HÀNH RÚT TIỀN
@@ -193,7 +265,11 @@ const UserWallet = () => {
         <>
           <Typography
             sx={{
-              fontSize: "30px", fontWeight: "bold", textAlign: "center", paddingBottom: "20px", fontFamily: 'REM'
+              fontSize: "30px",
+              fontWeight: "bold",
+              textAlign: "center",
+              paddingBottom: "20px",
+              fontFamily: "REM",
             }}
           >
             VÍ COMZONE
@@ -206,12 +282,15 @@ const UserWallet = () => {
           >
             <Box>
               <div style={{ display: "flex", marginRight: "20px" }}>
-                <Typography variant="h6" mr={2} sx={{ fontFamily: 'REM' }}>
+                <Typography variant="h6" mr={2} sx={{ fontFamily: "REM" }}>
                   Số dư hiện tại:
                 </Typography>
-                <Typography variant="h6" sx={{ color: "#FF8A00", fontFamily: 'REM' }}>
+                <Typography
+                  variant="h6"
+                  sx={{ color: "#FF8A00", fontFamily: "REM" }}
+                >
                   {isVisible
-                    ? `${CurrencySplitter(userInfo?.balance)} đ`
+                    ? `${CurrencySplitter(userInfo?.balance ?? 0)} đ`
                     : "****** đ"}
                 </Typography>
                 <IconButton onClick={() => setIsVisible(!isVisible)}>
@@ -219,14 +298,18 @@ const UserWallet = () => {
                 </IconButton>
               </div>
               <div style={{ display: "flex", marginRight: "20px" }}>
-                <Typography variant="h6" mr={2} sx={{ fontFamily: 'REM' }}>
+                <Typography variant="h6" mr={2} sx={{ fontFamily: "REM" }}>
                   Hiện có thể rút:
                 </Typography>
-                <Typography variant="h6" sx={{ color: "#FF8A00", fontFamily: 'REM' }}>
+                <Typography
+                  variant="h6"
+                  sx={{ color: "#FF8A00", fontFamily: "REM" }}
+                >
                   {isVisible
                     ? `${CurrencySplitter(
-                      userInfo?.balance - userInfo?.nonWithdrawableAmount
-                    )} đ`
+                        (userInfo?.balance ?? 0) -
+                          (userInfo?.nonWithdrawableAmount ?? 0)
+                      )} đ`
                     : "****** đ"}
                 </Typography>
                 <IconButton onClick={() => setIsVisible(!isVisible)}>
@@ -238,7 +321,11 @@ const UserWallet = () => {
             <Box display="flex" gap={2}>
               <Button
                 sx={{
-                  backgroundColor: "#fff", color: "#000", border: "1px solid black", padding: "5px 20px", fontFamily: 'REM'
+                  backgroundColor: "#fff",
+                  color: "#000",
+                  border: "1px solid black",
+                  padding: "5px 20px",
+                  fontFamily: "REM",
                 }}
                 onClick={() => setShowWithdrawForm(true)}
               >
@@ -246,7 +333,10 @@ const UserWallet = () => {
               </Button>
               <Button
                 sx={{
-                  backgroundColor: "#000", color: "#fff", padding: "5px 20px", fontFamily: 'REM'
+                  backgroundColor: "#000",
+                  color: "#fff",
+                  padding: "5px 20px",
+                  fontFamily: "REM",
                 }}
                 onClick={() => setShowDepositForm(true)}
               >
@@ -259,37 +349,86 @@ const UserWallet = () => {
             <Table>
               <TableHead>
                 <TableRow style={{ backgroundColor: "black" }}>
-                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
+                  <TableCell
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontFamily: "REM",
+                    }}
+                  >
                     Ngày giao dịch
                   </TableCell>
-                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
+                  <TableCell
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontFamily: "REM",
+                    }}
+                  >
                     Loại giao dịch
                   </TableCell>
-                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
+                  <TableCell
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontFamily: "REM",
+                    }}
+                  >
                     Số Tiền (đ)
                   </TableCell>
-                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
+                  <TableCell
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontFamily: "REM",
+                    }}
+                  >
                     Trạng Thái
                   </TableCell>
-                  <TableCell style={{ color: "white", textAlign: "center", fontFamily: 'REM' }}>
+                  <TableCell
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontFamily: "REM",
+                    }}
+                  >
                     Ghi Chú
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedTransactions.map((transaction, index) => (
-                  <TableRow key={index}>
-                    <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.date}</TableCell>
-                    <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.type}</TableCell>
-                    <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.amount}</TableCell>
-                    <TableCell sx={{ fontFamily: 'REM' }} align="center">
-                      <span style={getStatusChipStyles(transaction.status)}>
-                        {translateStatus(transaction.status)}
-                      </span>
-                    </TableCell>
-                    <TableCell sx={{ fontFamily: 'REM' }} align="center">{transaction.note}</TableCell>
-                  </TableRow>
-                ))}
+                {paginatedTransactions.map(
+                  (transaction: Transaction, index) => (
+                    <TableRow key={index}>
+                      <TableCell sx={{ fontFamily: "REM" }} align="center">
+                        {transaction.date}
+                      </TableCell>
+                      <TableCell sx={{ fontFamily: "REM" }} align="center">
+                        {transaction.type}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontFamily: "REM",
+                          color: `${
+                            transaction.type === "Nạp tiền" ? "green" : "red"
+                          }`,
+                        }}
+                        align="center"
+                      >
+                        {transaction?.amount}
+                      </TableCell>
+
+                      <TableCell sx={{ fontFamily: "REM" }} align="center">
+                        <span style={getStatusChipStyles(transaction.status)}>
+                          {translateStatus(transaction.status).toUpperCase()}
+                        </span>
+                      </TableCell>
+                      <TableCell sx={{ fontFamily: "REM" }} align="center">
+                        {transaction.note}
+                      </TableCell>
+                    </TableRow>
+                  )
+                )}
               </TableBody>
             </Table>
             <TablePagination

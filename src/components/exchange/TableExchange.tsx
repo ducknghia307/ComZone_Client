@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Avatar, Table, Tag, Tooltip } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
@@ -58,7 +59,12 @@ const TableExchange: React.FC = () => {
           <div className="flex flex-col items-start gap-2">
             {othersComics.slice(0, maxShown).map((comics) => (
               <span className="flex items-center gap-2">
-                <Avatar src={comics.coverImage} shape="square" size={32} />
+                <Avatar
+                  key={comics.id}
+                  src={comics.coverImage}
+                  shape="square"
+                  size={32}
+                />
                 <Tooltip
                   title={<p className="text-black">{comics.title}</p>}
                   color="white"

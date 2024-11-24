@@ -14,8 +14,6 @@ export const connectSocket = () => {
   const user = state.auth.userId;
 
   if (user) {
-    console.log(socket.io);
-
     socket.io.opts.query = { user };
     if (!socket.connected) {
       socket.connect();

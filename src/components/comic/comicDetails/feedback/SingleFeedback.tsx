@@ -29,8 +29,8 @@ export default function SingleFeedback({
 
       <div className="flex items-stretch gap-1">
         <Avatar.Group shape="square" max={{ count: 4 }}>
-          {feedback.attachedImages?.map((img) => {
-            return <Avatar src={img} size={100} />;
+          {feedback.attachedImages?.map((img, index) => {
+            return <Avatar key={index} src={img} size={100} />;
           })}
         </Avatar.Group>
       </div>

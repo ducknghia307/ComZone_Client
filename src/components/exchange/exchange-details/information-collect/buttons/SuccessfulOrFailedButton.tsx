@@ -3,21 +3,26 @@ import { useState } from "react";
 import ActionConfirm from "../../../../actionConfirm/ActionConfirm";
 import { privateAxios } from "../../../../../middleware/axiosInstance";
 import { notification } from "antd";
+import RefundRequest from "../RefundRequest";
+import { Exchange } from "../../../../../common/interfaces/exchange.interface";
 
 export default function SuccessfulOrFailedButton({
-  exchangeId,
+  exchange,
   fetchExchangeDetails,
+  setIsLoading,
 }: {
-  exchangeId: string;
+  exchange: Exchange;
   fetchExchangeDetails: Function;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [isConfirmingFailed, setIsConfirmingFailed] = useState<boolean>(false);
   const [isConfirmingSuccessful, setIsConfirmingSuccessful] =
     useState<boolean>(false);
 
   const handleConfirmSuccessful = async () => {
+    setIsLoading(true);
     await privateAxios
-      .patch(`exchange-confirmation/delivery/${exchangeId}`)
+      .patch(`exchange-confirmation/delivery/${exchange.id}`)
       .then(() => {
         fetchExchangeDetails();
         notification.success({
@@ -26,11 +31,12 @@ export default function SuccessfulOrFailedButton({
           duration: 5,
         });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
   };
 
   const handleConfirmFailed = async () => {
-    await privateAxios.patch(`exchange-confirmation/delivery/${exchangeId}`);
+    await privateAxios.patch(`exchange-confirmation/delivery/${exchange.id}`);
   };
 
   return (
@@ -41,21 +47,11 @@ export default function SuccessfulOrFailedButton({
       >
         Gặp vấn đề khi nhận hàng
       </button>
-      <ActionConfirm
+      <RefundRequest
         isOpen={isConfirmingFailed}
         setIsOpen={setIsConfirmingFailed}
-        title="Bạn không nhận được hàng?"
-        description={
-          <p className="text-sm">
-            Bằng việc xác nhận bạn không nhận được hàng, cuộc trao đổi này sẽ bị
-            hủy bỏ và số tiền cọc sẽ được chuyển đều cho hai bên.
-            <br />
-            <span className="text-xs text-red-600">
-              Thao tác này không thể hoàn tác.
-            </span>
-          </p>
-        }
-        confirmCallback={() => handleConfirmFailed()}
+        exchange={exchange}
+        setIsLoading={setIsLoading}
       />
 
       <button

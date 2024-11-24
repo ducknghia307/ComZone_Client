@@ -1,11 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import ExchangePost from "../components/exchangeNewsFeed/ExchangePost";
 import { notification } from "antd";
 import { useEffect, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
-import {
-  Exchange,
-  ExchangePostInterface,
-} from "../common/interfaces/exchange.interface";
+import { ExchangePostInterface } from "../common/interfaces/exchange.interface";
 import Loading from "../components/loading/Loading";
 import ExchangeSearchBar from "../components/exchangeNewsFeed/ExchangeSearchBar";
 import CreatePostModal from "../components/exchangeNewsFeed/CreatePostModal";
@@ -30,7 +28,6 @@ export default function ExchangeNewsFeed() {
   );
 
   const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
-  const [openSubscription, setOpenSubscription] = useState<boolean>(false);
   const [isSelectModalOpen, setIsSelectModalOpen] = useState<string>("");
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
@@ -108,14 +105,8 @@ export default function ExchangeNewsFeed() {
         duration: 8,
       });
     } else {
-      //FETCH USER'S EXCHANGE SUBSCRIPTION
       setOpenCreatePost(true);
     }
-  };
-
-  const handleSelectSubscription = () => {
-    setOpenSubscription(false);
-    setOpenCreatePost(true);
   };
 
   const handleSearch = async () => {
@@ -133,28 +124,6 @@ export default function ExchangeNewsFeed() {
     fetchExchangeNewsFeed();
   }, [searchParams]);
 
-  const handleOpenChat = async (exchange: Exchange) => {
-    // if (!isLoggedIn) {
-    //   alert("Chưa đăng nhập!");
-    //   return;
-    // } else {
-    //   dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
-    //   await privateAxios
-    //     .post("chat-rooms", {
-    //       secondUser: exchange.user.id,
-    //       exchange: exchange.id,
-    //     })
-    //     .then((res) => {
-    //       sessionStorage.setItem("connectedChat", res.data.id);
-    //       setIsChatOpen(true);
-    //     })
-    //     .catch((err) => console.log(err))
-    //     .finally(() =>
-    //       dispatch(authSlice.actions.updateIsLoading({ isLoading: false }))
-    //     );
-    // }
-  };
-
   return (
     <div className="w-full flex justify-center bg-[rgba(0,0,0,0.03)]">
       {isLoading && <Loading />}
@@ -167,12 +136,6 @@ export default function ExchangeNewsFeed() {
             setSearchKey={setSearchKey}
             handleSearch={handleSearch}
           />
-
-          {/* <SubscriptionModal
-            openSubscription={openSubscription}
-            setOpenSubscription={setOpenSubscription}
-            handleSelectSubscription={handleSelectSubscription}
-          /> */}
 
           <CreatePostModal
             openCreatePost={openCreatePost}

@@ -187,15 +187,52 @@ export default function InformationCollectSection({
         )}
       </div>
 
-      {caughtProgress && firstCurrentStage === 0 && (
-        <ViewBothComicsLists
-          requestComicsList={exchangeDetails.requestUserList.map(
-            (item) => item.comics
-          )}
-          postComicsList={exchangeDetails.postUserList.map(
-            (item) => item.comics
-          )}
-          isRequestUser={exchangeDetails.isRequestUser}
+      {caughtProgress && firstCurrentStage === 6 && (
+        <SuccessfulExchange exchangeDetails={exchangeDetails} />
+      )}
+
+      {caughtProgress && firstCurrentStage === 5 && (
+        <div className="w-full text-center border border-gray-500 rounded-lg py-2">
+          Đang chờ{" "}
+          <span className="font-semibold">
+            <Avatar src={secondUser.avatar} />
+            &ensp;{secondUser.name}
+          </span>{" "}
+          xác nhận giao hàng thành công...
+        </div>
+      )}
+
+      {caughtProgress && firstCurrentStage === 4 && (
+        <DeliveryProcessInfo
+          exchangeDetails={exchangeDetails}
+          firstUser={firstUser}
+          secondUser={secondUser}
+          firstAddress={firstAddress}
+          secondAddress={secondAddress}
+          fetchExchangeDetails={fetchExchangeDetails}
+          setIsLoading={setIsLoading}
+        />
+      )}
+
+      {caughtProgress && firstCurrentStage === 3 && (
+        <PlaceDeposit
+          exchangeDetails={exchangeDetails}
+          firstAddress={firstAddress}
+          secondAddress={secondAddress}
+          firstUser={firstUser}
+          secondUser={secondUser}
+          fetchExchangeDetails={fetchExchangeDetails}
+          setIsLoading={setIsLoading}
+        />
+      )}
+
+      {caughtProgress && firstCurrentStage === 2 && (
+        <SubmitDeliveryInfo
+          selectedAddress={selectedAddress}
+          setSelectedAddress={setSelectedAddress}
+          addresses={addresses}
+          setAddresses={setAddresses}
+          fetchUserAddress={fetchUserAddress}
         />
       )}
 
@@ -216,52 +253,16 @@ export default function InformationCollectSection({
           />
         ))}
 
-      {caughtProgress && firstCurrentStage === 2 && (
-        <SubmitDeliveryInfo
-          selectedAddress={selectedAddress}
-          setSelectedAddress={setSelectedAddress}
-          addresses={addresses}
-          setAddresses={setAddresses}
-          fetchUserAddress={fetchUserAddress}
+      {caughtProgress && firstCurrentStage === 0 && (
+        <ViewBothComicsLists
+          requestComicsList={exchangeDetails.requestUserList.map(
+            (item) => item.comics
+          )}
+          postComicsList={exchangeDetails.postUserList.map(
+            (item) => item.comics
+          )}
+          isRequestUser={exchangeDetails.isRequestUser}
         />
-      )}
-
-      {caughtProgress && firstCurrentStage === 3 && (
-        <PlaceDeposit
-          exchangeDetails={exchangeDetails}
-          firstAddress={firstAddress}
-          secondAddress={secondAddress}
-          firstUser={firstUser}
-          secondUser={secondUser}
-          fetchExchangeDetails={fetchExchangeDetails}
-          setIsLoading={setIsLoading}
-        />
-      )}
-      {caughtProgress && firstCurrentStage === 4 && (
-        <DeliveryProcessInfo
-          exchangeDetails={exchangeDetails}
-          firstUser={firstUser}
-          secondUser={secondUser}
-          firstAddress={firstAddress}
-          secondAddress={secondAddress}
-          fetchExchangeDetails={fetchExchangeDetails}
-          setIsLoading={setIsLoading}
-        />
-      )}
-
-      {caughtProgress && firstCurrentStage === 5 && (
-        <div className="w-full text-center border border-gray-500 rounded-lg py-2">
-          Đang chờ{" "}
-          <span className="font-semibold">
-            <Avatar src={secondUser.avatar} />
-            &ensp;{secondUser.name}
-          </span>{" "}
-          xác nhận giao hàng thành công...
-        </div>
-      )}
-
-      {caughtProgress && firstCurrentStage === 6 && (
-        <SuccessfulExchange exchangeDetails={exchangeDetails} />
       )}
     </div>
   );

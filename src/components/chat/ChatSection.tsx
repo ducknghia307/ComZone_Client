@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { MessageGroup } from "../../common/interfaces/message.interface";
 import ChatMessageHistory from "./ChatMessageHistory";
 import ChatMessageInput from "./ChatMessageInput";
@@ -6,19 +7,16 @@ import ComicsSectionInChat from "./ComicsSectionInChat";
 import ExchangeSectionInChat from "./ExchangeSectionInChat";
 import { ChatRoom } from "../../common/interfaces/chat-room.interface";
 import { Comic } from "../../common/base.interface";
-import { MutableRefObject } from "react";
+import { MutableRefObject, SetStateAction } from "react";
 
 export default function ChatSection({
   currentRoom,
-  currentRoomIdRef,
   currentMessList,
-  fetchChatRoomList,
   handleSendMessage,
   messageInput,
   setMessageInput,
   updateIsRead,
   lastMessageRef,
-  setIsLoading,
   setIsChatOpen,
   sentComicsList,
   setSentComicsList,
@@ -30,20 +28,20 @@ export default function ChatSection({
   currentRoom: ChatRoom | undefined;
   currentRoomIdRef: MutableRefObject<string>;
   currentMessList: MessageGroup[];
-  fetchChatRoomList: () => void;
-  handleSendMessage: () => void;
+  fetchChatRoomList: Function;
+  handleSendMessage: Function;
   messageInput: string;
-  setMessageInput: () => void;
-  updateIsRead: () => void;
+  setMessageInput: React.Dispatch<SetStateAction<any>>;
+  updateIsRead: Function;
   lastMessageRef: any;
   isLoading: boolean;
-  setIsLoading: () => void;
-  setIsChatOpen: () => void;
+  setIsLoading: React.Dispatch<SetStateAction<boolean>>;
+  setIsChatOpen: React.Dispatch<SetStateAction<boolean>>;
   sentComicsList: Comic[];
-  setSentComicsList: () => void;
+  setSentComicsList: React.Dispatch<SetStateAction<any>>;
   handleSendMessageAsComics: () => void;
   sentImage: File | undefined;
-  setSentImage: () => void;
+  setSentImage: React.Dispatch<SetStateAction<any>>;
   handleSendMessageAsImage: () => void;
 }) {
   return (
@@ -57,13 +55,13 @@ export default function ChatSection({
         <>
           <div className="w-full flex flex-col items-stretch justify-start relative">
             <ChatSectionHeader chatRoom={currentRoom} />
-            {currentRoom?.comics && (
+            {currentRoom.comics && (
               <ComicsSectionInChat
                 comics={currentRoom.comics}
                 setIsChatOpen={setIsChatOpen}
               />
             )}
-            {currentRoom?.exchange && (
+            {currentRoom.exchange && (
               <ExchangeSectionInChat
                 chatRoom={currentRoom}
                 setIsChatOpen={setIsChatOpen}

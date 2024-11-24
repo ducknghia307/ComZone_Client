@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { Comic, UserInfo } from "../../common/base.interface";
 import { useNavigate, useParams } from "react-router-dom";
@@ -57,6 +58,8 @@ export default function ComicsDetailTemp() {
           .then((res1) => {
             setComicsListFromSeller(res1.data);
           });
+
+        await fetchSellerFeedback(res.data.sellerId.id);
       })
       .catch((err) => console.log(err));
   };
@@ -70,14 +73,13 @@ export default function ComicsDetailTemp() {
     }
   };
 
-  const fetchSellerFeedback = async () => {
+  const fetchSellerFeedback = async (sellerId: string) => {
     await publicAxios
-      .get(`seller-feedback/seller/some/${seller?.id}`)
+      .get(`seller-feedback/seller/some/${sellerId}`)
       .then((res) => {
-        if (res.data.length > 0) {
-          setFeedbackList(res.data[0]);
-          setTotalFeedback(res.data[1]);
-        }
+        console.log(res.data[0]);
+        setFeedbackList(res.data[0]);
+        setTotalFeedback(res.data[1]);
       })
       .catch((err) => console.log(err));
   };
@@ -161,7 +163,6 @@ export default function ComicsDetailTemp() {
   useEffect(() => {
     fetchUserInfo();
     fetchCurrentComics();
-    fetchSellerFeedback();
     fetchRelatedComicsList();
   }, [id]);
 

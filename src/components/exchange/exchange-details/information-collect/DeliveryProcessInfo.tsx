@@ -160,8 +160,9 @@ export default function DeliveryProcessInfo({
 
       {userDelivery?.overallStatus === "DELIVERED" ? (
         <SuccessfulOrFailedButton
-          exchangeId={exchangeDetails.exchange.id}
+          exchange={exchangeDetails.exchange}
           fetchExchangeDetails={fetchExchangeDetails}
+          setIsLoading={setIsLoading}
         />
       ) : userDelivery?.overallStatus === "FAILED" ? (
         <FailedDeliveryButton />

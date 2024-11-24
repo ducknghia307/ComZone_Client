@@ -1,10 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { useState } from "react";
 import SingleOfferedComics from "./SingleOfferedComics";
 import styles from "./style.module.css";
-import {
-  Exchange,
-  ExchangePostInterface,
-} from "../../common/interfaces/exchange.interface";
+import { ExchangePostInterface } from "../../common/interfaces/exchange.interface";
 import moment from "moment/min/moment-with-locales";
 import dateFormat from "../../assistants/date.format";
 import { Modal, notification } from "antd";
@@ -18,14 +16,11 @@ moment.locale("vi");
 export default function ExchangePost({
   post,
   userExchangeComicsList,
-  index,
   isLoading,
   isSelectModalOpen,
   setIsSelectModalOpen,
   isChatOpen,
   setIsChatOpen,
-  currentUserId,
-  tourIndex,
   navigate,
   isLoggedIn,
 }: {
@@ -79,10 +74,7 @@ export default function ExchangePost({
         <div className="flex items-center justify-between gap-4">
           <div className="w-full flex items-center gap-4">
             <img
-              src={
-                post.user.avatar ||
-                "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small/postUser-profile-icon-profile-avatar-postUser-icon-male-icon-face-icon-profile-icon-free-png.png"
-              }
+              src={post.user.avatar}
               className="w-[4em] h-[4em] rounded-full"
             />
             <div className="flex flex-col items-start gap-1">

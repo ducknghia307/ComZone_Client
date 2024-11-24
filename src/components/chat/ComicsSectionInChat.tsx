@@ -8,12 +8,15 @@ export default function ComicsSectionInChat({
   setIsChatOpen,
 }: {
   comics: Comic;
-  setIsChatOpen: Function;
+  setIsChatOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const navigate = useNavigate();
   return (
-    <div className="sticky top-0 z-10 w-full flex justify-between items-center mt-4 py-2 border-t rounded-b-lg drop-shadow-md bg-white transition-all duration-200">
+    <div
+      onClick={() => setIsExpanded(!isExpanded)}
+      className="sticky top-0 z-10 w-full flex justify-between items-center py-2 rounded-b-lg drop-shadow-md bg-white transition-all duration-200 cursor-pointer"
+    >
       <div className="flex items-center gap-4 px-4">
         <img
           src={comics.coverImage}
@@ -46,7 +49,7 @@ export default function ComicsSectionInChat({
           </button>
         </div>
 
-        <button onClick={() => setIsExpanded(!isExpanded)} className="">
+        <div className="hover:text-gray-700">
           {isExpanded ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -68,7 +71,7 @@ export default function ComicsSectionInChat({
               <path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"></path>
             </svg>
           )}
-        </button>
+        </div>
       </div>
     </div>
   );

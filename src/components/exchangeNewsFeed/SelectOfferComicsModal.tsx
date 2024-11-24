@@ -1,11 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Avatar, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
-import {
-  Exchange,
-  ExchangePostInterface,
-} from "../../common/interfaces/exchange.interface";
+import { ExchangePostInterface } from "../../common/interfaces/exchange.interface";
 import ActionConfirm from "../actionConfirm/ActionConfirm";
 import Loading from "../loading/Loading";
 
@@ -105,8 +104,7 @@ export default function SelectOfferComicsModal({
         console.log(res.data);
 
         await privateAxios
-          .post("chat-rooms", {
-            secondUser: post.user.id,
+          .post("chat-rooms/exchange", {
             exchange: res.data.exchange.id,
           })
           .then((response) => {

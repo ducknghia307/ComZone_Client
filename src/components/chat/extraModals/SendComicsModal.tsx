@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Avatar, Modal } from "antd";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import { useEffect, useState } from "react";
@@ -151,9 +152,8 @@ export default function SendComicsModal({
         <div className="flex items-center justify-end gap-8 mt-8">
           <button
             onClick={() => {
-              sentComicsList.length === 0
-                ? setIsOpen(false)
-                : setSentComicsList([]);
+              if (sentComicsList.length === 0) setIsOpen(false);
+              else setSentComicsList([]);
             }}
             className="hover:underline"
           >
@@ -173,9 +173,9 @@ export default function SendComicsModal({
             title={`Xác nhận gửi ${sentComicsList.length} truyện?`}
             description={
               <Avatar.Group shape="square" max={{ count: 5 }}>
-                {sentComicsList.map((comics) => {
+                {sentComicsList.map((comics, index) => {
                   return (
-                    <Avatar size={100}>
+                    <Avatar key={index} size={100}>
                       <img src={comics.coverImage} alt="" />
                     </Avatar>
                   );

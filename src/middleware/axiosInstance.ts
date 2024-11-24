@@ -30,7 +30,6 @@ const publicAxios = axios.create({
 privateAxios.interceptors.request.use(
   (config) => {
     const state = store.getState();
-    console.log(state);
 
     const accessToken = state.auth.accessToken;
     if (accessToken) {

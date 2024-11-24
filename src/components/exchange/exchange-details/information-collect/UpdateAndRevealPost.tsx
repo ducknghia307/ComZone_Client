@@ -165,7 +165,7 @@ export default function UpdateAndRevealPost({
           {newImages.length > 0 && (
             <div className="flex items-center gap-2">
               {newImages.map((image, index) => (
-                <div className="relative group">
+                <div key={index} className="relative group">
                   <img
                     key={image}
                     src={image}

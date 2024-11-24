@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DeliveryAddress from "../components/checkout/DeliveryAddress";
 import PaymentMethod from "../components/checkout/PaymentMethod";
 import OrderCheck from "../components/checkout/OrderCheck";

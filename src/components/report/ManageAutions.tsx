@@ -1,20 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import TablePagination from '@mui/material/TablePagination';
-import { privateAxios } from '../../middleware/axiosInstance';
-import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import OrderDetailMod from './OrderDetailMod';
-import AuctionDetailMod from '../modal/AuctionDetailMod';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { Auction, UserInfo } from '../../common/base.interface';
+import React, { useState, useEffect } from "react";
+import { styled } from "@mui/material/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import TablePagination from "@mui/material/TablePagination";
+import { privateAxios } from "../../middleware/axiosInstance";
+import {
+  Box,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import AuctionDetailMod from "../modal/AuctionDetailMod";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import { Auction, UserInfo } from "../../common/base.interface";
 interface Order {
   id: number;
   customerName: string;
@@ -28,10 +33,9 @@ interface SelectedAuction extends Auction {
   sellerInfo: UserInfo;
 }
 
-
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#c66a7a',
+    backgroundColor: "#c66a7a",
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.body}`]: {
@@ -40,11 +44,11 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  backgroundColor: '#fff',
-  '&:nth-of-type(odd)': {
-    backgroundColor: '#ffe3d842', // Alternate rows with light pink shade
+  backgroundColor: "#fff",
+  "&:nth-of-type(odd)": {
+    backgroundColor: "#ffe3d842", // Alternate rows with light pink shade
   },
-  '&:last-child td, &:last-child th': {
+  "&:last-child td, &:last-child th": {
     border: 0,
   },
 }));
@@ -54,17 +58,18 @@ const ManageAuctions: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  // const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAuction, setSelectedAuction] = useState<SelectedAuction | null>(null);
+  const [selectedAuction, setSelectedAuction] =
+    useState<SelectedAuction | null>(null);
 
-  const openOrderDetail = (orderId: string) => {
-    setSelectedOrderId(orderId);
-  };
+  // const openOrderDetail = (orderId: string) => {
+  //   setSelectedOrderId(orderId);
+  // };
 
-  const closeOrderDetail = () => {
-    setSelectedOrderId(null);
-  };
+  // const closeOrderDetail = () => {
+  //   setSelectedOrderId(null);
+  // };
 
   useEffect(() => {
     const fetchOrdersWithItems = async () => {
@@ -92,12 +97,13 @@ const ManageAuctions: React.FC = () => {
     fetchOrdersWithItems();
   }, []);
 
-
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -116,7 +122,6 @@ const ManageAuctions: React.FC = () => {
     setIsModalOpen(true);
   };
 
-
   const handleModalSuccess = () => {
     // Refresh or update the auctions data if necessary
     handleModalClose();
@@ -124,51 +129,107 @@ const ManageAuctions: React.FC = () => {
 
   const getStatusChipStyles = (status: string) => {
     switch (status) {
-      case 'SUCCESSFUL':
-        return { color: '#4caf50', backgroundColor: '#e8f5e9', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
-      case 'UPCOMING':
-        return { color: '#6226EF', backgroundColor: '#EDE7F6', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
-      case 'COMPLETED':
-        return { color: '#009688', backgroundColor: '#e0f2f1', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
-      case 'PROCESSING':
-        return { color: '#ff9800', backgroundColor: '#fff3e0', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block', };
-      case 'ONGOING':
-        return { color: '#2196f3', backgroundColor: '#e3f2fd', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
-      case 'FAILED':
-        return { color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
-      case 'REJECTED':
-        return { color: '#f44336', backgroundColor: '#ffebee', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
+      case "SUCCESSFUL":
+        return {
+          color: "#4caf50",
+          backgroundColor: "#e8f5e9",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      case "UPCOMING":
+        return {
+          color: "#6226EF",
+          backgroundColor: "#EDE7F6",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      case "COMPLETED":
+        return {
+          color: "#009688",
+          backgroundColor: "#e0f2f1",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      case "PROCESSING":
+        return {
+          color: "#ff9800",
+          backgroundColor: "#fff3e0",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      case "ONGOING":
+        return {
+          color: "#2196f3",
+          backgroundColor: "#e3f2fd",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      case "FAILED":
+        return {
+          color: "#e91e63",
+          backgroundColor: "#fce4ec",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
+      case "REJECTED":
+        return {
+          color: "#f44336",
+          backgroundColor: "#ffebee",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
     }
   };
 
   const translateStatus = (status: string) => {
     switch (status) {
-      case 'SUCCESSFUL':
-        return 'Thành công';
+      case "SUCCESSFUL":
+        return "Thành công";
       case "COMPLETED":
         return "Hoàn thành";
-      case 'UPCOMING':
-        return 'Sắp diễn ra';
-      case 'PROCESSING':
-        return 'Đang xử lí';
-      case 'ONGOING':
-        return 'Đang diễn ra';
-      case 'FAILED':
-        return 'Thất bại';
-      case 'REJECTED':
-        return 'Bị từ chối';
+      case "UPCOMING":
+        return "Sắp diễn ra";
+      case "PROCESSING":
+        return "Đang xử lí";
+      case "ONGOING":
+        return "Đang diễn ra";
+      case "FAILED":
+        return "Thất bại";
+      case "REJECTED":
+        return "Bị từ chối";
       default:
         return status;
     }
   };
 
   const truncateText = (text: string, maxLength: number): string => {
-    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   };
 
   return (
-    <div style={{ paddingBottom: '40px' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+    <div style={{ paddingBottom: "40px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "30px",
+        }}
+      >
         {/* Search Box */}
         <TextField
           variant="outlined"
@@ -176,18 +237,31 @@ const ManageAuctions: React.FC = () => {
           // value={searchTerm}
           // onChange={handleSearch}
           size="small"
-          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+          sx={{
+            backgroundColor: "#c66a7a",
+            borderRadius: "4px",
+            color: "#fff",
+            width: "300px",
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchOutlinedIcon sx={{ color: '#fff' }} />
+                <SearchOutlinedIcon sx={{ color: "#fff" }} />
               </InputAdornment>
             ),
-            style: { color: '#fff' },
+            style: { color: "#fff" },
           }}
         />
       </Box>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color: '#71002b' }}>
+      <Typography
+        variant="h5"
+        sx={{
+          marginBottom: "20px",
+          fontWeight: "bold",
+          fontFamily: "REM",
+          color: "#71002b",
+        }}
+      >
         Quản lý đấu giá
       </Typography>
       <Paper>
@@ -195,15 +269,47 @@ const ManageAuctions: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell style={{ fontFamily: 'REM' }}>Người Bán</StyledTableCell>
-                <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Tên Truyện</StyledTableCell>
-                <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Trạng Thái Đấu Giá</StyledTableCell>
+                <StyledTableCell style={{ fontFamily: "REM" }}>
+                  Người Bán
+                </StyledTableCell>
+                <StyledTableCell
+                  align="left"
+                  style={{ whiteSpace: "nowrap", fontFamily: "REM" }}
+                >
+                  Tên Truyện
+                </StyledTableCell>
+                <StyledTableCell
+                  align="left"
+                  style={{ whiteSpace: "nowrap", fontFamily: "REM" }}
+                >
+                  Trạng Thái Đấu Giá
+                </StyledTableCell>
                 {/* <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Thời Gian Bắt Đầu</StyledTableCell>
                 <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Thời Gian Kết Thúc</StyledTableCell> */}
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Giá Khởi Điểm</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Bước Giá</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Giá Hiện Tại</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>Chi Tiết</StyledTableCell>
+                <StyledTableCell
+                  align="right"
+                  style={{ whiteSpace: "nowrap", fontFamily: "REM" }}
+                >
+                  Giá Khởi Điểm
+                </StyledTableCell>
+                <StyledTableCell
+                  align="right"
+                  style={{ whiteSpace: "nowrap", fontFamily: "REM" }}
+                >
+                  Bước Giá
+                </StyledTableCell>
+                <StyledTableCell
+                  align="right"
+                  style={{ whiteSpace: "nowrap", fontFamily: "REM" }}
+                >
+                  Giá Hiện Tại
+                </StyledTableCell>
+                <StyledTableCell
+                  align="right"
+                  style={{ whiteSpace: "nowrap", fontFamily: "REM" }}
+                >
+                  Chi Tiết
+                </StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -214,43 +320,63 @@ const ManageAuctions: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                auctions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((auction) => (
-                  <React.Fragment key={auction.id}>
-                    <StyledTableRow>
-                      <StyledTableCell style={{ fontFamily: 'REM' }}>
-                        {auction.comics.sellerId.name}
-                      </StyledTableCell>
-                      <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
-                        {truncateText(auction.comics.title, 20)}
-                      </StyledTableCell>
-                      <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
-                        <span style={getStatusChipStyles(auction.status)}>
-                          {translateStatus(auction.status)}
-                        </span>
-                      </StyledTableCell>
-                      {/* <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
+                auctions
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((auction) => (
+                    <React.Fragment key={auction.id}>
+                      <StyledTableRow>
+                        <StyledTableCell style={{ fontFamily: "REM" }}>
+                          {auction.comics.sellerId.name}
+                        </StyledTableCell>
+                        <StyledTableCell
+                          align="left"
+                          style={{ whiteSpace: "nowrap", fontFamily: "REM" }}
+                        >
+                          {truncateText(auction.comics.title, 20)}
+                        </StyledTableCell>
+                        <StyledTableCell
+                          align="left"
+                          style={{ fontFamily: "REM" }}
+                        >
+                          <span style={getStatusChipStyles(auction.status)}>
+                            {translateStatus(auction.status)}
+                          </span>
+                        </StyledTableCell>
+                        {/* <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                         {new Date(auction.startTime).toLocaleString()}
                       </StyledTableCell>
                       <StyledTableCell align="left" style={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                         {new Date(auction.endTime).toLocaleString()}
                       </StyledTableCell> */}
-                      <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
-                        {auction.reservePrice.toLocaleString()} đ
-                      </StyledTableCell>
-                      <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
-                        {auction.priceStep.toLocaleString()} đ
-                      </StyledTableCell>
-                      <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
-                        {auction.currentPrice?.toLocaleString()} đ
-                      </StyledTableCell>
-                      <StyledTableCell align="left">
-                        <IconButton color="default" onClick={() => handleEditClick(auction)}>
-                          <InfoOutlinedIcon />
-                        </IconButton>
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  </React.Fragment>
-                ))
+                        <StyledTableCell
+                          align="left"
+                          style={{ fontFamily: "REM" }}
+                        >
+                          {auction.reservePrice.toLocaleString()} đ
+                        </StyledTableCell>
+                        <StyledTableCell
+                          align="left"
+                          style={{ fontFamily: "REM" }}
+                        >
+                          {auction.priceStep.toLocaleString()} đ
+                        </StyledTableCell>
+                        <StyledTableCell
+                          align="left"
+                          style={{ fontFamily: "REM" }}
+                        >
+                          {auction.currentPrice?.toLocaleString()} đ
+                        </StyledTableCell>
+                        <StyledTableCell align="left">
+                          <IconButton
+                            color="default"
+                            onClick={() => handleEditClick(auction)}
+                          >
+                            <InfoOutlinedIcon />
+                          </IconButton>
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    </React.Fragment>
+                  ))
               )}
             </TableBody>
           </Table>
@@ -280,7 +406,7 @@ const ManageAuctions: React.FC = () => {
             endTime: selectedAuction.endTime,
             currentPrice: selectedAuction.currentPrice,
             sellerInfo: selectedAuction.sellerInfo,
-            status: selectedAuction.status
+            status: selectedAuction.status,
           }}
           onSuccess={handleModalSuccess}
         />

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import backgr from "../assets/bookshelf.jpg";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { LoginUser } from "../redux/features/auth/authActionCreators";
 

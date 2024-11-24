@@ -9,7 +9,7 @@ import {
   Col,
   notification,
 } from "antd";
-import moment, { Moment } from "moment";
+import { Moment } from "moment";
 import dayjs from "dayjs";
 import { privateAxios } from "../../../middleware/axiosInstance";
 

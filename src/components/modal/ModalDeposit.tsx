@@ -2,10 +2,7 @@ import React from "react";
 import { Modal, Button, Typography } from "@mui/material";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import {
-  callbackUrl,
-  navigateSlice,
-} from "../../redux/features/navigate/navigateSlice";
+import { callbackUrl } from "../../redux/features/navigate/navigateSlice";
 import { useNavigate } from "react-router-dom";
 
 interface ModalDepositProps {

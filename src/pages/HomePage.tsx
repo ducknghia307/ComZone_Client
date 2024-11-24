@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import CarouselComponent from "../components/home/Carousel";
 import HotComic from "../components/home/HotComic";
 import Auctions from "../components/home/Auctions";

@@ -265,8 +265,9 @@ const Checkout = () => {
         console.log("orderType", orderType);
 
         const orderResponse = await privateAxios.post("/orders", {
+          sellerId: sellerId,
           totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
-          paymentMethod: selectedPaymentMethod,
+          paymentMethod: selectedPaymentMethod.toUpperCase(),
           deliveryId: newDelivery.id,
           addressId: selectedAddress?.id,
           note: notes[sellerId] || "",

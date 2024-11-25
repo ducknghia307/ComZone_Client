@@ -26,7 +26,6 @@ export default function PayButton({
     await privateAxios
       .get("users/profile")
       .then((res) => {
-        console.log(res.data.balance);
         setUserBalance(res.data.balance);
       })
       .catch((err) => console.log(err))
@@ -56,7 +55,6 @@ export default function PayButton({
     await privateAxios
       .patch(`/exchanges/pay/${exchangeId}`)
       .then((res) => {
-        console.log(res.data);
         notification.success({ message: "Thanh toán thành công", duration: 5 });
         fetchExchangeDetails();
       })

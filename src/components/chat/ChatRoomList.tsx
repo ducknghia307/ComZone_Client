@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { useState } from "react";
 import dateFormat from "../../assistants/date.format";
 import { Avatar } from "antd";

@@ -84,7 +84,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
         const theme = useTheme();
 
         const paymentStatusColor =
-        paymentMethod === "WALLET" ? "#32CD32" : paymentMethod === "COD" ? "#ff9800" : "#000";
+            paymentMethod === "WALLET" ? "#32CD32" : paymentMethod === "COD" ? "#ff9800" : "#000";
 
         return (
             <Box
@@ -173,7 +173,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                         <CloseIcon />
                     </IconButton>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px', alignItems:'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '0px', color: 'rgba(0, 0, 0, 0.4)' }}>
                         <Typography
                             variant="body2"
@@ -192,7 +192,33 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                             Mã đơn hàng: {order.delivery.deliveryTrackingCode}
                         </Typography>
                     </div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px',
+                            padding: '20px',
+                            backgroundColor: '#ffe6e6',
+                            borderRadius: '8px',
+                            border: '1px solid #f50057',
+                        }}
+                    >
+                        <Typography
+                            variant="body1"
+                            sx={{ fontWeight: 'bold', color: '#d32f2f', fontFamily: "REM" }}
+                        >
+                            Lý do từ chối hoàn tiền:
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{ color: '#d32f2f', fontFamily: "REM" }}
+                        >
+                            {order.rejectReason || 'Không có lý do cụ thể'}
+                        </Typography>
+                    </div>
                 </Box>
+
+
                 <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
                     <Grid size={12} sx={{ borderTop: `1px solid rgba(0, 0, 0, 0.12)`, paddingTop: '10px', paddingBottom: '10px' }}>
                         <Stack divider={<Divider />} spacing={2} direction="row" justifyContent="space-between" padding={'10px 20px'}>

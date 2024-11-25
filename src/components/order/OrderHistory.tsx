@@ -11,7 +11,7 @@ import { Comic, UserInfo } from "../../common/base.interface";
 import GavelIcon from '@mui/icons-material/Gavel';
 import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
 import ModalRequestRefund from "../modal/ModalRequestRefund";
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 interface Order {
   id: string;
   status: string;
@@ -23,7 +23,18 @@ interface Order {
   items: Item[];
   type: string;
   user?: UserInfo;
+  refundRequest?: RefundRequest;
+  rejectReason?: string;
 }
+
+interface RefundRequest {
+  id: string;
+  description: string;
+  rejectedReason: string;
+  createdAt: string;
+  attachedImages?: string[];
+}
+
 interface Item {
   comics: Comic;
 }
@@ -56,18 +67,32 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         const ordersData = response.data;
         // Fetch items for each order
         const ordersWithItems = await Promise.all(
+          // ordersData.map(async (order: any) => {
+          //   const itemsResponse = await privateAxios.get(
+          //     `/order-items/order/${order.id}`
+          //   );
+          //   const itemsData = itemsResponse.data;
+
+          //   return { ...order, items: itemsData }; // order với order items
+          // })
           ordersData.map(async (order: any) => {
             const itemsResponse = await privateAxios.get(
               `/order-items/order/${order.id}`
             );
             const itemsData = itemsResponse.data;
 
-            return { ...order, items: itemsData }; // order với order items
+            const refundRequestResponse = await privateAxios.get(
+              `/refund-requests/order/${order.id}`
+            );
+
+            const refundData = refundRequestResponse.data;
+
+            return { ...order, items: itemsData, refundRequest: refundData, rejectReason: refundData?.rejectedReason }; // order với order items
           })
         );
 
         setOrders(ordersWithItems);
-        console.log("Orders with items:", ordersWithItems);
+        console.log("Orders with items and refund requests:", ordersWithItems);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
@@ -240,7 +265,8 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
   };
 
   const openOrderDetailsModal = (order: Order) => {
-    setSelectedOrder(order);
+    // setSelectedOrder(order);
+    setSelectedOrder({ ...order, rejectReason: order.rejectReason });
     setOrderDetailsOpen(true);
   };
 
@@ -412,27 +438,37 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
               ))}
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                padding: "20px",
-                gap: "10px",
-                backgroundColor: "#fff",
-                alignItems: "center",
-              }}
-            >
-              <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
-                Thành tiền:{" "}
-              </Typography>
-              <Typography
-                sx={{ fontSize: "28px", color: "#f77157", fontFamily: "REM" }}
-              >
-                {Number(order.totalPrice).toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-              </Typography>
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "20px",
+              // backgroundColor: "#fafafa",
+              borderTop: "1px solid #eee"
+            }}>
+              {order.status === "FAILED" && (
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
+                    <ErrorOutlineIcon className="text-red-500 mr-2" />
+                    <div className="flex flex-col">
+                      <span className="text-red-600 font-semibold font-['REM']">Lý do từ chối hoàn tiền</span>
+                      <span className="text-red-500 font-['REM']">
+                        {order.refundRequest?.rejectedReason || "Không có lý do cụ thể"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3 ml-auto">
+                <span className="font-['REM'] text-lg">Thành tiền:</span>
+                <span className="font-['REM'] text-2xl font-medium text-[#f77157]">
+                  {Number(order.totalPrice).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </span>
+              </div>
             </div>
 
             <div

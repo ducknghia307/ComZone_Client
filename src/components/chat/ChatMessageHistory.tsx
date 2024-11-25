@@ -2,6 +2,8 @@ import { MessageGroup } from "../../common/interfaces/message.interface";
 import moment from "moment/min/moment-with-locales";
 import styles from "./style.module.css";
 import { Avatar, Image } from "antd";
+import ViewComicsMessageModal from "./extraModals/ViewComicsMessageModal";
+import { useState } from "react";
 
 moment.locale("vi");
 
@@ -12,6 +14,8 @@ export default function ChatMessageHistory({
   messagesList: MessageGroup[];
   lastMessageRef: any;
 }) {
+  const [isViewingComics, setIsViewingComics] = useState<string>("");
+
   if (!messagesList || messagesList.length === 0) return;
 
   return (
@@ -81,7 +85,10 @@ export default function ChatMessageHistory({
                       >
                         {message.type === "TEXT" && message.content}
                         {message.type === "COMICS" && message.comics && (
-                          <div className="flex flex-col items-stretch gap-1 group">
+                          <div
+                            onClick={() => setIsViewingComics(message.id)}
+                            className="flex flex-col items-stretch gap-1 group cursor-pointer"
+                          >
                             <Avatar.Group
                               shape="square"
                               max={{ count: 5 }}
@@ -108,6 +115,12 @@ export default function ChatMessageHistory({
                                 Nhấn vào để xem chi tiết!
                               </span>
                             </p>
+
+                            <ViewComicsMessageModal
+                              isOpen={isViewingComics == message.id}
+                              setIsOpen={setIsViewingComics}
+                              comicsList={message.comics}
+                            />
                           </div>
                         )}
                         {message.type === "IMAGE" && (

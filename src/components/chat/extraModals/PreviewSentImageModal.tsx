@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Modal, notification } from "antd";
 
 export default function PreviewSentImageModal({

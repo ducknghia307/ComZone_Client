@@ -133,11 +133,7 @@ const TableExchange: React.FC = () => {
             break;
           case "DELIVERING":
             color = "yellow";
-            translatedStatus = "Đang giao hàng";
-            break;
-          case "DELIVERED":
-            color = "green";
-            translatedStatus = "Đã giao hàng thành công";
+            translatedStatus = "Đang chờ xác nhận giao hàng";
             break;
           case "SUCCESSFUL":
             color = "green";

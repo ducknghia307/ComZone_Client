@@ -27,6 +27,8 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
 
   const formatEndTime = (endTime: string) => {
     const date = new Date(endTime);
+    console.log(auctionData.endTime);
+
     return date.toLocaleString("vi-VN", {
       timeZone: "Asia/Ho_Chi_Minh",
       weekday: "short",

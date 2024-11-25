@@ -19,8 +19,8 @@ const ExchangeDetail: React.FC = () => {
 
   const [exchangeData, setExchangeData] = useState<ExchangeDetails>();
 
-  const [firstCurrentStage, setFirstCurrentStage] = useState<number>(1);
-  const [secondCurrentStage, setSecondCurrentStage] = useState<number>(1);
+  const [firstCurrentStage, setFirstCurrentStage] = useState<number>(0);
+  const [secondCurrentStage, setSecondCurrentStage] = useState<number>(0);
   const [firstAddress, setFirstAddress] = useState<string>("");
   const [secondAddress, setSecondAddress] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -119,18 +119,17 @@ const ExchangeDetail: React.FC = () => {
         ? exchangeDetails.exchange.post.user
         : exchangeDetails.exchange.requestUser;
 
-      //FETCH STAGE 0
-      if (exchangeDetails.exchange.status === "PENDING") {
-        setFirstCurrentStage(0);
-        setSecondCurrentStage(0);
-        return;
-      }
-
       //FETCH STAGE 6
       if (exchangeDetails.exchange.status === "SUCCESSFUL") {
         setFirstCurrentStage(6);
         setSecondCurrentStage(6);
         return;
+      }
+
+      //FETCH STAGE 1
+      if (exchangeDetails.exchange.status === "DEALING") {
+        setFirstCurrentStage(1);
+        setSecondCurrentStage(1);
       }
 
       const firstConfirmationResponse = await privateAxios(

@@ -97,11 +97,10 @@ export interface Auction {
   maxPrice: number;
   isPaid?: boolean;
   paymentDeadline?: string;
-  depositAmount: number;
   winner?: {
     id: string;
     name: string;
-    createdAt: string
+    createdAt: string;
   };
 }
 

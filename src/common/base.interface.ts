@@ -11,7 +11,7 @@ export interface UserInfo {
   email: string;
   id: string;
   name: string;
-  phone: number;
+  phone: string;
   avatar: string;
   refresh_token: string;
   role: string | null;
@@ -19,7 +19,7 @@ export interface UserInfo {
   balance: number;
   nonWithdrawableAmount: number;
   last_active?: Date | null;
-  isActive: boolean;
+  isActive?: boolean;
   follower_count?: number;
   address: string;
 }

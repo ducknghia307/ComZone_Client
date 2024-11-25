@@ -12,6 +12,9 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from
 import { privateAxios } from '../middleware/axiosInstance';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { OrderDetailData } from '../common/base.interface';
+import { Modal, notification } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import "../components/ui/OrderDetailSeller.css";
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
@@ -231,67 +234,170 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
         }
     };
 
-    const handleConfirmAction = async (actionType: string) => {
-        const confirmMessage =
-            actionType === "start"
-                ? "Bạn có chắc chắn muốn bắt đầu đóng gói đơn hàng này không?"
-                : "Bạn có chắc chắn muốn hoàn tất đóng gói để shipper có thể đến lấy hàng không?";
+    // const handleConfirmAction = async (actionType: string) => {
+    //     const confirmMessage =
+    //         actionType === "start"
+    //             ? "Bạn có chắc chắn muốn bắt đầu đóng gói đơn hàng này không?"
+    //             : "Bạn có chắc chắn muốn hoàn tất đóng gói để shipper có thể đến lấy hàng không?";
 
-        if (window.confirm(confirmMessage)) {
-            try {
-                const endpoint =
-                    actionType === "start"
+    //     if (window.confirm(confirmMessage)) {
+    //         try {
+    //             const endpoint =
+    //                 actionType === "start"
+    //                     ? `/orders/status/start-packaging/${orderId}`
+    //                     : `/orders/status/finish-packaging/${orderId}`;
+
+    //             const response = await privateAxios.post(endpoint);
+
+    //             if (actionType === "start") {
+    //                 onStatusUpdate(orderId, "PACKAGING");
+    //                 setOrderDetail(prev => prev ? { ...prev, status: "PACKAGING" } : null);
+    //             } else if (actionType === "finish") {
+    //                 if (response.status === 400) {
+    //                     alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
+
+    //                     await privateAxios.patch("/orders/cancel", {
+    //                         orderId: orderId,
+    //                         cancelReason: "Đơn hàng gặp lỗi, cần hủy."
+    //                     });
+    //                     onStatusUpdate(orderId, "CANCELED");
+    //                     setOrderDetail(prev => prev ? { ...prev, status: "CANCELED" } : null);
+    //                     alert("Đơn hàng đã được hủy thành công.");
+    //                 } else {
+    //                     onStatusUpdate(orderId, "PACKAGING", "ready_to_pick");
+    //                     setOrderDetail(prev => prev ? {
+    //                         ...prev,
+    //                         status: "PACKAGING",
+    //                         delivery_status: "ready_to_pick"
+    //                     } : null);
+    //                     alert("Trạng thái đơn hàng đã được cập nhật thành công.");
+    //                 }
+    //             }
+    //         } catch (error : any) {
+    //             if (actionType === "finish" && error.response?.status === 400) {
+    //                 alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
+    //                 try {
+    //                     await privateAxios.patch("/orders/cancel", {
+    //                         orderId: orderId,
+    //                         cancelReason: "Đơn hàng gặp lỗi, cần hủy."
+    //                     });
+    //                     onStatusUpdate(orderId, "CANCELED");
+    //                     setOrderDetail(prev => prev ? { ...prev, status: "CANCELED" } : null);
+    //                     alert("Đơn hàng đã được hủy thành công.");
+    //                 } catch (cancelError) {
+    //                     console.error("Error cancelling the order:", cancelError);
+    //                     alert("Có lỗi xảy ra khi hủy đơn hàng.");
+    //                 }
+    //             } else {
+    //                 console.error("Error updating order status:", error);
+    //                 alert("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.");
+    //             }
+    //         }
+    //     }
+    // };
+
+    const handleConfirmAction = async (actionType: string) => {
+        const confirmConfig = {
+            start: {
+                title: 'Xác nhận đơn hàng',
+                content: 'Bạn có chắc chắn muốn bắt đầu đóng gói đơn hàng này không?'
+            },
+            finish: {
+                title: 'Hoàn tất đóng gói',
+                content: 'Bạn có chắc chắn muốn hoàn tất đóng gói để shipper có thể đến lấy hàng không?'
+            }
+        };
+    
+        const { title, content } = confirmConfig[actionType as keyof typeof confirmConfig];
+    
+        Modal.confirm({
+            title: title,
+            icon: <ExclamationCircleOutlined style={{ fontSize: '36px', color: '#faad14' }} />,
+            content: content,
+            okText: 'Xác nhận',
+            cancelText: 'Hủy',
+            centered: true,
+            className: 'styled-modal-confirm',
+            onOk: async () => {
+                try {
+                    const endpoint = actionType === "start"
                         ? `/orders/status/start-packaging/${orderId}`
                         : `/orders/status/finish-packaging/${orderId}`;
-
-                const response = await privateAxios.post(endpoint);
-
-                if (actionType === "start") {
-                    onStatusUpdate(orderId, "PACKAGING");
-                    setOrderDetail(prev => prev ? { ...prev, status: "PACKAGING" } : null);
-                } else if (actionType === "finish") {
-                    if (response.status === 400) {
-                        alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
-
-                        await privateAxios.patch("/orders/cancel", {
-                            orderId: orderId,
-                            cancelReason: "Đơn hàng gặp lỗi, cần hủy."
+    
+                    const response = await privateAxios.post(endpoint);
+    
+                    if (actionType === "start") {
+                        const updatedDetail = { ...orderDetail, status: "PACKAGING" };
+                        setOrderDetail(updatedDetail);
+                        onStatusUpdate(orderId, "PACKAGING");
+                        
+                        notification.success({
+                            message: 'Thành công',
+                            description: 'Đã xác nhận đơn hàng thành công',
+                            duration: 3
                         });
-                        onStatusUpdate(orderId, "CANCELED");
-                        setOrderDetail(prev => prev ? { ...prev, status: "CANCELED" } : null);
-                        alert("Đơn hàng đã được hủy thành công.");
-                    } else {
-                        onStatusUpdate(orderId, "PACKAGING", "ready_to_pick");
-                        setOrderDetail(prev => prev ? {
-                            ...prev,
+                    } else if (actionType === "finish") {
+                        const updatedDeliveryStatus = "ready_to_pick";
+                        const updatedDetail = {
+                            ...orderDetail,
                             status: "PACKAGING",
-                            delivery_status: "ready_to_pick"
-                        } : null);
-                        alert("Trạng thái đơn hàng đã được cập nhật thành công.");
-                    }
-                }
-            } catch (error : any) {
-                if (actionType === "finish" && error.response?.status === 400) {
-                    alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
-                    try {
-                        await privateAxios.patch("/orders/cancel", {
-                            orderId: orderId,
-                            cancelReason: "Đơn hàng gặp lỗi, cần hủy."
+                            delivery: { ...orderDetail?.delivery, status: updatedDeliveryStatus },
+                        };
+    
+                        setOrderDetail(updatedDetail);
+                        onStatusUpdate(orderId, "PACKAGING", { status: updatedDeliveryStatus });
+    
+                        notification.success({
+                            message: 'Thành công',
+                            description: 'Trạng thái đơn hàng đã được cập nhật thành công',
+                            duration: 3
                         });
-                        onStatusUpdate(orderId, "CANCELED");
-                        setOrderDetail(prev => prev ? { ...prev, status: "CANCELED" } : null);
-                        alert("Đơn hàng đã được hủy thành công.");
-                    } catch (cancelError) {
-                        console.error("Error cancelling the order:", cancelError);
-                        alert("Có lỗi xảy ra khi hủy đơn hàng.");
                     }
-                } else {
-                    console.error("Error updating order status:", error);
-                    alert("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.");
+                } catch (error: any) {
+                    if (actionType === "finish" && error.response?.status === 400) {
+                        Modal.confirm({
+                            title: 'Lỗi đơn hàng',
+                            icon: <ExclamationCircleOutlined />,
+                            content: 'Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.',
+                            okText: 'Hủy đơn hàng',
+                            cancelText: 'Đóng',
+                            onOk: async () => {
+                                try {
+                                    await privateAxios.patch("/orders/cancel", {
+                                        orderId: orderId,
+                                        cancelReason: "Đơn hàng gặp lỗi, cần hủy.",
+                                    });
+                                    
+                                    const updatedDetail = { ...orderDetail, status: "CANCELED" };
+                                    setOrderDetail(updatedDetail);
+                                    onStatusUpdate(orderId, "CANCELED");
+                                    
+                                    notification.success({
+                                        message: 'Thành công',
+                                        description: 'Đơn hàng đã được hủy thành công',
+                                        duration: 3
+                                    });
+                                } catch (cancelError) {
+                                    notification.error({
+                                        message: 'Lỗi',
+                                        description: 'Có lỗi xảy ra khi hủy đơn hàng',
+                                        duration: 3
+                                    });
+                                }
+                            },
+                        });
+                    } else {
+                        notification.error({
+                            message: 'Lỗi',
+                            description: 'Có lỗi xảy ra khi cập nhật trạng thái đơn hàng',
+                            duration: 3
+                        });
+                    }
                 }
-            }
-        }
+            },
+        });
     };
+    
 
     useEffect(() => {
         if (order) {
@@ -316,9 +422,9 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                 <Box display="flex" justifyContent="space-between" alignItems="center" >
                 <StatusChip 
                         status={orderDetail.status} 
-                        deliveryStatus={orderDetail.deliveryStatus}
+                        deliveryStatus={orderDetail.delivery?.status}
                     >
-                        {translateStatus(orderDetail.status, orderDetail.deliveryStatus)}
+                        {translateStatus(orderDetail.status, orderDetail.delivery?.status)}
                     </StatusChip>
                     <Typography
                         variant="h5"
@@ -411,9 +517,9 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                                             border: '2px solid black',
                                         }}
                                     />
-                                    <InfoRow label="Họ tên" value={orderDetail.delivery.to.name} />
-                                    <InfoRow label="Số điện thoại" value={orderDetail.delivery.to.phone} />
-                                    <InfoRow label="Địa chỉ" value={orderDetail.delivery.to.address} />
+                                    <InfoRow label="Họ tên" value={orderDetail.delivery?.to?.name} />
+                                    <InfoRow label="Số điện thoại" value={orderDetail.delivery?.to?.phone} />
+                                    <InfoRow label="Địa chỉ" value={orderDetail.delivery?.to?.address} />
                                 </Box>
 
                                 <Divider orientation="vertical" flexItem />
@@ -426,7 +532,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                                         }}
                                     />
                                     <InfoRow label="Tổng tiền" value={`${orderDetail.totalPrice} đ`} />
-                                    <InfoRow label="Phí vận chuyển" value={`${orderDetail.deliveryFee} đ`} />
+                                    <InfoRow label="Phí vận chuyển" value={`${orderDetail.delivery.deliveryFee} đ`} />
                                     <InfoRow label="Phương thức thanh toán" value={orderDetail.paymentMethod === 'WALLET' ? 'Ví Comzone' : orderDetail.paymentMethod} />
                                     <InfoRow
                                         label="Trạng thái thanh toán"
@@ -513,7 +619,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
                         Xác nhận đơn hàng
                     </Button>
                 )}
-                {(orderDetail.status === 'PACKAGING' && orderDetail.deliveryStatus !== 'ready_to_pick') && (
+                {orderDetail.status === 'PACKAGING' && orderDetail.delivery?.status !== 'ready_to_pick' && (
                     <Button
                         sx={{ backgroundColor: '#4A4A4A', color: '#fff', padding: '5px 20px', fontWeight: 'bold' }}
                         onClick={() => handleConfirmAction("finish")}

@@ -189,7 +189,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                                 fontFamily: 'REM'
                             }}
                         >
-                            Mã đơn hàng: {order.deliveryTrackingCode}
+                            Mã đơn hàng: {order.delivery.deliveryTrackingCode}
                         </Typography>
                     </div>
                 </Box>
@@ -308,7 +308,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                     }}>
                         <Typography sx={{ fontSize: "15px", fontFamily: "REM", color: "text.secondary" }}>Phí vận chuyển: </Typography>
                         <Typography sx={{ fontSize: "15px", color: "text.secondary", fontFamily: "REM" }}>
-                            {Number(order.deliveryFee).toLocaleString("vi-VN", {
+                            {Number(order.delivery.deliveryFee).toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
                             })}

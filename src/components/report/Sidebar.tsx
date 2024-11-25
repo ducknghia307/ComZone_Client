@@ -143,6 +143,7 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
+import CurrencyExchangeOutlinedIcon from '@mui/icons-material/CurrencyExchangeOutlined';
 interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
@@ -210,6 +211,11 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       title: "Quản Lý Đánh Giá",
       path: "/mod/feedbacks",
       icon: <EventNoteOutlinedIcon sx={{ color: 'inherit' }} />
+    },
+    {
+      title: "Quản Lý Hoàn Tiền",
+      path: "/mod/refunds",
+      icon: <CurrencyExchangeOutlinedIcon sx={{ color: 'inherit' }} />
     },
   ];
 

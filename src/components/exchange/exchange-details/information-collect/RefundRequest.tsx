@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import React, { useState } from "react";
 import { Input, Modal, notification, Select } from "antd";
 import { privateAxios } from "../../../../middleware/axiosInstance";
@@ -8,16 +9,18 @@ export default function RefundRequest({
   setIsOpen,
   exchange,
   setIsLoading,
+  fetchExchangeDetails,
 }: {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   exchange: Exchange;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchExchangeDetails: Function;
 }) {
   const [reason, setReason] = useState<{ label: string; value: string }>();
   const [description, setDescription] = useState<string>("");
 
-  const [uploadedImageFiles, setUploadedImageFiles] = useState<File[]>([]);
+  const [uploadedImageFiles, setUploadedImageFiles] = useState<any[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
 
   const reasonsList = [
@@ -88,6 +91,7 @@ export default function RefundRequest({
         attachedImages: attachedImages.length > 0 ? attachedImages : null,
       })
       .then(() => {
+        fetchExchangeDetails();
         notification.success({
           key: "success-refund-request",
           message: (
@@ -109,17 +113,19 @@ export default function RefundRequest({
       .finally(() => setIsLoading(false));
   };
 
+  const handleClose = (e: any) => {
+    e.stopPropagation();
+    setReason(undefined);
+    setDescription("");
+    setUploadedImageFiles([]);
+    setPreviewImages([]);
+    setIsOpen(false);
+  };
+
   return (
     <Modal
       open={isOpen}
-      onCancel={(e) => {
-        e.stopPropagation();
-        setReason(undefined);
-        setDescription("");
-        setUploadedImageFiles([]);
-        setPreviewImages([]);
-        setIsOpen(false);
-      }}
+      onCancel={handleClose}
       footer={null}
       centered
       width={window.innerWidth * 0.5}
@@ -128,11 +134,12 @@ export default function RefundRequest({
         <p className="font-semibold text-xl pb-4">GẶP VẤN ĐỀ KHI NHẬN TRUYỆN</p>
 
         <div className="flex items-center gap-2">
-          <p className="text-sm font-light whitespace-nowrap">
+          <p className="text-sm whitespace-nowrap">
             Vấn đề bạn gặp phải: <span className="text-red-600">*</span>
           </p>
+
           <Select
-            style={{ width: "100%" }}
+            style={{ width: "100%", height: "auto" }}
             size="large"
             options={reasonsList}
             value={reason}
@@ -140,35 +147,37 @@ export default function RefundRequest({
             placeholder={
               <p className="text-sm italic">Chọn một loại vấn đề...</p>
             }
-            optionRender={(props) => (
-              <p className="text-xs text-wrap">{props.label}</p>
-            )}
-            labelRender={(props) => (
-              <p className="text-xs text-wrap">{props.label}</p>
-            )}
+            optionRender={(props) => <p className="text-wrap">{props.label}</p>}
+            labelRender={(props) => <p className="text-wrap">{props.label}</p>}
           />
         </div>
 
         <div className="pb-4">
-          <p className="font-light">
+          <p>
             Mô tả: <span className="text-red-600">*</span>
           </p>
           <Input.TextArea
-            placeholder="Mô tả vấn đề bạn gặp phải..."
+            placeholder="Mô tả cụ thể vấn đề bạn của bạn..."
             autoSize={{ minRows: 5, maxRows: 8 }}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={2000}
             showCount
-            className="REM font-light text-xs"
+            className="REM text-sm"
+            style={{ padding: "0.5em" }}
           />
         </div>
 
         <div className="pb-4">
-          <p className="font-light">Đính kèm hình ảnh:</p>
+          <p>
+            Đính kèm hình ảnh mô tả: <span className="text-red-600">*</span>{" "}
+            <span className="text-xs font-light italic">
+              (Tối đa 8 hình ảnh)
+            </span>
+          </p>
           <p className="font-light text-xs italic">
-            Chúng tôi khuyến khích bạn đính kèm hình ảnh để giải quyết ổn thỏa
-            hơn cho cả hai bên.
+            Hình ảnh phải mô tả được rõ tình trạng và vấn đề để được tiến hành
+            phê duyệt và giải quyết.
           </p>
 
           <div className="flex items-center justify-start gap-2 pt-2 pb-4">
@@ -201,22 +210,24 @@ export default function RefundRequest({
 
             <input
               type="file"
+              multiple
               hidden
               id="add-image"
               accept="image/png, image/gif, image/jpeg"
               onChange={(e) => {
-                if (e.target.files !== null && e.target.files[0])
-                  setUploadedImageFiles((prev) => [
-                    ...prev,
-                    e.target.files![0],
-                  ]);
-                setPreviewImages((prev) => [
-                  ...prev,
-                  URL.createObjectURL(e.target.files![0]),
-                ]);
+                if (e.target.files !== null && e.target.files.length > 0) {
+                  Array.from(e.target.files).map((file) => {
+                    setUploadedImageFiles((prev) => [...prev, file]);
+                    setPreviewImages((prev) => [
+                      ...prev,
+                      URL.createObjectURL(file),
+                    ]);
+                  });
+                }
               }}
             />
             <button
+              hidden={uploadedImageFiles.length === 8}
               onClick={() => {
                 document.getElementById("add-image")?.click();
               }}
@@ -236,11 +247,18 @@ export default function RefundRequest({
         </div>
 
         <div className="flex items-stretch gap-2">
-          <button className="grow py-2 rounded-md border border-gray-300 duration-200 hover:bg-gray-100">
+          <button
+            onClick={handleClose}
+            className="grow py-2 rounded-md border border-gray-300 duration-200 hover:bg-gray-100"
+          >
             HỦY BỎ
           </button>
           <button
-            disabled={!reason || description.length === 0}
+            disabled={
+              !reason ||
+              description.length === 0 ||
+              uploadedImageFiles.length === 0
+            }
             onClick={() => handleSubmitRefundRequest()}
             className="grow py-2 rounded-md bg-sky-800 text-white duration-200 hover:bg-sky-900 disabled:bg-gray-300"
           >

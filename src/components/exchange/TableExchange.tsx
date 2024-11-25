@@ -69,7 +69,7 @@ const TableExchange: React.FC = () => {
                   title={<p className="text-black">{comics.title}</p>}
                   color="white"
                 >
-                  <p className="text-start cursor-default text-xs line-clamp-2">
+                  <p className="text-start cursor-default line-clamp-2">
                     {comics.title}
                   </p>
                 </Tooltip>
@@ -78,7 +78,7 @@ const TableExchange: React.FC = () => {
             {othersComics.length > maxShown && (
               <button
                 onClick={() => handleRowClick(record.id)}
-                className="font-light text-xs p-1 rounded-md bg-black text-white mx-auto duration-200 hover:bg-gray-700"
+                className="font-light p-1 rounded-md bg-black text-white mx-auto duration-200 hover:bg-gray-700"
               >
                 + {othersComics.length - maxShown} truyện khác
               </button>
@@ -109,7 +109,10 @@ const TableExchange: React.FC = () => {
       title: "Thời gian",
       dataIndex: "createdAt",
       render: (createdAt: Date) => (
-        <p className="text-xs font-light">{moment(createdAt).calendar()}</p>
+        <p className="font-light">
+          {moment(createdAt).calendar().charAt(0).toUpperCase() +
+            moment(createdAt).calendar().slice(1)}
+        </p>
       ),
       align: "center",
     },
@@ -117,7 +120,7 @@ const TableExchange: React.FC = () => {
       title: "Trạng thái",
       dataIndex: "status",
       render: (status: string) => {
-        let color = "geekblue"; // Default color
+        let color = "geekblue";
         let translatedStatus = status;
         switch (status) {
           case "PENDING":
@@ -130,11 +133,7 @@ const TableExchange: React.FC = () => {
             break;
           case "DELIVERING":
             color = "yellow";
-            translatedStatus = "Đang giao hàng";
-            break;
-          case "DELIVERED":
-            color = "green";
-            translatedStatus = "Đã giao hàng thành công";
+            translatedStatus = "Đang chờ xác nhận giao hàng";
             break;
           case "SUCCESSFUL":
             color = "green";
@@ -161,7 +160,7 @@ const TableExchange: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleRowClick(record.id)}
-            className="px-2 py-1 rounded-md border border-gray-300 text-xs flex items-center gap-1"
+            className="px-2 py-1 rounded-md border border-gray-300 flex items-center gap-1"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -23,22 +23,21 @@ import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import { Modal } from "antd"; // For confirmation modal
 import { CheckOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import AuctionModal from "../comic/sellerManagement/AuctionModal";
+import { Comic } from "../../common/base.interface";
 
 const { confirm } = Modal;
 
 const SellerManagement = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
   const [selectionModel, setSelectionModel] = useState([]);
-  const [comics, setComics] = useState([]);
+  const [comics, setComics] = useState<Comic[]>([]);
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedComic, setSelectedComic] = useState(null); // State to store the selected comic for auction modal
+  const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
   const navigate = useNavigate();
 
-  const handleAuction = (comic) => {
-    console.log("::::", comic);
-
+  const handleAuction = (comic: any) => {
     setSelectedComic(comic); // Set the selected comic
     setIsModalVisible(true); // Show the modal
   };
@@ -51,16 +50,11 @@ const SellerManagement = () => {
     setIsModalVisible(false); // Close the modal
     setComics((prevComics) =>
       prevComics.map((prevComic) =>
-        prevComic.id === selectedComic.id
+        prevComic.id === selectedComic?.id
           ? { ...prevComic, status: "AUCTION" }
           : prevComic
       )
     );
-  };
-
-  const handleViewMore = (comic) => {
-    // Logic for viewing more details about the comic
-    console.log("View more details for", comic);
   };
 
   const handleSell = (comic: Comic) => {
@@ -113,14 +107,7 @@ const SellerManagement = () => {
       });
   }, []);
 
-  const handleMenuItemClick = (item) => {
-    setSelectedMenuItem(item);
-    if (item === "comic") {
-      navigate("/sellermanagement/comic");
-    }
-  };
-
-  const getGenreNames = (genreArray) => {
+  const getGenreNames = (genreArray: any) => {
     if (!Array.isArray(genreArray) || genreArray.length === 0) {
       return "No genres";
     }

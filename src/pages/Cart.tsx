@@ -84,7 +84,7 @@ const Cart = () => {
         >,
         comic: Comic
       ) => {
-        const sellerId = comic.sellerId || "unknown";
+        const sellerId = comic.sellerId || null;
         const sellerName = comic.sellerId.name || "Unknown Seller";
         const sellerAvt = comic.sellerId.avatar || "";
         if (!groups[sellerId.id]) {
@@ -162,13 +162,13 @@ const Cart = () => {
         >,
         comic
       ) => {
-        const sellerId = comic.sellerId || "unknown";
+        const sellerId = comic.sellerId.id || null;
         const sellerName = comic.sellerId.name || "Unknown Seller";
 
-        if (!groups[sellerId.id]) {
-          groups[sellerId.id] = { sellerName, comics: [] };
+        if (!groups[sellerId]) {
+          groups[sellerId] = { sellerName, comics: [] };
         }
-        groups[sellerId.id].comics.push({ comic });
+        groups[sellerId].comics.push({ comic });
         return groups;
       },
       {}

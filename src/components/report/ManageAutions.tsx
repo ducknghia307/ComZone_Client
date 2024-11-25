@@ -113,10 +113,10 @@ const ManageAuctions: React.FC = () => {
     setSelectedAuction(null);
   };
 
-  const handleEditClick = (auction: Auction) => {
+  const handleEditClick = (auction: SelectedAuction) => {
     setSelectedAuction({
       ...auction,
-      sellerInfo: auction.comics.sellerId || {},
+      sellerInfo: auction.comics.sellerId ? auction.sellerInfo : null,
       comics: auction.comics,
     });
     setIsModalOpen(true);
@@ -369,7 +369,9 @@ const ManageAuctions: React.FC = () => {
                         <StyledTableCell align="left">
                           <IconButton
                             color="default"
-                            onClick={() => handleEditClick(auction)}
+                            onClick={() =>
+                              handleEditClick(auction as SelectedAuction)
+                            }
                           >
                             <InfoOutlinedIcon />
                           </IconButton>

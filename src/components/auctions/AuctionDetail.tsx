@@ -53,7 +53,13 @@ interface HighestBid {
   price: number; // Assuming there's a price field
   timestamp?: string; // Add other fields as necessary
 }
-
+interface AuctionAnnounce {
+  id: string;
+  status: string;
+  title: string;
+  auction: Auction;
+  message: string;
+}
 const ComicAuction = () => {
   const { id } = useParams<Record<string, string>>();
   const [comic, setComic] = useState<any>(null);
@@ -78,7 +84,7 @@ const ComicAuction = () => {
   const [hasDeposited, setHasDeposited] = useState(false);
   console.log("auctiondata", auctionData);
   const navigate = useNavigate();
-  const auctionAnnounce = useAppSelector(
+  const auctionAnnounce = useAppSelector<AuctionAnnounce | null>(
     (state) => state.annoucement.auctionAnnounce
   );
 

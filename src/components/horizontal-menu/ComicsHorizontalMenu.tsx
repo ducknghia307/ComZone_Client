@@ -1,6 +1,6 @@
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { Comic } from "../../common/base.interface";

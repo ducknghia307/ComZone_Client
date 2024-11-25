@@ -1,4 +1,3 @@
-import React from "react";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../../pages/HomePage";
 import Genres from "../../pages/Genres";
@@ -30,7 +29,6 @@ import NotFound from "../notFound/NotFound";
 import CurrentUserRecentAct from "../../pages/CurrentUserRecentAct";
 import CurrentUserHistoryExchange from "../../pages/CurrentUserHistoryExchange";
 import CurrentUserComicExchange from "../../pages/CurrentUserComicExchange";
-import CurrentUserPostExchange from "../../pages/CurrentUserPostExchange";
 import CurrentUserComicSelling from "../../pages/CurrentUserComicSelling";
 import ModComics from "../../pages/ModComics";
 import ModUsers from "../../pages/ModUsers";
@@ -107,10 +105,6 @@ const AppRouter = () => {
         <Route
           path="/profile/comicExchange"
           element={<CurrentUserComicExchange />}
-        />
-        <Route
-          path="/profile/postExchange"
-          element={<CurrentUserPostExchange />}
         />
         <Route
           path="/profile/comicSelling"

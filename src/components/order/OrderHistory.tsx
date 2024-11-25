@@ -8,10 +8,10 @@ import "../ui/OrderHistory.css";
 import { privateAxios } from "../../middleware/axiosInstance";
 import OrderDetailsModal from "../modal/OrderDetailModal";
 import { Comic, UserInfo } from "../../common/base.interface";
-import GavelIcon from '@mui/icons-material/Gavel';
+import GavelIcon from "@mui/icons-material/Gavel";
 import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
 import ModalRequestRefund from "../modal/ModalRequestRefund";
-
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 interface Order {
   id: string;
   status: string;
@@ -23,15 +23,23 @@ interface Order {
   items: Item[];
   type: string;
   user?: UserInfo;
+  refundRequest?: RefundRequest;
+  rejectReason?: string;
 }
+
+interface RefundRequest {
+  id: string;
+  description: string;
+  rejectedReason: string;
+  createdAt: string;
+  attachedImages?: string[];
+}
+
 interface Item {
   comics: Comic;
 }
-interface OrderHistoryProps {
-  orders: Order[];
-}
 
-const OrderHistory: React.FC<OrderHistoryProps> = () => {
+const OrderHistory = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [openModal, setOpenModal] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -56,18 +64,37 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
         const ordersData = response.data;
         // Fetch items for each order
         const ordersWithItems = await Promise.all(
+          // ordersData.map(async (order: any) => {
+          //   const itemsResponse = await privateAxios.get(
+          //     `/order-items/order/${order.id}`
+          //   );
+          //   const itemsData = itemsResponse.data;
+
+          //   return { ...order, items: itemsData }; // order với order items
+          // })
           ordersData.map(async (order: any) => {
             const itemsResponse = await privateAxios.get(
               `/order-items/order/${order.id}`
             );
             const itemsData = itemsResponse.data;
 
-            return { ...order, items: itemsData }; // order với order items
+            const refundRequestResponse = await privateAxios.get(
+              `/refund-requests/order/${order.id}`
+            );
+
+            const refundData = refundRequestResponse.data;
+
+            return {
+              ...order,
+              items: itemsData,
+              refundRequest: refundData,
+              rejectReason: refundData?.rejectedReason,
+            }; // order với order items
           })
         );
 
         setOrders(ordersWithItems);
-        console.log("Orders with items:", ordersWithItems);
+        console.log("Orders with items and refund requests:", ordersWithItems);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
@@ -77,40 +104,40 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
   }, []);
 
   const cornerRibbonStyle = {
-    position: 'absolute' as const,
+    position: "absolute" as const,
     top: 0,
     left: 0,
-    width: '120px', // giảm kích thước
-    height: '120px', // giảm kích thước
-    overflow: 'hidden',
+    width: "120px", // giảm kích thước
+    height: "120px", // giảm kích thước
+    overflow: "hidden",
     zIndex: 1,
   };
 
   const ribbonContentStyle = {
-    position: 'absolute' as const,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '150px', // giảm độ rộng của text container
-    transform: 'rotate(-45deg)',
-    top: '20px', // điều chỉnh vị trí lên cao hơn
-    left: '-35px', // điều chỉnh vị trí sang trái
-    backgroundColor: '#f77157',
-    color: 'white',
-    padding: '4px 0', // giảm padding
-    fontFamily: 'REM',
-    fontSize: '12px', // giảm font size
-    fontWeight: 'bold',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+    position: "absolute" as const,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "150px", // giảm độ rộng của text container
+    transform: "rotate(-45deg)",
+    top: "20px", // điều chỉnh vị trí lên cao hơn
+    left: "-35px", // điều chỉnh vị trí sang trái
+    backgroundColor: "#f77157",
+    color: "white",
+    padding: "4px 0", // giảm padding
+    fontFamily: "REM",
+    fontSize: "12px", // giảm font size
+    fontWeight: "bold",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
   };
 
   const orderCardStyle = {
-    position: 'relative' as const,
-    marginBottom: '20px',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-    overflow: 'hidden',
+    position: "relative" as const,
+    marginBottom: "20px",
+    backgroundColor: "#fff",
+    borderRadius: "8px",
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+    overflow: "hidden",
   };
 
   const getStatusColor = (status: string) => {
@@ -240,7 +267,8 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
   };
 
   const openOrderDetailsModal = (order: Order) => {
-    setSelectedOrder(order);
+    // setSelectedOrder(order);
+    setSelectedOrder({ ...order, rejectReason: order.rejectReason });
     setOrderDetailsOpen(true);
   };
 
@@ -274,12 +302,13 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           "DELIVERED",
           "SUCCESSFUL",
           "CANCELED",
-          "FAILED"
+          "FAILED",
         ].map((status) => (
           <span
             key={status}
-            className={`status-tab REM ${selectedStatus === status ? "active" : ""
-              }`}
+            className={`status-tab REM ${
+              selectedStatus === status ? "active" : ""
+            }`}
             onClick={() => setSelectedStatus(status)}
             style={{ whiteSpace: "nowrap" }}
           >
@@ -304,15 +333,11 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
 
       <div className="purchase-history-content">
         {filteredOrders.map((order) => (
-          <div
-            key={order.id}
-            className="status-detail"
-            style={orderCardStyle}
-          >
-            {order.type === 'AUCTION' && (
+          <div key={order.id} className="status-detail" style={orderCardStyle}>
+            {order.type === "AUCTION" && (
               <div style={cornerRibbonStyle}>
                 <div style={ribbonContentStyle}>
-                  <GavelIcon sx={{ fontSize: 16, marginRight: '4px' }} />
+                  <GavelIcon sx={{ fontSize: 16, marginRight: "4px" }} />
                   Đấu giá
                 </div>
               </div>
@@ -399,13 +424,13 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                     <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
                       {order.type === "AUCTION"
                         ? Number(order.totalPrice).toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })
+                            style: "currency",
+                            currency: "VND",
+                          })
                         : Number(item.comics.price).toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })}
+                            style: "currency",
+                            currency: "VND",
+                          })}
                     </Typography>
                   </div>
                 </div>
@@ -415,24 +440,39 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
             <div
               style={{
                 display: "flex",
-                justifyContent: "flex-end",
-                padding: "20px",
-                gap: "10px",
-                backgroundColor: "#fff",
+                justifyContent: "space-between",
                 alignItems: "center",
+                padding: "20px",
+                // backgroundColor: "#fafafa",
+                borderTop: "1px solid #eee",
               }}
             >
-              <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
-                Thành tiền:{" "}
-              </Typography>
-              <Typography
-                sx={{ fontSize: "28px", color: "#f77157", fontFamily: "REM" }}
-              >
-                {Number(order.totalPrice).toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-              </Typography>
+              {order.status === "FAILED" && (
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
+                    <ErrorOutlineIcon className="text-red-500 mr-2" />
+                    <div className="flex flex-col">
+                      <span className="text-red-600 font-semibold font-['REM']">
+                        Lý do từ chối hoàn tiền
+                      </span>
+                      <span className="text-red-500 font-['REM']">
+                        {order.refundRequest?.rejectedReason ||
+                          "Không có lý do cụ thể"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3 ml-auto">
+                <span className="font-['REM'] text-lg">Thành tiền:</span>
+                <span className="font-['REM'] text-2xl font-medium text-[#f77157]">
+                  {Number(order.totalPrice).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </span>
+              </div>
             </div>
 
             <div

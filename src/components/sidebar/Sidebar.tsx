@@ -12,11 +12,16 @@ import { useAppSelector } from "../../redux/hooks";
 import { useLocation } from "react-router-dom";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import "../ui/Sidebar.css";
-import { Genre } from "../../common/base.interface";
+import { Comic, Genre } from "../../common/base.interface";
 
+interface SidebarProps {
+  onGenreFilterChange?: (updatedGenres: string[]) => void;
+  onAuthorFilterChange?: (updatedAuthors: string[]) => void;
+  onConditionFilterChange?: (updatedConditions: string[]) => void;
+}
 const conditions = ["SEALED", "USED"];
 
-const Sidebar = ({
+const Sidebar: React.FC<SidebarProps> = ({
   onGenreFilterChange,
   onAuthorFilterChange,
   onConditionFilterChange,
@@ -25,11 +30,11 @@ const Sidebar = ({
   const [isConditionOpen, setIsConditionOpen] = useState(true);
   const [isAuthorOpen, setIsAuthorOpen] = useState(true);
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [authors, setAuthors] = useState([]);
+  const [authors, setAuthors] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedGenres, setSelectedGenres] = useState([]);
-  const [selectedAuthors, setSelectedAuthors] = useState([]);
-  const [selectedConditions, setSelectedConditions] = useState([]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
+  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const location = useLocation();
 
@@ -44,13 +49,13 @@ const Sidebar = ({
         const genreResponse = await publicAxios("/genres");
         setGenres(genreResponse.data);
 
-        const comicsResponse = isLoggedIn
-          ? await privateAxios.get("/comics/except-seller/available")
-          : await publicAxios.get("/comics/status/available");
+        const comicsResponse = await publicAxios.get<Comic[]>(
+          "/comics/status/available"
+        );
 
         const comicsData = comicsResponse.data;
-        const authorsData = [
-          ...new Set(comicsData.map((comic) => comic.author)),
+        const authorsData: string[] = [
+          ...new Set(comicsData.map((comic: any) => comic.author)),
         ];
         setAuthors(authorsData);
       } catch (error) {
@@ -67,7 +72,7 @@ const Sidebar = ({
   const toggleCondition = () => setIsConditionOpen(!isConditionOpen);
   const toggleAuthor = () => setIsAuthorOpen(!isAuthorOpen);
 
-  const handleGenreChange = (event) => {
+  const handleGenreChange = (event: any) => {
     const genre = event.target.name;
     const isChecked = event.target.checked;
     const updatedSelectedGenres = isChecked
@@ -80,7 +85,7 @@ const Sidebar = ({
     }
   };
 
-  const handleAuthorChange = (event) => {
+  const handleAuthorChange = (event: any) => {
     const author = event.target.name;
     const isChecked = event.target.checked;
     const updatedSelectedAuthors = isChecked
@@ -93,7 +98,7 @@ const Sidebar = ({
     }
   };
 
-  const handleConditionChange = (event) => {
+  const handleConditionChange = (event: any) => {
     const condition = event.target.name;
     const isChecked = event.target.checked;
     const updatedSelectedConditions = isChecked

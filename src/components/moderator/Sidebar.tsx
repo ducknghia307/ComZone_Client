@@ -17,6 +17,7 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 import ViewHeadlineOutlinedIcon from "@mui/icons-material/ViewHeadlineOutlined";
 import { privateAxios } from "../../middleware/axiosInstance";
 import adminImage from "../../assets/settings.png";
+import { UserInfo } from "../../common/base.interface";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -25,7 +26,7 @@ interface SidebarProps {
 
 const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState();
+  const [userInfo, setUserInfo] = useState<UserInfo>();
   const currentUrl = window.location.pathname;
   const drawerWidth = isCollapsed ? "5%" : "16%";
 
@@ -94,9 +95,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           <ViewHeadlineOutlinedIcon />
         </IconButton>
       </Box>
-
       <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.12)" }} />
-
       {/* Profile Section */}
       {!isCollapsed && (
         <Box sx={{ p: 3, textAlign: "center" }}>
@@ -122,9 +121,8 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           </Typography>
         </Box>
       )}
-
+      ddowij xiu goi dien
       <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.12)" }} />
-
       {/* Menu Items */}
       <List sx={{ px: isCollapsed ? 1 : 2, pt: 2 }}>
         {menuItems.map((item) => (

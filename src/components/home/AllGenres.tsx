@@ -5,9 +5,8 @@ import "../ui/AllGenres.css";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Link } from "react-router-dom";
-import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
+import { publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
-import { useAppSelector } from "../../redux/hooks";
 
 const responsive = {
   superLargeDesktop: {
@@ -65,7 +64,6 @@ const CustomButtonGroup = ({
 const AllGenres: React.FC = () => {
   const [comics, setComics] = useState<Comic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   // const token = sessionStorage.getItem("accessToken");
 
   // useEffect(() => {

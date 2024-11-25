@@ -311,9 +311,9 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({ open, onClose, orderId,
         const { title, content } = confirmConfig[actionType as keyof typeof confirmConfig];
     
         Modal.confirm({
-            title: title,
+            title: <p className='text-lg font-bold'>{title}</p>,
             icon: <ExclamationCircleOutlined style={{ fontSize: '36px', color: '#faad14' }} />,
-            content: content,
+            content: <p className='text-base text-justify'>{content}</p>,
             okText: 'Xác nhận',
             cancelText: 'Hủy',
             centered: true,

@@ -8,6 +8,7 @@ interface RejectReasonModalProps {
     open: boolean;
     onClose: () => void;
     orderId: string;
+    onConfirm: (reason: string) => void;
 }
 
 const RejectReasonModal: React.FC<RejectReasonModalProps> = ({ open, onClose, orderId }) => {

@@ -12,7 +12,7 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { convertToVietnameseDate } from "../../utils/convertDateVietnamese";
 import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
 interface AuctionHistoryProps {
-  auctions: Auction[];
+  auctions?: Auction[];
 }
 
 const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
@@ -20,7 +20,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   const [loading, setLoading] = useState(true);
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const userId = useAppSelector((state) => state.auth.userId);
-  const [highestBid, setHighestBid] = useState();
+  const [highestBid, setHighestBid] = useState<any[]>([]);
   console.log("highestbid", highestBid);
 
   console.log("userid", userId);
@@ -338,38 +338,40 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                     </div>
                   )}
 
-                  {highestBid.some((bid) => bid.auction?.id === auction.id) && (
-                    <div>
-                      <Typography
-                        sx={{ fontSize: "20px", marginTop: "8px" }}
-                        variant="body2"
-                      >
-                        {highestBid.find(
-                          (bid) => bid.auction?.id === auction.id
-                        )?.price === auction.currentPrice ? (
-                          // If the highest bid price is equal to the current price, show the highest bid message
-                          <div className="inline-block text-lg text-green-600 font-bold py-2 px-4 rounded-md bg-green-100 mb-2 max-w-full">
-                            Bạn là người đặt giá cao nhất với{" "}
-                            {highestBid
-                              .find((bid) => bid.auction?.id === auction.id)
-                              ?.price.toLocaleString("vi-VN")}
-                            đ
-                          </div>
-                        ) : (
-                          // Otherwise, show the normal bid message
-                          <span>
-                            Bạn đã đặt giá:{" "}
-                            <span style={{ color: "#FF7F00" }}>
+                  {highestBid &&
+                    highestBid.some(
+                      (bid) => bid.auction?.id === auction.id
+                    ) && (
+                      <div>
+                        <Typography
+                          sx={{ fontSize: "20px", marginTop: "8px" }}
+                          variant="body2"
+                        >
+                          {highestBid.find(
+                            (bid) => bid.auction?.id === auction.id
+                          )?.price === auction.currentPrice ? (
+                            <div className="inline-block text-lg text-green-600 font-bold py-2 px-4 rounded-md bg-green-100 mb-2 max-w-full">
+                              Bạn là người đặt giá cao nhất với{" "}
                               {highestBid
                                 .find((bid) => bid.auction?.id === auction.id)
-                                ?.price.toLocaleString("vi-VN")}
+                                ?.price.toLocaleString("vi-VN")}{" "}
                               đ
+                            </div>
+                          ) : (
+                            // Otherwise, show the normal bid message
+                            <span>
+                              Bạn đã đặt giá:{" "}
+                              <span style={{ color: "#FF7F00" }}>
+                                {highestBid
+                                  .find((bid) => bid.auction?.id === auction.id)
+                                  ?.price.toLocaleString("vi-VN")}{" "}
+                                đ
+                              </span>
                             </span>
-                          </span>
-                        )}
-                      </Typography>
-                    </div>
-                  )}
+                          )}
+                        </Typography>
+                      </div>
+                    )}
 
                   {(auction.status === "SUCCESSFUL" ||
                     auction.status === "COMPLETED") && (

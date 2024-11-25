@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Avatar } from "antd";
 import { ExchangeDetails } from "../../../../common/interfaces/exchange.interface";
 import ViewBothComicsLists from "./ViewBothComicsLists";
@@ -8,6 +9,10 @@ import DeliveryProcessInfo from "./DeliveryProcessInfo";
 import SuccessfulExchange from "./SuccessfulExchange";
 import { Address } from "../../../../common/base.interface";
 import DealsInformation from "./DealsInformation";
+import { ExchangeRefundRequest } from "../../../../common/interfaces/refund-request.interface";
+import { useEffect, useState } from "react";
+import { privateAxios } from "../../../../middleware/axiosInstance";
+import ViewRefundButton from "./buttons/ViewRefundButton";
 
 export default function InformationCollectSection({
   exchangeDetails,
@@ -36,6 +41,13 @@ export default function InformationCollectSection({
   secondAddress: string;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  console.log(firstCurrentStage);
+  const [refundRequestsList, setRefundRequestsList] = useState<
+    ExchangeRefundRequest[]
+  >([]);
+  const [userRefundRequest, setUserRefundRequest] =
+    useState<ExchangeRefundRequest>();
+
   const self = exchangeDetails.isRequestUser
     ? exchangeDetails.exchange.requestUser
     : exchangeDetails.exchange.post.user;
@@ -44,7 +56,10 @@ export default function InformationCollectSection({
     ? exchangeDetails.exchange.post.user
     : exchangeDetails.exchange.requestUser;
 
-  const caughtProgress = firstCurrentStage <= secondCurrentStage;
+  const caughtProgress =
+    firstCurrentStage <= secondCurrentStage &&
+    exchangeDetails.exchange.status !== "FAILED";
+
   const firstUser = exchangeDetails.isRequestUser
     ? exchangeDetails.exchange.requestUser
     : exchangeDetails.exchange.post.user;
@@ -56,6 +71,25 @@ export default function InformationCollectSection({
   const isFailed = ["FAILED", "REJECTED"].some(
     (status) => status === exchangeDetails.exchange.status
   );
+
+  const fetchUserRefundRequest = async () => {
+    setIsLoading(true);
+
+    await privateAxios
+      .get(`refund-requests/user/exchange/${exchangeDetails.exchange.id}`)
+      .then((res) => {
+        setRefundRequestsList(res.data);
+        setUserRefundRequest(
+          res.data.find((req: ExchangeRefundRequest) => req.mine)
+        );
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    if (isFailed) fetchUserRefundRequest();
+  }, [exchangeDetails]);
 
   const getTitle = () => {
     if (isFailed)
@@ -262,6 +296,13 @@ export default function InformationCollectSection({
             (item) => item.comics
           )}
           isRequestUser={exchangeDetails.isRequestUser}
+        />
+      )}
+
+      {isFailed && (
+        <ViewRefundButton
+          refundRequest={userRefundRequest}
+          requestsList={refundRequestsList}
         />
       )}
     </div>

@@ -4,9 +4,9 @@ import "react-multi-carousel/lib/styles.css";
 import "../ui/HotComic.css";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import StarIcon from "@mui/icons-material/Star";
+
 import { Link } from "react-router-dom";
-import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
+import { publicAxios } from "../../middleware/axiosInstance";
 import { useAppSelector } from "../../redux/hooks";
 
 const responsive = {

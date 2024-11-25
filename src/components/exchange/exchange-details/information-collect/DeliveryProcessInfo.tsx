@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import React, { useEffect, useState } from "react";
 import { LinearProgress } from "@mui/material";
@@ -8,6 +9,8 @@ import { Delivery } from "../../../../common/interfaces/delivery.interface";
 import SuccessfulOrFailedButton from "./buttons/SuccessfulOrFailedButton";
 import { UserInfo } from "../../../../common/base.interface";
 import FailedDeliveryButton from "./buttons/FailedDeliveryButton";
+import { ExchangeRefundRequest } from "../../../../common/interfaces/refund-request.interface";
+import ViewRefundButton from "./buttons/ViewRefundButton";
 moment.locale("vi");
 
 export default function DeliveryProcessInfo({
@@ -28,6 +31,11 @@ export default function DeliveryProcessInfo({
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [userDelivery, setUserDelivery] = useState<Delivery>();
+  const [refundRequestsList, setRefundRequestsList] = useState<
+    ExchangeRefundRequest[]
+  >([]);
+  const [userRefundRequest, setUserRefundRequest] =
+    useState<ExchangeRefundRequest>();
 
   const exchange = exchangeDetails.exchange;
 
@@ -37,8 +45,23 @@ export default function DeliveryProcessInfo({
     await privateAxios
       .get(`deliveries/exchange/from-user/${exchange.id}`)
       .then((res) => {
-        console.log(res.data);
+        console.log("RES: ", res.data);
         setUserDelivery(res.data);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  };
+
+  const fetchUserRefundRequest = async () => {
+    setIsLoading(true);
+
+    await privateAxios
+      .get(`refund-requests/user/exchange/${exchange.id}`)
+      .then((res) => {
+        setRefundRequestsList(res.data);
+        setUserRefundRequest(
+          res.data.find((req: ExchangeRefundRequest) => req.mine)
+        );
       })
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
@@ -46,6 +69,7 @@ export default function DeliveryProcessInfo({
 
   useEffect(() => {
     fetchUserDelivery();
+    fetchUserRefundRequest();
   }, [exchangeDetails]);
 
   const getDeliveryStatus = () => {
@@ -93,8 +117,8 @@ export default function DeliveryProcessInfo({
       <h2 className="text-lg font-bold text-gray-700 mb-4">
         Thông tin giao hàng
       </h2>
-      <div className="w-full flex flex-row">
-        <div className="w-1/2 flex flex-col">
+      <div className="w-full flex flex-row gap-4">
+        <div className="grow flex flex-col">
           <div className="mb-4">
             <h3 className="font-semibold text-gray-800">Người gửi:</h3>
             <p className="font-light">{firstUser.name}</p>
@@ -107,7 +131,8 @@ export default function DeliveryProcessInfo({
             <p className="font-light">{secondAddress}</p>
           </div>
         </div>
-        <div className="w-1/2 flex flex-col gap-8">
+
+        <div className="basis-1/2 min-w-max flex flex-col gap-8">
           <div className="flex items-center gap-4">
             <h3 className="font-semibold text-gray-800">
               Mã vận đơn: &emsp;{" "}
@@ -159,11 +184,18 @@ export default function DeliveryProcessInfo({
       </div>
 
       {userDelivery?.overallStatus === "DELIVERED" ? (
-        <SuccessfulOrFailedButton
-          exchange={exchangeDetails.exchange}
-          fetchExchangeDetails={fetchExchangeDetails}
-          setIsLoading={setIsLoading}
-        />
+        !userRefundRequest ? (
+          <SuccessfulOrFailedButton
+            exchange={exchangeDetails.exchange}
+            fetchExchangeDetails={fetchExchangeDetails}
+            setIsLoading={setIsLoading}
+          />
+        ) : (
+          <ViewRefundButton
+            refundRequest={userRefundRequest}
+            requestsList={refundRequestsList}
+          />
+        )
       ) : userDelivery?.overallStatus === "FAILED" ? (
         <FailedDeliveryButton />
       ) : (

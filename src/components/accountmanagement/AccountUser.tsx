@@ -72,67 +72,14 @@ const AccountUser: React.FC = () => {
     },
   ];
 
-  const auctions: Auction[] = [
-    {
-      id: "1",
-      shopName: "Tạp Hóa Truyện",
-      productName: "Thám Tử Lừng Danh Conan - Tập 102",
-      status: "ONGOING",
-      imgUrl: "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg",
-      currentPrice: 29000,
-      userBid: 20000,
-      finalPrice: 50000,
-      isWin: false,
-      reservePrice: 10000,
-      priceStep: 2000,
-      startTime: "2024-11-01T10:00:00Z",
-      endTime: "2024-11-30T10:00:00Z",
-      comics: {
-        id: "comic1",
-        createdAt: "2024-10-01T12:00:00Z",
-        updatedAt: "2024-10-05T15:00:00Z",
-        deletedAt: null,
-        title: "Thám Tử Lừng Danh Conan - Tập 102",
-        author: "Gosho Aoyama",
-        description: "The latest volume of Detective Conan",
-        coverImage: "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg",
-        condition: "SEALED",
-        edition: "REGULAR",
-        page: 200,
-        publishedDate: "2024-09-01",
-        price: 29000,
-        status: "AVAILABLE",
-        quantity: 100,
-        previewChapter: ["Chapter 1", "Chapter 2"],
-        sellerId: {
-          createdAt: "2024-01-01T00:00:00Z",
-          email: "seller@example.com",
-          id: "seller1",
-          is_verified: true,
-          name: "Tạp Hóa Truyện",
-          phone: "0123456789",
-          avatar: "https://example.com/avatar.jpg",
-          refresh_token: "refresh-token",
-          role: "SELLER",
-          updatedAt: "2024-10-01T00:00:00Z",
-          balance: 100000,
-          nonWithdrawableAmount: 5000,
-        },
-        onSaleSince: new Date(),
-      },
-      maxPrice: 100000,
-    },
-  ];
-  
-
   const renderContent = () => {
     switch (selectedMenuItem) {
       case "purchase":
-        return <OrderHistory orders={orders} />;
+        return <OrderHistory />;
       case "profile":
         return <ProfileUser />;
       case "auction":
-        return <AuctionHistory auctions={auctions} />;
+        return <AuctionHistory />;
       case "wallet":
         return <UserWallet />;
       case "exchange":
@@ -163,36 +110,41 @@ const AccountUser: React.FC = () => {
           <div className="menu-section">
             <ul>
               <li
-                className={`menu-item ${selectedMenuItem === "purchase" ? "active" : ""
-                  }`}
+                className={`menu-item ${
+                  selectedMenuItem === "purchase" ? "active" : ""
+                }`}
                 onClick={() => handleMenuItemClick("purchase")}
               >
                 <ShoppingBagOutlinedIcon /> Lịch Sử Mua Hàng
               </li>
               <li
-                className={`menu-item ${selectedMenuItem === "profile" ? "active" : ""
-                  }`}
+                className={`menu-item ${
+                  selectedMenuItem === "profile" ? "active" : ""
+                }`}
                 onClick={() => handleMenuItemClick("profile")}
               >
                 <PersonOutlinedIcon /> Hồ Sơ Của Tôi
               </li>
               <li
-                className={`menu-item ${selectedMenuItem === "auction" ? "active" : ""
-                  }`}
+                className={`menu-item ${
+                  selectedMenuItem === "auction" ? "active" : ""
+                }`}
                 onClick={() => handleMenuItemClick("auction")}
               >
                 <TvOutlinedIcon /> Lịch Sử Đấu Giá
               </li>
               <li
-                className={`menu-item ${selectedMenuItem === "wallet" ? "active" : ""
-                  }`}
+                className={`menu-item ${
+                  selectedMenuItem === "wallet" ? "active" : ""
+                }`}
                 onClick={() => handleMenuItemClick("wallet")}
               >
                 <AccountBalanceWalletOutlinedIcon /> Ví Của Tôi
               </li>
               <li
-                className={`menu-item ${selectedMenuItem === "exchange" ? "active" : ""
-                  }`}
+                className={`menu-item ${
+                  selectedMenuItem === "exchange" ? "active" : ""
+                }`}
                 onClick={() => handleMenuItemClick("exchange")}
               >
                 <MultipleStopOutlinedIcon /> Lịch Sử Trao Đổi

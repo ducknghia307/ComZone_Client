@@ -11,7 +11,7 @@ export interface UserInfo {
   email: string;
   id: string;
   name: string;
-  phone: number;
+  phone: string;
   avatar: string;
   refresh_token: string;
   role: string | null;
@@ -84,7 +84,7 @@ export interface Auction {
   productName: string;
   status: string;
   imgUrl: string;
-  currentPrice: number;
+  currentPrice?: number;
   userBid?: number;
   finalPrice?: number;
   isWin?: boolean;
@@ -125,6 +125,7 @@ export interface Comic {
   genres?: Genre[];
   sellerId: UserInfo;
   onSaleSince?: Date;
+  type: "TRADITIONAL" | "AUCTION";
   comics: {
     title: string;
     genres: Genre[];
@@ -175,6 +176,7 @@ export interface Delivery {
   deliveryFee: number | null;
   deliveryTrackingCode: string | null;
   estimatedDeliveryTime: string | null;
+  status: string;
   from: {
     id: string;
     createdAt: string;

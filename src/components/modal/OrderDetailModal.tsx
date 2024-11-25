@@ -164,12 +164,8 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
   }) => {
     const theme = useTheme();
 
-    const paymentStatusColor =
-      paymentMethod === "WALLET"
-        ? "#32CD32"
-        : paymentMethod === "COD"
-        ? "#ff9800"
-        : "#000";
+        const paymentStatusColor =
+            paymentMethod === "WALLET" ? "#32CD32" : paymentMethod === "COD" ? "#ff9800" : "#000";
 
     return (
       <Box
@@ -225,122 +221,107 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
     },
   }));
 
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      BackdropProps={{
-        style: { backgroundColor: "rgba(0, 0, 0, 0.1)", boxShadow: "24" },
-      }}
-    >
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 1000,
-          maxHeight: "90vh",
-          bgcolor: "background.paper",
-          boxShadow: "none",
-          p: 4,
-          borderRadius: "8px",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 2,
-          }}
-        >
-          <Typography sx={getStatusChipStyle(order.status)}>
-            {getStatusText(order.status)}
-          </Typography>
-          <Typography
-            gutterBottom
-            textAlign="center"
-            sx={{ fontWeight: "bold", fontSize: "24px", fontFamily: "REM" }}
-          >
-            Chi tiết đơn hàng {order.productName}
-          </Typography>
-          <IconButton onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            paddingBottom: "10px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              marginTop: "0px",
-              color: "rgba(0, 0, 0, 0.4)",
-            }}
-          >
-            <Typography
-              variant="body2"
-              sx={{
-                fontFamily: "REM",
-              }}
+    return (
+        <Modal open={open} onClose={onClose} BackdropProps={{
+            style: { backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: '24' },
+        }}>
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 1000,
+                    maxHeight: '90vh',
+                    bgcolor: 'background.paper',
+                    boxShadow: 'none',
+                    p: 4,
+                    borderRadius: '8px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
             >
-              Ngày tạo đơn hàng: {new Date(order.createdAt).toLocaleString()}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                fontFamily: "REM",
-              }}
-            >
-              Mã đơn hàng: {order.delivery.deliveryTrackingCode}
-            </Typography>
-          </div>
-        </Box>
-        <Box sx={{ maxHeight: "60vh", overflowY: "auto" }}>
-          <Grid
-            size={12}
-            sx={{
-              borderTop: `1px solid rgba(0, 0, 0, 0.12)`,
-              paddingTop: "10px",
-              paddingBottom: "10px",
-            }}
-          >
-            <Stack
-              divider={<Divider />}
-              spacing={2}
-              direction="row"
-              justifyContent="space-between"
-              padding={"10px 20px"}
-            >
-              <Box display="flex" flexDirection="column" flex={1} gap={1}>
-                <Chip
-                  label="Thông tin người bán"
-                  sx={{
-                    fontSize: "18px",
-                    fontWeight: "bold",
-                    backgroundColor: "#fff",
-                    color: "#000",
-                    padding: "18px 25px",
-                    fontFamily: "REM",
-                    border: "2px solid black",
-                  }}
-                />
-                <InfoRow label="Họ tên" value={order.delivery.from.name} />
-                <InfoRow
-                  label="Số điện thoại"
-                  value={order.delivery.from.phone}
-                />
-                <InfoRow label="Địa chỉ" value={order.delivery.from.address} />
-              </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography sx={getStatusChipStyle(order.status)}>
+                        {getStatusText(order.status)}
+                    </Typography>
+                    <Typography
+                        gutterBottom
+                        textAlign="center"
+                        sx={{ fontWeight: 'bold', fontSize: '24px', fontFamily: "REM", }}
+                    >
+                        Chi tiết đơn hàng {order.productName}
+                    </Typography>
+                    <IconButton onClick={onClose} >
+                        <CloseIcon />
+                    </IconButton>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px', alignItems:'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '0px', color: 'rgba(0, 0, 0, 0.4)' }}>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                fontFamily: 'REM'
+                            }}
+                        >
+                            Ngày tạo đơn hàng: {new Date(order.createdAt).toLocaleString()}
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                fontFamily: 'REM'
+                            }}
+                        >
+                            Mã đơn hàng: {order.delivery.deliveryTrackingCode}
+                        </Typography>
+                    </div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px',
+                            padding: '20px',
+                            backgroundColor: '#ffe6e6',
+                            borderRadius: '8px',
+                            border: '1px solid #f50057',
+                        }}
+                    >
+                        <Typography
+                            variant="body1"
+                            sx={{ fontWeight: 'bold', color: '#d32f2f', fontFamily: "REM" }}
+                        >
+                            Lý do từ chối hoàn tiền:
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{ color: '#d32f2f', fontFamily: "REM" }}
+                        >
+                            {order.rejectReason || 'Không có lý do cụ thể'}
+                        </Typography>
+                    </div>
+                </Box>
+
+
+                <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                    <Grid size={12} sx={{ borderTop: `1px solid rgba(0, 0, 0, 0.12)`, paddingTop: '10px', paddingBottom: '10px' }}>
+                        <Stack divider={<Divider />} spacing={2} direction="row" justifyContent="space-between" padding={'10px 20px'}>
+                            <Box display="flex" flexDirection="column" flex={1} gap={1}>
+                                <Chip
+                                    label="Thông tin người bán"
+                                    sx={{
+                                        fontSize: '18px',
+                                        fontWeight: 'bold',
+                                        backgroundColor: '#fff',
+                                        color: '#000',
+                                        padding: '18px 25px',
+                                        fontFamily: "REM",
+                                        border: '2px solid black',
+                                    }}
+                                />
+                                <InfoRow label="Họ tên" value={order.delivery.from.name} />
+                                <InfoRow label="Số điện thoại" value={order.delivery.from.phone} />
+                                <InfoRow label="Địa chỉ" value={order.delivery.from.address} />
+                            </Box>
 
               <Divider orientation="vertical" flexItem />
 

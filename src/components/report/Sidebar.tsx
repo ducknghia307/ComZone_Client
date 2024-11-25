@@ -130,32 +130,33 @@ import {
   Button,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import AirplayOutlinedIcon from '@mui/icons-material/AirplayOutlined';
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import ViewHeadlineOutlinedIcon from '@mui/icons-material/ViewHeadlineOutlined';
+import AirplayOutlinedIcon from "@mui/icons-material/AirplayOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import ViewHeadlineOutlinedIcon from "@mui/icons-material/ViewHeadlineOutlined";
 import { privateAxios } from "../../middleware/axiosInstance";
-import adminImage from '../../assets/settings.png';
+import adminImage from "../../assets/settings.png";
 import TvOutlinedIcon from "@mui/icons-material/TvOutlined";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import MultipleStopOutlinedIcon from "@mui/icons-material/MultipleStopOutlined";
-import GavelOutlinedIcon from '@mui/icons-material/GavelOutlined';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import GavelOutlinedIcon from "@mui/icons-material/GavelOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
-import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
-import CurrencyExchangeOutlinedIcon from '@mui/icons-material/CurrencyExchangeOutlined';
+import EventNoteOutlinedIcon from "@mui/icons-material/EventNoteOutlined";
+import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined";
 interface SidebarProps {
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+  onSelect?: (item: string) => void;
 }
 
-const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
+const Sidebar = ({ isCollapsed, onToggleCollapse, onSelect }: SidebarProps) => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState();
   const currentUrl = window.location.pathname;
   const dispatch = useAppDispatch();
   const { accessToken } = useAppSelector((state) => state.auth);
-  const drawerWidth = isCollapsed ? '5%' : 'auto';
+  const drawerWidth = isCollapsed ? "5%" : "auto";
 
   const fetchUserInfo = async () => {
     try {
@@ -183,39 +184,41 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
     {
       title: "Quản Lý Người Dùng",
       path: "/mod/users",
-      icon: <PersonOutlineOutlinedIcon sx={{ color: 'inherit' }} />
+      icon: <PersonOutlineOutlinedIcon sx={{ color: "inherit" }} />,
     },
     {
       title: "Quản Lý Truyện",
       path: "/mod/comics",
-      icon: <PersonOutlineOutlinedIcon sx={{ color: 'inherit' }} />
-    }, {
+      icon: <PersonOutlineOutlinedIcon sx={{ color: "inherit" }} />,
+    },
+    {
       title: "Quản Lý Đơn Hàng",
       path: "/mod/orders",
-      icon: <TvOutlinedIcon sx={{ color: 'inherit' }} />
-    }, {
+      icon: <TvOutlinedIcon sx={{ color: "inherit" }} />,
+    },
+    {
       title: "Quản Lý Đấu Giá",
       path: "/mod/auctions",
-      icon: <GavelOutlinedIcon sx={{ color: 'inherit' }} />
-    // }, {
-    //   title: "Quản Lý Trao Đổi",
-    //   path: "/mod/exchanges",
-    //   icon: <MultipleStopOutlinedIcon sx={{ color: 'inherit' }} />
+      icon: <GavelOutlinedIcon sx={{ color: "inherit" }} />,
+      // }, {
+      //   title: "Quản Lý Trao Đổi",
+      //   path: "/mod/exchanges",
+      //   icon: <MultipleStopOutlinedIcon sx={{ color: 'inherit' }} />
     },
     {
       title: "Quản Lý Ví",
       path: "/mod/deposits",
-      icon: <AccountBalanceWalletOutlinedIcon sx={{ color: 'inherit' }} />
+      icon: <AccountBalanceWalletOutlinedIcon sx={{ color: "inherit" }} />,
     },
     {
       title: "Quản Lý Đánh Giá",
       path: "/mod/feedbacks",
-      icon: <EventNoteOutlinedIcon sx={{ color: 'inherit' }} />
+      icon: <EventNoteOutlinedIcon sx={{ color: "inherit" }} />,
     },
     {
       title: "Quản Lý Hoàn Tiền",
       path: "/mod/refunds",
-      icon: <CurrencyExchangeOutlinedIcon sx={{ color: 'inherit' }} />
+      icon: <CurrencyExchangeOutlinedIcon sx={{ color: "inherit" }} />,
     },
   ];
 
@@ -224,25 +227,25 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       variant="permanent"
       sx={{
         width: drawerWidth,
-        transition: 'width 0.3s ease',
-        '& .MuiDrawer-paper': {
+        transition: "width 0.3s ease",
+        "& .MuiDrawer-paper": {
           width: drawerWidth,
-          boxSizing: 'border-box',
-          background: 'linear-gradient(180deg, #662249 0%, #a33757 100%)',
-          color: '#fff',
-          borderRight: 'none',
-          transition: 'width 0.3s ease',
-          overflowX: 'hidden',
-          overflowY: 'auto'
+          boxSizing: "border-box",
+          background: "linear-gradient(180deg, #662249 0%, #a33757 100%)",
+          color: "#fff",
+          borderRight: "none",
+          transition: "width 0.3s ease",
+          overflowX: "hidden",
+          overflowY: "auto",
         },
       }}
     >
       {/* Header with Toggle Button */}
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: isCollapsed ? 'center' : 'space-between',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: isCollapsed ? "center" : "space-between",
           padding: isCollapsed ? 1 : 3,
           minHeight: 64,
         }}
@@ -251,35 +254,35 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           <Typography
             variant="h6"
             sx={{
-              fontFamily: 'REM',
-              fontWeight: 'bold',
-              color: '#fff',
-              letterSpacing: '0.05em',
-              whiteSpace: 'nowrap',
-              textAlign: 'center',
-              flex: 1
+              fontFamily: "REM",
+              fontWeight: "bold",
+              color: "#fff",
+              letterSpacing: "0.05em",
+              whiteSpace: "nowrap",
+              textAlign: "center",
+              flex: 1,
             }}
           >
             MODERATOR
           </Typography>
         )}
-        <IconButton onClick={onToggleCollapse} sx={{ color: '#fff' }}>
+        <IconButton onClick={onToggleCollapse} sx={{ color: "#fff" }}>
           <ViewHeadlineOutlinedIcon />
         </IconButton>
       </Box>
 
-      <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.12)' }} />
+      <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.12)" }} />
 
       {/* Profile Section */}
       {!isCollapsed && (
-        <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Box sx={{ p: 3, textAlign: "center" }}>
           <Avatar
             src={adminImage}
             sx={{
               width: 80,
               height: 80,
-              margin: '0 auto',
-              border: '3px solid rgba(255, 255, 255, 0.2)',
+              margin: "0 auto",
+              border: "3px solid rgba(255, 255, 255, 0.2)",
             }}
           />
           {/* <Typography
@@ -296,22 +299,29 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
         </Box>
       )}
 
-      <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.12)' }} />
+      <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.12)" }} />
 
       {/* Menu Items */}
       <List sx={{ px: isCollapsed ? 1 : 2, pt: 2 }}>
         {menuItems.map((item) => (
-          <ListItem key={item.title} disablePadding sx={{ whiteSpace: 'nowrap' }}>
+          <ListItem
+            key={item.title}
+            disablePadding
+            sx={{ whiteSpace: "nowrap" }}
+          >
             <ListItemButton
               sx={{
-                borderRadius: '8px',
+                borderRadius: "8px",
                 mb: 1,
-                justifyContent: isCollapsed ? 'center' : 'flex-start',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                justifyContent: isCollapsed ? "center" : "flex-start",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.08)",
                 },
-                backgroundColor: currentUrl === item.path ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
-                transition: 'all 0.2s ease-in-out',
+                backgroundColor:
+                  currentUrl === item.path
+                    ? "rgba(255, 255, 255, 0.12)"
+                    : "transparent",
+                transition: "all 0.2s ease-in-out",
                 minHeight: 35,
                 px: isCollapsed ? 1 : 3,
               }}
@@ -319,9 +329,12 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
             >
               <ListItemIcon
                 sx={{
-                  minWidth: isCollapsed ? 0 : '40px',
-                  color: currentUrl === item.path ? '#fff' : 'rgba(255, 255, 255, 0.7)',
-                  justifyContent: 'center',
+                  minWidth: isCollapsed ? 0 : "40px",
+                  color:
+                    currentUrl === item.path
+                      ? "#fff"
+                      : "rgba(255, 255, 255, 0.7)",
+                  justifyContent: "center",
                 }}
               >
                 {item.icon}
@@ -330,12 +343,15 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
                 <ListItemText
                   primary={item.title}
                   sx={{
-                    '& .MuiTypography-root': {
-                      fontFamily: 'REM',
-                      fontWeight: currentUrl === item.path ? 'bold' : 'normal',
-                      color: currentUrl === item.path ? '#fff' : 'rgba(255, 255, 255, 0.7)',
-                      fontSize: '0.95rem',
-                    }
+                    "& .MuiTypography-root": {
+                      fontFamily: "REM",
+                      fontWeight: currentUrl === item.path ? "bold" : "normal",
+                      color:
+                        currentUrl === item.path
+                          ? "#fff"
+                          : "rgba(255, 255, 255, 0.7)",
+                      fontSize: "0.95rem",
+                    },
                   }}
                 />
               )}
@@ -343,13 +359,22 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           </ListItem>
         ))}
       </List>
-      <ListItem disablePadding sx={{ whiteSpace: 'nowrap', position: 'absolute', bottom: '10px', width: '100%', padding:'0 20px' }}>
+      <ListItem
+        disablePadding
+        sx={{
+          whiteSpace: "nowrap",
+          position: "absolute",
+          bottom: "10px",
+          width: "100%",
+          padding: "0 20px",
+        }}
+      >
         <ListItemButton
           sx={{
-            borderRadius: '8px',
-            justifyContent: isCollapsed ? 'center' : 'flex-start',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            borderRadius: "8px",
+            justifyContent: isCollapsed ? "center" : "flex-start",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.08)",
             },
             minHeight: 35,
             px: isCollapsed ? 1 : 3,
@@ -358,9 +383,9 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
         >
           <ListItemIcon
             sx={{
-              minWidth: isCollapsed ? 0 : '40px',
-              color: '#fff',
-              justifyContent: 'center',
+              minWidth: isCollapsed ? 0 : "40px",
+              color: "#fff",
+              justifyContent: "center",
             }}
           >
             <LogoutOutlinedIcon />
@@ -369,11 +394,11 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
             <ListItemText
               primary="Logout"
               sx={{
-                '& .MuiTypography-root': {
-                  fontFamily: 'REM',
-                  fontWeight: 'bold',
-                  color: '#fff',
-                  fontSize: '0.95rem',
+                "& .MuiTypography-root": {
+                  fontFamily: "REM",
+                  fontWeight: "bold",
+                  color: "#fff",
+                  fontSize: "0.95rem",
                 },
               }}
             />

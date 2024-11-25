@@ -68,7 +68,6 @@ const Genres: React.FC<GenresProps> = ({
 
         setAuctionComics(auctionComics.data);
         console.log("auction comics", auctionComics.data);
-
       } catch (error) {
         console.error("Error fetching comics:", error);
       } finally {
@@ -109,15 +108,19 @@ const Genres: React.FC<GenresProps> = ({
       ? comic.title.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
 
-    const genreMatch = filteredGenres.length > 0
-      ? comic.genres && comic.genres.some((genre) => filteredGenres.includes(genre.name))
-      : true;
-    const authorMatch = filteredAuthors.length > 0
-      ? filteredAuthors.includes(comic.author)
-      : true;
-    const conditionMatch = filteredConditions.length > 0
-      ? filteredConditions.includes(comic.condition)
-      : true;
+    const genreMatch =
+      filteredGenres.length > 0
+        ? comic.genres &&
+          comic.genres.some((genre) => filteredGenres.includes(genre.name))
+        : true;
+    const authorMatch =
+      filteredAuthors.length > 0
+        ? filteredAuthors.includes(comic.author)
+        : true;
+    const conditionMatch =
+      filteredConditions.length > 0
+        ? filteredConditions.includes(comic.condition)
+        : true;
 
     return matchesSearchQuery && genreMatch && authorMatch && conditionMatch;
   };
@@ -127,23 +130,32 @@ const Genres: React.FC<GenresProps> = ({
       ? comic.comics.title.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
 
-    const genreMatch = filteredGenres.length > 0
-      ? comic.comics.genres && comic.comics.genres.some((genre) => filteredGenres.includes(genre.name))
-      : true;
-    const authorMatch = filteredAuthors.length > 0
-      ? filteredAuthors.includes(comic.comics.author)
-      : true;
-    const conditionMatch = filteredConditions.length > 0
-      ? filteredConditions.includes(comic.comics.condition)
-      : true;
+    const genreMatch =
+      filteredGenres.length > 0
+        ? comic.comics.genres &&
+          comic.comics.genres.some((genre) =>
+            filteredGenres.includes(genre.name)
+          )
+        : true;
+    const authorMatch =
+      filteredAuthors.length > 0
+        ? filteredAuthors.includes(comic.comics.author)
+        : true;
+    const conditionMatch =
+      filteredConditions.length > 0
+        ? filteredConditions.includes(comic.comics.condition)
+        : true;
 
     return matchesSearchQuery && genreMatch && authorMatch && conditionMatch;
   };
 
   // Apply the filter to each list separately
-  const filteredRegularComics = comics.filter((comic) => filterRegularComics(comic));
-  const filteredAuctionComics = auctionComics.filter((comic) => filterAuctionComics(comic));
-
+  const filteredRegularComics = comics.filter((comic) =>
+    filterRegularComics(comic)
+  );
+  const filteredAuctionComics = auctionComics.filter((comic) =>
+    filterAuctionComics(comic)
+  );
 
   const sortedComics = [...filteredRegularComics].sort((a, b) =>
     sortOrder === "asc" ? a.price - b.price : b.price - a.price
@@ -156,7 +168,6 @@ const Genres: React.FC<GenresProps> = ({
   const sortedAuctionComics = [...filteredAuctionComics].sort((a, b) =>
     sortOrder === "asc" ? a.price - b.price : b.price - a.price
   );
-
 
   // const auctionComics = sortedComics.filter(
   //   (comic) => comic.status === "AUCTION"
@@ -241,7 +252,11 @@ const Genres: React.FC<GenresProps> = ({
                           date={Date.now() + 100000000}
                           renderer={renderer}
                         />
-                        <Button className="detail-button" variant="contained" onClick={() => handleDetailClick(comic.id)}>
+                        <Button
+                          className="detail-button"
+                          variant="contained"
+                          onClick={() => handleDetailClick(comic.id)}
+                        >
                           Xem Chi Tiết
                         </Button>
                       </div>

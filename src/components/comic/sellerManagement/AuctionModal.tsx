@@ -20,14 +20,6 @@ interface Comic {
   title: string;
   author: string;
 }
-
-interface AuctionModalProps {
-  open: boolean;
-  onCancel: () => void;
-  comic: Comic;
-  onSuccess: () => void;
-}
-
 interface AuctionFormValues {
   reservePrice: number;
   maxPrice: number;
@@ -36,6 +28,13 @@ interface AuctionFormValues {
   startTime: Moment | null;
   endTime: Moment | null;
 }
+
+type AuctionModalProps = {
+  open: boolean;
+  comic: Comic | null; // Null-safe typing
+  onCancel: () => void;
+  onSuccess: () => void;
+};
 
 const AuctionModal: React.FC<AuctionModalProps> = ({
   open,
@@ -52,7 +51,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
     try {
       const response = await privateAxios.post("/auction", {
         ...values,
-        comicsId: comic.id,
+        comicsId: comic?.id,
         status: "UPCOMING", // Add comic ID to the auction data
       });
       console.log(response.data);

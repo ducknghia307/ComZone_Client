@@ -217,7 +217,7 @@ const Checkout = () => {
           0;
 
         const sellerDetails = sellerDetailsGroup.find(
-          (details) => details.user.id === sellerId
+          (details: SellerDetails) => details.user.id === sellerId
         );
 
         const newUserDeliveryInfo = await privateAxios

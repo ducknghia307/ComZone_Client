@@ -82,7 +82,7 @@ const AllAuctions = ({
       const genreMatch =
         filteredGenres.length === 0 ||
         (comic.comics.genres &&
-          comic.comics.genres.some((genre) =>
+          comic.comics.genres.some((genre: any) =>
             filteredGenres.includes(genre.name)
           ));
 
@@ -163,7 +163,7 @@ const AllAuctions = ({
                 size="medium"
               />
               <p className="text-center m-1 REM bg-orange-200">SẮP DIỄN RA</p>
-              
+
               <Button
                 className="detail-button"
                 onClick={() => handleDetailClick(comic.id)}

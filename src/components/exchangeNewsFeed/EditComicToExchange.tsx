@@ -1,10 +1,4 @@
-import {
-  InputNumber,
-  notification,
-  Radio,
-  RadioChangeEvent,
-  Select,
-} from "antd";
+import { notification, Radio, RadioChangeEvent, Select } from "antd";
 import React, { useState, useEffect } from "react";
 import CoverImagePlaceholder from "../../assets/comics-cover-placeholder.png";
 import { privateAxios } from "../../middleware/axiosInstance";
@@ -30,7 +24,7 @@ const EditComicToExchange: React.FC<EditComicToExchangeProps> = ({
   const [author, setAuthor] = useState("");
   const [edition, setEdition] = useState("REGULAR");
   const [numOfComics, setNumOfComics] = useState(2);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
   const [api, contextHolder] = notification.useNotification();
@@ -62,7 +56,6 @@ const EditComicToExchange: React.FC<EditComicToExchangeProps> = ({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      setImageFile(selectedFile);
       await uploadImage(selectedFile);
     }
   };
@@ -86,7 +79,6 @@ const EditComicToExchange: React.FC<EditComicToExchangeProps> = ({
   };
 
   const handleRemoveImage = () => {
-    setImageFile(null);
     setImageUrl("");
   };
 
@@ -146,7 +138,6 @@ const EditComicToExchange: React.FC<EditComicToExchangeProps> = ({
     openNotification();
     setTitle("");
     setAuthor("");
-    setImageFile(null);
     setImageUrl("");
     setEdition("REGULAR");
     setUsed(1);

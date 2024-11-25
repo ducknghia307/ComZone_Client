@@ -427,7 +427,7 @@ const AuctionManagement = () => {
           open={isModalOpen}
           onCancel={handleModalClose}
           comic={selectedAuction.comics}
-          auctionData={{
+            auctionData={{
             id: selectedAuction.id,
             shopName: selectedAuction.shopName,
             productName: selectedAuction.productName,

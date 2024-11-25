@@ -18,9 +18,8 @@ const OrderManagement = () => {
         const fetchOrders = async () => {
             try {
                 const response = await privateAxios.get('/orders/seller');
-
-                // Check if response data is an array, or access the array within the response object
                 const data = Array.isArray(response.data) ? response.data : response.data.orders;
+                console.log("orders seller", data);
 
                 if (Array.isArray(data)) {
                     setOrders(data);
@@ -76,8 +75,8 @@ const OrderManagement = () => {
         }
     };
 
-    const getStatusChipStyles = (status: string, deliveryStatus?: string) => {
-        if (status === 'PACKAGING' && deliveryStatus === 'ready_to_pick') {
+    const getStatusChipStyles = (status: string, delivery?: { status: string }) => {
+        if (status === 'PACKAGING' && delivery?.status === 'ready_to_pick') {
             return {
                 color: '#7c4af2',
                 backgroundColor: '#e0d4fc',
@@ -136,20 +135,36 @@ const OrderManagement = () => {
         }
     };
 
-    const handleStatusUpdate = (orderId: string, newStatus: string, deliveryStatus?: string) => {
+    // const handleStatusUpdate = (orderId: string, newStatus: string, delivery?: { status: string }) => {
+    //     setOrders((prevOrders) =>
+    //         prevOrders.map((order) =>
+    //             order.id === orderId
+    //                 ? {
+    //                     ...order,
+    //                     status: newStatus,
+    //                     delivery: delivery || order.delivery
+    //                 }
+    //                 : order
+    //         )
+    //     );
+    // };
+
+    const handleStatusUpdate = (orderId: string, newStatus: string, delivery?: { status: string }) => {
         setOrders((prevOrders) =>
             prevOrders.map((order) =>
                 order.id === orderId
                     ? {
                         ...order,
                         status: newStatus,
-                        deliveryStatus: deliveryStatus || order.deliveryStatus
+                        delivery: delivery
+                            ? { ...order.delivery, status: delivery.status }
+                            : order.delivery,
                     }
                     : order
             )
         );
     };
-
+    
     return (
         <div className='seller-container' style={{ width: '100%', overflow: 'hidden', padding: '10px 10px 0 10px' }}>
             <Typography variant="h5" className="content-header">Quản Lý Đơn Hàng</Typography>
@@ -170,55 +185,55 @@ const OrderManagement = () => {
                     }}
                 />
             ) : (
-            <TableContainer component={Paper} className="order-table-container" sx={{ border: '1px solid black' }}>
-                <Table>
-                    <TableHead>
-                        <TableRow style={{ backgroundColor: 'black' }}>
-                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Mã Vận Đơn</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Tên Người Đặt</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Email</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Số Điện Thoại</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Tổng Tiền</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Phương Thức Thanh Toán</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Trạng Thái</TableCell>
-                            <TableCell style={{ color: 'white', textAlign: 'center' }}>Chi Tiết</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {paginatedOrders.map((order) => (
-                            <TableRow key={order.id}>
-                                <TableCell align="center">{order.deliveryTrackingCode || 'N/A'}</TableCell>
-                                <TableCell align="center">{order.toName}</TableCell>
-                                <TableCell align="center">{order.user.email}</TableCell>
-                                <TableCell align="center">{order.toPhone}</TableCell>
-                                <TableCell align="center">{order.totalPrice.toLocaleString()} đ</TableCell>
-                                <TableCell align="center">
-                                    {order.paymentMethod === 'WALLET' ? 'Ví Comzone' : order.paymentMethod}
-                                </TableCell>
-                                <TableCell align="center">
-                                    <span style={getStatusChipStyles(order.status, order.deliveryStatus)}>
-                                        {translateStatus(order.status, order.deliveryStatus)}
-                                    </span>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <IconButton color="primary" onClick={() => openOrderDetail(order.id)}>
-                                        <EditOutlinedIcon />
-                                    </IconButton>
-                                </TableCell>
+                <TableContainer component={Paper} className="order-table-container" sx={{ border: '1px solid black' }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow style={{ backgroundColor: 'black' }}>
+                                <TableCell style={{ color: 'white', textAlign: 'center' }}>Mã Vận Đơn</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center' }}>Tên Người Đặt</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center' }}>Email</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center' }}>Số Điện Thoại</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center' }}>Tổng Tiền</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center' }}>Phương Thức Thanh Toán</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center' }}>Trạng Thái</TableCell>
+                                <TableCell style={{ color: 'white', textAlign: 'center' }}>Chi Tiết</TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 15]}
-                    component="div"
-                    count={orders.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </TableContainer>
+                        </TableHead>
+                        <TableBody>
+                            {paginatedOrders.map((order) => (
+                                <TableRow key={order.id}>
+                                    <TableCell align="center">{order.delivery?.deliveryTrackingCode || 'N/A'}</TableCell>
+                                    <TableCell align="center">{order.toName}</TableCell>
+                                    <TableCell align="center">{order.user.email}</TableCell>
+                                    <TableCell align="center">{order.toPhone}</TableCell>
+                                    <TableCell align="center">{order.totalPrice.toLocaleString()} đ</TableCell>
+                                    <TableCell align="center">
+                                        {order.paymentMethod === 'WALLET' ? 'Ví Comzone' : order.paymentMethod}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <span style={getStatusChipStyles(order.status, order.delivery)}>
+                                            {translateStatus(order.status, order.delivery?.status)}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <IconButton color="primary" onClick={() => openOrderDetail(order.id)}>
+                                            <EditOutlinedIcon />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 15]}
+                        component="div"
+                        count={orders.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </TableContainer>
             )}
             {selectedOrderId && (
                 <OrderDetailSeller

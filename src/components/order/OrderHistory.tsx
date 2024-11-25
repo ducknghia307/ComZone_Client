@@ -8,8 +8,9 @@ import "../ui/OrderHistory.css";
 import { privateAxios } from "../../middleware/axiosInstance";
 import OrderDetailsModal from "../modal/OrderDetailModal";
 import { Comic, UserInfo } from "../../common/base.interface";
-import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
 import GavelIcon from '@mui/icons-material/Gavel';
+import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
+import ModalRequestRefund from "../modal/ModalRequestRefund";
 
 interface Order {
   id: string;
@@ -44,6 +45,9 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
   //   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  console.log("Order ID selected for refund modal:", selectedOrderId);
+
+  const [isRefundModalOpen, setRefundModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchOrdersWithItems = async () => {
@@ -508,6 +512,10 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                     Đã Nhận Được Hàng
                   </Button>
                   <Button
+                    onClick={() => {
+                      setRefundModalOpen(true);
+                      setSelectedOrderId(order.id.toString());
+                    }}
                     sx={{
                       color: "#fff",
                       backgroundColor: "#FFB74D",
@@ -517,7 +525,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
                       fontFamily: "REM",
                     }}
                   >
-                    Chưa Nhận Được Hàng
+                    Gặp vấn đề khi nhận hàng
                   </Button>
                 </>
               ) : (
@@ -555,6 +563,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           userId={selectedUserId || ""}
           orderId={selectedOrderId || ""} // Truyền orderId
           onStatusUpdate={handleStatusUpdate} // Truyền callback
+        />
+
+        <ModalRequestRefund
+          open={isRefundModalOpen}
+          onClose={() => setRefundModalOpen(false)}
+          orderId={selectedOrderId || ""}
         />
       </div>
     </div>

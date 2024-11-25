@@ -4,7 +4,6 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import "../ui/AuctionHistory.css";
 import { Auction } from "../../common/base.interface";
-import { Auction } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { useAppSelector } from "../../redux/hooks";
 import { useNavigate } from "react-router-dom";
@@ -20,8 +19,6 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   const [selectedAuctionStatus, setSelectedAuctionStatus] = useState("all");
   const [loading, setLoading] = useState(true);
   const [auctions, setAuctions] = useState<Auction[]>([]);
-  const [selectedAuction, setSelectedAuction] = useState<Auction | null>(null);
-  const [isModalOpen, setModalOpen] = useState(false);
   const [selectedAuction, setSelectedAuction] = useState<Auction | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const userId = useAppSelector((state) => state.auth.userId);

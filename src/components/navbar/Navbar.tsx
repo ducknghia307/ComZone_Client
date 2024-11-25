@@ -159,7 +159,7 @@ const Navbar = () => {
               Quản lí Shop
             </Link>
           )}
-          {userInfo.role === "MODERATOR" && (
+          {userInfo?.role === "MODERATOR" && (
             <Link to={"/mod/users"} className="REM text-base">
               Quản lí hệ thống
             </Link>

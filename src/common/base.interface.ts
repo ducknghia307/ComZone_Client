@@ -19,7 +19,7 @@ export interface UserInfo {
   balance: number;
   nonWithdrawableAmount: number;
   last_active?: Date | null;
-  isActive: boolean;
+  isActive?: boolean;
   follower_count?: number;
   address: string;
 }

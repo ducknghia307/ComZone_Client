@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Modal } from "antd";
 import { ReactNode } from "react";
 
@@ -24,7 +25,7 @@ export default function ActionConfirm({
       onCancel={(e) => {
         e.stopPropagation();
         setIsOpen(false);
-        cancelCallback && cancelCallback();
+        if (cancelCallback) cancelCallback();
       }}
       destroyOnClose={true}
       footer={null}

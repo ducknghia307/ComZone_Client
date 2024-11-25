@@ -52,6 +52,7 @@ export default function SuccessfulOrFailedButton({
         setIsOpen={setIsConfirmingFailed}
         exchange={exchange}
         setIsLoading={setIsLoading}
+        fetchExchangeDetails={fetchExchangeDetails}
       />
 
       <button

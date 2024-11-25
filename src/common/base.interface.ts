@@ -93,6 +93,7 @@ export interface Auction {
   startTime: string;
   endTime: string;
   comics: Comic;
+  depositAmount: number;
   maxPrice: number;
   isPaid?: boolean;
   paymentDeadline?: string;

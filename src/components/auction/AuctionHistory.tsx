@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Typography, Button, TextField, Avatar, Chip } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
-import Countdown from "react-countdown";
 import "../ui/AuctionHistory.css";
-import { Auction, OrderDetailData } from "../../common/base.interface";
+import { Auction } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { useAppSelector } from "../../redux/hooks";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { convertToVietnameseDate } from "../../utils/convertDateVietnamese";
 import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
+import AuctionDetailModal from "../modal/AuctionDetailModal";
 interface AuctionHistoryProps {
   auctions?: Auction[];
 }
@@ -19,6 +19,8 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   const [selectedAuctionStatus, setSelectedAuctionStatus] = useState("all");
   const [loading, setLoading] = useState(true);
   const [auctions, setAuctions] = useState<Auction[]>([]);
+  const [selectedAuction, setSelectedAuction] = useState<Auction | null>(null);
+  const [isModalOpen, setModalOpen] = useState(false);
   const userId = useAppSelector((state) => state.auth.userId);
   const [highestBid, setHighestBid] = useState<any[]>([]);
   console.log("highestbid", highestBid);
@@ -188,8 +190,8 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
       selectedAuctionStatus === "all"
         ? auctions
         : auctions.filter(
-            (auction: Auction) => auction.status === selectedAuctionStatus
-          );
+          (auction: Auction) => auction.status === selectedAuctionStatus
+        );
 
     if (filteredAuctions.length === 0) {
       return <Typography>Không có dữ liệu đấu giá phù hợp.</Typography>;
@@ -459,6 +461,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
               </Button>
             ) : (
               <Button
+                onClick={() => handleOpenModal(auction)}
                 variant="contained"
                 style={{
                   backgroundColor: "#000000",
@@ -470,7 +473,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
               </Button>
             )}
             {auction.status === "SUCCESSFUL" &&
-            auction.winner?.id === userId ? (
+              auction.winner?.id === userId ? (
               <div>
                 <Button
                   size="large"
@@ -495,30 +498,37 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
     });
   };
 
+  const handleOpenModal = (auction: Auction) => {
+    setSelectedAuction(auction);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedAuction(null);
+    setModalOpen(false);
+  };
+
   return (
     <div>
       <div className="status-auction-tabs">
         <span
-          className={`status-auction-tab ${
-            selectedAuctionStatus === "all" ? "active" : ""
-          }`}
+          className={`status-auction-tab ${selectedAuctionStatus === "all" ? "active" : ""
+            }`}
           onClick={() => setSelectedAuctionStatus("all")}
         >
           Tất cả
         </span>
 
         <span
-          className={`status-auction-tab ${
-            selectedAuctionStatus === "ONGOING" ? "active" : ""
-          }`}
+          className={`status-auction-tab ${selectedAuctionStatus === "ONGOING" ? "active" : ""
+            }`}
           onClick={() => setSelectedAuctionStatus("ONGOING")}
         >
           Đang diễn ra
         </span>
         <span
-          className={`status-auction-tab ${
-            selectedAuctionStatus === "SUCCESSFUL" ? "active" : ""
-          }`}
+          className={`status-auction-tab ${selectedAuctionStatus === "SUCCESSFUL" ? "active" : ""
+            }`}
           onClick={() => setSelectedAuctionStatus("SUCCESSFUL")}
         >
           Kết Thúc
@@ -532,9 +542,8 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           Hoàn thành
         </span>
         <span
-          className={`status-auction-tab ${
-            selectedAuctionStatus === "FAILED" ? "active" : ""
-          }`}
+          className={`status-auction-tab ${selectedAuctionStatus === "FAILED" ? "active" : ""
+            }`}
           onClick={() => setSelectedAuctionStatus("FAILED")}
         >
           Bị Hủy
@@ -553,7 +562,15 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           }}
         />
       </div>
-      <div className="auction-history-content">{renderAuctionContent()}</div>
+      <div className="auction-history-content">{renderAuctionContent()}
+        {selectedAuction && (
+          <AuctionDetailModal
+            open={isModalOpen}
+            onClose={handleCloseModal}
+            auction={selectedAuction}
+          />
+        )}
+      </div>
     </div>
   );
 };

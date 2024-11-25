@@ -53,6 +53,7 @@ interface RefundRequest {
     order: Order;
     user: User;
     images: string[];
+    exchange: Order;
 }
 
 interface RefundDetails {
@@ -62,6 +63,8 @@ interface RefundDetails {
     images: string[] | null;
     description: string;
     createdAt: string;
+    exchangeId: string;
+    requestId: string;
 }
 
 interface RefundModalProps {
@@ -276,10 +279,12 @@ const ManageRefunds: React.FC = () => {
                         ? {
                             name: selectedRefund.user.name,
                             orderId: selectedRefund.order?.id,
+                            // exchangeId: selectedRefund.exchange?.id,
                             reason: selectedRefund.reason,
                             images: selectedRefund.images,
                             createdAt: selectedRefund.createdAt,
-                            description: selectedRefund.description
+                            description: selectedRefund.description,
+                            requestId: selectedRefund.id || '',
                         }
                         : null
                 }

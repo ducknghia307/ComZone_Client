@@ -63,7 +63,7 @@ const UserWallet = () => {
             "Rút tiền") ||
           "Thanh toán",
         amount: `${
-          transaction.walletDeposit && transaction.type === "ADD" ? "+" : "-"
+          transaction.type === "ADD" ? "+" : "-"
         }${transaction.amount.toLocaleString("vi-VN")} đ`,
         status: transaction.status,
         note:
@@ -75,8 +75,14 @@ const UserWallet = () => {
               : transaction.deposit
               ? `Trao đổi cọc #${transaction.code}`
               : "Thông tin giao dịch không có sẵn"
-            : transaction.type === "ADD" && transaction.walletDeposit
-            ? "Nạp tiền vào ví"
+            : transaction.type === "ADD"
+            ? transaction.exchange
+              ? `Thanh toán tiền bù trao đổi #${transaction.code}`
+              : transaction.deposit
+              ? `Hoàn trả cọc #${transaction.code}`
+              : transaction.walletDeposit
+              ? "Nạp tiền vào ví"
+              : "Thông tin giao dịch không có sẵn"
             : transaction.type === "SUBTRACT" && transaction.walletDeposit
             ? "Rút tiền từ ví"
             : "Thông tin giao dịch không có sẵn",
@@ -408,13 +414,13 @@ const UserWallet = () => {
                       <TableCell
                         sx={{
                           fontFamily: "REM",
-                          color: `${
-                            transaction.type === "Nạp tiền" ? "green" : "red"
-                          }`,
+                          color: transaction.amount.toString().startsWith("+")
+                            ? "green"
+                            : "red",
                         }}
                         align="center"
                       >
-                        {transaction?.amount}
+                        {transaction.amount}
                       </TableCell>
 
                       <TableCell sx={{ fontFamily: "REM" }} align="center">

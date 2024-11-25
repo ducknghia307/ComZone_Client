@@ -13,7 +13,7 @@ interface AuctionDetailModalProps {
     onClose: () => void;
     auction: {
         comics: { id: string; title: string; coverImage: string };
-        currentPrice: number;
+        currentPrice?: number;
         maxPrice: number;
         reservePrice: number;
         depositAmount: number;

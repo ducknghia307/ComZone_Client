@@ -7,3 +7,8 @@ export interface SellerFeedback extends BaseInterface {
   comment: string;
   attachedImages?: string[];
 }
+export interface SellerFeedbackResponse {
+  averageRating: number;
+  feedback: SellerFeedback[];
+  totalFeedback: number;
+}

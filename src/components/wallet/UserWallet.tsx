@@ -20,17 +20,16 @@ import "../ui/UserWallet.css";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DepositForm from "./DepositForm";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { BaseInterface, UserInfo } from "../../common/base.interface";
+import { UserInfo } from "../../common/base.interface";
 import CurrencySplitter from "../../assistants/Spliter";
 import { useAppSelector } from "../../redux/hooks";
 import { Transaction } from "../../common/interfaces/transaction.interface";
-import { fontSize } from "@mui/system";
 const UserWallet = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [transactions, setTransactions] = useState([]);
   const userId = useAppSelector((state) => state.auth.userId);
@@ -70,11 +69,11 @@ const UserWallet = () => {
         note:
           transaction.type === "SUBTRACT"
             ? transaction.order
-              ? `Thanh toán đơn hàng ${transaction.order.id}`
+              ? `Thanh toán đơn hàng #${transaction.code}`
               : transaction.exchange
-              ? `Trao đổi đơn hàng ${transaction.exchange.id}`
+              ? `Thanh toán trao đổi #${transaction.code}`
               : transaction.deposit
-              ? `Trao đổi đơn hàng ${transaction?.deposit.id}`
+              ? `Trao đổi cọc #${transaction.code}`
               : "Thông tin giao dịch không có sẵn"
             : transaction.type === "ADD" && transaction.walletDeposit
             ? "Nạp tiền vào ví"
@@ -432,7 +431,7 @@ const UserWallet = () => {
               </TableBody>
             </Table>
             <TablePagination
-              rowsPerPageOptions={[10, 20]}
+              rowsPerPageOptions={[20, 50]}
               component="div"
               count={transactions.length}
               rowsPerPage={rowsPerPage}

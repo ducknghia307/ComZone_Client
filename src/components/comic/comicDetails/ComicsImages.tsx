@@ -62,11 +62,11 @@ export default function ComicsImages({
   };
 
   return (
-    <div className="basis-1/3 min-w-[15em] gap-2">
+    <div className="basis-1/3 min-w-[20em] gap-2">
       <div className="w-full bg-white flex flex-col items-center justify-center gap-4 rounded-xl py-2 drop-shadow-md top-1 sticky">
         <img
           src={currentImage}
-          className="w-full bg-contain cursor-pointer px-2 rounded-lg"
+          className="w-full h-[30em] bg-contain cursor-pointer px-2 rounded-lg"
           onClick={() => setIsModalOpen(true)}
         />
         <div className="w-full flex justify-center items-center px-4">

@@ -1,104 +1,101 @@
 .all-genres-section {
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-top: 32px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 32px;
 }
 
 .all-genres-cards {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-    padding-left: 0;
-    padding-right: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .all-genres-card {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-sizing: border-box;
-    margin-bottom: 20px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
 }
 
 .all-genres-card img {
-    margin-bottom: 15px;
-    width: 160px;
-    height: 230px;
-    object-fit: cover;
+  margin-bottom: 15px;
+  width: 160px;
+  height: 230px;
+  object-fit: cover;
 }
 
 .all-genres-card p {
-    margin: 5px 0;
+  margin: 5px 0;
 }
 
 .all-genres-card .price {
-    font-size: 24px;
-    color: #ff4d4f;
-    font-weight: bold;
+  font-size: 24px;
+  color: #ff4d4f;
+  font-weight: bold;
 }
 
 .all-genres-card .title {
-    font-weight: 600;
-    font-size: 18px;
-    color: #808089;
+  font-weight: 600;
+  font-size: 18px;
+  color: #808089;
 }
 
 .all-genres-card .description {
-    font-size: 18px;
-    color: #000;
+  font-size: 18px;
+  color: #000;
 }
 
 .no-auction-comics,
 .no-regular-comics {
-    font-style: italic;
-    color: gray;
-    text-align: left;
-    margin-top: 20px;
-    width: 400px;
+  font-style: italic;
+  color: gray;
+  text-align: left;
+  margin-top: 20px;
+  width: 400px;
 }
 
-
 .rating-sold {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .rating-sold .divider {
-    width: 1px;
-    height: 16px;
-    background-color: #808089;
-    margin: 0 10px;
+  width: 1px;
+  height: 16px;
+  background-color: #808089;
+  margin: 0 10px;
 }
 
 .rating-sold .rating {
-    color: #ffc107;
+  color: #ffc107;
 }
 
 .rating-sold .sold-info {
-    font-size: 16px;
-    color: #808089;
+  font-size: 16px;
+  color: #808089;
 }
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {
-    .all-genres-cards {
-        grid-template-columns: repeat(3, 1fr);
-        /* 3 cards per row for tablets */
-    }
+  .all-genres-cards {
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 cards per row for tablets */
+  }
 }
 
 @media (max-width: 800px) {
-    .all-genres-cards {
-        grid-template-columns: repeat(2, 1fr);
-        /* 2 cards per row for small tablets */
-    }
+  .all-genres-cards {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 cards per row for small tablets */
+  }
 }
 
 @media (max-width: 464px) {
-    .all-genres-cards {
-        grid-template-columns: 1fr;
-        /* 1 card per row for mobile devices */
-    }
+  .all-genres-cards {
+    grid-template-columns: 1fr;
+    /* 1 card per row for mobile devices */
+  }
 }

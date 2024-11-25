@@ -17,7 +17,10 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { message } from "antd";
 import { callbackUrl } from "../../redux/features/navigate/navigateSlice";
 import ChatModal from "../../pages/ChatModal";
-import { SellerFeedback } from "../../common/interfaces/seller-feedback.interface";
+import {
+  SellerFeedback,
+  SellerFeedbackResponse,
+} from "../../common/interfaces/seller-feedback.interface";
 import Loading from "../loading/Loading";
 
 export default function ComicsDetailTemp() {
@@ -27,7 +30,7 @@ export default function ComicsDetailTemp() {
   const [imageList, setImageList] = useState<string[]>([]);
   const [currentImage, setCurrentImage] = useState<string>("");
   const [relatedComicsList, setRelatedComicsList] = useState<Comic[]>([]);
-  const [sellerDetails, setSellerDetails] = useState();
+  const [averageRating, setAverageRating] = useState<number>();
   const [feedbackList, setFeedbackList] = useState<SellerFeedback[]>([]);
   const [totalFeedback, setTotalFeedback] = useState<number>(0);
   const [comicsListFromSeller, setComicsListFromSeller] = useState<
@@ -77,9 +80,12 @@ export default function ComicsDetailTemp() {
     await publicAxios
       .get(`seller-feedback/seller/some/${sellerId}`)
       .then((res) => {
+        console.log("b", res.data);
+        const resFeedback: SellerFeedbackResponse = res.data;
         console.log(res.data[0]);
-        setFeedbackList(res.data[0]);
-        setTotalFeedback(res.data[1]);
+        setFeedbackList(resFeedback.feedback);
+        setTotalFeedback(resFeedback.totalFeedback);
+        setAverageRating(resFeedback.averageRating);
       })
       .catch((err) => console.log(err));
   };
@@ -227,13 +233,18 @@ export default function ComicsDetailTemp() {
                 seller={seller}
                 comics={currentComics}
                 handleOpenChat={handleOpenChat}
+                currentId={userInfo?.id}
+                totalFeedback={totalFeedback}
+                averageRating={averageRating}
               />
-              <ComicsBillingSection
-                currentComics={currentComics}
-                handleAddToCart={handleAddToCart}
-                handleBuyNow={handleBuyNow}
-                isInCart={isInCart}
-              />
+              {userInfo?.id !== seller?.id && (
+                <ComicsBillingSection
+                  currentComics={currentComics}
+                  handleAddToCart={handleAddToCart}
+                  handleBuyNow={handleBuyNow}
+                  isInCart={isInCart}
+                />
+              )}
             </div>
           </div>
 

@@ -122,7 +122,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
 
             // Gọi callback để cập nhật giao diện
             // onStatusUpdate(orderId, "COMPLETED");
-            onStatusUpdate(orderId, "COMPLETED");
+            onStatusUpdate(orderId, "SUCCESSFUL");
 
             alert("Đánh giá đã được gửi thành công!");
             console.log(payload);

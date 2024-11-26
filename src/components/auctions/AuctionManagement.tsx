@@ -384,7 +384,7 @@ const AuctionManagement = () => {
                           </IconButton>
                         )}
 
-                        {auction.status === "UPCOMING" && (
+                        {auction.status === "UPCOMINGs" && (
                           <Popconfirm
                             title="Dừng phiên đấu giá"
                             description="Bạn có thực sự muốn dừng phiên đấu giá này?"

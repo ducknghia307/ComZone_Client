@@ -90,6 +90,16 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
     <div>
       {loading ? (
         <Loading />
+      ) : auctionData.status === "UPCOMING" ? ( // Auction is not active yet
+        <p
+          style={{
+            fontFamily: "REM",
+            fontSize: "20px",
+            paddingBottom: "15px",
+          }}
+        >
+          Phiên đấu giá sẽ bắt đầu {formatEndTime(auctionData.startTime)}
+        </p>
       ) : (
         <>
           {auctionEnded && (

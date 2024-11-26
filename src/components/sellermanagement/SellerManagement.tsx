@@ -40,12 +40,6 @@ const SellerManagement = () => {
   const handleAuction = (comic: any) => {
     setSelectedComic(comic); // Set the selected comic
     setIsModalVisible(true); // Show the modal
-    notification.success({
-      key: "success",
-      message: "Thành công",
-      description: "Tạo đấu giá thành công!",
-      duration: 5,
-    });
   };
 
   const handleModalCancel = () => {
@@ -61,6 +55,12 @@ const SellerManagement = () => {
           : prevComic
       )
     );
+    notification.success({
+      key: "success",
+      message: "Thành công",
+      description: "Tạo đấu giá thành công!",
+      duration: 5,
+    });
   };
 
   const handleSell = (comic: Comic) => {

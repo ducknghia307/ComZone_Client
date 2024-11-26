@@ -37,7 +37,6 @@ const ProfileUser: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { accessToken } = useAppSelector((state) => state.auth);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo>();
 
   const [profileData, setProfileData] = useState<ProfileData>({

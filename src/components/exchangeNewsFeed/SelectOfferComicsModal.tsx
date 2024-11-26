@@ -1,11 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Avatar, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
-import {
-  Exchange,
-  ExchangePostInterface,
-} from "../../common/interfaces/exchange.interface";
+import { ExchangePostInterface } from "../../common/interfaces/exchange.interface";
 import ActionConfirm from "../actionConfirm/ActionConfirm";
 import Loading from "../loading/Loading";
 
@@ -83,7 +82,7 @@ export default function SelectOfferComicsModal({
   const handleModalClose = (
     e?: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    e && e.stopPropagation();
+    if (e) e.stopPropagation();
     setIsConfirming(false);
     setIsSelectingMine(true);
     setPostSelectOptionValues([]);
@@ -105,8 +104,7 @@ export default function SelectOfferComicsModal({
         console.log(res.data);
 
         await privateAxios
-          .post("chat-rooms", {
-            secondUser: post.user.id,
+          .post("chat-rooms/exchange", {
             exchange: res.data.exchange.id,
           })
           .then((response) => {
@@ -153,7 +151,7 @@ export default function SelectOfferComicsModal({
 
           <div className="grow flex items-stretch justify-start gap-8">
             {isSelectingMine && (
-              <div className="basis-1/2 flex flex-col items-stretch gap-4">
+              <div className="basis-full flex flex-col items-stretch gap-4 max-h-64 overflow-y-auto">
                 <p className="font-light italic">
                   Đầu tiên, hãy chọn từ danh sách truyện dùng để trao đổi của
                   bạn:
@@ -180,6 +178,9 @@ export default function SelectOfferComicsModal({
                       />
                       <p>{option.data.label}</p>
                     </div>
+                  )}
+                  labelRender={(option) => (
+                    <div className="font-light">{option.label}</div>
                   )}
                   onSelect={(value: string) => {
                     setSelectedRequestComicsList((prev) => [...prev, value]);
@@ -209,7 +210,7 @@ export default function SelectOfferComicsModal({
             )}
 
             {!isSelectingMine && (
-              <div className="basis-1/2 flex flex-col items-stretch gap-4">
+              <div className="basis-full flex flex-col items-stretch gap-4">
                 <p className="font-light italic">
                   Chọn những truyện của{" "}
                   <span className="font-semibold">{post.user.name}</span> mà bạn

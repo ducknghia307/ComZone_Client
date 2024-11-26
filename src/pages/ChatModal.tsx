@@ -1,7 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { io, Socket } from "socket.io-client";
 import { Modal, notification } from "antd";
 import ChatRoomList from "../components/chat/ChatRoomList";
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../redux/hooks";
 import ChatSection from "../components/chat/ChatSection";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
@@ -16,7 +18,7 @@ export default function ChatModal({
   getMessageUnreadList,
 }: {
   isChatOpen: boolean;
-  setIsChatOpen: Function;
+  setIsChatOpen: React.Dispatch<SetStateAction<boolean>>;
   getMessageUnreadList?: Function;
 }) {
   const { isLoggedIn, userId, accessToken } = useAppSelector(
@@ -40,7 +42,7 @@ export default function ChatModal({
   const socketRef = useRef<Socket>();
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3000/chat");
+    socketRef.current = io(`${import.meta.env.VITE_SERVER_BASE_URL}chat`);
 
     if (socketRef.current) {
       socketRef.current.on("new-message", (newMessage: Message) => {
@@ -79,25 +81,28 @@ export default function ChatModal({
   }, [currentRoomId]);
 
   const fetchChatRoomList = async () => {
-    await privateAxios
-      .get("chat-rooms/user")
-      .then((res) => {
-        const list: ChatRoom[] = res.data;
-        setChatRoomList(list);
+    if (isLoggedIn)
+      await privateAxios
+        .get("chat-rooms/user")
+        .then((res) => {
+          const list: ChatRoom[] = res.data;
+          setChatRoomList(list);
 
-        if (socketRef.current) socketRef.current.emit("join-room", { userId });
+          if (socketRef.current)
+            socketRef.current.emit("join-room", { userId });
 
-        if (currentRoomId.length > 0) return;
-        if (list.length > 0) {
-          setCurrentRoomId(list[0].id);
-        }
-      })
-      .catch((err) => console.log(err));
+          if (currentRoomId.length > 0) return;
+          if (list.length > 0) {
+            setCurrentRoomId(list[0].id);
+          }
+        })
+        .catch((err) => console.log(err));
   };
 
-  const connectSessionChatRoom = () => {
+  const connectSessionChatRoom = async () => {
     const sessionChat = sessionStorage.getItem("connectedChat");
     if (!sessionChat) return;
+    await fetchChatRoomList();
     if (chatRoomList.length > 0) {
       setCurrentRoomId(sessionChat);
       currentRoomIdRef.current = sessionChat;
@@ -187,7 +192,7 @@ export default function ChatModal({
       if (!sentImage) return;
       setIsLoading(true);
 
-      var formData = new FormData();
+      const formData = new FormData();
       formData.append("image", sentImage);
       await publicAxios
         .post("file/upload/image", formData, {
@@ -217,29 +222,40 @@ export default function ChatModal({
   const handleSelectChatRoom = (chatRoom: ChatRoom) => {
     setCurrentRoomId(chatRoom.id);
     currentRoomIdRef.current = chatRoom.id;
+
     if (chatRoom.lastMessage?.isRead) return;
-    updateIsRead(chatRoom);
+    updateIsRead();
   };
 
   useEffect(() => {
-    fetchMessageList();
     currentRoomIdRef.current = currentRoomId;
+    fetchMessageList();
   }, [currentRoomId]);
 
-  const updateIsRead = async (chatRoom: ChatRoom) => {
-    if (chatRoom.lastMessage?.isRead || chatRoom.lastMessage?.mine) return;
-    else
-      await privateAxios
-        .patch(`chat-messages/chat-room/is-read/${chatRoom.id}`)
-        .then(() => {
-          socketRef.current!.emit("update-room-list", {
-            userId,
-            chatRoomId: chatRoom.id,
-          });
+  const updateIsRead = async () => {
+    const currentRoom = chatRoomList.find(
+      (chatRoom) => chatRoom.id === currentRoomIdRef.current
+    );
+    if (
+      !currentRoom ||
+      !currentRoom.lastMessage ||
+      currentRoom.lastMessage?.isRead ||
+      currentRoom.lastMessage?.mine
+    ) {
+      return;
+    }
 
-          socketRef.current?.emit("get-unread-list", { userId });
-        })
-        .catch((err) => console.log(err));
+    await privateAxios
+      .patch(`chat-messages/chat-room/is-read/${currentRoom.id}`)
+      .then(() => {
+        socketRef.current!.emit("update-room-list", {
+          userId,
+          chatRoomId: currentRoom.id,
+        });
+
+        socketRef.current?.emit("get-unread-list", { userId });
+      })
+      .catch((err) => console.log(err));
   };
 
   const scrollDown = () => {

@@ -1,7 +1,18 @@
 import React from 'react';
 import { Box, Button, IconButton, Modal, Paper, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-const ModalFeedback = ({ isOpen, feedback, onClose }) => {
+interface Feedback {
+    createdAt: string;
+    comment: string;
+    rating: number;
+    attachedImages: string[]; // Assuming images are URLs
+}
+interface ModalFeedbackProps {
+    isOpen: boolean;
+    feedback: Feedback | null;
+    onClose: () => void;
+}
+const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose }) => {
     return (
         <Modal
             open={isOpen}

@@ -39,6 +39,26 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                 return {
                     color: '#e91e63', backgroundColor: '#fce4ec', borderRadius: '8px', padding: '4px 12px', fontWeight: 'bold', display: 'inline-block', fontFamily: "REM", fontSize: '16px'
                 };
+            case "SUCCESSFUL":
+                return {
+                    color: "#4caf50",
+                    backgroundColor: "#e8f5e9",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                    fontFamily: "REM",
+                };
+            case "FAILED":
+                return {
+                    color: "#ffffff",
+                    backgroundColor: "#d32f2f",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                    fontFamily: "REM",
+                };
             default:
                 return {};
         }
@@ -52,12 +72,19 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
             case "DELIVERED": return "Đã giao thành công";
             case "COMPLETED": return "Hoàn tất";
             case "CANCELED": return "Bị hủy";
+            case "SUCCESSFUL":
+                return "Hoàn tất";
+            case "FAILED":
+                return "Thất bại";
             default: return "Tất cả";
         }
     };
 
-    const InfoRow = ({ label, value, isPaid }: { label: string; value: string | number; isPaid?: boolean; }) => {
+    const InfoRow = ({ label, value, paymentMethod }: { label: string; value: string | number; paymentMethod?: string; }) => {
         const theme = useTheme();
+
+        const paymentStatusColor =
+            paymentMethod === "WALLET" ? "#32CD32" : paymentMethod === "COD" ? "#ff9800" : "#000";
 
         return (
             <Box
@@ -86,9 +113,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                     variant="body1"
                     sx={{
                         paddingLeft: 2,
-                        color: isPaid !== undefined
-                            ? (isPaid ? '#32CD32' : '#ff9800')
-                            : '#000',
+                        color: paymentMethod ? paymentStatusColor : '#000',
                         whiteSpace: 'normal',
                         wordWrap: 'break-word',
                         fontFamily: "REM"
@@ -148,7 +173,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                         <CloseIcon />
                     </IconButton>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px', alignItems:'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '0px', color: 'rgba(0, 0, 0, 0.4)' }}>
                         <Typography
                             variant="body2"
@@ -164,10 +189,36 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                                 fontFamily: 'REM'
                             }}
                         >
-                            Mã đơn hàng: {order.deliveryTrackingCode}
+                            Mã đơn hàng: {order.delivery.deliveryTrackingCode}
+                        </Typography>
+                    </div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px',
+                            padding: '20px',
+                            backgroundColor: '#ffe6e6',
+                            borderRadius: '8px',
+                            border: '1px solid #f50057',
+                        }}
+                    >
+                        <Typography
+                            variant="body1"
+                            sx={{ fontWeight: 'bold', color: '#d32f2f', fontFamily: "REM" }}
+                        >
+                            Lý do từ chối hoàn tiền:
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{ color: '#d32f2f', fontFamily: "REM" }}
+                        >
+                            {order.rejectReason || 'Không có lý do cụ thể'}
                         </Typography>
                     </div>
                 </Box>
+
+
                 <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
                     <Grid size={12} sx={{ borderTop: `1px solid rgba(0, 0, 0, 0.12)`, paddingTop: '10px', paddingBottom: '10px' }}>
                         <Stack divider={<Divider />} spacing={2} direction="row" justifyContent="space-between" padding={'10px 20px'}>
@@ -184,9 +235,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                                         border: '2px solid black',
                                     }}
                                 />
-                                <InfoRow label="Họ tên" value={order.fromName} />
-                                <InfoRow label="Số điện thoại" value={order.fromPhone} />
-                                <InfoRow label="Địa chỉ" value={order.fromAddress} />
+                                <InfoRow label="Họ tên" value={order.delivery.from.name} />
+                                <InfoRow label="Số điện thoại" value={order.delivery.from.phone} />
+                                <InfoRow label="Địa chỉ" value={order.delivery.from.address} />
                             </Box>
 
                             <Divider orientation="vertical" flexItem />
@@ -203,8 +254,10 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                                 <InfoRow label="Phương thức thanh toán" value={order.paymentMethod === 'WALLET' ? 'Ví Comzone' : order.paymentMethod} />
                                 <InfoRow
                                     label="Trạng thái thanh toán"
-                                    value={order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
-                                    isPaid={order.isPaid}
+                                    value={
+                                        order.paymentMethod === "WALLET" ? "Đã thanh toán" : "Chưa thanh toán"
+                                    }
+                                    paymentMethod={order.paymentMethod}
                                 />
                             </Box>
                         </Stack>
@@ -281,7 +334,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                     }}>
                         <Typography sx={{ fontSize: "15px", fontFamily: "REM", color: "text.secondary" }}>Phí vận chuyển: </Typography>
                         <Typography sx={{ fontSize: "15px", color: "text.secondary", fontFamily: "REM" }}>
-                            {Number(order.deliveryFee).toLocaleString("vi-VN", {
+                            {Number(order.delivery.deliveryFee).toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
                             })}

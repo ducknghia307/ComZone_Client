@@ -9,7 +9,8 @@ import { privateAxios } from "../../middleware/axiosInstance";
 import { useAppSelector } from "../../redux/hooks";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCartOutlined } from "@ant-design/icons";
-
+import { convertToVietnameseDate } from "../../utils/convertDateVietnamese";
+import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
 interface AuctionHistoryProps {
   auctions: Auction[];
 }
@@ -17,7 +18,7 @@ interface AuctionHistoryProps {
 const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   const [selectedAuctionStatus, setSelectedAuctionStatus] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [auctions, setAuctions] = useState([]);
+  const [auctions, setAuctions] = useState<Auction[]>([]);
   const userId = useAppSelector((state) => state.auth.userId);
   console.log("userid", userId);
 
@@ -67,8 +68,6 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           fontWeight: "bold",
           display: "inline-block",
         };
-      // case 'UPCOMING':
-      //     return { color: '#6226EF', backgroundColor: '#EDE7F6', borderRadius: '8px', padding: '8px 20px', fontWeight: 'bold', display: 'inline-block' };
       case "UPCOMING":
         return {
           color: "#ff9800",
@@ -105,6 +104,15 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           fontWeight: "bold",
           display: "inline-block",
         };
+      case "COMPLETED":
+        return {
+          color: "#009688",
+          backgroundColor: "#e0f2f1",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
     }
   };
 
@@ -126,7 +134,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   };
   console.log("123", auctions);
 
-  const handleBuy = (auction: Auction) => {
+  const handleBuy = (auction: Auction, type: string) => {
     if (!auction) return;
 
     sessionStorage.setItem(
@@ -138,7 +146,9 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
             {
               comic: auction.comics,
               currentPrice: auction.currentPrice,
+              auctionId: auction.id,
               quantity: 1,
+              type,
             },
           ],
         },
@@ -148,7 +158,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
     navigate("/checkout");
   };
   const getAuctionResultColor = (isWin: boolean) => {
-    return isWin ? "#D6FFD8" : "red"; // Xanh lá cho win, xám cho lose
+    return isWin ? "#D6FFD8" : "rgb(255 173 201)"; // Xanh lá cho win, đỏ cho lose
   };
 
   const renderAuctionContent = () => {
@@ -171,8 +181,26 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
 
     // Map through the filtered auctions and render each auction
     return filteredAuctions.map((auction: Auction) => {
+      const vietnameseDate = convertToVietnameseDate(auction?.paymentDeadline);
       const isWin =
-        auction.status === "SUCCESSFUL" && auction.winner.id === userId;
+        auction.status === "SUCCESSFUL" && auction.winner?.id === userId;
+
+      const statusText = isWin
+        ? "Đấu giá thành công"
+        : auction.status === "SUCCESSFUL"
+        ? "Đấu giá thất bại"
+        : translateStatus(auction.status);
+
+      const statusStyles = isWin
+        ? getStatusChipStyles("SUCCESSFUL")
+        : auction.status === "SUCCESSFUL"
+        ? getStatusChipStyles("FAILED")
+        : getStatusChipStyles(auction.status);
+
+      const borderColor =
+        auction.status === "COMPLETED"
+          ? "transparent" // No border for COMPLETED auctions
+          : getAuctionResultColor(isWin);
 
       return (
         <div
@@ -183,10 +211,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
             marginBottom: "20px",
             padding: "16px",
             boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-            borderLeft:
-              isWin || auction.isWin === false
-                ? `5px solid ${getAuctionResultColor(isWin)}`
-                : "none",
+            borderLeft: `5px solid ${borderColor}`,
           }}
         >
           <div
@@ -206,9 +231,9 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
             </div>
 
             {/* Chip màu cho trạng thái đấu giá */}
-            <div style={getStatusChipStyles(auction.status)}>
+            <div style={statusStyles}>
               <Typography sx={{ fontSize: "16px", fontWeight: "bold" }}>
-                {translateStatus(auction.status)}
+                {statusText}
               </Typography>
             </div>
           </div>
@@ -239,13 +264,13 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                           {auction.currentPrice?.toLocaleString("vi-VN")} đ
                         </span>
                       </Typography>
-                      <Typography
+                      {/* <Typography
                         sx={{ fontSize: "20px", marginTop: "8px" }}
                         variant="body2"
                       >
                         Bạn đã đặt giá:{" "}
                         <span style={{ color: "#FF7F00" }}>1.100.000 đ</span>
-                      </Typography>
+                      </Typography> */}
                     </div>
                   )}
 
@@ -261,6 +286,25 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                             {auction.currentPrice?.toLocaleString("vi-VN")}
                           </span>
                         </Typography>
+                        {auction?.winner?.id === userId && (
+                          <Typography
+                            sx={{
+                              fontSize: "16px",
+                              marginTop: "8px",
+                              color: "grey",
+                              display: "flex",
+                              alignItems: "center", // Vertically center the icon and text
+                            }}
+                            variant="body2"
+                          >
+                            <ReportGmailerrorredIcon
+                              sx={{ marginRight: "8px", color: "red" }}
+                            />
+                            Vui lòng thanh toán trước {vietnameseDate} nếu không
+                            bạn sẽ mất cọc
+                            <span style={{ color: "#FF0000" }}></span>
+                          </Typography>
+                        )}
                       </>
                     </div>
                   )}
@@ -284,7 +328,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                 style={{
                   backgroundColor: "#000000",
                   color: "#FFFFFF",
-                  fontSize: "16px",
+                  fontSize: "15px",
                 }}
                 onClick={() => navigate(`/auctiondetail/${auction.id}`)}
               >
@@ -306,26 +350,21 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
             auction.winner?.id === userId ? (
               <div>
                 <Button
+                  size="large"
                   variant="contained"
                   style={{
                     backgroundColor: "green",
                     color: "#FFFFFF",
-                    fontSize: "16px",
-                    marginTop: "12px",
+                    fontSize: "17px",
+
+                    marginLeft: "10px",
                   }}
-                  onClick={() => handleBuy(auction)} // Pass the auction to handleBuy
+                  onClick={() => handleBuy(auction, "currentPrice")}
                 >
                   <ShoppingCartOutlined className="mr-2" />
                   <Typography>Thanh toán</Typography>
                 </Button>
               </div>
-            ) : auction.status === "SUCCESSFUL" ? (
-              <Typography
-                sx={{ fontSize: "20px", marginTop: "8px", color: "#E91E63" }}
-                variant="body2"
-              >
-                Đấu giá thất bại
-              </Typography>
             ) : null}
           </div>
         </div>
@@ -344,12 +383,6 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
         >
           Tất cả
         </span>
-        {/* <span
-                    className={`status-auction-tab ${selectedAuctionStatus === 'UPCOMING' ? 'active' : ''}`}
-                    onClick={() => setSelectedAuctionStatus('UPCOMING')}
-                >
-                    Sắp diễn ra
-                </span> */}
         <span
           className={`status-auction-tab ${
             selectedAuctionStatus === "PROCESSING" ? "active" : ""

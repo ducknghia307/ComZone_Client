@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import backgr from "../assets/bookshelf.jpg";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { LoginUser } from "../redux/features/auth/authActionCreators";
 
@@ -17,7 +17,9 @@ const SignIn = () => {
   const [emailRegister, setEmailRegister] = useState("");
   const handleLoginGoogle = async () => {
     try {
-      window.location.href = "http://localhost:3000/auth/google/login";
+      window.location.href = `${
+        import.meta.env.VITE_SERVER_BASE_URL
+      }auth/google/login`;
       //  window.location.reload();
     } catch (error) {
       console.log("Google login error:", error);

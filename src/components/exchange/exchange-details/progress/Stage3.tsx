@@ -1,18 +1,27 @@
-import styles from "./style.module.css";
-
-export default function Stage3({ currentStage }: { currentStage: number }) {
-  const stage = 4;
+export default function Stage2({
+  currentStage,
+  rotate,
+}: {
+  currentStage: number;
+  rotate?: boolean;
+}) {
+  const stage = 3;
 
   return (
-    <div className="relative flex items-center p-2">
+    <div
+      className={`relative flex flex-col items-center gap-2 px-4 py-2 ${
+        currentStage < stage - 1 && "opacity-20"
+      }`}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         width="24"
         height="24"
         fill="currentColor"
+        className={`${currentStage >= stage && "opacity-20"}`}
       >
-        <path d="M3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979ZM20.0049 10.9998H4.00488V18.9998H20.0049V10.9998ZM20.0049 8.99979V4.99979H4.00488V8.99979H20.0049ZM14.0049 14.9998H18.0049V16.9998H14.0049V14.9998Z"></path>
+        <path d="M17 2V4H20.0066C20.5552 4 21 4.44495 21 4.9934V21.0066C21 21.5552 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5551 3 21.0066V4.9934C3 4.44476 3.44495 4 3.9934 4H7V2H17ZM7 6H5V20H19V6H17V8H7V6ZM9 16V18H7V16H9ZM9 13V15H7V13H9ZM9 10V12H7V10H9ZM15 4H9V6H15V4Z"></path>
       </svg>
 
       {currentStage >= stage && (
@@ -30,11 +39,11 @@ export default function Stage3({ currentStage }: { currentStage: number }) {
       )}
 
       <p
-        className={`absolute bottom-[-50%] left-1/2 translate-x-[-50%] text-[0.7em] whitespace-nowrap ${
+        className={`text-[0.7em] whitespace-nowrap ${
           currentStage >= stage && "opacity-50"
         }`}
       >
-        Thanh toán
+        Thông tin giao hàng
       </p>
     </div>
   );

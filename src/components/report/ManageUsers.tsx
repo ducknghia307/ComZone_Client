@@ -20,6 +20,7 @@ interface User {
   email: string;
   status: string;
   avatar?: string;
+  role: string;
 }
 
 // Styled Components for Moderator
@@ -240,7 +241,12 @@ const ManageUsers: React.FC = () => {
         </TableContainer>
         <StyledTablePagination
           rowsPerPageOptions={[5, 10, 15]}
-          component="div"
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
           count={users.length}
           rowsPerPage={rowsPerPage}
           page={page}

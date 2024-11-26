@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import UserInformation from "../components/Profile/UserInformation";
 import { privateAxios } from "../middleware/axiosInstance";
 import { UserInfo } from "../common/base.interface";

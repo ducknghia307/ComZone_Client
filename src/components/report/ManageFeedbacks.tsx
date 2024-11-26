@@ -20,6 +20,16 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { privateAxios } from '../../middleware/axiosInstance';
 import ModalFeedback from './ModalFeedback';
+interface Feedback {
+  id: string;
+  user: { name: string };
+  seller: { name: string };
+  createdAt: string;
+  comment: string;
+  rating: number;
+  attachedImages: string[];
+  isApprove: boolean;
+}
 
 // Styled Components
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -50,11 +60,11 @@ const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
 }));
 
 const ManageFeedbacks: React.FC = () => {
-  const [feedbacks, setFeedbacks] = useState([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -91,17 +101,37 @@ const ManageFeedbacks: React.FC = () => {
     setSelectedFeedback(null);
   };
 
+  // Hàm cập nhật feedback trong danh sách
+  const updateFeedback = (updatedFeedback: Feedback) => {
+    setFeedbacks((prevFeedbacks) =>
+      prevFeedbacks.map((feedback) =>
+        feedback.id === updatedFeedback.id ? updatedFeedback : feedback
+      )
+    );
+  };
+
   const paginatedData = feedbacks.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+
+  const getStatusColor = (isApprove: boolean) => {
+    return isApprove
+      ? { color: '#4caf50', backgroundColor: '#e8f5e9', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '14px' }
+      : { color: '#e91e63', backgroundColor: '#fce4ec', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '14px' };
+  };
+
+  const getStatusText = (isApprove: boolean) => {
+    return isApprove ? "Đã duyệt" : "Chưa duyệt";
+  };
+
 
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <TextField
           variant="outlined"
-          placeholder="Tìm kiếm đánh giá..."
+          placeholder="Tìm kiếm..."
           size="small"
           sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
           InputProps={{
@@ -136,6 +166,7 @@ const ManageFeedbacks: React.FC = () => {
                 <StyledTableCell align="center">Nội Dung</StyledTableCell>
                 <StyledTableCell align="center">Đánh Giá</StyledTableCell>
                 <StyledTableCell align="center">Ảnh Đính Kèm</StyledTableCell>
+                <StyledTableCell align="center">Trạng Thái</StyledTableCell>
                 <StyledTableCell align="center">Chi Tiết</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -160,6 +191,12 @@ const ManageFeedbacks: React.FC = () => {
                     </StyledTableCell>
                     <StyledTableCell align="center">{feedback.attachedImages.length} ảnh</StyledTableCell>
                     <StyledTableCell align="center">
+                      <span style={getStatusColor(feedback.isApprove)}>
+                        {getStatusText(feedback.isApprove)}
+                      </span>
+                    </StyledTableCell>
+
+                    <StyledTableCell align="center">
                       <IconButton color="primary" onClick={() => openModal(feedback)}>
                         <EditOutlinedIcon />
                       </IconButton>
@@ -172,7 +209,12 @@ const ManageFeedbacks: React.FC = () => {
         </TableContainer>
         <StyledTablePagination
           rowsPerPageOptions={[5, 10, 15]}
-          component="div"
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
           count={feedbacks.length}
           rowsPerPage={rowsPerPage}
           page={page}
@@ -184,6 +226,7 @@ const ManageFeedbacks: React.FC = () => {
         isOpen={isModalOpen}
         feedback={selectedFeedback}
         onClose={closeModal}
+        onUpdateFeedback={updateFeedback}
       />
     </div>
   );

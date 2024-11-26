@@ -1,11 +1,11 @@
-import React from 'react';
-import AccountUser from '../components/accountmanagement/AccountUser';
+import AccountUser from "../components/accountmanagement/AccountUser";
 
 const AccountManagement = () => {
-    return (
-        <div className="w-full overflow-x-hidden"><AccountUser /></div>
-
-    );
+  return (
+    <div className="w-full overflow-x-hidden">
+      <AccountUser />
+    </div>
+  );
 };
 
 export default AccountManagement;

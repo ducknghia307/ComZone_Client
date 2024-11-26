@@ -25,7 +25,7 @@ function App() {
     return () => {
       socket.disconnect();
     };
-  }, [accessToken, userId]); // Run this effect only when accessToken or userId changes
+  }, [accessToken, userId]); 
 
   return (
     <ConfigProvider

@@ -9,6 +9,7 @@ const announcementSlice = createSlice({
     auctionAnnouncement(state, action) {
       state.auctionAnnounce = action.payload;
       console.log(action.payload);
+      
     },
   },
 });

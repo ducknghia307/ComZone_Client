@@ -52,6 +52,8 @@ const HotComics: React.FC<GenresProps> = ({
       try {
         const response = await publicAxios.get("/comics/status/available");
         const data = response.data;
+        console.log("hot comics", data);
+        
 
         const hotComics = data.filter(
           (comic: any) => comic.condition === "SEALED"
@@ -89,10 +91,10 @@ const HotComics: React.FC<GenresProps> = ({
   );
 
   const auctionComics = sortedComics.filter(
-    (comic) => comic.status === "AUCTION"
+    (comic) => comic.type === "AUCTION"
   );
   const nonAuctionComics = sortedComics.filter(
-    (comic) => comic.status !== "AUCTION"
+    (comic) => comic.type !== "AUCTION"
   );
 
   const formatPrice = (price: number) => {
@@ -144,7 +146,7 @@ const HotComics: React.FC<GenresProps> = ({
                     auctionComics.map((comic) => (
                       <div className="auction-card" key={comic.id}>
                         <img
-                          src={comic.coverImage?.[0] || "/default-cover.jpg"}
+                          src={comic.coverImage || "/default-cover.jpg"}
                           alt={comic.title}
                           className=" object-cover mx-auto"
                         />
@@ -188,7 +190,7 @@ const HotComics: React.FC<GenresProps> = ({
                       <div className="hot-comic-card" key={comic.id}>
                         <Link to={`/detail/${comic.id}`}>
                           <img
-                            src={comic.coverImage?.[0] || "/default-cover.jpg"}
+                            src={comic.coverImage}
                             alt={comic.title}
                             className="object-cover mx-auto"
                           />
@@ -213,7 +215,7 @@ const HotComics: React.FC<GenresProps> = ({
                   <div className="hot-comic-card" key={comic.id}>
                     <Link to={`/detail/${comic.id}`}>
                       <img
-                        src={comic.coverImage?.[0] || "/default-cover.jpg"}
+                        src={comic.coverImage}
                         alt={comic.title}
                         className="object-cover mx-auto"
                       />

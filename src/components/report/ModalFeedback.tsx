@@ -6,8 +6,49 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
+import { privateAxios } from '../../middleware/axiosInstance';
+interface Feedback {
+    id: string;
+    user: { name: string };
+    seller: { name: string };
+    createdAt: string;
+    comment: string;
+    rating: number;
+    attachedImages: string[];
+    isApprove: boolean;
+  }
+interface ModalFeedbackProps {
+    isOpen: boolean;
+    feedback: Feedback | null;
+    onClose: () => void;
+    onUpdateFeedback: (updatedFeedback: Feedback) => void;
+  }
+  const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose, onUpdateFeedback }) => {
+    const handleApprove = async () => {
+        if (!feedback?.id) {
+            console.error("Feedback ID is missing!");
+            return;
+        }
 
-const ModalFeedback = ({ isOpen, feedback, onClose }) => {
+        console.log(`API URL: /seller-feedback/approve/${feedback.id}`);
+
+        try {
+            console.log("Approving feedback ID:", feedback.id);
+            const response = await privateAxios.patch(`/seller-feedback/approve/${feedback.id}`);
+            console.log("Approval response:", response.data);
+            alert("Feedback đã được duyệt thành công!");
+
+            // Cập nhật trạng thái feedback qua callback
+            const updatedFeedback = { ...feedback, isApprove: true };
+            onUpdateFeedback(updatedFeedback);
+
+            onClose(); // Đóng modal
+        } catch (error) {
+            console.error("Error approving feedback:", error);
+            alert("Có lỗi xảy ra khi duyệt đánh giá!");
+        }
+    };
+
     return (
         <Modal
             open={isOpen}
@@ -100,11 +141,7 @@ const ModalFeedback = ({ isOpen, feedback, onClose }) => {
                             {/* Time and Rating Section */}
                             <Box
                                 sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    flexWrap: 'wrap',
-                                    gap: 2,
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2,
                                 }}
                             >
                                 <Stack direction="row" alignItems="center" spacing={1}>
@@ -127,11 +164,7 @@ const ModalFeedback = ({ isOpen, feedback, onClose }) => {
                                         label={`${feedback.rating}/5`}
                                         size="small"
                                         sx={{
-                                            bgcolor: '#c66a7a',
-                                            color: 'white',
-                                            fontWeight: 600,
-                                            fontSize: '0.875rem',
-                                            height: 24,
+                                            bgcolor: '#c66a7a', color: 'white', fontWeight: 600, fontSize: '0.875rem', height: 24,
                                         }}
                                     />
                                 </Stack>
@@ -141,18 +174,14 @@ const ModalFeedback = ({ isOpen, feedback, onClose }) => {
                             <Paper
                                 elevation={0}
                                 sx={{
-                                    bgcolor: 'rgba(113, 0, 43, 0.04)',
-                                    borderRadius: '16px',
-                                    p: 2.5,
+                                    bgcolor: 'rgba(113, 0, 43, 0.04)', borderRadius: '16px', p: 2.5,
                                 }}
                             >
                                 <Stack spacing={2.5} direction="row" justifyContent='space-between' paddingX='30px'>
                                     <Stack direction="row" alignItems="center" spacing={2}>
                                         <Avatar
                                             sx={{
-                                                bgcolor: '#71002b',
-                                                width: 40,
-                                                height: 40,
+                                                bgcolor: '#71002b', width: 40, height: 40,
                                             }}
                                         >
                                             <PersonOutlineIcon />
@@ -170,9 +199,7 @@ const ModalFeedback = ({ isOpen, feedback, onClose }) => {
                                     <Stack direction="row" alignItems="center" spacing={2}>
                                         <Avatar
                                             sx={{
-                                                bgcolor: '#c66a7a',
-                                                width: 40,
-                                                height: 40,
+                                                bgcolor: '#c66a7a', width: 40, height: 40,
                                             }}
                                         >
                                             <StorefrontOutlinedIcon />
@@ -193,10 +220,7 @@ const ModalFeedback = ({ isOpen, feedback, onClose }) => {
                             <Paper
                                 elevation={0}
                                 sx={{
-                                    p: 2.5,
-                                    bgcolor: '#F8FAFC',
-                                    borderRadius: '16px',
-                                    backgroundColor: 'rgba(113, 0, 43, 0.04)',
+                                    p: 2.5, bgcolor: '#F8FAFC', borderRadius: '16px', backgroundColor: 'rgba(113, 0, 43, 0.04)',
                                 }}
                             >
                                 <Stack spacing={2} >
@@ -222,10 +246,7 @@ const ModalFeedback = ({ isOpen, feedback, onClose }) => {
                                 <Paper
                                     elevation={0}
                                     sx={{
-                                        p: 2.5,
-                                        bgcolor: '#F8FAFC',
-                                        borderRadius: '16px',
-                                        backgroundColor: 'rgba(113, 0, 43, 0.04)',
+                                        p: 2.5, bgcolor: '#F8FAFC', borderRadius: '16px', backgroundColor: 'rgba(113, 0, 43, 0.04)',
                                     }}
                                 >
                                     <Stack spacing={2.5}>
@@ -247,14 +268,9 @@ const ModalFeedback = ({ isOpen, feedback, onClose }) => {
                                                 <ImageListItem
                                                     key={index}
                                                     sx={{
-                                                        borderRadius: '12px',
-                                                        overflow: 'hidden',
-                                                        bgcolor: 'white',
-                                                        border: '1px solid rgba(0,0,0,0.06)',
+                                                        borderRadius: '12px', overflow: 'hidden', bgcolor: 'white', border: '1px solid rgba(0,0,0,0.06)',
                                                         '&:hover': {
-                                                            transform: 'translateY(-4px)',
-                                                            transition: 'all 0.3s ease',
-                                                            boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                                                            transform: 'translateY(-4px)', transition: 'all 0.3s ease', boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
                                                         },
                                                     }}
                                                 >
@@ -269,12 +285,7 @@ const ModalFeedback = ({ isOpen, feedback, onClose }) => {
                                                             alt={`Feedback ${index + 1}`}
                                                             loading="lazy"
                                                             style={{
-                                                                position: 'absolute',
-                                                                top: 0,
-                                                                left: 0,
-                                                                width: '100%',
-                                                                height: '100%',
-                                                                objectFit: 'cover',
+                                                                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
                                                             }}
                                                         />
                                                     </Box>
@@ -288,32 +299,52 @@ const ModalFeedback = ({ isOpen, feedback, onClose }) => {
                     )}
                 </Box>
 
-                {/* Footer */}
+                {/* Buttons */}
                 <Box
                     sx={{
                         p: 3,
                         borderTop: '1px solid rgba(113, 0, 43, 0.1)',
                         display: 'flex',
                         justifyContent: 'flex-end',
+                        gap: 2,
                     }}
                 >
+                    {!feedback?.isApprove && (
+                        <Button
+                            onClick={handleApprove}
+                            variant="contained"
+                            sx={{
+                                background: 'linear-gradient(45deg, #71002b 30%, #c66a7a 90%)',
+                                color: 'white',
+                                px: 4,
+                                py: 1.2,
+                                borderRadius: '12px',
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                fontSize: '0.95rem',
+                                boxShadow: '0 8px 16px rgba(113, 0, 43, 0.3)',
+                                '&:hover': {
+                                    boxShadow: '0 12px 20px rgba(113, 0, 43, 0.4)',
+                                    transform: 'translateY(-1px)',
+                                },
+                            }}
+                        >
+                            Duyệt Đánh Giá
+                        </Button>
+                    )}
                     <Button
                         onClick={onClose}
                         variant="contained"
                         sx={{
-                            background: 'linear-gradient(45deg, #71002b 30%, #c66a7a 90%)',
-                            color: 'white',
+                            bgcolor: '#fff',
+                            color: '#71002b',
+                            border: '1px solid #c66a7a',
                             px: 4,
                             py: 1.2,
                             borderRadius: '12px',
                             textTransform: 'none',
                             fontWeight: 600,
                             fontSize: '0.95rem',
-                            boxShadow: '0 8px 16px rgba(113, 0, 43, 0.3)',
-                            '&:hover': {
-                                boxShadow: '0 12px 20px rgba(113, 0, 43, 0.4)',
-                                transform: 'translateY(-1px)',
-                            },
                         }}
                     >
                         Đóng

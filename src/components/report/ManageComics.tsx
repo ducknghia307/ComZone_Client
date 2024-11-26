@@ -50,7 +50,7 @@ const ManageComics: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openBanModal, setOpenBanModal] = useState(false);
-  const [selectedComicId, setSelectedComicId] = useState<number | null>(null);
+  const [selectedComicId, setSelectedComicId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchComics = async () => {
@@ -79,19 +79,19 @@ const ManageComics: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "UNAVAILABLE":
-        return { color: '#e91e63', backgroundColor: '#fce4ec', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' };
+        return { color: '#e91e63', backgroundColor: '#fce4ec', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
       case "AVAILABLE":
-        return { color: '#4caf50', backgroundColor: '#e8f5e9', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' };
+        return { color: '#4caf50', backgroundColor: '#e8f5e9', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
       case "AUCTION":
-        return { color: '#ff9800', backgroundColor: '#fff3e0', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' };
+        return { color: '#ff9800', backgroundColor: '#fff3e0', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
       case "EXCHANGE":
-        return { color: '#52a7bf', backgroundColor: '#daf4ff', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' };
+        return { color: '#52a7bf', backgroundColor: '#daf4ff', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
       case "EXCHANGE_OFFER":
-        return { color: '#673ab7', backgroundColor: '#ede7f6', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' };
+        return { color: '#673ab7', backgroundColor: '#ede7f6', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
       case "SOLD":
-        return { color: '#757575', backgroundColor: '#eeeeee', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' };
+        return { color: '#757575', backgroundColor: '#eeeeee', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
       case "REMOVED":
-        return { color: '#f44336', backgroundColor: '#ffebee', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px' };
+        return { color: '#f44336', backgroundColor: '#ffebee', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
     }
   };
 
@@ -108,7 +108,7 @@ const ManageComics: React.FC = () => {
     }
   };
 
-  const handleOpenBanModal = (comicId: number) => {
+  const handleOpenBanModal = (comicId: string) => {
     setSelectedComicId(comicId);
     setOpenBanModal(true);
   };
@@ -164,12 +164,12 @@ const ManageComics: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>Ảnh Bìa</StyledTableCell>
-                <StyledTableCell>Tên Truyện</StyledTableCell>
-                <StyledTableCell align="right">Tác Giả</StyledTableCell>
-                <StyledTableCell align="right">Trạng Thái</StyledTableCell>
-                <StyledTableCell align="right">Tập/Bộ</StyledTableCell>
-                <StyledTableCell align="right">Chỉnh Sửa</StyledTableCell>
+                <StyledTableCell style={{ whiteSpace: 'nowrap' }}>Ảnh Bìa</StyledTableCell>
+                <StyledTableCell style={{ whiteSpace: 'nowrap' }}>Tên Truyện</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Tác Giả</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Trạng Thái</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Tập/Bộ</StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Chỉnh Sửa</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -208,7 +208,12 @@ const ManageComics: React.FC = () => {
         </TableContainer>
         <StyledTablePagination
           rowsPerPageOptions={[5, 10, 15]}
-          component="div"
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
           count={comics.length}
           rowsPerPage={rowsPerPage}
           page={page}

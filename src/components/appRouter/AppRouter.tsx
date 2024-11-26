@@ -39,9 +39,11 @@ import ModAuctions from "../../pages/ModAuctions";
 import ModExchanges from "../../pages/ModExchanges";
 import ModDeposits from "../../pages/ModWallet";
 import ModFeedbacks from "../../pages/ModFeedbacks";
+import ModRefunds from "../../pages/ModRefunds";
 
 import AdminUsers from "../../pages/AdminUsers";
 import AdminDashboard from "../../pages/AdminDashboard";
+import AdminSubscription from "../../pages/AdminSubscription";
 import Exchange from "../../pages/Exchange";
 import ExchangeDetail from "../../pages/ExchangeDetail";
 
@@ -125,9 +127,11 @@ const AppRouter = () => {
         <Route path="/mod/exchanges" element={<ModExchanges />} />
         <Route path="/mod/deposits" element={<ModDeposits />} />
         <Route path="/mod/feedbacks" element={<ModFeedbacks />} />
+        <Route path="/mod/refunds" element={<ModRefunds />} />
 
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/subscription" element={<AdminSubscription />} />
       </Routes>
     </div>
   );

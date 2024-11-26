@@ -6,13 +6,13 @@ const { store } = makeStore();
 
 // Axios instance setup
 const privateAxios = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: import.meta.env.VITE_SERVER_BASE_URL,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
 
 const publicAxios = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: import.meta.env.VITE_SERVER_BASE_URL,
   withCredentials: true,
 });
 
@@ -29,8 +29,8 @@ const publicAxios = axios.create({
 // Request interceptor for privateAxios
 privateAxios.interceptors.request.use(
   (config) => {
-    // Always get the latest state
     const state = store.getState();
+
     const accessToken = state.auth.accessToken;
     if (accessToken) {
       config.headers["Authorization"] = "Bearer " + accessToken;
@@ -93,7 +93,7 @@ const getNewTokens = async (
       }
     );
     return response.data; // Assuming the API returns { token }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error refreshing tokens:", error.response?.data || error);
     throw error; // Propagate the error to be handled in the calling function
   }

@@ -9,7 +9,7 @@ import {
   Col,
   notification,
 } from "antd";
-import moment, { Moment } from "moment";
+import { Moment } from "moment";
 import dayjs from "dayjs";
 import { privateAxios } from "../../../middleware/axiosInstance";
 
@@ -32,6 +32,7 @@ interface AuctionFormValues {
   reservePrice: number;
   maxPrice: number;
   priceStep: number;
+  depositAmount: number;
   startTime: Moment | null;
   endTime: Moment | null;
 }
@@ -43,6 +44,8 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
   onSuccess,
 }) => {
   const [form] = Form.useForm<AuctionFormValues>();
+  console.log(form);
+
   const startTime = dayjs(form.getFieldValue("startTime"));
   // Handle form submission
   const handleSubmit = async (values: AuctionFormValues) => {
@@ -50,7 +53,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
       const response = await privateAxios.post("/auction", {
         ...values,
         comicsId: comic.id,
-        status: "ONGOING", // Add comic ID to the auction data
+        status: "UPCOMING", // Add comic ID to the auction data
       });
       console.log(response.data);
       onSuccess(); // Trigger success action after successful API call
@@ -124,42 +127,65 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
       </div>
 
       <Form form={form} onFinish={handleSubmit} layout="vertical">
-        <Form.Item
-          name="reservePrice"
-          label="Giá khởi điểm (đ)"
-          rules={[{ required: true, message: "Vui lòng nhập giá khởi điểm" }]}
-        >
-          <InputNumber
-            style={{ width: "100%" }}
-            min={0}
-            placeholder="Nhập giá khởi điểm"
-          />
-        </Form.Item>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="reservePrice"
+              label="Giá khởi điểm (đ)"
+              rules={[
+                { required: true, message: "Vui lòng nhập giá khởi điểm" },
+              ]}
+            >
+              <InputNumber
+                style={{ width: "100%" }}
+                min={0}
+                placeholder="Nhập giá khởi điểm"
+              />
+            </Form.Item>
+          </Col>
 
-        <Form.Item
-          name="maxPrice"
-          label="Giá tối đa (đ)"
-          rules={[{ required: true, message: "Vui lòng nhập giá tối đa" }]}
-        >
-          <InputNumber
-            style={{ width: "100%" }}
-            min={0}
-            placeholder="Nhập giá tối đa"
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="priceStep"
-          label="Bước giá (đ)"
-          rules={[{ required: true, message: "Vui lòng nhập bước giá" }]}
-        >
-          <InputNumber
-            style={{ width: "100%" }}
-            min={0}
-            placeholder="Nhập bước giá"
-          />
-        </Form.Item>
-
+          <Col span={12}>
+            <Form.Item
+              name="maxPrice"
+              label="Giá tối đa (đ)"
+              rules={[{ required: true, message: "Vui lòng nhập giá tối đa" }]}
+            >
+              <InputNumber
+                style={{ width: "100%" }}
+                min={0}
+                placeholder="Nhập giá tối đa"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="priceStep"
+              label="Bước giá (đ)"
+              rules={[{ required: true, message: "Vui lòng nhập bước giá" }]}
+            >
+              <InputNumber
+                style={{ width: "100%" }}
+                min={0}
+                placeholder="Nhập bước giá"
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="depositAmount"
+              label="Mức cọc (đ)"
+              rules={[{ required: true, message: "Vui lòng nhập mức cọc" }]}
+            >
+              <InputNumber
+                style={{ width: "100%" }}
+                min={0}
+                placeholder="Nhập mức cọc"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
         {/* Row to display start and end time next to each other */}
         <Row gutter={16}>
           <Col span={12}>
@@ -178,6 +204,31 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                 format="YYYY-MM-DD HH:mm"
                 style={{ width: "100%" }}
                 placeholder="Chọn thời gian bắt đầu"
+                disabledDate={(current) => {
+                  // Disable all dates before now
+                  return current && current.isBefore(dayjs().startOf("day"));
+                }}
+                disabledTime={(current) => {
+                  // Only allow times that are at least 1 hour after the current time
+                  if (!current) return {};
+                  const now = dayjs();
+                  const oneHourFromNow = now.add(1, "hour");
+                  if (current.isSame(now, "day")) {
+                    return {
+                      disabledHours: () =>
+                        Array.from({ length: 24 }, (_, i) =>
+                          i < oneHourFromNow.hour() ? i : -1
+                        ).filter((x) => x !== -1),
+                      disabledMinutes: () =>
+                        current.isSame(oneHourFromNow, "hour")
+                          ? Array.from({ length: 60 }, (_, i) =>
+                              i < oneHourFromNow.minute() ? i : -1
+                            ).filter((x) => x !== -1)
+                          : [],
+                    };
+                  }
+                  return {};
+                }}
               />
             </Form.Item>
           </Col>

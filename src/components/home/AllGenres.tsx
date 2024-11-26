@@ -95,9 +95,7 @@ const AllGenres: React.FC = () => {
   useEffect(() => {
     const fetchComics = async () => {
       try {
-        const response = isLoggedIn
-          ? await privateAxios.get("/comics/except-seller/available") // For logged-in users
-          : await publicAxios.get("/comics/status/available"); // For guests
+        const response = await publicAxios.get("/comics/status/available"); // For guests
 
         setComics(response.data);
       } catch (error) {

@@ -188,12 +188,14 @@ const Navbar = () => {
   const adminAndModPaths = [
     "/admin/dashboard",
     "/admin/users",
+    "/admin/subscription",
     "/mod/users",
     "/mod/comics",
     "/mod/orders",
     "/mod/auctions",
     "/mod/deposits",
     "/mod/feedbacks",
+    "/mod/refunds",
   ];
 
   if (adminAndModPaths.includes(location1.pathname)) {

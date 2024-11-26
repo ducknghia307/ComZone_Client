@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import "../components/ui/AccountUser.css";
 import Grid from "@mui/material/Grid2";
 import Sidebar from "../components/accountmanagement/Sidebar";
-import AuctionHistory from "../components/auction/AuctionHistory";
+
 import ExchangeHistory from "../components/exchangeNewsFeed/ExchangeHistory";
 
 const ExchangeUser: React.FC = () => {
-  const [selectedMenuItem, setSelectedMenuItem] = useState("purchase");
+  // const [selectedMenuItem, setSelectedMenuItem] = useState("purchase");
 
-  const handleMenuItemClick = (item: string) => {
-    setSelectedMenuItem(item);
-  };
+  // const handleMenuItemClick = (item: string) => {
+  //   setSelectedMenuItem(item);
+  // };
 
   return (
     <div className="account-user-container w-full">

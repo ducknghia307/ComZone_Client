@@ -4,8 +4,25 @@ import Grid from '@mui/material/Grid2';
 import { Form } from 'antd';
 import dayjs from 'dayjs';
 import { Close as CloseIcon } from '@mui/icons-material';
-
-const AuctionDetailMod = ({ open, onCancel, comic, auctionData, onSuccess, onClose }) => {
+import { Comic, UserInfo } from '../../common/base.interface';
+interface AuctionDetailModProps {
+    open: boolean;
+    onCancel: () => void;
+    // onClose: () => void;
+    onSuccess: () => void;
+    comic: Comic;
+    auctionData: {
+      reservePrice: number;
+      maxPrice: number;
+      priceStep: number;
+      startTime: string;
+      endTime: string;
+      currentPrice: number;
+      sellerInfo: UserInfo;
+      status: string;
+    };
+  }
+  const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({ open, onCancel, comic, auctionData, onSuccess }) => {
     const [form] = Form.useForm();
 
     const sellerInfo = auctionData?.sellerInfo || {};
@@ -120,7 +137,7 @@ const AuctionDetailMod = ({ open, onCancel, comic, auctionData, onSuccess, onClo
 
     return (
         <StyledDialog
-            open={open} onClose={onClose} maxWidth="md" fullWidth
+            open={open} maxWidth="md" fullWidth
         >
             <DialogTitle
                 sx={{

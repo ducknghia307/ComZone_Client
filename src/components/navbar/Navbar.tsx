@@ -17,6 +17,7 @@ import {
 } from "@ant-design/icons";
 import RegisterSellerModal from "./RegisterSellerModal";
 import ChatModal from "../../pages/ChatModal";
+import { toast } from "sonner";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -101,6 +102,18 @@ const Navbar = () => {
     if (searchTerm.trim()) {
       window.location.href = `/search?query=${encodeURIComponent(searchTerm)}`;
     }
+  };
+
+  const handleOpenAnnouncement = () => {
+    toast.success(
+      <p className="REM font-semibold text-2xl">
+        Ban da hoan thanh Ban da hoan thanh Ban da hoan thanh Ban da hoan thanh
+        Ban da hoan thanh Ban da hoan thanh Ban da hoan thanh Ban da hoan thanh{" "}
+      </p>,
+      {
+        className: "text-red-500",
+      }
+    );
   };
 
   const location = useLocation();
@@ -339,8 +352,11 @@ const Navbar = () => {
                         </svg>
                       </Badge>
                     </li>
-                    {/* noti */}
-                    <li className="items-center cursor-pointer duration-200 hover:opacity-50 ml-4 lg:flex hidden">
+                    {/* announcement */}
+                    <li
+                      onClick={handleOpenAnnouncement}
+                      className="items-center cursor-pointer duration-200 hover:opacity-50 ml-4 lg:flex hidden"
+                    >
                       <svg
                         width="40"
                         height="40"

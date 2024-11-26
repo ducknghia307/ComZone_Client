@@ -188,6 +188,7 @@ export interface Delivery {
     address: string;
   };
   to: {
+    user: any;
     id: string;
     createdAt: string;
     note: string | null;

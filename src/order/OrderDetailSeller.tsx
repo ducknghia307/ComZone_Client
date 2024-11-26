@@ -640,10 +640,10 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                     label="Tổng tiền"
                     value={`${orderDetail.totalPrice} đ`}
                   />
-                  <InfoRow
+                  {/* <InfoRow
                     label="Phí vận chuyển"
                     value={`${orderDetail.delivery.deliveryFee} đ`}
-                  />
+                  /> */}
                   <InfoRow
                     label="Phương thức thanh toán"
                     value={

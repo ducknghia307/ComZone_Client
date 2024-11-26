@@ -250,9 +250,9 @@ const OrderManagement = () => {
                   <TableCell align="center">
                     {order.delivery?.deliveryTrackingCode || "N/A"}
                   </TableCell>
-                  <TableCell align="center">{order.toName}</TableCell>
-                  <TableCell align="center">{order.user.email}</TableCell>
-                  <TableCell align="center">{order.toPhone}</TableCell>
+                  <TableCell align="center">{order.delivery.to.name}</TableCell>
+                  <TableCell align="center">{order.delivery.to.user.email}</TableCell>
+                  <TableCell align="center">{order.delivery.to.phone}</TableCell>
                   <TableCell align="center">
                     {order.totalPrice.toLocaleString()} đ
                   </TableCell>

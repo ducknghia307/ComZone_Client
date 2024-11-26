@@ -50,18 +50,15 @@ const AllAuctions = ({
         console.log("Available Comics:", data);
 
         const ongoingComics = data.filter(
-          (auction: any) =>
-            auction.status === "ONGOING" &&
-            new Date(auction.startTime) <= new Date() &&
-            new Date(auction.endTime) > new Date()
+          (auction: any) => auction.status === "ONGOING"
         );
         setOngoingComics(ongoingComics);
 
         const upcomingComics = data.filter(
-          (auction: any) =>
-            auction.status === "UPCOMING" &&
-            new Date(auction.startTime) > new Date()
+          (auction: any) => auction.status === "UPCOMING"
         );
+        // console.log();
+
         setUpcomingComics(upcomingComics);
       } catch (error) {
         console.error("Error fetching comics:", error);

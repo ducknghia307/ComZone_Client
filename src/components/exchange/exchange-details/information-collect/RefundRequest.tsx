@@ -128,7 +128,7 @@ export default function RefundRequest({
       onCancel={handleClose}
       footer={null}
       centered
-      width={window.innerWidth * 0.5}
+      width={window.innerWidth * 0.4}
     >
       <div className="pt-4 flex flex-col gap-4">
         <p className="font-semibold text-xl pb-4">GẶP VẤN ĐỀ KHI NHẬN TRUYỆN</p>

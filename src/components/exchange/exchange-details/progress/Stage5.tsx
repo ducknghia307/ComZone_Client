@@ -36,7 +36,7 @@ export default function Stage4({ currentStage }: { currentStage: number }) {
           currentStage >= stage && "opacity-50"
         }`}
       >
-        Giao hàng
+        Xác nhận giao hàng
       </p>
     </div>
   );

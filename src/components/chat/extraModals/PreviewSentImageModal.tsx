@@ -15,8 +15,8 @@ export default function PreviewSentImageModal({
   handleSendMessageAsImage: Function;
 }) {
   const handleConfirmSend = async () => {
-    await handleSendMessageAsImage();
     setIsOpen(false);
+    await handleSendMessageAsImage();
   };
 
   if (isOpen && !sentImage) {

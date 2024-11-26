@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Avatar, Modal } from "antd";
 import { privateAxios } from "../../../middleware/axiosInstance";
@@ -55,8 +56,8 @@ export default function SendComicsModal({
 
   const handleConfirmSend = async () => {
     await handleSendMessageAsComics();
-    setIsConfirming(false);
     setIsOpen(false);
+    setIsConfirming(false);
   };
 
   return (

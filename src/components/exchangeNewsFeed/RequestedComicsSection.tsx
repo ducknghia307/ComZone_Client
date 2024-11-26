@@ -14,15 +14,13 @@ export default function RequestedComicsSection({
   const [currentComics, setCurrentComics] = useState(0);
 
   const handlePrev = () => {
-    currentComics > 0
-      ? setCurrentComics(currentComics - 1)
-      : setCurrentComics(list.length - 1);
+    if (currentComics > 0) setCurrentComics(currentComics - 1);
+    else setCurrentComics(list.length - 1);
   };
 
   const handleNext = () => {
-    currentComics < list.length - 1
-      ? setCurrentComics(currentComics + 1)
-      : setCurrentComics(0);
+    if (currentComics < list.length - 1) setCurrentComics(currentComics + 1);
+    else setCurrentComics(0);
   };
 
   const getEdition = (comics: Comic) => {

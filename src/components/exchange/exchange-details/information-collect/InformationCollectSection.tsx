@@ -278,6 +278,7 @@ export default function InformationCollectSection({
             self={self}
             theOther={theOther}
             fetchExchangeDetails={fetchExchangeDetails}
+            setIsLoading={setIsLoading}
           />
         ) : (
           <DealsInformation

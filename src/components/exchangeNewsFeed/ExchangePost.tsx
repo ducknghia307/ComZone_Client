@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import { useState } from "react";
+import React, { useState } from "react";
 import SingleOfferedComics from "./SingleOfferedComics";
 import styles from "./style.module.css";
 import { ExchangePostInterface } from "../../common/interfaces/exchange.interface";
@@ -16,7 +16,7 @@ moment.locale("vi");
 export default function ExchangePost({
   post,
   userExchangeComicsList,
-  isLoading,
+  setIsLoading,
   isSelectModalOpen,
   setIsSelectModalOpen,
   isChatOpen,
@@ -27,7 +27,7 @@ export default function ExchangePost({
   post: ExchangePostInterface;
   userExchangeComicsList: Comic[];
   index: number;
-  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isSelectModalOpen: string;
   setIsSelectModalOpen: Function;
   isChatOpen: boolean;
@@ -84,7 +84,7 @@ export default function ExchangePost({
               <p className="font-light text-[0.7em] tracking-wider">
                 {checkTimeDisplay ? (
                   <span>
-                    {dateFormat(post.createdAt, "dd/mm/yyyy")} &#8226;{" "}
+                    {moment(post.createdAt).format("DD MMMM")} &#8226;{" "}
                     {dateFormat(post.createdAt, "HH:MM")}
                   </span>
                 ) : (
@@ -163,11 +163,10 @@ export default function ExchangePost({
               <SelectOfferComicsModal
                 post={post}
                 userExchangeComicsList={userExchangeComicsList}
-                isLoading={isLoading}
                 isSelectModalOpen={isSelectModalOpen}
                 setIsSelectModalOpen={setIsSelectModalOpen}
-                isChatOpen={isChatOpen}
                 setIsChatOpen={setIsChatOpen}
+                setIsLoading={setIsLoading}
               />
             </div>
           ) : (

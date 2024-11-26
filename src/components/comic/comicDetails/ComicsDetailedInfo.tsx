@@ -10,6 +10,8 @@ export default function ComicsDetailedInfo({
     return genre.name;
   });
 
+  if (!currentComics) return;
+
   return (
     <div className="w-full flex flex-col gap-2 bg-white px-4 py-4 rounded-xl drop-shadow-md">
       <p className="text-sm pb-2">Thông tin chi tiết</p>
@@ -59,25 +61,38 @@ export default function ComicsDetailedInfo({
         <p className="w-1/2">{currentComics?.page}</p>
       </div>
 
-      <div
-        className={`${
-          !currentComics?.publishedDate && "hidden"
-        } flex items-center text-xs py-2 border-b`}
-      >
-        <p className="w-1/2 text-gray-600">Ngày phát hành</p>
-        <p className="w-1/2">
-          {dateFormat(currentComics?.publishedDate, "dd/mm/yyyy")}
-        </p>
-      </div>
+      {currentComics.publishedDate && (
+        <div
+          className={`${
+            !currentComics?.publishedDate && "hidden"
+          } flex items-center text-xs py-2 border-b`}
+        >
+          <p className="w-1/2 text-gray-600">Năm phát hành</p>
+          <p className="w-1/2">{currentComics.publishedDate}</p>
+        </div>
+      )}
 
       <div
         className={`${
           !currentComics?.publishedDate && "hidden"
         } flex items-center text-xs py-2 border-b`}
       >
-        <p className="w-1/2 text-gray-600">Số lượng cuốn</p>
-        <p className="w-1/2">{currentComics?.quantity}</p>
+        <p className="w-1/2 text-gray-600">Truyện lẻ / Bộ truyện</p>
+        <p className="w-1/2">
+          {currentComics?.quantity === 1 ? "Truyện lẻ" : "Bộ truyện"}
+        </p>
       </div>
+
+      {currentComics?.quantity > 1 && (
+        <div
+          className={`${
+            !currentComics?.publishedDate && "hidden"
+          } flex items-center text-xs py-2 border-b`}
+        >
+          <p className="w-1/2 text-gray-600">Số lượng cuốn</p>
+          <p className="w-1/2">{currentComics?.quantity}</p>
+        </div>
+      )}
     </div>
   );
 }

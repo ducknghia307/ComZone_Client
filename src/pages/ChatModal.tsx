@@ -11,6 +11,7 @@ import Loading from "../components/loading/Loading";
 import { Message, MessageGroup } from "../common/interfaces/message.interface";
 import { ChatRoom } from "../common/interfaces/chat-room.interface";
 import { Comic } from "../common/base.interface";
+import socket from "../services/socket";
 
 export default function ChatModal({
   isChatOpen,
@@ -39,11 +40,9 @@ export default function ChatModal({
 
   const currentRoomIdRef = useRef(currentRoomId);
 
-  const socketRef = useRef<Socket>();
+  const socketRef = useRef<Socket>(socket);
 
   useEffect(() => {
-    socketRef.current = io(`${import.meta.env.VITE_SERVER_BASE_URL}chat`);
-
     if (socketRef.current) {
       socketRef.current.on("new-message", (newMessage: Message) => {
         socketRef.current?.emit("update-room-list", {

@@ -87,9 +87,16 @@ export default function ProgressSection({
             {downArrow(firstCurrentStage, 4)}
 
             <Stage5 currentStage={firstCurrentStage} />
-            {downArrow(firstCurrentStage, 5)}
-
-            <Stage6 currentStage={firstCurrentStage} />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="currentColor"
+              className={`${firstCurrentStage < 5 && "opacity-20"}`}
+            >
+              <path d="M14.5895 16.0032L5.98291 7.39664L7.39712 5.98242L16.0037 14.589V7.00324H18.0037V18.0032H7.00373V16.0032H14.5895Z"></path>
+            </svg>
           </div>
         </div>
 
@@ -134,12 +141,21 @@ export default function ProgressSection({
             {downArrow(secondCurrentStage, 4)}
 
             <Stage5 currentStage={secondCurrentStage} />
-            {downArrow(secondCurrentStage, 5)}
-
-            <Stage6 currentStage={secondCurrentStage} />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="currentColor"
+              className={`${secondCurrentStage < 5 && "opacity-20"}`}
+            >
+              <path d="M9 13.589L17.6066 4.98242L19.0208 6.39664L10.4142 15.0032H18V17.0032H7V6.00324H9V13.589Z"></path>
+            </svg>
           </div>
         </div>
       </div>
+
+      <Stage6 currentStage={firstCurrentStage} />
     </div>
   );
 }

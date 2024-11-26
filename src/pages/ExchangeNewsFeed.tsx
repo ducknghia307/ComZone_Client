@@ -17,9 +17,7 @@ import { authSlice } from "../redux/features/auth/authSlice";
 import { Comic } from "../common/base.interface";
 
 export default function ExchangeNewsFeed() {
-  const { isLoggedIn, isLoading, userId } = useAppSelector(
-    (state) => state.auth
-  );
+  const { isLoggedIn, userId } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
 
   const [postList, setPostList] = useState<ExchangePostInterface[]>([]);
@@ -35,6 +33,8 @@ export default function ExchangeNewsFeed() {
   const [searchKey, setSearchKey] = useState<string>(
     searchParams.get("search") || ""
   );
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -155,7 +155,7 @@ export default function ExchangeNewsFeed() {
                     post={post}
                     userExchangeComicsList={userExchangeComicsList}
                     index={index}
-                    isLoading={isLoading}
+                    setIsLoading={setIsLoading}
                     isSelectModalOpen={isSelectModalOpen}
                     setIsSelectModalOpen={setIsSelectModalOpen}
                     currentUserId={userId}

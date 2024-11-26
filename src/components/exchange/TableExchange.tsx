@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { Avatar, Table, Tag, Tooltip } from "antd";
+import { Avatar, Empty, Table, Tag, Tooltip } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import { privateAxios } from "../../middleware/axiosInstance";
 import {
@@ -232,6 +232,13 @@ const TableExchange: React.FC = () => {
         onChange={onChange}
         pagination={{ pageSize: 20, hideOnSinglePage: true }}
         showSorterTooltip={{ target: "sorter-icon" }}
+        locale={{
+          emptyText: (
+            <Empty description="">
+              <p className="font-light text-gray-500">Chưa có trao đổi nào!</p>
+            </Empty>
+          ),
+        }}
       />
     </div>
   );

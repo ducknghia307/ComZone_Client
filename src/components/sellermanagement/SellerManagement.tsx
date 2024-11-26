@@ -20,7 +20,7 @@ import DeliveryManagement from "../delivery/DeliveryManagement";
 import GavelIcon from "@mui/icons-material/Gavel";
 import OrderManagement from "../../order/OrderManagement";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
-import { Modal } from "antd"; // For confirmation modal
+import { Modal, notification } from "antd"; // For confirmation modal
 import { CheckOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import AuctionModal from "../comic/sellerManagement/AuctionModal";
 import { Comic } from "../../common/base.interface";
@@ -40,6 +40,12 @@ const SellerManagement = () => {
   const handleAuction = (comic: any) => {
     setSelectedComic(comic); // Set the selected comic
     setIsModalVisible(true); // Show the modal
+    notification.success({
+      key: "success",
+      message: "Thành công",
+      description: "Tạo đấu giá thành công!",
+      duration: 5,
+    });
   };
 
   const handleModalCancel = () => {
@@ -68,6 +74,12 @@ const SellerManagement = () => {
         privateAxios
           .patch(`comics/${comic.id}/status`, { status: "AVAILABLE" })
           .then(() => {
+            notification.success({
+              key: "success",
+              message: "Thành công",
+              description: "Truyện đăng bán thành công!",
+              duration: 5,
+            });
             console.log(`Truyện "${comic.title}" đã được đưa vào bán`);
             // Update the comic list after selling
             setComics((prevComics) =>

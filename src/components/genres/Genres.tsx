@@ -183,7 +183,7 @@ const Genres: React.FC<GenresProps> = ({
       ) : (
         <>
           <div className="all-genres-section flex justify-between items-center REM">
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-xl font-bold">
               {searchQuery
                 ? `Kết quả tìm kiếm cho: "${searchQuery}"`
                 : "Tất cả thể loại"}

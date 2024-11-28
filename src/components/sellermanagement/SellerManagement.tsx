@@ -26,6 +26,7 @@ import AuctionModal from "../comic/sellerManagement/AuctionModal";
 import { Comic } from "../../common/base.interface";
 import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
 import SellerSubsModal from "./SellerSubsModal";
+import ActionCell from "./ActionCell";
 
 const { confirm } = Modal;
 
@@ -75,6 +76,48 @@ const SellerManagement = () => {
       message: "Thành công",
       description: "Tạo đấu giá thành công!",
       duration: 5,
+    });
+  };
+  const handleStopSelling = (comic: Comic) => {
+    // Show a confirmation modal before stopping the sale
+    confirm({
+      title: "Xác nhận dừng bán sản phẩm?",
+      icon: <CheckCircleOutlined style={{ color: "red" }} />,
+      content: `Bạn có chắc chắn muốn dừng bán truyện "${comic.title}" không?`,
+      onOk() {
+        // Call the API to stop selling the comic
+        privateAxios
+          .patch(`/comics/${comic.id}/stop-sell`)
+          .then(() => {
+            notification.success({
+              key: "success",
+              message: "Thành công",
+              description: "Truyện đã được dừng bán thành công!",
+              duration: 5,
+            });
+            console.log(`Truyện "${comic.title}" đã được dừng bán`);
+
+            // Update the comic list after stopping the sale
+            setComics((prevComics) =>
+              prevComics.map((prevComic) =>
+                prevComic.id === comic.id
+                  ? { ...prevComic, status: "Không khả dụng" }
+                  : prevComic
+              )
+            );
+          })
+          .catch((error) => {
+            console.error("Lỗi khi dừng bán truyện:", error);
+            notification.error({
+              message: "Lỗi",
+              description: "Không thể dừng bán truyện. Vui lòng thử lại.",
+              duration: 5,
+            });
+          });
+      },
+      onCancel() {
+        console.log("Hủy dừng bán truyện.");
+      },
     });
   };
 
@@ -266,28 +309,12 @@ const SellerManagement = () => {
 
         if (status === "Không khả dụng") {
           return (
-            <div>
-              <div>
-                <IconButton
-                  aria-label="edit"
-                  color="success"
-                  onClick={() => handleAuction(params.row)}
-                >
-                  <GavelIcon
-                    sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
-                  />
-                </IconButton>
-                <IconButton
-                  aria-label="edit"
-                  color="success"
-                  onClick={() => handleSell(params.row)}
-                >
-                  <AddBusinessIcon
-                    sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
-                  />
-                </IconButton>
-              </div>
-            </div>
+            <ActionCell
+              params={params}
+              handleAuction={handleAuction}
+              handleSell={handleSell}
+              handleStopSelling={handleStopSelling}
+            />
           );
         }
 

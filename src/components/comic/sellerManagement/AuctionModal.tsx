@@ -235,14 +235,15 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                   style={{ width: "100%" }}
                   placeholder="Chọn thời gian bắt đầu"
                   disabledDate={(current) => {
-                    // Disable all dates before now
+                    // Disable dates before today
                     return current && current.isBefore(dayjs().startOf("day"));
                   }}
                   disabledTime={(current) => {
-                    // Only allow times that are at least 1 hour after the current time
+                    // Only allow times at least 1 hour from now
                     if (!current) return {};
                     const now = dayjs();
                     const oneHourFromNow = now.add(1, "hour");
+
                     if (current.isSame(now, "day")) {
                       return {
                         disabledHours: () =>
@@ -272,7 +273,6 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                     required: true,
                     message: "Vui lòng chọn thời gian kết thúc",
                   },
-                  { validator: validateEndTime }, // Custom validation for end time
                 ]}
               >
                 <DatePicker
@@ -281,19 +281,46 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                   }}
                   format="YYYY-MM-DD HH:mm"
                   style={{ width: "100%" }}
-                  placeholder="Nhập thời gian kết thúc"
+                  placeholder="Chọn thời gian kết thúc"
                   disabledDate={(current) => {
                     const startTime = form.getFieldValue("startTime");
-                    if (!startTime) return false;
+                    if (!startTime) return true; // Disable all dates until startTime is set
 
                     const startDayjs = dayjs(startTime);
-                    const oneDayAfter = startDayjs.add(1, "day");
+                    const oneDayAfter = startDayjs.add(1, "day"); // Start time + 24 hours
                     const sevenDaysAfter = startDayjs.add(7, "days");
 
+                    // Allow selecting 30/11 at 12:06 PM or later
                     return (
-                      current.isBefore(oneDayAfter.startOf("day")) ||
+                      current.isBefore(oneDayAfter.startOf("day")) || // Entire day before oneDayAfter
                       current.isAfter(sevenDaysAfter.endOf("day"))
                     );
+                  }}
+                  disabledTime={(current) => {
+                    const startTime = form.getFieldValue("startTime");
+                    if (!startTime || !current) return {};
+
+                    const startDayjs = dayjs(startTime);
+                    const exactOneDayAfter = startDayjs.add(1, "day"); // Start time + 24 hours
+
+                    // If `endTime` is on the same day as `exactOneDayAfter`, disable earlier times
+                    if (current.isSame(exactOneDayAfter, "day")) {
+                      return {
+                        disabledHours: () =>
+                          Array.from({ length: 24 }, (_, i) =>
+                            i < exactOneDayAfter.hour() ? i : -1
+                          ).filter((x) => x !== -1),
+                        disabledMinutes: () =>
+                          current.hour() === exactOneDayAfter.hour()
+                            ? Array.from({ length: 60 }, (_, i) =>
+                                i < exactOneDayAfter.minute() ? i : -1
+                              ).filter((x) => x !== -1)
+                            : [],
+                      };
+                    }
+
+                    // No restrictions for other days within the valid range
+                    return {};
                   }}
                 />
               </Form.Item>

@@ -7,6 +7,7 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
   const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
   const [role, setRole] = useState(false);
   const [comicsData, setComicsData] = useState([]);
+  console.log(filteredAnnouncements);
 
   useEffect(() => {
     const hasSellerAnnouncements = announcements.some(
@@ -102,14 +103,6 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
       <div className="mb-2">
         {filteredAnnouncements.length > 0 ? (
           filteredAnnouncements.map((item, index) => {
-            // Find comic associated with this announcement
-            // const associatedComic = comicsData.find(
-            //   (comic) =>
-            //     comic.title === item.auction?.comics?.title ||
-            //     (item.order &&
-            //       item.order.comics?.title === comic.title)
-            // );
-
             return (
               <div
                 key={index}
@@ -125,6 +118,17 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
                     <div className="flex mt-1 space-x-2 mr-2">
                       <img
                         src={item.auction.comics.coverImage}
+                        alt="Thông báo"
+                        className="w-16 h-12 rounded-md object-cover"
+                        style={{ objectFit: "fill" }}
+                      />
+                    </div>
+                  )}
+                {item.type === "ORDER" &&
+                  item.orderItems[0].comics.coverImage && (
+                    <div className="flex mt-1 space-x-2 mr-2">
+                      <img
+                        src={item.orderItems[0].comics.coverImage}
                         alt="Thông báo"
                         className="w-16 h-12 rounded-md object-cover"
                         style={{ objectFit: "fill" }}

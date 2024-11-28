@@ -124,6 +124,7 @@ const ManageRefunds: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
     // Fetch data from API
     useEffect(() => {
@@ -178,12 +179,23 @@ const ManageRefunds: React.FC = () => {
         return <Typography sx={{ color: 'red', textAlign: 'center', marginTop: '50px' }}>{error}</Typography>;
     }
 
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
+
+    const filteredRefunds = refundRequests.filter((refundRequest) =>
+        refundRequest.user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div style={{ paddingBottom: '40px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+                {/* Search Box */}
                 <TextField
                     variant="outlined"
                     placeholder="Tìm kiếm..."
+                    value={searchTerm}
+                    onChange={handleSearch}
                     size="small"
                     sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
                     InputProps={{
@@ -217,7 +229,7 @@ const ManageRefunds: React.FC = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {refundRequests.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((refund) => (
+                            {filteredRefunds.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((refund) => (
                                 <StyledTableRow key={refund.id}>
                                     <StyledTableCell>{refund.user.name}</StyledTableCell>
                                     <StyledTableCell>{refund.order?.id}</StyledTableCell>

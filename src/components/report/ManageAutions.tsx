@@ -60,9 +60,8 @@ const ManageAuctions: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   // const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAuction, setSelectedAuction] =
-    useState<SelectedAuction | null>(null);
-
+  const [selectedAuction, setSelectedAuction] = useState<SelectedAuction | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   // const openOrderDetail = (orderId: string) => {
   //   setSelectedOrderId(orderId);
   // };
@@ -113,14 +112,45 @@ const ManageAuctions: React.FC = () => {
     setSelectedAuction(null);
   };
 
+  // const handleEditClick = (auction: SelectedAuction) => {
+  //   const sellerInfo = auction.comics.sellerId || {};
+  //   setSelectedAuction({
+  //     ...auction,
+  //     sellerInfo: sellerInfo,
+  //     comics: auction.comics,
+  //   });
+  //   setIsModalOpen(true);
+  // };
+
   const handleEditClick = (auction: SelectedAuction) => {
+    const sellerInfo: UserInfo = auction.comics.sellerId
+      ? auction.comics.sellerId
+      : {
+        createdAt: "",
+        email: "",
+        id: "",
+        name: "",
+        phone: "",
+        avatar: "",
+        refresh_token: "",
+        role: null,
+        updatedAt: "",
+        balance: 0,
+        nonWithdrawableAmount: 0,
+        last_active: null,
+        isActive: false,
+        follower_count: 0,
+        address: "",
+      };
+
     setSelectedAuction({
       ...auction,
-      sellerInfo: auction.comics.sellerId ? auction.sellerInfo : null,
+      sellerInfo: sellerInfo,
       comics: auction.comics,
     });
     setIsModalOpen(true);
   };
+
 
   const handleModalSuccess = () => {
     // Refresh or update the auctions data if necessary
@@ -220,36 +250,33 @@ const ManageAuctions: React.FC = () => {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredAuctions = auctions.filter((auction) =>
+    auction.comics.sellerId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    auction.comics.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div style={{ paddingBottom: "40px" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "30px",
-        }}
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         {/* Search Box */}
         <TextField
           variant="outlined"
           placeholder="Tìm kiếm..."
-          // value={searchTerm}
-          // onChange={handleSearch}
+          value={searchTerm}
+          onChange={handleSearch}
           size="small"
-          sx={{
-            backgroundColor: "#c66a7a",
-            borderRadius: "4px",
-            color: "#fff",
-            width: "300px",
-          }}
+          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchOutlinedIcon sx={{ color: "#fff" }} />
+                <SearchOutlinedIcon sx={{ color: '#fff' }} />
               </InputAdornment>
             ),
-            style: { color: "#fff" },
+            style: { color: '#fff' },
           }}
         />
       </Box>
@@ -320,7 +347,7 @@ const ManageAuctions: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                auctions
+                filteredAuctions
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((auction) => (
                     <React.Fragment key={auction.id}>

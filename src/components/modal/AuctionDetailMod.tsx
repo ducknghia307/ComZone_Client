@@ -52,7 +52,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
   const [form] = Form.useForm();
 
   const sellerInfo: UserInfo = auctionData?.sellerInfo || null;
-  console.log(sellerInfo);
+  console.log("seller info", sellerInfo);
 
   const theme = useTheme();
 

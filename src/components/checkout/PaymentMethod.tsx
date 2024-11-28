@@ -50,8 +50,9 @@ const PaymentMethod = ({
         const resWalletDes = await privateAxios.post("/wallet-deposits", {
           amount: selectedAmount,
         });
-        const resZalopay = await privateAxios.post("/zalopay/checkout", {
+        const resZalopay = await privateAxios.post("/zalopay", {
           walletDeposit: resWalletDes.data.id,
+          redirectPath: "/checkout",
         });
         console.log(resZalopay);
         window.location.href = resZalopay.data.orderurl;
@@ -59,8 +60,9 @@ const PaymentMethod = ({
         const resWalletDes = await privateAxios.post("/wallet-deposits", {
           amount: selectedAmount,
         });
-        const resVNpay = await privateAxios.post("/vnpay/checkout", {
+        const resVNpay = await privateAxios.post("/vnpay", {
           walletDeposit: resWalletDes.data.id,
+          redirectPath: "/checkout",
         });
         console.log(resVNpay);
 

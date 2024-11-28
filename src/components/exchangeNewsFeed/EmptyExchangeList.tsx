@@ -18,7 +18,7 @@ export default function EmptyExchangeList({
           width: "300px",
           borderRadius: "50%",
         }}
-        className="basis-1/2 w-1/2 hidden lg:block"
+        className={`basis-1/2 w-1/2 hidden lg:block ${isLoading && "hidden"}`}
       />
 
       <div className="basis-1/2 flex flex-col items-center justify-center gap-4 text-center text-gray-700">

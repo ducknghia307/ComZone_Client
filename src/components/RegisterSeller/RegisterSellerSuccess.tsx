@@ -1,6 +1,6 @@
 const RegisterSellerSuccess = () => {
   return (
-    <div className="w-full REM flex items-stretch ">
+    <div className="w-full REM flex items-stretch">
       <div className="flex flex-col justify-start items-start py-8 gap-4 relative max-h-96 overflow-y-auto overflow-x-hidden">
         <h2 className="font-bold text-xl">ĐIỀU KHOẢN SỬ DỤNG VÀ CAM KẾT</h2>
 

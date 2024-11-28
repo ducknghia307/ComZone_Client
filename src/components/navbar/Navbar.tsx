@@ -15,7 +15,7 @@ import {
   ShopOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import RegisterSellerModal from "./RegisterSellerModal";
+import RegisterSellerModal from "../RegisterSeller/RegisterSellerModal";
 import ChatModal from "../../pages/ChatModal";
 import { toast } from "sonner";
 const Navbar = () => {
@@ -607,11 +607,13 @@ const Navbar = () => {
         isRegisterSellerModal={isRegisterSellerModal}
         setIsRegisterSellerModal={setIsRegisterSellerModal}
       />
-      <ChatModal
-        isChatOpen={isChatOpen}
-        setIsChatOpen={setIsChatOpen}
-        getMessageUnreadList={getMessageUnreadList}
-      />
+      {isChatOpen && (
+        <ChatModal
+          isChatOpen={isChatOpen}
+          setIsChatOpen={setIsChatOpen}
+          getMessageUnreadList={getMessageUnreadList}
+        />
+      )}
     </>
   );
 };

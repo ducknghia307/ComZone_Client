@@ -226,7 +226,7 @@ export default function UpdateAndRevealPost({
                     id="add-image"
                     accept="image/png, image/gif, image/jpeg"
                     onChange={(e) => {
-                      if (e.target.files !== null && e.target.files[0])
+                      if (e.target.files && e.target.files[0])
                         setUploadedImageFiles((prev) => [
                           ...prev,
                           e.target.files![0],

@@ -76,7 +76,9 @@ const UserWallet = () => {
               ? `Tiền cọc trao đổi #${transaction.code}`
               : "Thông tin giao dịch không có sẵn"
             : transaction.type === "ADD"
-            ? transaction.exchange
+            ? transaction.order
+              ? `Nhận tiền đơn hàng #${transaction.code} (${transaction.note})`
+              : transaction.exchange
               ? `Thanh toán tiền bù trao đổi #${transaction.code}`
               : transaction.deposit
               ? `Hoàn trả cọc #${transaction.code}`

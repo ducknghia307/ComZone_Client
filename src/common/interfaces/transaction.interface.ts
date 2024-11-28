@@ -12,7 +12,7 @@ export interface Transaction extends BaseInterface {
   type: string;
   status: string;
   user: UserInfo;
-  note: string;
+  note?: string;
   date: string;
   auction?: Auction;
   exchange?: Exchange;

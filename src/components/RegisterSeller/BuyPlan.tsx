@@ -28,6 +28,8 @@ export default function BuyPlan({
   const [amount, setAmount] = useState<number>(0);
   const [paymentGateway, setPaymentGateway] = useState<"zalopay" | "vnpay">();
 
+  const redirectPath = window.location.pathname;
+
   const getPlanTitle = () => {
     switch (index) {
       case 0:
@@ -51,7 +53,7 @@ export default function BuyPlan({
         });
         const resZalopay = await privateAxios.post("/zalopay", {
           walletDeposit: resWalletDes.data.id,
-          redirectPath: redirect || "/accountManagement/profile",
+          redirectPath: redirectPath || "/",
         });
         window.location.href = resZalopay.data.orderurl;
       } else if (paymentGateway === "vnpay") {
@@ -60,7 +62,7 @@ export default function BuyPlan({
         });
         const resVNpay = await privateAxios.post("/vnpay", {
           walletDeposit: resWalletDes.data.id,
-          redirectPath: redirect || "/accountManagement/profile",
+          redirectPath: redirectPath || "/",
         });
         window.location.href = resVNpay.data.url;
       } else {
@@ -188,7 +190,11 @@ export default function BuyPlan({
               </div>
             ) : (
               <div className="flex flex-col gap-1">
-                <p className="text-red-500 italic">Số dư hiện tại không đủ.</p>
+                {amount + user.balance < plan.price && (
+                  <p className="text-red-500 italic">
+                    Số dư hiện tại không đủ.
+                  </p>
+                )}
 
                 {user.balance > 0 && (
                   <div className="flex justify-start items-center gap-4 mb-4">
@@ -220,7 +226,7 @@ export default function BuyPlan({
                         );
                     }}
                   />
-                  {amount < user.balance + plan.price && (
+                  {amount + user.balance < plan.price && (
                     <p className="text-red-500 text-xs italic">
                       Cần phải nạp thêm:{" "}
                       {CurrencySplitter(plan.price - user.balance)} đ
@@ -290,7 +296,7 @@ export default function BuyPlan({
 
         {user.balance < plan.price ? (
           <button
-            disabled={!paymentGateway || amount < user.balance + plan.price}
+            disabled={!paymentGateway || amount + user.balance < plan.price}
             onClick={() => redirectToPay()}
             className="self-stretch py-2 mt-4 font-semibold text-lg bg-sky-900 text-white rounded-md duration-200 hover:bg-gray-800 disabled:bg-gray-300"
           >

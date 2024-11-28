@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Logo from "../../assets/hcn-logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { MenuProps } from "antd";
-import { Badge, Dropdown, Popover } from "antd";
+import { Badge, Dropdown, notification, Popover } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { authSlice } from "../../redux/features/auth/authSlice";
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
@@ -28,12 +28,12 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const { accessToken } = useAppSelector((state) => state.auth);
   const [cartLength, setCartLength] = useState(0);
-  const [isRegisterSellerModal, setIsRegisterSellerModal] =
-    useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [chatUnreadCount, setChatUnreadCount] = useState<number>(0);
   const [announcements, setAnnouncements] = useState([]);
   const [unreadAnnouce, setUnreadAnnouce] = useState(0);
+  const [isRegisteringSeller, setIsRegisteringSeller] =
+    useState<boolean>(false);
 
   const navigate = useNavigate();
   const location1 = useLocation();
@@ -92,6 +92,51 @@ const Navbar = () => {
     return () => {
       socket.off("notification");
     };
+  }, []);
+
+  const handleSubscribePlan = async (planId: string) => {
+    await privateAxios
+      .post("seller-subscriptions", {
+        planId,
+      })
+      .then(() => {
+        notification.success({
+          key: "buy-plan",
+          message: "Đăng ký gói bán ComZone thành công!",
+          description: (
+            <p className="text-xs REM">
+              Giờ đây bạn có thể tiến hành bán và đấu giá truyện tranh trên hệ
+              thống với số lượt của gói đăng ký.
+            </p>
+          ),
+          duration: 8,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        notification.error({
+          key: "buy-plan",
+          message: "Đã có lỗi xảy ra!",
+          duration: 5,
+        });
+      });
+  };
+
+  useEffect(() => {
+    const sessionRedirect = sessionStorage.getItem("registeringSellerPlan");
+    if (sessionRedirect) {
+      const params: any = new Proxy(
+        new URLSearchParams(window.location.search),
+        {
+          get: (searchParams, prop) => searchParams.get(prop.toString()),
+        }
+      );
+      const paymentStatus = params ? params.payment_status : null;
+      if (paymentStatus && paymentStatus === "SUCCESSFUL") {
+        handleSubscribePlan(sessionRedirect);
+      }
+      sessionStorage.removeItem("registeringSellerPlan");
+    }
   }, []);
 
   const fetchUnreadAnnouncement = async () => {
@@ -206,7 +251,7 @@ const Navbar = () => {
           {userInfo?.role === "MEMBER" && (
             <p
               className="REM text-base"
-              onClick={() => setIsRegisterSellerModal(!isRegisterSellerModal)}
+              onClick={() => setIsRegisteringSeller(true)}
             >
               Trở thành Người bán
             </p>
@@ -657,15 +702,18 @@ const Navbar = () => {
           )}
         </div>
       </nav>
-      <RegisterSellerModal
-        isRegisterSellerModal={isRegisterSellerModal}
-        setIsRegisterSellerModal={setIsRegisterSellerModal}
-      />
       {isChatOpen && (
         <ChatModal
           isChatOpen={isChatOpen}
           setIsChatOpen={setIsChatOpen}
           getMessageUnreadList={getMessageUnreadList}
+        />
+      )}
+
+      {isRegisteringSeller && (
+        <RegisterSellerModal
+          isRegisterSellerModal={isRegisteringSeller}
+          setIsRegisterSellerModal={setIsRegisteringSeller}
         />
       )}
     </>

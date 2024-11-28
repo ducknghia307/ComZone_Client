@@ -72,24 +72,26 @@ const UserWallet = () => {
         note:
           transaction.type === "SUBTRACT"
             ? transaction.order
-              ? `Thanh toán đơn hàng #${transaction.code}`
+              ? `Thanh toán đơn hàng`
               : transaction.exchange
-              ? `Thanh toán trao đổi #${transaction.code}`
+              ? `Thanh toán trao đổi`
               : transaction.deposit
-              ? `Tiền cọc trao đổi #${transaction.code}`
+              ? `Tiền cọc trao đổi`
+              : transaction.sellerSubscription
+              ? `Mua gói bán ComZone`
+              : transaction.withdrawal
+              ? `Rút tiền về tài khoản ngân hàng`
               : "Thông tin giao dịch không có sẵn"
             : transaction.type === "ADD"
             ? transaction.order
-              ? `Nhận tiền đơn hàng #${transaction.code} (${transaction.note})`
+              ? `Nhận tiền đơn hàng (${transaction.note})`
               : transaction.exchange
-              ? `Thanh toán tiền bù trao đổi #${transaction.code}`
+              ? `Thanh toán tiền bù trao đổi`
               : transaction.deposit
-              ? `Hoàn trả cọc #${transaction.code}`
+              ? `Hoàn trả cọc`
               : transaction.walletDeposit
               ? "Nạp tiền vào ví"
               : "Thông tin giao dịch không có sẵn"
-            : transaction.type === "SUBTRACT" && transaction.walletDeposit
-            ? "Rút tiền từ ví"
             : "Thông tin giao dịch không có sẵn",
       }));
       setTransactions(formattedTransactions);

@@ -19,8 +19,6 @@ export default function ExchangePost({
   post,
   userExchangeComicsList,
   setIsLoading,
-  isSelectModalOpen,
-  setIsSelectModalOpen,
   setIsChatOpen,
   navigate,
   isLoggedIn,
@@ -30,8 +28,6 @@ export default function ExchangePost({
   userExchangeComicsList: Comic[];
   index: number;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  isSelectModalOpen: string;
-  setIsSelectModalOpen: Function;
   setIsChatOpen: Function;
   currentUserId: string;
   tourIndex?: number;
@@ -133,8 +129,6 @@ export default function ExchangePost({
                 isLoggedIn={isLoggedIn}
                 userExchangeComicsList={userExchangeComicsList}
                 navigate={navigate}
-                isSelectModalOpen={isSelectModalOpen}
-                setIsSelectModalOpen={setIsSelectModalOpen}
                 setIsChatOpen={setIsChatOpen}
                 setIsLoading={setIsLoading}
               />

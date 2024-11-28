@@ -1,4 +1,4 @@
-import { Avatar } from "antd";
+import { Avatar, Image } from "antd";
 import { SellerFeedback } from "../../../../common/interfaces/seller-feedback.interface";
 import moment from "moment/min/moment-with-locales";
 import { Rating } from "@mui/material";
@@ -30,7 +30,7 @@ export default function SingleFeedback({
       <div className="flex items-stretch gap-1">
         <Avatar.Group shape="square" max={{ count: 4 }}>
           {feedback.attachedImages?.map((img, index) => {
-            return <Avatar key={index} src={img} size={100} />;
+            return <Image key={index} src={img} width={100} />;
           })}
         </Avatar.Group>
       </div>

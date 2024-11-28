@@ -80,9 +80,7 @@ export default function ComicsDetailTemp() {
     await publicAxios
       .get(`seller-feedback/seller/some/${sellerId}`)
       .then((res) => {
-        console.log("b", res.data);
         const resFeedback: SellerFeedbackResponse = res.data;
-        console.log(res.data[0]);
         setFeedbackList(resFeedback.feedback);
         setTotalFeedback(resFeedback.totalFeedback);
         setAverageRating(resFeedback.averageRating);
@@ -157,8 +155,6 @@ export default function ComicsDetailTemp() {
         console.error("Error adding item to cart:", error);
       }
     } else {
-      console.log("Redirecting to sign-in from:", location.pathname);
-
       message.error("You need to sign in to add items to your cart.");
 
       dispatch(callbackUrl({ navigateUrl: location.pathname }));

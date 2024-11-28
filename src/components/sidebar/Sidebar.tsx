@@ -5,6 +5,9 @@ import {
   FormGroup,
   Collapse,
   CircularProgress,
+  Radio,
+  RadioGroup,
+  FormControl,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -19,7 +22,7 @@ interface SidebarProps {
   onAuthorFilterChange?: (updatedAuthors: string[]) => void;
   onConditionFilterChange?: (updatedConditions: string[]) => void;
 }
-const conditions = ["SEALED", "USED"];
+const conditions = ["ALL", "SEALED", "USED"];
 
 const Sidebar: React.FC<SidebarProps> = ({
   onGenreFilterChange,
@@ -34,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [loading, setLoading] = useState(true);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
-  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
+  const [selectedCondition, setSelectedCondition] = useState<string[]>([]);
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const location = useLocation();
 
@@ -99,22 +102,20 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const handleConditionChange = (event: any) => {
-    const condition = event.target.name;
-    const isChecked = event.target.checked;
-    const updatedSelectedConditions = isChecked
-      ? [...selectedConditions, condition]
-      : selectedConditions.filter((c) => c !== condition);
-
-    setSelectedConditions(updatedSelectedConditions);
-    if (typeof onConditionFilterChange === "function") {
-      onConditionFilterChange(updatedSelectedConditions);
+    if (event.target.value === "ALL") {
+      onConditionFilterChange([]);
+    } else {
+      setSelectedCondition(event.target.value);
+      if (typeof onConditionFilterChange === "function") {
+        onConditionFilterChange(event.target.value);
+      }
     }
   };
 
   return (
     <div className="sidebar REM">
       <div className="sidebar-header">
-        <h2>Khám phá truyện</h2>
+        <h2 className="uppercase">Khám phá truyện</h2>
         <div className="line-header"></div>
       </div>
 
@@ -144,7 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         onChange={handleGenreChange}
                       />
                     }
-                    label={<p className="REM text-nowrap">{genre.name}</p>}
+                    label={<p className="REM">{genre.name}</p>}
                   />
                 ))}
               </FormGroup>
@@ -162,26 +163,26 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </div>
               <Collapse in={isConditionOpen}>
-                <FormGroup className="mt-4">
+                <RadioGroup defaultValue="ALL" className="mt-4">
                   {conditions.map((condition) => (
                     <FormControlLabel
                       key={condition}
-                      control={
-                        <Checkbox
-                          name={condition}
-                          onChange={handleConditionChange}
-                        />
-                      }
+                      control={<Radio />}
+                      name={condition}
+                      value={condition}
+                      onChange={handleConditionChange}
                       label={
                         <p className="REM">
-                          {condition === "SEALED"
+                          {condition === "ALL"
+                            ? "Tất cả tình trạng"
+                            : condition === "SEALED"
                             ? "Nguyên Seal"
                             : "Đã Qua Sử Dụng"}
                         </p>
                       }
                     />
                   ))}
-                </FormGroup>
+                </RadioGroup>
               </Collapse>
             </div>
           )}

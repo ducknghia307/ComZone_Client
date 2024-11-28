@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Select } from "antd";
 import React, { useEffect, useState } from "react";
 import {
@@ -25,10 +26,10 @@ const DeliveryMethod: React.FC<DeliveryMethodProps> = ({
 }) => {
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [provinceDrop, setProvinceDrop] = useState<ProvinceDrop[]>([]);
-  const [selectProvince, setSelectProvince] = useState<Province | null>(); //
+  const [selectProvince, setSelectProvince] = useState<Province | null>();
   const [districts, setDistricts] = useState<District[]>([]);
   const [districtDrop, setDistrictDrop] = useState<DistrictDrop[]>([]);
-  const [selectDistrict, setSelectDistrict] = useState<District | null>(); //
+  const [selectDistrict, setSelectDistrict] = useState<District | null>();
   const [wards, setWards] = useState<Ward[]>([]);
   const [wardDrop, setWardDrop] = useState<WardDrop[]>([]);
   const [selectWard, setSelectWard] = useState<Ward | null>(null);

@@ -22,24 +22,22 @@ const AllGenres = () => {
   };
 
   return (
-    <div className="homepage w-full overflow-x-hidden px-4">
-      <Grid container spacing={0}>
-        <Grid size={2}>
-          <Sidebar
-            onGenreFilterChange={handleGenreFilterChange}
-            onAuthorFilterChange={handleAuthorFilterChange}
-            onConditionFilterChange={handleConditionFilterChange}
-          />
-        </Grid>
-        <Grid size={10}>
-          <Genres
-            filteredGenres={filteredGenres}
-            filteredAuthors={filteredAuthors}
-            filteredConditions={filteredConditions}
-          />
-        </Grid>
-      </Grid>
-      {/* <Footer /> */}
+    <div className="homepage w-full overflow-x-hidden flex px-4">
+      <div className="min-w-fit">
+        <Sidebar
+          onGenreFilterChange={handleGenreFilterChange}
+          onAuthorFilterChange={handleAuthorFilterChange}
+          onConditionFilterChange={handleConditionFilterChange}
+        />
+      </div>
+
+      <div className="grow min-w-[30em]">
+        <Genres
+          filteredGenres={filteredGenres}
+          filteredAuthors={filteredAuthors}
+          filteredConditions={filteredConditions}
+        />
+      </div>
     </div>
   );
 };

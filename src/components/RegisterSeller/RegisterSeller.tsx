@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { message, Steps } from "antd";
+import { message, notification, Steps } from "antd";
 import SellerInfomation from "./SellerInfomation";
 import DeliveryMethod from "./DeliveryMethod";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { UserInfo } from "../../common/base.interface";
 import RegisterSellerSuccess from "./RegisterSellerSuccess";
 import { useNavigate } from "react-router-dom";
+import SubscriptionRegister from "./SubscriptionRegister";
 
 const RegisterSeller = ({
   setIsRegisterSellerModal,
 }: {
-  setIsRegisterSellerModal: Function;
+  setIsRegisterSellerModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [current, setCurrent] = useState(0);
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -58,7 +59,7 @@ const RegisterSeller = ({
       if (!otp) {
         message.error("Vui lòng nhập mã xác thực.");
       } else {
-        if (otp === "123456") {
+        if (otp === "111111") {
           message.success("Mã OTP hợp lệ");
           setCurrent(current + 1);
         } else {
@@ -84,21 +85,31 @@ const RegisterSeller = ({
   const items = [
     {
       key: "Thông tin Người bán",
-      title: <span className="whitespace-nowrap">Thông tin người bán</span>,
+      title: (
+        <span className="text-xs whitespace-nowrap">Thông tin người bán</span>
+      ),
     },
     {
       key: "Cài đặt vận chuyển",
-      title: <span className="whitespace-nowrap">Cài đặt vận chuyển</span>,
+      title: (
+        <span className="text-xs whitespace-nowrap">Cài đặt vận chuyển</span>
+      ),
     },
     {
-      key: "Hoàn tất",
-      title: <span className="whitespace-nowrap">Hoàn tất</span>,
+      key: "Điều khoản sử dụng",
+      title: (
+        <span className="text-xs whitespace-nowrap">Điều khoản sử dụng</span>
+      ),
+    },
+    {
+      key: "Đăng ký gói bán",
+      title: <span className="text-xs whitespace-nowrap">Đăng ký gói bán</span>,
     },
   ];
 
   const steps = [
     {
-      title: "Thông tin Người bán",
+      title: "Thông tin người bán",
       content: (
         <SellerInfomation
           userInfo={userInfo}
@@ -106,9 +117,9 @@ const RegisterSeller = ({
           setOtp={setOtp}
           otpSent={otpSent}
           handleSendOtp={handleSendOtp}
-          setName={setName} // Pass down the setter
-          setEmail={setEmail} // Pass down the setter
-          setPhone={setPhone} // Pass down the setter
+          setName={setName}
+          setEmail={setEmail}
+          setPhone={setPhone}
         />
       ),
     },
@@ -117,16 +128,25 @@ const RegisterSeller = ({
       content: (
         <DeliveryMethod
           validateAddress={validateAddress}
-          setDistrict={setDistrict} // Pass down the setter
-          setProvince={setProvince} // Pass down the setter
-          setWard={setWard} // Pass down the setter
-          setDetailedAddress={setDetailedAddress} // Pass down the setter
+          setDistrict={setDistrict}
+          setProvince={setProvince}
+          setWard={setWard}
+          setDetailedAddress={setDetailedAddress}
         />
       ),
     },
     {
-      title: "Hoàn tất",
+      title: "Điều khoản sử dụng",
       content: <RegisterSellerSuccess />,
+    },
+    {
+      title: "Đăng ký gói bán",
+      content: (
+        <SubscriptionRegister
+          user={userInfo}
+          setIsRegisterSellerModal={setIsRegisterSellerModal}
+        />
+      ),
     },
   ];
 
@@ -145,33 +165,31 @@ const RegisterSeller = ({
 
     try {
       const response = await privateAxios.post("/seller-details", sellerData);
-      message.success("Đăng ký thông tin người bán thành công!");
+      message.success(
+        "Đăng ký thông tin người bán thành công! Bạn có thể tiếp tục đăng ký gói bán của ComZone.",
+        8
+      );
       console.log("Response data:", response.data);
-      navigate("/sellerManagement");
     } catch (error) {
       message.error(
         "Đã xảy ra lỗi khi đăng ký thông tin người bán. Vui lòng thử lại."
       );
       console.error("Error posting seller details:", error);
     } finally {
-      setIsRegisterSellerModal(false);
+      setCurrent(current + 1);
     }
   };
 
   return (
-    <div className="w-full px-2 pb-4 pt-8">
+    <div className="w-full max-w-[70vw] px-2 pt-8">
       <div className="flex w-full items-center justify-center">
-        <Steps
-          current={current}
-          items={items}
-          labelPlacement="vertical"
-          progressDot
-        />
+        <Steps current={current} items={items} labelPlacement="vertical" />
       </div>
       <div className="w-full">{steps[current].content}</div>
+
       <div className="flex w-full items-center justify-center">
         <div className="mt-6 flex flex-row items-center justify-end w-full h-10 gap-4">
-          {current > 0 && (
+          {current > 0 && current < steps.length - 1 && (
             <button
               className="px-8 py-2 rounded-lg bg-white text-black duration-200 hover:opacity-70 border border-black"
               onClick={prev}
@@ -179,7 +197,7 @@ const RegisterSeller = ({
               Quay lại
             </button>
           )}
-          {current < steps.length - 1 && (
+          {current < steps.length - 2 && (
             <button
               className="px-16 py-2 rounded-lg bg-black text-white duration-200 hover:opacity-70"
               onClick={next}
@@ -187,10 +205,10 @@ const RegisterSeller = ({
               Tiếp theo
             </button>
           )}
-          {current === steps.length - 1 && (
+          {current === steps.length - 2 && (
             <button
               className="px-16 py-2 rounded-lg bg-green-700 text-white duration-200 hover:opacity-70"
-              onClick={handleFinish} // Call handleFinish when "Hoàn thành" is clicked
+              onClick={handleFinish}
             >
               Hoàn thành
             </button>

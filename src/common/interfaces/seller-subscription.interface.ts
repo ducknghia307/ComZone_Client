@@ -14,6 +14,7 @@ export interface SellerSubscription extends BaseInterface {
   remainingSellTime: number;
   remainingAuctionTime: number;
   isAutoRenewed: boolean;
+  usedTrial: boolean;
   canSell: boolean;
   canAuction: boolean;
   isActive: boolean;

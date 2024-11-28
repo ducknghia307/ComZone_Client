@@ -29,7 +29,13 @@ import SellerSubsModal from "./SellerSubsModal";
 
 const { confirm } = Modal;
 
-const SellerManagement = () => {
+const SellerManagement = ({
+  sellerSubscription,
+  fetchSellerSubscription,
+}: {
+  sellerSubscription: SellerSubscription | null;
+  fetchSellerSubscription: () => void;
+}) => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
   const [selectionModel, setSelectionModel] = useState([]);
   const [comics, setComics] = useState<Comic[]>([]);
@@ -38,8 +44,6 @@ const SellerManagement = () => {
   const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const [sellerSubscription, setSellerSubscription] =
-    useState<SellerSubscription | null>();
   const [isRegisteringPlan, setIsRegisteringPlan] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -66,10 +70,11 @@ const SellerManagement = () => {
     setComics((prevComics) =>
       prevComics.map((prevComic) =>
         prevComic.id === selectedComic?.id
-          ? { ...prevComic, status: "AUCTION" }
+          ? { ...prevComic, status: "AVAILABLE" }
           : prevComic
       )
     );
+    fetchSellerSubscription();
     notification.success({
       key: "success",
       message: "Thành công",
@@ -96,7 +101,7 @@ const SellerManagement = () => {
           privateAxios
             .patch(`comics/${comic.id}/status`, { status: "AVAILABLE" })
             .then(async () => {
-              await privateAxios.patch("seller-subscriptions/seller", {
+              await privateAxios.patch("seller-subscriptions/sell", {
                 quantity: 1,
               });
 
@@ -115,6 +120,8 @@ const SellerManagement = () => {
                     : prevComic
                 )
               );
+
+              fetchSellerSubscription();
             })
             .catch((error) => {
               console.error("Lỗi khi đưa truyện vào bán:", error);
@@ -134,15 +141,6 @@ const SellerManagement = () => {
     return genreArray.map((genre) => genre.name).join(", ");
   };
 
-  const fetchSellerSubscription = async () => {
-    await privateAxios
-      .get("seller-subscriptions/user")
-      .then((res) => {
-        setSellerSubscription(res.data);
-      })
-      .catch((err) => console.log(err));
-  };
-
   useEffect(() => {
     // Gọi API để lấy danh sách comics và genres
     Promise.all([
@@ -160,8 +158,6 @@ const SellerManagement = () => {
         console.error("Error fetching data:", error);
         setLoading(false);
       });
-
-    fetchSellerSubscription();
   }, []);
 
   const handleAddComicsClick = () => {
@@ -355,8 +351,7 @@ const SellerManagement = () => {
             variant="contained"
             sx={{
               borderRadius: "20px",
-              backgroundColor: "#D9D9D9",
-              color: "#000",
+              fontFamily: "REM",
             }}
             startIcon={<AddIcon />}
             onClick={() => handleAddComicsClick()}
@@ -370,10 +365,10 @@ const SellerManagement = () => {
     switch (selectedMenuItem) {
       case "comic":
         return (
-          <div>
-            <Typography variant="h5" className="content-header">
+          <div className="flex flex-col gap-4">
+            <p className="uppercase text-2xl font-semibold REM">
               Quản lí truyện tranh
-            </Typography>
+            </p>
             <Box sx={{ marginBottom: "20px" }}>
               <div
                 style={{
@@ -386,8 +381,7 @@ const SellerManagement = () => {
                   variant="contained"
                   sx={{
                     borderRadius: "20px",
-                    backgroundColor: "#D9D9D9",
-                    color: "#000",
+                    fontFamily: "REM",
                   }}
                   startIcon={<AddIcon />}
                   onClick={() => handleAddComicsClick()}
@@ -447,7 +441,6 @@ const SellerManagement = () => {
               onCancel={handleModalCancel} // Event handler for closing the modal
               onSuccess={handleModalSuccess} // Event handler for successful auction creation
             />
-            ;
           </div>
         );
       case "order":
@@ -472,7 +465,6 @@ const SellerManagement = () => {
         <SellerSubsModal
           isOpen={isRegisteringPlan}
           setIsOpen={setIsRegisteringPlan}
-          redirect="/sellermanagement/comic"
         />
       )}
     </div>

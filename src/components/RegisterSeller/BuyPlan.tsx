@@ -13,7 +13,7 @@ export default function BuyPlan({
   isOpen,
   setIsOpen,
   setIsRegisterSellerModal,
-  redirect,
+  callback,
 }: {
   user?: UserInfo;
   plan: MembershipPlan;
@@ -21,7 +21,7 @@ export default function BuyPlan({
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<string>>;
   setIsRegisterSellerModal?: React.Dispatch<React.SetStateAction<boolean>>;
-  redirect?: string;
+  callback?: () => void;
 }) {
   const [isHidingBalance, setIsHidingBalance] = useState<boolean>(true);
   const [confirmCheck, setConfirmCheck] = useState<boolean>(false);
@@ -45,7 +45,7 @@ export default function BuyPlan({
 
   const redirectToPay = async () => {
     try {
-      sessionStorage.setItem("registeringSellerPlan", plan.id);
+      localStorage.setItem("registeringSellerPlan", plan.id);
 
       if (paymentGateway === "zalopay") {
         const resWalletDes = await privateAxios.post("/wallet-deposits", {
@@ -84,6 +84,7 @@ export default function BuyPlan({
           message: "Đăng ký gói bán thành công",
           duration: 5,
         });
+        if (callback) callback();
       })
       .catch((err) => {
         console.log(err);

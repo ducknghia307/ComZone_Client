@@ -24,7 +24,7 @@ export default function ExchangeNewsFeed() {
   );
 
   const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
-  const [isSelectModalOpen, setIsSelectModalOpen] = useState<string>("");
+
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -155,8 +155,6 @@ export default function ExchangeNewsFeed() {
                     userExchangeComicsList={userExchangeComicsList}
                     index={index}
                     setIsLoading={setIsLoading}
-                    isSelectModalOpen={isSelectModalOpen}
-                    setIsSelectModalOpen={setIsSelectModalOpen}
                     currentUserId={userId}
                     setIsChatOpen={setIsChatOpen}
                     tourIndex={tourIndex}

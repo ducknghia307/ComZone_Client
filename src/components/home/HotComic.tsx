@@ -114,7 +114,7 @@ const HotComic: React.FC = () => {
       {loading ? (
         <p>Loading comics...</p>
       ) : (
-        <div className="hot-comic-cards mt-4">
+        <div className="hot-comic-cards mt-4 REM">
           <Carousel
             responsive={responsive}
             customButtonGroup={
@@ -142,18 +142,6 @@ const HotComic: React.FC = () => {
                   <p className="price">{formatPrice(comic.price)}</p>
                   <p className="author">{comic.author.toUpperCase()}</p>
                   <p className="title">{comic.title}</p>
-                  {/* <div className="rating-sold-comic">
-                    <p className="rating">
-                      {[...Array(5)].map((_, index) => (
-                        <StarIcon
-                          key={index}
-                          style={{ width: "20px", color: "#ffc107" }}
-                        />
-                      ))}
-                    </p>
-                    <div className="divider"></div>
-                    <p className="sold-info">Đã bán {comic.sold}</p>
-                  </div> */}
                 </Link>
               </div>
             ))}

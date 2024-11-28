@@ -93,8 +93,8 @@ const AllGenres: React.FC = () => {
   useEffect(() => {
     const fetchComics = async () => {
       try {
-        const response = await publicAxios.get("/comics/status/available"); // For guests
-
+        const response = await publicAxios.get("/comics/status/available");
+        console.log(response.data);
         setComics(response.data);
       } catch (error) {
         console.error("Error fetching comics:", error);

@@ -64,7 +64,7 @@ const Genres: React.FC<GenresProps> = ({
   const fetchComics = async (comicsCount?: number) => {
     try {
       const response = await publicAxios.get(
-        `/comics/status/available?load=${comicsCount || comicsEachLoad}`
+        `/comics/count/status/available?load=${comicsCount || comicsEachLoad}`
       );
       setComics(response.data[0]);
       setTotalComicsQuantity(response.data[1]);
@@ -189,7 +189,6 @@ const Genres: React.FC<GenresProps> = ({
       ) : (
         <>
           <div className="all-genres-section flex justify-between items-center REM">
-
             <h2 className="text-2xl font-bold uppercase">
               {searchQuery
                 ? `Kết quả tìm kiếm cho: "${searchQuery}"`

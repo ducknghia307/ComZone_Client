@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Comic, UserInfo } from "../../../common/base.interface";
 
 export default function ComicsSeller({
@@ -15,8 +16,6 @@ export default function ComicsSeller({
   totalFeedback: number;
   averageRating?: number;
 }) {
-  console.log(totalFeedback);
-
   return (
     <div className="w-full">
       <div

@@ -4,6 +4,7 @@ import { Comic } from "../../../common/base.interface";
 import { ExchangePostInterface } from "../../../common/interfaces/exchange.interface";
 import { notification } from "antd";
 import SelectOfferComicsModal from "../modal/SelectOfferComicsModal";
+import { useState } from "react";
 
 export default function OthersPostButtons({
   handleOpenModal,
@@ -12,8 +13,6 @@ export default function OthersPostButtons({
   userExchangeComicsList,
   setIsChatOpen,
   setIsLoading,
-  setIsSelectModalOpen,
-  isSelectModalOpen,
   navigate,
 }: {
   handleOpenModal: () => void;
@@ -21,11 +20,11 @@ export default function OthersPostButtons({
   isLoggedIn: boolean;
   userExchangeComicsList: Comic[];
   navigate: NavigateFunction;
-  setIsSelectModalOpen: Function;
-  isSelectModalOpen: string;
   setIsChatOpen: Function;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const [isSelectModalOpen, setIsSelectModalOpen] = useState<string>("");
+
   return (
     <>
       <div className="flex flex-row gap-4">
@@ -75,14 +74,16 @@ export default function OthersPostButtons({
         </button>
       </div>
 
-      <SelectOfferComicsModal
-        post={post}
-        userExchangeComicsList={userExchangeComicsList}
-        isSelectModalOpen={isSelectModalOpen}
-        setIsSelectModalOpen={setIsSelectModalOpen}
-        setIsChatOpen={setIsChatOpen}
-        setIsLoading={setIsLoading}
-      />
+      {isSelectModalOpen === post.id && (
+        <SelectOfferComicsModal
+          post={post}
+          userExchangeComicsList={userExchangeComicsList}
+          isSelectModalOpen={isSelectModalOpen}
+          setIsSelectModalOpen={setIsSelectModalOpen}
+          setIsChatOpen={setIsChatOpen}
+          setIsLoading={setIsLoading}
+        />
+      )}
     </>
   );
 }

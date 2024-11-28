@@ -24,11 +24,13 @@ export default function SellerFeedbackSection({
       ) : (
         <div className="flex flex-col items-stretch justify-start gap-4">
           {feedbackList.map((feedback) => {
-            return <SingleFeedback feedback={feedback} />;
+            return <SingleFeedback key={feedback.id} feedback={feedback} />;
           })}
-          <button className="hover:underline pt-4">
-            Xem thêm {totalFeedback - feedbackList.length} đánh giá
-          </button>
+          {totalFeedback - feedbackList.length > 0 && (
+            <button className="hover:underline pt-4">
+              Xem thêm {totalFeedback - feedbackList.length} đánh giá
+            </button>
+          )}
         </div>
       )}
     </div>

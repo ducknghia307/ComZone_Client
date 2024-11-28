@@ -55,9 +55,12 @@ const UserWallet = () => {
           "vi-VN"
         ),
         type:
-          (transaction.walletDeposit &&
-            transaction.type === "ADD" &&
-            "Nạp tiền") ||
+          (transaction.type === "ADD" &&
+            (transaction.walletDeposit
+              ? "Nạp tiền"
+              : transaction.order
+              ? "Nhận tiền"
+              : "")) ||
           (transaction.walletDeposit &&
             transaction.type === "SUBTRACT" &&
             "Rút tiền") ||

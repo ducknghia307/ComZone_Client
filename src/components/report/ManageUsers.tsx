@@ -58,6 +58,7 @@ const ManageUsers: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openBanModal, setOpenBanModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -153,6 +154,16 @@ const ManageUsers: React.FC = () => {
     }
   };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.role.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -160,8 +171,8 @@ const ManageUsers: React.FC = () => {
         <TextField
           variant="outlined"
           placeholder="Tìm kiếm..."
-          // value={searchTerm}
-          // onChange={handleSearch}
+          value={searchTerm}
+          onChange={handleSearch}
           size="small"
           sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
           InputProps={{
@@ -201,7 +212,7 @@ const ManageUsers: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                users
+                filteredUsers
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((user) => (
                     <StyledTableRow key={user.id}>
@@ -215,23 +226,23 @@ const ManageUsers: React.FC = () => {
                       <StyledTableCell>{user.name}</StyledTableCell>
                       <StyledTableCell align="right">{user.email}</StyledTableCell>
                       <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM' }}>
-                      <span style={getRoleStyle(user.role)}>
-                        {user.role}
-                      </span>
-                    </StyledTableCell>
+                        <span style={getRoleStyle(user.role)}>
+                          {user.role}
+                        </span>
+                      </StyledTableCell>
                       <StyledTableCell align="right">
                         <span style={getStatusColor(user.status)}>{getStatusText(user.status)}</span>
                       </StyledTableCell>
                       <StyledTableCell align="right">
-                      {user.status === 'BANNED' ? (
-                        <IconButton color="primary" >
-                          <InfoOutlinedIcon />
-                        </IconButton>
-                      ) : (
-                        <IconButton color="error" onClick={() => handleOpenBanModal(user.id)}>
-                          <DeleteOutlineOutlinedIcon />
-                        </IconButton>
-                      )}
+                        {user.status === 'BANNED' ? (
+                          <IconButton color="primary" >
+                            <InfoOutlinedIcon />
+                          </IconButton>
+                        ) : (
+                          <IconButton color="error" onClick={() => handleOpenBanModal(user.id)}>
+                            <DeleteOutlineOutlinedIcon />
+                          </IconButton>
+                        )}
                       </StyledTableCell>
                     </StyledTableRow>
                   ))

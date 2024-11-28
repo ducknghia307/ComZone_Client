@@ -37,6 +37,7 @@ const ManageWallet: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -45,8 +46,11 @@ const ManageWallet: React.FC = () => {
         const formattedTransactions = response.data.map((transaction: any) => ({
           date: new Date(transaction.createdAt).toLocaleDateString("vi-VN"),
           userName: transaction.user?.name || "N/A",
-          type: transaction.amount > 0 ? "Nạp Tiền" : "Rút Tiền",
-          amount: `${transaction.amount > 0 ? "+" : ""}${transaction.amount.toLocaleString("vi-VN")} đ`,
+          // type: transaction.amount > 0 ? "Nạp Tiền" : "Rút Tiền",
+          type: transaction.type === "ADD" ? "Nạp Tiền" : "Thanh Toán",
+          // amount: `${transaction.amount > 0 ? "+" : ""}${transaction.amount.toLocaleString("vi-VN")} đ`,
+          // amount: `${transaction.type === "ADD" ? "+" : "-"}${Math.abs(transaction.amount).toLocaleString("vi-VN")} đ`,
+          amount: transaction.amount,
           status: transaction.status,
           note: transaction.note || "Không có ghi chú",
         }));
@@ -123,12 +127,36 @@ const ManageWallet: React.FC = () => {
     }
   };
 
+  const getAmountStyle = (amount: number, type: string) => {
+    if (type === "Nạp Tiền") {
+      return {
+        color: "#4caf50",
+      };
+    } else {
+      return {
+        color: "#e91e63",
+      };
+    }
+  };
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredWallet = transactions.filter((transaction) =>
+    transaction.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    transaction.type.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        {/* Search Box */}
         <TextField
           variant="outlined"
           placeholder="Tìm kiếm..."
+          value={searchTerm}
+          onChange={handleSearch}
           size="small"
           sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
           InputProps={{
@@ -168,12 +196,14 @@ const ManageWallet: React.FC = () => {
                   </StyledTableCell>
                 </TableRow>
               ) : (
-                transactions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((transaction, index) => (
+                filteredWallet.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((transaction, index) => (
                   <StyledTableRow key={index}>
                     <StyledTableCell>{transaction.date}</StyledTableCell>
                     <StyledTableCell align="left">{transaction.userName}</StyledTableCell>
                     <StyledTableCell align="left">{transaction.type}</StyledTableCell>
-                    <StyledTableCell align="right">{transaction.amount}</StyledTableCell>
+                    <StyledTableCell align="right" style={getAmountStyle(transaction.amount, transaction.type)}>
+                      {transaction.type === "Nạp Tiền" ? `+${transaction.amount.toLocaleString("vi-VN")}` : `-${Math.abs(transaction.amount).toLocaleString("vi-VN")}`} đ
+                    </StyledTableCell>
                     <StyledTableCell align="right">
                       <span style={getStatusChipStyles(transaction.status)}>
                         {translateStatus(transaction.status)}

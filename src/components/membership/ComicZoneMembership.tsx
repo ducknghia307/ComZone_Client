@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Chip, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { publicAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import StarIcon from "@mui/icons-material/Star";
 import TimerIcon from "@mui/icons-material/Timer";
 import GavelIcon from "@mui/icons-material/Gavel";
@@ -11,6 +11,7 @@ import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import CardMembershipOutlined from "@mui/icons-material/CardMembershipOutlined";
 import BuyPlan from "../RegisterSeller/BuyPlan";
 import { UserInfo } from "../../common/base.interface";
+import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
 
 export interface MembershipPlan {
   id: string;
@@ -22,12 +23,14 @@ export interface MembershipPlan {
 
 const ComicZoneMembership = ({
   user,
+  userSubs,
   setIsRegisterSellerModal,
-  redirect,
+  callback,
 }: {
   user?: UserInfo;
+  userSubs: SellerSubscription | null;
   setIsRegisterSellerModal?: React.Dispatch<React.SetStateAction<boolean>>;
-  redirect?: string;
+  callback?: () => void;
 }) => {
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [isBuyingPlan, setIsBuyingPlan] = useState<string>("");
@@ -255,6 +258,7 @@ const ComicZoneMembership = ({
 
               <Button
                 onClick={() => setIsBuyingPlan(plan.id)}
+                disabled={plan.price === 0 && userSubs?.usedTrial}
                 variant="contained"
                 sx={{
                   mt: "auto",
@@ -286,6 +290,8 @@ const ComicZoneMembership = ({
                       style: "currency",
                       currency: "VND",
                     }).format(plan.price)
+                  : userSubs?.usedTrial
+                  ? "Đã hết lượt sử dụng"
                   : "Bắt đầu dùng thử"}
               </Button>
             </Box>
@@ -296,7 +302,7 @@ const ComicZoneMembership = ({
               isOpen={isBuyingPlan === plan.id}
               setIsOpen={setIsBuyingPlan}
               setIsRegisterSellerModal={setIsRegisterSellerModal}
-              redirect={redirect}
+              callback={callback}
             />
           </Grid>
         ))}

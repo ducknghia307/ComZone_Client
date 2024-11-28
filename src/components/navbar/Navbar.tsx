@@ -123,7 +123,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const sessionRedirect = sessionStorage.getItem("registeringSellerPlan");
+    const sessionRedirect = localStorage.getItem("registeringSellerPlan");
     if (sessionRedirect) {
       const params: any = new Proxy(
         new URLSearchParams(window.location.search),
@@ -135,7 +135,7 @@ const Navbar = () => {
       if (paymentStatus && paymentStatus === "SUCCESSFUL") {
         handleSubscribePlan(sessionRedirect);
       }
-      sessionStorage.removeItem("registeringSellerPlan");
+      localStorage.removeItem("registeringSellerPlan");
     }
   }, []);
 

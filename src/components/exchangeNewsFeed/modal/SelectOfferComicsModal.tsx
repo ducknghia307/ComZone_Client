@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Avatar, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
-import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
-import { Comic } from "../../common/base.interface";
-import { ExchangePostInterface } from "../../common/interfaces/exchange.interface";
-import ActionConfirm from "../actionConfirm/ActionConfirm";
 import { useNavigate } from "react-router-dom";
+import { ExchangePostInterface } from "../../../common/interfaces/exchange.interface";
+import { Comic } from "../../../common/base.interface";
+import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
+import ActionConfirm from "../../actionConfirm/ActionConfirm";
 
 export default function SelectOfferComicsModal({
   post,
@@ -135,7 +135,6 @@ export default function SelectOfferComicsModal({
         onCancel={(e) => handleModalClose(e)}
         footer={null}
         width={window.innerWidth * 0.4}
-        maskClosable={false}
       >
         <div className="w-full py-4 flex flex-col items-stretch justify-start gap-4">
           <p className="text-[1.5em] font-semibold">CHỌN TRUYỆN ĐỂ TRAO ĐỔI</p>

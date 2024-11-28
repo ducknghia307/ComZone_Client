@@ -8,8 +8,10 @@ import dateFormat from "../../assistants/date.format";
 import { Modal, notification } from "antd";
 import { publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
-import SelectOfferComicsModal from "./SelectOfferComicsModal";
+import SelectOfferComicsModal from "./modal/SelectOfferComicsModal";
 import { NavigateFunction } from "react-router-dom";
+import OthersPostButtons from "./post-buttons/OthersPostButtons";
+import SelfPostButton from "./post-buttons/SelfPostButton";
 
 moment.locale("vi");
 
@@ -19,10 +21,10 @@ export default function ExchangePost({
   setIsLoading,
   isSelectModalOpen,
   setIsSelectModalOpen,
-  isChatOpen,
   setIsChatOpen,
   navigate,
   isLoggedIn,
+  fetchExchangeNewsFeed,
 }: {
   post: ExchangePostInterface;
   userExchangeComicsList: Comic[];
@@ -30,12 +32,12 @@ export default function ExchangePost({
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isSelectModalOpen: string;
   setIsSelectModalOpen: Function;
-  isChatOpen: boolean;
   setIsChatOpen: Function;
   currentUserId: string;
   tourIndex?: number;
   navigate: NavigateFunction;
   isLoggedIn: boolean;
+  fetchExchangeNewsFeed: () => void;
 }) {
   const [currentlySelected, setCurrentlySelected] = useState<number>(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,14 +50,17 @@ export default function ExchangePost({
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
   const handleSelect = (value: number) => {
     if (currentlySelected === value) setCurrentlySelected(-1);
     else setCurrentlySelected(value);
   };
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
     fetchComicExchangeOffer();
   };
+
   const checkTimeDisplay =
     post.createdAt &&
     moment(new Date()).unix() - moment(post.createdAt).unix() > 172800;
@@ -68,6 +73,7 @@ export default function ExchangePost({
       console.log("Error:", error);
     }
   };
+
   return (
     <div className="w-full flex rounded-lg px-4 max-w-[100em] bg-white drop-shadow-md">
       <div className="grow flex flex-col min-w-[30em] px-2 py-4">
@@ -78,9 +84,28 @@ export default function ExchangePost({
               className="w-[4em] h-[4em] rounded-full"
             />
             <div className="flex flex-col items-start gap-1">
-              <p className="font-semibold text-lg tracking-wide">
-                {post.user.name}
-              </p>
+              <div className="flex items-center gap-4">
+                <p className="font-semibold text-lg tracking-wide">
+                  {post.user.name}
+                </p>
+                <span
+                  className={`${
+                    post.user.role !== "SELLER" && "hidden"
+                  } flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500 text-white`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="12"
+                    height="12"
+                    fill="currentColor"
+                  >
+                    <path d="M14 4.4375C15.3462 4.4375 16.4375 3.34619 16.4375 2H17.5625C17.5625 3.34619 18.6538 4.4375 20 4.4375V5.5625C18.6538 5.5625 17.5625 6.65381 17.5625 8H16.4375C16.4375 6.65381 15.3462 5.5625 14 5.5625V4.4375ZM1 11C4.31371 11 7 8.31371 7 5H9C9 8.31371 11.6863 11 15 11V13C11.6863 13 9 15.6863 9 19H7C7 15.6863 4.31371 13 1 13V11ZM4.87601 12C6.18717 12.7276 7.27243 13.8128 8 15.124 8.72757 13.8128 9.81283 12.7276 11.124 12 9.81283 11.2724 8.72757 10.1872 8 8.87601 7.27243 10.1872 6.18717 11.2724 4.87601 12ZM17.25 14C17.25 15.7949 15.7949 17.25 14 17.25V18.75C15.7949 18.75 17.25 20.2051 17.25 22H18.75C18.75 20.2051 20.2051 18.75 22 18.75V17.25C20.2051 17.25 18.75 15.7949 18.75 14H17.25Z"></path>
+                  </svg>
+                  <p className="text-xs">Người bán trên ComZone</p>
+                </span>
+              </div>
+
               <p className="font-light text-[0.7em] tracking-wider">
                 {checkTimeDisplay ? (
                   <span>
@@ -92,106 +117,47 @@ export default function ExchangePost({
                 )}
               </p>
             </div>
-            <span
-              className={`${
-                post.user.role !== "SELLER" && "hidden"
-              } flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500 text-white`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="12"
-                height="12"
-                fill="currentColor"
-              >
-                <path d="M14 4.4375C15.3462 4.4375 16.4375 3.34619 16.4375 2H17.5625C17.5625 3.34619 18.6538 4.4375 20 4.4375V5.5625C18.6538 5.5625 17.5625 6.65381 17.5625 8H16.4375C16.4375 6.65381 15.3462 5.5625 14 5.5625V4.4375ZM1 11C4.31371 11 7 8.31371 7 5H9C9 8.31371 11.6863 11 15 11V13C11.6863 13 9 15.6863 9 19H7C7 15.6863 4.31371 13 1 13V11ZM4.87601 12C6.18717 12.7276 7.27243 13.8128 8 15.124 8.72757 13.8128 9.81283 12.7276 11.124 12 9.81283 11.2724 8.72757 10.1872 8 8.87601 7.27243 10.1872 6.18717 11.2724 4.87601 12ZM17.25 14C17.25 15.7949 15.7949 17.25 14 17.25V18.75C15.7949 18.75 17.25 20.2051 17.25 22H18.75C18.75 20.2051 20.2051 18.75 22 18.75V17.25C20.2051 17.25 18.75 15.7949 18.75 14H17.25Z"></path>
-              </svg>
-              <p className="text-xs">Người bán trên ComZone</p>
-            </span>
           </div>
 
-          {!post.mine && !post.already ? (
-            <div className={``}>
-              <div className="flex flex-row gap-4">
-                <button
-                  className="border rounded-lg min-w-max p-2"
-                  onClick={handleOpenModal}
-                >
-                  Xem truyện của{" "}
-                  <span className="font-semibold">{post.user.name}</span>
-                </button>
-                <button
-                  onClick={() => {
-                    if (!isLoggedIn) {
-                      notification.info({
-                        key: "not-logged-in",
-                        message: "Bạn cần đăng nhập để bắt đầu trao đổi!",
-                        description: (
-                          <button className="w-full py-2 rounded-md text-white font-semibold bg-sky-600 duration-200 hover:bg-sky-700">
-                            Đăng nhập
-                          </button>
-                        ),
-                        duration: 5,
-                      });
-                    } else if (userExchangeComicsList.length === 0) {
-                      notification.info({
-                        key: "empty_exchange_comics",
-                        message: "Bạn chưa có truyện để trao đổi!",
-                        description: (
-                          <p className="text-xs">
-                            Bạn phải thực hiện thêm thông tin của truyện mà bạn
-                            muốn dùng để trao đổi trên hệ thống trước khi thực
-                            hiện trao đổi.
-                            <br />
-                            <button
-                              onClick={() => navigate("")}
-                              className="text-sky-600 underline mt-2"
-                            >
-                              Thêm truyện ngay
-                            </button>
-                          </p>
-                        ),
-                        duration: 8,
-                      });
-                    } else setIsSelectModalOpen(post.id);
-                  }}
-                  className="min-w-max p-2 bg-sky-700 text-white rounded-lg"
-                >
-                  Bắt đầu trao đổi
-                </button>
-              </div>
-              <SelectOfferComicsModal
+          <div className="order-last sm:order-none">
+            {post.mine ? (
+              <SelfPostButton
                 post={post}
+                fetchExchangeNewsFeed={fetchExchangeNewsFeed}
+                setIsLoading={setIsLoading}
+              />
+            ) : !post.already ? (
+              <OthersPostButtons
+                handleOpenModal={handleOpenModal}
+                post={post}
+                isLoggedIn={isLoggedIn}
                 userExchangeComicsList={userExchangeComicsList}
+                navigate={navigate}
                 isSelectModalOpen={isSelectModalOpen}
                 setIsSelectModalOpen={setIsSelectModalOpen}
                 setIsChatOpen={setIsChatOpen}
                 setIsLoading={setIsLoading}
               />
-            </div>
-          ) : (
-            post.already &&
-            post.alreadyExchange && (
-              <button
-                onClick={() => {
-                  sessionStorage.setItem(
-                    "connectedExchange",
-                    post.alreadyExchange?.id || ""
-                  );
-                  navigate("/exchange/sent-request");
-                }}
-                className="text-[0.7em] font-light min-w-fit underline"
-              >
-                Xem yêu cầu của bạn
-              </button>
-            )
-          )}
+            ) : (
+              post.already &&
+              post.alreadyExchange && (
+                <button
+                  onClick={() => {
+                    navigate("/exchange/sent-request");
+                  }}
+                  className="text-[0.7em] font-light min-w-fit underline"
+                >
+                  Xem yêu cầu của bạn
+                </button>
+              )
+            )}
+          </div>
         </div>
 
         <p className="pl-2 py-4">{post.postContent}</p>
 
         {post.images && (
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] items-stretch gap-2">
             {post.images.map((image) => (
               <img
                 key={image}

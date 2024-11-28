@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Modal } from "antd";
 import { ReactNode } from "react";
 
@@ -12,11 +11,11 @@ export default function ActionConfirm({
   extraWarning,
 }: {
   isOpen: boolean;
-  setIsOpen: Function;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   title: string;
   description?: string | ReactNode;
-  confirmCallback: Function;
-  cancelCallback?: Function;
+  confirmCallback: () => void;
+  cancelCallback?: () => void;
   extraWarning?: string;
 }) {
   return (
@@ -27,7 +26,6 @@ export default function ActionConfirm({
         setIsOpen(false);
         if (cancelCallback) cancelCallback();
       }}
-      destroyOnClose={true}
       footer={null}
       width={500}
       centered
@@ -52,8 +50,7 @@ export default function ActionConfirm({
 
         <div className="flex items-center justify-end gap-8 mt-4">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               setIsOpen(false);
               if (cancelCallback) cancelCallback();
             }}
@@ -62,8 +59,7 @@ export default function ActionConfirm({
             Quay lại
           </button>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               setIsOpen(false);
               confirmCallback();
             }}

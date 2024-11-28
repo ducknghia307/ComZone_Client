@@ -224,7 +224,7 @@ const ExchangeDetail: React.FC = () => {
   return (
     <div className="REM min-h-[80vh] w-full flex justify-center gap-4 px-4 py-4">
       {isLoading && <Loading />}
-      {firstCurrentStage > 0 ? (
+      {firstCurrentStage > -1 ? (
         <>
           <div className="basis-2/3 flex flex-col items-stretch justify-start gap-4 px-4 border-r border-gray-300">
             <InformationCollectSection

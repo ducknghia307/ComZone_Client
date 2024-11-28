@@ -13,6 +13,7 @@ export default function BuyPlan({
   isOpen,
   setIsOpen,
   setIsRegisterSellerModal,
+  redirect,
 }: {
   user?: UserInfo;
   plan: MembershipPlan;
@@ -20,6 +21,7 @@ export default function BuyPlan({
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<string>>;
   setIsRegisterSellerModal?: React.Dispatch<React.SetStateAction<boolean>>;
+  redirect?: string;
 }) {
   const [isHidingBalance, setIsHidingBalance] = useState<boolean>(true);
   const [confirmCheck, setConfirmCheck] = useState<boolean>(false);
@@ -49,7 +51,7 @@ export default function BuyPlan({
         });
         const resZalopay = await privateAxios.post("/zalopay", {
           walletDeposit: resWalletDes.data.id,
-          redirectPath: "/accountManagement/profile",
+          redirectPath: redirect || "/accountManagement/profile",
         });
         window.location.href = resZalopay.data.orderurl;
       } else if (paymentGateway === "vnpay") {
@@ -58,7 +60,7 @@ export default function BuyPlan({
         });
         const resVNpay = await privateAxios.post("/vnpay", {
           walletDeposit: resWalletDes.data.id,
-          redirectPath: "/accountManagement/profile",
+          redirectPath: redirect || "/accountManagement/profile",
         });
         window.location.href = resVNpay.data.url;
       } else {

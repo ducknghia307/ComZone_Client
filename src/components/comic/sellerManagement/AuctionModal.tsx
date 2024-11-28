@@ -46,19 +46,19 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
   console.log(form);
 
   const startTime = dayjs(form.getFieldValue("startTime"));
-  // Handle form submission
   const handleSubmit = async (values: AuctionFormValues) => {
     try {
-      const response = await privateAxios.post("/auction", {
+      await privateAxios.post("/auction", {
         ...values,
         comicsId: comic?.id,
-        status: "UPCOMING", // Add comic ID to the auction data
+        status: "UPCOMING",
       });
-      console.log(response.data);
-      onSuccess(); // Trigger success action after successful API call
+
+      await privateAxios.patch("seller-subscriptions/auction", { quantity: 1 });
+
+      onSuccess();
     } catch (error) {
       console.error("Error during API call:", error);
-      // Handle any error state or show notification
     }
   };
   // Custom validator to check that the end time is not more than 7 days after the start time

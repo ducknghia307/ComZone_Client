@@ -23,9 +23,11 @@ export interface MembershipPlan {
 const ComicZoneMembership = ({
   user,
   setIsRegisterSellerModal,
+  redirect,
 }: {
   user?: UserInfo;
   setIsRegisterSellerModal?: React.Dispatch<React.SetStateAction<boolean>>;
+  redirect?: string;
 }) => {
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [isBuyingPlan, setIsBuyingPlan] = useState<string>("");
@@ -231,20 +233,22 @@ const ComicZoneMembership = ({
                   </div>
                 )}
 
-                {plan.sellTime === 0 && plan.auctionTime === 0 && (
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <AllInclusiveIcon />
-                    <p className="font-bold text-lg py-2">
-                      Bán & Đấu giá truyện không giới hạn
-                    </p>
-                  </div>
-                )}
+                {plan.sellTime === 0 &&
+                  plan.auctionTime === 0 &&
+                  plan.duration > 0 && (
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <AllInclusiveIcon />
+                      <p className="font-bold text-lg py-2">
+                        Bán & Đấu giá truyện không giới hạn
+                      </p>
+                    </div>
+                  )}
 
                 {plan.duration > 0 && (
                   <div className="flex items-center justify-start gap-2">
                     <AccessTimeIcon />
                     <p>Thời hạn:</p>
-                    <p>{plan.duration} tháng</p>
+                    <p>{plan.duration * 30} ngày</p>
                   </div>
                 )}
               </div>
@@ -292,6 +296,7 @@ const ComicZoneMembership = ({
               isOpen={isBuyingPlan === plan.id}
               setIsOpen={setIsBuyingPlan}
               setIsRegisterSellerModal={setIsRegisterSellerModal}
+              redirect={redirect}
             />
           </Grid>
         ))}

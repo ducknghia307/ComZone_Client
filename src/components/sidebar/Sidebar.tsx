@@ -131,7 +131,9 @@ const Sidebar: React.FC<SidebarProps> = ({
               className="header flex justify-between items-center cursor-pointer"
               onClick={toggleGenre}
             >
-              <h3 className="text-lg font-bold">Thể loại truyện tranh</h3>
+              <h3 className="text-base font-bold text-nowrap">
+                Thể loại truyện tranh
+              </h3>
               {isGenreOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </div>
             <Collapse in={isGenreOpen}>
@@ -159,7 +161,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className="header flex justify-between items-center cursor-pointer"
                 onClick={toggleCondition}
               >
-                <h3 className="text-lg font-bold">Tình trạng truyện</h3>
+                <h3 className="text-base font-bold">Tình trạng truyện</h3>
                 {isConditionOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </div>
               <Collapse in={isConditionOpen}>
@@ -193,7 +195,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               className="header flex justify-between items-center cursor-pointer"
               onClick={toggleAuthor}
             >
-              <h3 className="text-lg font-bold">Tác Giả</h3>
+              <h3 className="text-base font-bold">Tác Giả</h3>
               {isAuthorOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </div>
             <Collapse in={isAuthorOpen}>
@@ -204,7 +206,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     control={
                       <Checkbox name={author} onChange={handleAuthorChange} />
                     }
-                    label={<p className="REM">{author}</p>}
+                    label={<p className="REM text-sm">{author}</p>}
                   />
                 ))}
               </FormGroup>

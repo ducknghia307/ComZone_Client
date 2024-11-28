@@ -51,6 +51,7 @@ const ManageComics: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openBanModal, setOpenBanModal] = useState(false);
   const [selectedComicId, setSelectedComicId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const fetchComics = async () => {
@@ -135,6 +136,15 @@ const ManageComics: React.FC = () => {
     }
   };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredComics = comics.filter((comic) =>
+    comic.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    comic.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -142,8 +152,8 @@ const ManageComics: React.FC = () => {
         <TextField
           variant="outlined"
           placeholder="Tìm kiếm..."
-          // value={searchTerm}
-          // onChange={handleSearch}
+          value={searchTerm}
+          onChange={handleSearch}
           size="small"
           sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
           InputProps={{
@@ -180,7 +190,7 @@ const ManageComics: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                comics.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((comic) => (
+                filteredComics.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((comic) => (
                   <StyledTableRow key={comic.id}>
                     <StyledTableCell>
                       <img style={{ width: '80px', height: '120px' }} src={comic.coverImage} alt={comic.title} />

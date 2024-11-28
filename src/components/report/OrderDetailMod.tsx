@@ -95,11 +95,15 @@ interface OrderDetailProps {
     open: boolean;
     onClose: () => void;
     orderId: string;
-    onStatusUpdate: (orderId: string, newStatus: string, deliveryStatus?: string) => void; 
+    onStatusUpdate: (orderId: string, newStatus: string, deliveryStatus?: string,  paymentMethod?: string) => void;
     order: OrderDetailData | undefined;
+    // paymentMethod: string;
 }
-const InfoRow = ({ label, value, isPaid }: { label: string; value: string | number; isPaid?: boolean; }) => {
+const InfoRow = ({ label, value, paymentMethod }: { label: string; value: string | number; paymentMethod?: string; }) => {
     const theme = useTheme();
+
+    const paymentStatusColor =
+        paymentMethod === "WALLET" ? "#32CD32" : paymentMethod === "COD" ? "#ff9800" : "#000";
 
     return (
         <Box
@@ -129,9 +133,7 @@ const InfoRow = ({ label, value, isPaid }: { label: string; value: string | numb
                 fontWeight={500}
                 sx={{
                     paddingLeft: 2,
-                    color: isPaid !== undefined
-                        ? (isPaid ? '#32CD32' : '#ff9800')
-                        : '#000',
+                    color: paymentMethod ? paymentStatusColor : "#000",
                     whiteSpace: 'normal',
                     wordWrap: 'break-word',
                 }}
@@ -159,7 +161,7 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                 setOrderDetail(ordersData);
 
                 const ordersArray = Array.isArray(ordersData) ? ordersData : [ordersData];
-                console.log(ordersArray);
+                console.log("orders", ordersArray);
 
                 const ordersWithItems = await Promise.all(
                     ordersArray.map(async (order: any) => {
@@ -286,8 +288,8 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                 }}
             >
                 <Box display="flex" justifyContent="space-between" alignItems="center" >
-                <StatusChip 
-                        status={orderDetail.status} 
+                    <StatusChip
+                        status={orderDetail.status}
                         deliveryStatus={orderDetail.deliveryStatus}
                     >
                         {translateStatus(orderDetail.status, orderDetail.deliveryStatus)}
@@ -388,7 +390,7 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                     <InfoRow label="Địa chỉ" value={orderDetail.delivery.to.address} />
                                 </Box>
 
-                                <Divider orientation="vertical" flexItem/>
+                                <Divider orientation="vertical" flexItem />
 
                                 <Box display="flex" flexDirection="column" flex={1} gap={1}>
                                     <Chip
@@ -420,10 +422,19 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                     <InfoRow label="Tổng tiền" value={`${orderDetail.totalPrice} đ`} />
                                     <InfoRow label="Phí vận chuyển" value={`${orderDetail.delivery.deliveryFee} đ`} />
                                     <InfoRow label="Phương thức thanh toán" value={orderDetail.paymentMethod === 'WALLET' ? 'Ví Comzone' : orderDetail.paymentMethod} />
-                                    <InfoRow
+                                    {/* <InfoRow
                                         label="Trạng thái thanh toán"
                                         value={orderDetail.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
                                         isPaid={orderDetail.isPaid}
+                                    /> */}
+                                    <InfoRow
+                                        label="Trạng thái thanh toán"
+                                        value={
+                                            orderDetail.paymentMethod === "WALLET"
+                                                ? "Đã thanh toán"
+                                                : "Chưa thanh toán"
+                                        }
+                                        paymentMethod={orderDetail.paymentMethod}
                                     />
                                 </Box>
                             </Stack>

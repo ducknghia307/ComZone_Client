@@ -66,7 +66,7 @@ const ManageOrders: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const openOrderDetail = (orderId: string) => {
     setSelectedOrderId(orderId);
@@ -238,6 +238,15 @@ const ManageOrders: React.FC = () => {
     }
   };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredOrders = orders.filter((order) =>
+    order.delivery.to.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.delivery.from.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -245,8 +254,8 @@ const ManageOrders: React.FC = () => {
         <TextField
           variant="outlined"
           placeholder="Tìm kiếm..."
-          // value={searchTerm}
-          // onChange={handleSearch}
+          value={searchTerm}
+          onChange={handleSearch}
           size="small"
           sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
           InputProps={{
@@ -284,45 +293,39 @@ const ManageOrders: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                orders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-                  <React.Fragment key={order.id}>
-                    <StyledTableRow>
-                      <StyledTableCell style={{ fontFamily: 'REM' }} rowSpan={order.items.length + 1} component="th" scope="row">
-                        {order.delivery.deliveryTrackingCode}
-                      </StyledTableCell>
-                      <StyledTableCell style={{ fontFamily: 'REM' }} rowSpan={order.items.length + 1} align="left">
-                        {order.delivery.to.name}
-                      </StyledTableCell>
-                    </StyledTableRow>
-                    {order.items.map((item, index) => (
-                      <StyledTableRow key={index}>
-                        <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
-                          {order.delivery.from.name}
-                        </StyledTableCell>
-                        <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
-                          {/* <span>{Number(order.totalPrice).toLocaleString("vi-VN")} đ</span> */}
-                          <span>{order.totalPrice} đ</span>
-                        </StyledTableCell>
-                        <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
-                          {order.paymentMethod === 'WALLET' ? 'Ví Comzone' : order.paymentMethod}
-                        </StyledTableCell>
-                        <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>
-                          <span style={getStatusColor(order.status, order.deliveryStatus)}>
-                            {getStatusText(order.status, order.deliveryStatus)}
-                          </span>
-                        </StyledTableCell>
-                        <StyledTableCell align="right">
-                          <IconButton color="default" onClick={() => openOrderDetail(order.id)}>
-                            <InfoOutlinedIcon />
-                          </IconButton>
-                        </StyledTableCell>
-
-                      </StyledTableRow>
-                    ))}
-                  </React.Fragment>
+                filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
+                  <StyledTableRow key={order.id}>
+                    {/* Delivery Info */}
+                    <StyledTableCell rowSpan={1} component="th" scope="row">
+                      {order.delivery.deliveryTrackingCode || "N/A"}
+                    </StyledTableCell>
+                    <StyledTableCell rowSpan={1} align="left">
+                      {order.delivery.to.name || "N/A"}
+                    </StyledTableCell>
+                    <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
+                      {order.delivery.from?.name || "N/A"}
+                    </StyledTableCell>
+                    <StyledTableCell align="right">
+                      {order.totalPrice} đ {/* Show total price, not item price */}
+                    </StyledTableCell>
+                    <StyledTableCell align="right">
+                      {order.paymentMethod === 'WALLET' ? 'Ví Comzone' : order.paymentMethod}
+                    </StyledTableCell>
+                    <StyledTableCell align="right">
+                      <span style={getStatusColor(order.status, order.deliveryStatus)}>
+                        {getStatusText(order.status, order.deliveryStatus)}
+                      </span>
+                    </StyledTableCell>
+                    <StyledTableCell align="right">
+                      <IconButton color="default" onClick={() => openOrderDetail(order.id)}>
+                        <InfoOutlinedIcon />
+                      </IconButton>
+                    </StyledTableCell>
+                  </StyledTableRow>
                 ))
               )}
             </TableBody>
+
           </Table>
         </TableContainer>
         <TablePagination

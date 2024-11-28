@@ -66,6 +66,7 @@ const ManageFeedbacks: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
@@ -110,11 +111,6 @@ const ManageFeedbacks: React.FC = () => {
     );
   };
 
-  const paginatedData = feedbacks.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-
   const getStatusColor = (isApprove: boolean) => {
     return isApprove
       ? { color: '#4caf50', backgroundColor: '#e8f5e9', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '14px' }
@@ -125,13 +121,29 @@ const ManageFeedbacks: React.FC = () => {
     return isApprove ? "Đã duyệt" : "Chưa duyệt";
   };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredFeedbacks = feedbacks.filter((feedback) =>
+    feedback.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    feedback.seller.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const paginatedData = filteredFeedbacks.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        {/* Search Box */}
         <TextField
           variant="outlined"
           placeholder="Tìm kiếm..."
+          value={searchTerm}
+          onChange={handleSearch}
           size="small"
           sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
           InputProps={{
@@ -160,14 +172,14 @@ const ManageFeedbacks: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>Thời Gian</StyledTableCell>
-                <StyledTableCell align="center">Người Mua</StyledTableCell>
-                <StyledTableCell align="center">Người Bán</StyledTableCell>
-                <StyledTableCell align="center">Nội Dung</StyledTableCell>
-                <StyledTableCell align="center">Đánh Giá</StyledTableCell>
-                <StyledTableCell align="center">Ảnh Đính Kèm</StyledTableCell>
-                <StyledTableCell align="center">Trạng Thái</StyledTableCell>
-                <StyledTableCell align="center">Chi Tiết</StyledTableCell>
+                <StyledTableCell style={{ whiteSpace: 'nowrap' }}>Thời Gian</StyledTableCell>
+                <StyledTableCell align="center" style={{ whiteSpace: 'nowrap' }}>Người Mua</StyledTableCell>
+                <StyledTableCell align="center" style={{ whiteSpace: 'nowrap' }}>Người Bán</StyledTableCell>
+                <StyledTableCell align="center" style={{ whiteSpace: 'nowrap' }}>Nội Dung</StyledTableCell>
+                <StyledTableCell align="center" style={{ whiteSpace: 'nowrap' }}>Đánh Giá</StyledTableCell>
+                <StyledTableCell align="center" style={{ whiteSpace: 'nowrap' }}>Ảnh Đính Kèm</StyledTableCell>
+                <StyledTableCell align="center" style={{ whiteSpace: 'nowrap' }}>Trạng Thái</StyledTableCell>
+                <StyledTableCell align="center" style={{ whiteSpace: 'nowrap' }}>Chi Tiết</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -185,12 +197,15 @@ const ManageFeedbacks: React.FC = () => {
                     </StyledTableCell>
                     <StyledTableCell align="center">{feedback.user?.name || 'Unknown'}</StyledTableCell>
                     <StyledTableCell align="center">{feedback.seller?.name || 'Unknown'}</StyledTableCell>
-                    <StyledTableCell align="center">{feedback.comment}</StyledTableCell>
+                    <StyledTableCell align="center">
+                      {feedback.comment.length > 100 ? feedback.comment.substring(0, 50) + '...' : feedback.comment}
+                    </StyledTableCell>
+
                     <StyledTableCell align="center">
                       {feedback.rating} ⭐
                     </StyledTableCell>
                     <StyledTableCell align="center">{feedback.attachedImages.length} ảnh</StyledTableCell>
-                    <StyledTableCell align="center">
+                    <StyledTableCell style={{ whiteSpace: 'nowrap' }} align="center">
                       <span style={getStatusColor(feedback.isApprove)}>
                         {getStatusText(feedback.isApprove)}
                       </span>

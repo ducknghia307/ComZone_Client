@@ -22,8 +22,9 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { privateAxios } from "../../middleware/axiosInstance";
 import AuctionModalEdit from "../comic/sellerManagement/AuctionModalEdit";
 import { Auction } from "../../common/base.interface";
-import { Popconfirm } from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+import { notification, Popconfirm } from "antd";
+import { EyeOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import AuctionDetailModal from "../modal/AuctionDetailModal";
 
 const getStatusChipStyles = (status: string) => {
   switch (status) {
@@ -72,7 +73,7 @@ const getStatusChipStyles = (status: string) => {
         fontWeight: "bold",
         display: "inline-block",
       };
-    case "REJECTED":
+    case "CANCELED":
       return {
         color: "#f44336",
         backgroundColor: "#ffebee",
@@ -105,8 +106,8 @@ const translateStatus = (status: string) => {
       return "Đang diễn ra";
     case "FAILED":
       return "Thất bại";
-    case "REJECTED":
-      return "Bị từ chối";
+    case "CANCELED":
+      return "Bị hủy";
     case "COMPLETED":
       return "Hoàn thành";
     default:
@@ -121,7 +122,17 @@ const AuctionManagement = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAuction, setSelectedAuction] = useState<Auction | null>(null);
+  const [openDetail, setOpenDetail] = useState(false);
 
+  const handleOpenDetail = (auction) => {
+    setSelectedAuction(auction);
+    setOpenDetail(true);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedAuction(null);
+    setOpenDetail(false);
+  };
   useEffect(() => {
     privateAxios
       .get("/auction/seller")
@@ -170,12 +181,20 @@ const AuctionManagement = () => {
 
   const handleStopAuction = async (auctionId: string) => {
     try {
-      // await privateAxios.put(`/auction/${auctionId}/stop`);
-      // setAuctions((prevAuctions) =>
-      //     prevAuctions.map((auction) =>
-      //         auction.id === auctionId ? { ...auction, status: 'STOPPED' } : auction
-      //     )
-      // );
+      const response = await privateAxios.patch(`/auction/${auctionId}/cancel`);
+      setAuctions((prevAuctions) =>
+        prevAuctions.map((auction) =>
+          auction.id === auctionId
+            ? { ...auction, status: "CANCELED" }
+            : auction
+        )
+      );
+      notification.success({
+        key: "success",
+        message: "Thành công",
+        description: "Hủy phiên đấu giá thành công!",
+        duration: 3,
+      });
       console.log(`Auction with ID ${auctionId} has been stopped.`);
     } catch (error) {
       console.error("Error stopping the auction:", error);
@@ -375,7 +394,7 @@ const AuctionManagement = () => {
                       <div
                         style={{ display: "flex", justifyContent: "center" }}
                       >
-                        {auction.status === "FAILED" && (
+                        {auction.status === "CANCELED" && (
                           <IconButton
                             color="primary"
                             onClick={() => handleEditClick(auction)}
@@ -384,7 +403,7 @@ const AuctionManagement = () => {
                           </IconButton>
                         )}
 
-                        {auction.status === "UPCOMINGs" && (
+                        {auction.status === "UPCOMING" && (
                           <Popconfirm
                             title="Dừng phiên đấu giá"
                             description="Bạn có thực sự muốn dừng phiên đấu giá này?"
@@ -394,7 +413,7 @@ const AuctionManagement = () => {
                               />
                             }
                             onConfirm={() => handleStopAuction(auction.id)}
-                            okText="Hủy"
+                            okText="Dừng"
                             cancelText="Thoát"
                             overlayClassName="custom-popconfirm"
                           >
@@ -403,6 +422,12 @@ const AuctionManagement = () => {
                             </IconButton>
                           </Popconfirm>
                         )}
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleOpenDetail(auction)}
+                        >
+                          <EyeOutlined />
+                        </IconButton>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -427,7 +452,7 @@ const AuctionManagement = () => {
           open={isModalOpen}
           onCancel={handleModalClose}
           comic={selectedAuction.comics}
-            auctionData={{
+          auctionData={{
             id: selectedAuction.id,
             shopName: selectedAuction.shopName,
             productName: selectedAuction.productName,
@@ -444,6 +469,11 @@ const AuctionManagement = () => {
           onSuccess={handleModalSuccess}
         />
       )}
+      <AuctionDetailModal
+        open={openDetail}
+        onClose={handleCloseDetail}
+        auction={selectedAuction}
+      />
     </div>
   );
 };

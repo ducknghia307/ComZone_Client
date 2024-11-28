@@ -202,28 +202,17 @@ const SellerManagement = () => {
       align: "center",
       renderCell: (params) => {
         const statusMap: Record<string, string> = {
-          AVAILABLE: "Đang bán",
+          AVAILABLE: "Khả dụng",
           UNAVAILABLE: "Không khả dụng",
           SOLD: "Đã bán",
-          EXCHANGE: "Đổi",
-          AUCTION: "Đấu giá",
         };
 
         const status = statusMap[params.value] || "N/A";
 
-        // Check if the status is "Không khả dụng"
         if (status === "Không khả dụng") {
           return (
             <div>
               <div>
-                {/* <Button
-                  variant="outlined"
-                  color="primary"
-                  sx={{ marginRight: 1 }}
-                  onClick={() => handleViewMore(params.row)}
-                >
-                  Xem thêm
-                </Button> */}
                 <IconButton
                   aria-label="edit"
                   color="success"
@@ -246,6 +235,25 @@ const SellerManagement = () => {
             </div>
           );
         }
+
+        return <span>{status}</span>;
+      },
+    },
+    {
+      field: "type",
+      headerName: "Loại",
+      flex: 0.75,
+      headerClassName: "custom-header",
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => {
+        const statusMap: Record<string, string> = {
+          AUCTION: "Đấu giá",
+          SELL: "Đang bán",
+          NONE: "Không",
+        };
+
+        const status = statusMap[params.value] || "N/A";
 
         return <span>{status}</span>;
       },

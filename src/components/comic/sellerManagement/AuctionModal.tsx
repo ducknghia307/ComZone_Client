@@ -164,15 +164,15 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
             <Col span={12}>
               <Form.Item
                 name="maxPrice"
-                label="Giá tối đa (đ)"
+                label="Giá mua ngay (đ)"
                 rules={[
-                  { required: true, message: "Vui lòng nhập giá tối đa" },
+                  { required: true, message: "Vui lòng nhập giá mua ngay" },
                 ]}
               >
                 <InputNumber
                   style={{ width: "100%" }}
                   min={0}
-                  placeholder="Nhập giá tối đa"
+                  placeholder="Nhập giá mua ngay"
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }

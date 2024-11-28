@@ -8,13 +8,20 @@ import MultipleStopOutlinedIcon from "@mui/icons-material/MultipleStopOutlined";
 import { useNavigate } from "react-router-dom";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { UserInfo } from "../../common/base.interface";
-
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import "../ui/SidebarAccount.css";
 const Sidebar = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("");
   const navigate = useNavigate();
+  const [isNotificationExpanded, setIsNotificationExpanded] = useState(false);
 
   const handleMenuItemClick = (item: string) => {
     setSelectedMenuItem(item);
+    if (item === "announcement") {
+      setIsNotificationExpanded(!isNotificationExpanded);
+    } else {
+      setIsNotificationExpanded(false);
+    }
   };
 
   const currentUrl = window.location.pathname;
@@ -24,7 +31,7 @@ const Sidebar = () => {
   const fetchUserInfo = async () => {
     const response = await privateAxios("users/profile");
     console.log("user info", response);
-    
+
     setUserInfo(response.data);
   };
   useEffect(() => {
@@ -34,11 +41,7 @@ const Sidebar = () => {
   return (
     <div>
       <div className="profile-section1">
-        <img
-          src={userInfo?.avatar}
-          alt="avatar"
-          className="avatar-image"
-        />
+        <img src={userInfo?.avatar} alt="avatar" className="avatar-image" />
         <div>
           <p className="username">{userInfo?.name}</p>
           <a href="/accountManagement/profile" className="edit-profile">
@@ -71,6 +74,41 @@ const Sidebar = () => {
           >
             <PersonOutlinedIcon /> Hồ Sơ Của Tôi
           </li>
+          <li
+            className={`menu-item ${
+              currentUrl === "/accountmanagement/announcement" ? "active" : ""
+            }`}
+            onClick={() => {
+              handleMenuItemClick("announcement");
+              navigate("/accountmanagement/announcement");
+            }}
+          >
+            <NotificationsNoneIcon /> Thông báo
+            {isNotificationExpanded && (
+            <ul className="sub-menu">
+              <li
+                className="sub-menu-item"
+                onClick={() => navigate("/accountmanagement/orders")}
+              >
+                Đơn Hàng
+              </li>
+              <li
+                className="sub-menu-item"
+                onClick={() => navigate("/accountmanagement/auctions")}
+              >
+                Đấu Giá
+              </li>
+              <li
+                className="sub-menu-item"
+                onClick={() => navigate("/accountmanagement/exchanges")}
+              >
+                Trao Đổi
+              </li>
+            </ul>
+          )}
+          </li>
+       
+
           <li
             className={`menu-item ${
               currentUrl === "/accountmanagement/auction" ? "active" : ""

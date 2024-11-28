@@ -44,6 +44,7 @@ import AdminDashboard from "../../pages/AdminDashboard";
 import AdminSubscription from "../../pages/AdminSubscription";
 import Exchange from "../../pages/Exchange";
 import ExchangeDetail from "../../pages/ExchangeDetail";
+import Announcement from "../../pages/Announcement";
 
 const AppRouter = () => {
   return (
@@ -58,6 +59,7 @@ const AppRouter = () => {
         {/* <Route path="/accountmanagement" element={<AccountManagement />} /> */}
         <Route path="/accountmanagement/purchase" element={<OrderUser />} />
         <Route path="/accountmanagement/profile" element={<Profile />} />
+        <Route path="/accountmanagement/announcement" element={<Announcement />} />
         <Route path="/accountmanagement/auction" element={<AuctionUser />} />
         <Route path="/accountmanagement/wallet" element={<WalletUser />} />
         <Route path="/accountmanagement/exchange" element={<ExchangeUser />} />

@@ -1,0 +1,17 @@
+.sub-menu {
+    margin-left: 20px; /* Indent sub-menu */
+    list-style: none; /* Remove bullet points */
+    padding: 0;
+  }
+  
+  .sub-menu-item {
+    cursor: pointer;
+    padding: 5px 0;
+    color: #555; /* Optional: Style for sub-menu items */
+  }
+  
+  .sub-menu-item:hover {
+    color: #000; /* Optional: Hover effect */
+    font-weight: bold;
+  }
+  

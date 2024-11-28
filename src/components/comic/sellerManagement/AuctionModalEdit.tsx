@@ -1,6 +1,14 @@
 import React, { useEffect } from "react";
 import { Typography, Box } from "@mui/material";
-import { Form, InputNumber, DatePicker, Modal, Col, Row } from "antd";
+import {
+  Form,
+  InputNumber,
+  DatePicker,
+  Modal,
+  Col,
+  Row,
+  notification,
+} from "antd";
 import dayjs from "dayjs";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import { Auction, Comic } from "../../../common/base.interface";
@@ -43,6 +51,11 @@ const AuctionModalEdit = ({
     if (dayjs(value).isBefore(dayjs(startTime))) {
       return Promise.reject("Thời gian kết thúc phải sau thời gian bắt đầu");
     }
+    if (dayjs(value).diff(dayjs(startTime), "days") < 1) {
+      return Promise.reject(
+        "Thời gian kết thúc phải cách thời gian bắt đầu ít nhất 1 ngày"
+      );
+    }
 
     if (dayjs(value).isAfter(dayjs(startTime).add(7, "days"))) {
       return Promise.reject(
@@ -50,21 +63,6 @@ const AuctionModalEdit = ({
       );
     }
     return Promise.resolve();
-  };
-
-  const disabledDate = (current: dayjs.Dayjs | null): boolean => {
-    return current ? current < now.startOf("day") : false;
-  };
-
-  // Disable past times if today is selected
-  const disabledTime = (current: dayjs.Dayjs | null) => {
-    if (current && current.isSame(now, "day")) {
-      return {
-        disabledHours: () => [...Array(now.hour()).keys()],
-        disabledMinutes: () => [...Array(now.minute()).keys()],
-      };
-    }
-    return {};
   };
 
   const handleSubmit = async (values: {
@@ -85,12 +83,19 @@ const AuctionModalEdit = ({
         depositAmount: values.priceStep,
         startTime: dayjs(values.startTime).format("YYYY-MM-DDTHH:mm:ssZ"),
         endTime: dayjs(values.endTime).format("YYYY-MM-DDTHH:mm:ssZ"),
+        status: "UPCOMING",
       };
 
       await privateAxios.put(`/auction/${auctionData.id}`, updatedAuctionData);
 
       console.log("update", updatedAuctionData);
       onSuccess(updatedAuctionData);
+      notification.success({
+        key: "success",
+        message: "Thành công",
+        description: "Mở lại phiên đấu giá thành công!",
+        duration: 5,
+      });
       onCancel();
     } catch (error) {
       console.error("Error updating auction details:", error);
@@ -210,17 +215,17 @@ const AuctionModalEdit = ({
                     variant="body2"
                     sx={{ fontWeight: 500, color: "text.primary" }}
                   >
-                    Giá tối đa (đ)
+                    Giá mua ngay (đ)
                   </Typography>
                 }
                 rules={[
-                  { required: true, message: "Vui lòng nhập giá tối đa" },
+                  { required: true, message: "Vui lòng nhập giá mua ngay" },
                 ]}
               >
                 <InputNumber
                   style={{ width: "100%" }}
                   min={0}
-                  placeholder="Nhập giá tối đa"
+                  placeholder="Nhập giá mua ngay"
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
@@ -286,39 +291,71 @@ const AuctionModalEdit = ({
               ]}
             >
               <DatePicker
-                showTime
-                format="YYYY-MM-DD HH:mm:ss"
+                showTime={{
+                  format: "HH:mm",
+                }}
+                format="YYYY-MM-DD HH:mm"
                 style={{ width: "100%" }}
                 placeholder="Chọn thời gian bắt đầu"
-                disabledDate={disabledDate}
-                disabledTime={disabledTime}
-                onChange={() => {
-                  // Trigger re-validation of endTime when startTime changes
-                  form.validateFields(["endTime"]);
+                disabledDate={(current) => {
+                  // Disable all dates before now
+                  return current && current.isBefore(dayjs().startOf("day"));
+                }}
+                disabledTime={(current) => {
+                  // Only allow times that are at least 1 hour after the current time
+                  if (!current) return {};
+                  const now = dayjs();
+                  const oneHourFromNow = now.add(1, "hour");
+                  if (current.isSame(now, "day")) {
+                    return {
+                      disabledHours: () =>
+                        Array.from({ length: 24 }, (_, i) =>
+                          i < oneHourFromNow.hour() ? i : -1
+                        ).filter((x) => x !== -1),
+                      disabledMinutes: () =>
+                        current.isSame(oneHourFromNow, "hour")
+                          ? Array.from({ length: 60 }, (_, i) =>
+                              i < oneHourFromNow.minute() ? i : -1
+                            ).filter((x) => x !== -1)
+                          : [],
+                    };
+                  }
+                  return {};
                 }}
               />
             </Form.Item>
 
             <Form.Item
               name="endTime"
-              label={
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 500, color: "text.primary" }}
-                >
-                  Thời gian kết thúc
-                </Typography>
-              }
+              label="Thời gian kết thúc"
               rules={[
-                { required: true, message: "Vui lòng chọn thời gian kết thúc" },
-                { validator: validateEndTime },
+                {
+                  required: true,
+                  message: "Vui lòng chọn thời gian kết thúc",
+                },
+                { validator: validateEndTime }, // Custom validation for end time
               ]}
             >
               <DatePicker
-                showTime
-                format="YYYY-MM-DD HH:mm:ss"
+                showTime={{
+                  format: "HH:mm",
+                }}
+                format="YYYY-MM-DD HH:mm"
                 style={{ width: "100%" }}
-                placeholder="Chọn thời gian kết thúc"
+                placeholder="Nhập thời gian kết thúc"
+                disabledDate={(current) => {
+                  const startTime = form.getFieldValue("startTime");
+                  if (!startTime) return false;
+
+                  const startDayjs = dayjs(startTime);
+                  const oneDayAfter = startDayjs.add(1, "day");
+                  const sevenDaysAfter = startDayjs.add(7, "days");
+
+                  return (
+                    current.isBefore(oneDayAfter.startOf("day")) ||
+                    current.isAfter(sevenDaysAfter.endOf("day"))
+                  );
+                }}
               />
             </Form.Item>
           </Box>

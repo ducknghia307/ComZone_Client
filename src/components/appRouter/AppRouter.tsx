@@ -24,7 +24,6 @@ import OrderManagementSeller from "../../pages/OrderManagementSeller";
 import AuctionManagementSeller from "../../pages/AuctionManagementSeller";
 import FeedbackManagementSeller from "../../pages/FeedbackManagementSeller";
 import AllHotComics from "../../pages/HotComic";
-import ComicZoneMembership from "../membership/ComicZoneMembership";
 import NotFound from "../notFound/NotFound";
 import CurrentUserRecentAct from "../../pages/CurrentUserRecentAct";
 import CurrentUserHistoryExchange from "../../pages/CurrentUserHistoryExchange";
@@ -59,7 +58,10 @@ const AppRouter = () => {
         {/* <Route path="/accountmanagement" element={<AccountManagement />} /> */}
         <Route path="/accountmanagement/purchase" element={<OrderUser />} />
         <Route path="/accountmanagement/profile" element={<Profile />} />
-        <Route path="/accountmanagement/announcement" element={<Announcement />} />
+        <Route
+          path="/accountmanagement/announcement"
+          element={<Announcement />}
+        />
         <Route path="/accountmanagement/auction" element={<AuctionUser />} />
         <Route path="/accountmanagement/wallet" element={<WalletUser />} />
         <Route path="/accountmanagement/exchange" element={<ExchangeUser />} />
@@ -112,8 +114,6 @@ const AppRouter = () => {
           path="/profile/comicSelling"
           element={<CurrentUserComicSelling />}
         />
-        <Route path="/membership" element={<ComicZoneMembership />} />
-
         <Route path="*" element={<NotFound />} />
 
         <Route path="/mod/comics" element={<ModComics />} />

@@ -8,11 +8,11 @@ import { SellerSubscription } from "../../common/interfaces/seller-subscription.
 export default function SellerSubsModal({
   isOpen,
   setIsOpen,
-  redirect,
+  callback,
 }: {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  redirect: string;
+  callback?: () => void;
 }) {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [userSubs, setUserSubs] = useState<SellerSubscription | null>();
@@ -44,7 +44,11 @@ export default function SellerSubsModal({
       centered
       width="auto"
     >
-      <ComicZoneMembership user={userInfo} redirect={redirect} />
+      <ComicZoneMembership
+        user={userInfo}
+        callback={callback}
+        userSubs={userSubs}
+      />
     </Modal>
   );
 }

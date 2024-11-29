@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Typography,
@@ -11,8 +11,6 @@ import AddIcon from "@mui/icons-material/Add";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import "../ui/SellerCreateComic.css";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import IconButton from "@mui/material/IconButton";
 import { privateAxios } from "../../middleware/axiosInstance";
 import AuctionManagement from "../auctions/AuctionManagement";
@@ -21,12 +19,11 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import OrderManagement from "../../order/OrderManagement";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import { Modal, notification } from "antd"; // For confirmation modal
-import { CheckOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined } from "@ant-design/icons";
 import AuctionModal from "../comic/sellerManagement/AuctionModal";
 import { Comic } from "../../common/base.interface";
 import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
 import SellerSubsModal from "./SellerSubsModal";
-import MoneyOffIcon from "@mui/icons-material/MoneyOff";
 import { RenderCell } from "./RenderCell";
 
 const { confirm } = Modal;
@@ -39,15 +36,12 @@ const SellerManagement = ({
   fetchSellerSubscription?: () => void;
 }) => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
-  const [selectionModel, setSelectionModel] = useState([]);
   const [comics, setComics] = useState<Comic[]>([]);
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const [sellerSubscription, setSellerSubscription] =
-    useState<SellerSubscription | null>();
   const [isRegisteringPlan, setIsRegisteringPlan] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -84,6 +78,7 @@ const SellerManagement = ({
       description: "Tạo đấu giá thành công!",
       duration: 5,
     });
+    fetchSellerSubscription();
   };
   const handleStopSelling = (comic: Comic) => {
     // Show a confirmation modal before stopping the sale
@@ -166,6 +161,7 @@ const SellerManagement = ({
                     : prevComic
                 )
               );
+              fetchSellerSubscription();
             })
             .catch((error) => {
               console.error("Lỗi khi đưa truyện vào bán:", error);
@@ -185,15 +181,6 @@ const SellerManagement = ({
     return genreArray.map((genre) => genre.name).join(", ");
   };
 
-  const fetchSellerSubscription = async () => {
-    await privateAxios
-      .get("seller-subscriptions/user")
-      .then((res) => {
-        setSellerSubscription(res.data);
-      })
-      .catch((err) => console.log(err));
-  };
-
   useEffect(() => {
     // Gọi API để lấy danh sách comics và genres
     Promise.all([
@@ -211,8 +198,6 @@ const SellerManagement = ({
         console.error("Error fetching data:", error);
         setLoading(false);
       });
-
-    fetchSellerSubscription();
   }, []);
 
   const handleAddComicsClick = () => {
@@ -508,7 +493,6 @@ const SellerManagement = ({
         <SellerSubsModal
           isOpen={isRegisteringPlan}
           setIsOpen={setIsRegisteringPlan}
-          redirect="/sellermanagement/comic"
         />
       )}
     </div>

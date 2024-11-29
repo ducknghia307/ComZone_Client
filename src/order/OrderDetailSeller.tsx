@@ -1,30 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Typography,
-  IconButton,
-  Box,
-  Paper,
-  Stack,
-  Divider,
-  useTheme,
-  alpha,
-  styled,
-  Chip,
-  Button,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, Typography, IconButton, Box, Paper, Stack, Divider, useTheme, alpha, styled, Chip, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { Close as CloseIcon } from "@mui/icons-material";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from "@mui/material";
 import { privateAxios } from "../middleware/axiosInstance";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { OrderDetailData } from "../common/base.interface";
@@ -46,7 +24,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   borderRadius: theme.spacing(2),
   transition: "transform 0.2s, box-shadow 0.2s",
   "&:hover": {
-    // transform: 'translateY(-2px)',
     boxShadow: theme.shadows[4],
   },
 }));
@@ -55,47 +32,16 @@ const StatusChip = styled("span")<{ status: string; deliveryStatus?: string }>(
   ({ theme, status, deliveryStatus }) => {
     const getStatusColor = () => {
       if (status === "PACKAGING" && deliveryStatus === "ready_to_pick") {
-        return {
-          color: "#7c4af2",
-          backgroundColor: "#e0d4fc",
-        };
+        return { color: "#7c4af2", backgroundColor: "#e0d4fc", };
       }
       switch (status) {
-        case "PENDING":
-          return {
-            color: "#ff9800",
-            backgroundColor: "#fff3e0",
-          };
-        case "DELIVERED":
-          return {
-            color: "#32CD32",
-            backgroundColor: "#ccfccc",
-          };
-        case "PACKAGING":
-          return {
-            color: "#ff6b1c",
-            backgroundColor: "#ffe8db",
-          };
-        case "DELIVERING":
-          return {
-            color: "#2196f3",
-            backgroundColor: "#e3f2fd",
-          };
-        case "SUCCESSFUL":
-          return {
-            color: "#4caf50",
-            backgroundColor: "#e8f5e9",
-          };
-        case "CANCELED":
-          return {
-            color: "#e91e63",
-            backgroundColor: "#fce4ec",
-          };
-        default:
-          return {
-            color: theme.palette.info.main,
-            bgColor: alpha(theme.palette.info.light, 0.2),
-          };
+        case "PENDING": return { color: "#ff9800", backgroundColor: "#fff3e0", };
+        case "DELIVERED": return { color: "#32CD32", backgroundColor: "#ccfccc", };
+        case "PACKAGING": return { color: "#ff6b1c", backgroundColor: "#ffe8db", };
+        case "DELIVERING": return { color: "#2196f3", backgroundColor: "#e3f2fd", };
+        case "SUCCESSFUL": return { color: "#4caf50", backgroundColor: "#e8f5e9", };
+        case "CANCELED": return { color: "#e91e63", backgroundColor: "#fce4ec", };
+        default: return { color: theme.palette.info.main, bgColor: alpha(theme.palette.info.light, 0.2), };
       }
     };
 
@@ -127,33 +73,6 @@ interface OrderDetailProps {
   ) => void;
   order: OrderDetailData | undefined;
 }
-
-// const InfoSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => {
-//     const theme = useTheme();
-
-//     return (
-//         <StyledPaper>
-//             <Stack spacing={2}>
-//                 <Box display="flex" alignItems="center" gap={1}>
-//                     <Box
-//                         sx={{
-//                             color: theme.palette.primary.main,
-//                             backgroundColor: alpha(theme.palette.primary.main, 0.1),
-//                             padding: 1,
-//                             borderRadius: '50%'
-//                         }}
-//                     >
-//                         {icon}
-//                     </Box>
-//                     <Typography variant="h6" fontWeight={600} color="primary">
-//                         {title}
-//                     </Typography>
-//                 </Box>
-//                 <Box>{children}</Box>
-//             </Stack>
-//         </StyledPaper>
-//     );
-// };
 
 const InfoRow = ({
   label,
@@ -190,24 +109,14 @@ const InfoRow = ({
       <Typography
         color="text.secondary"
         variant="body2"
-        sx={{
-          whiteSpace: "nowrap",
-          fontWeight: "bold",
-          color: "#000",
-          fontSize: "16px",
-        }}
+        sx={{ whiteSpace: "nowrap", fontWeight: "bold", color: "#000", fontSize: "16px", }}
       >
         {label}
       </Typography>
       <Typography
         variant="body1"
         fontWeight={500}
-        sx={{
-          paddingLeft: 2,
-          color: paymentMethod ? paymentStatusColor : "#000",
-          whiteSpace: "normal",
-          wordWrap: "break-word",
-        }}
+        sx={{ paddingLeft: 2, color: paymentMethod ? paymentStatusColor : "#000", whiteSpace: "normal", wordWrap: "break-word", }}
       >
         {value}
       </Typography>
@@ -268,84 +177,15 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
       return "Hoàn tất đóng gói";
     }
     switch (status) {
-      case "PENDING":
-        return "Đang chờ xử lý";
-      case "DELIVERED":
-        return "Đã giao hàng";
-      case "PACKAGING":
-        return "Đang đóng gói";
-      case "DELIVERING":
-        return "Đang giao hàng";
-      case "SUCCESSFUL":
-        return "Hoàn tất";
-      case "CANCELED":
-        return "Đã hủy";
-      default:
-        return status;
+      case "PENDING": return "Đang chờ xử lý";
+      case "DELIVERED": return "Đã giao hàng";
+      case "PACKAGING": return "Đang đóng gói";
+      case "DELIVERING": return "Đang giao hàng";
+      case "SUCCESSFUL": return "Hoàn tất";
+      case "CANCELED": return "Đã hủy";
+      default: return status;
     }
   };
-
-  // const handleConfirmAction = async (actionType: string) => {
-  //     const confirmMessage =
-  //         actionType === "start"
-  //             ? "Bạn có chắc chắn muốn bắt đầu đóng gói đơn hàng này không?"
-  //             : "Bạn có chắc chắn muốn hoàn tất đóng gói để shipper có thể đến lấy hàng không?";
-
-  //     if (window.confirm(confirmMessage)) {
-  //         try {
-  //             const endpoint =
-  //                 actionType === "start"
-  //                     ? `/orders/status/start-packaging/${orderId}`
-  //                     : `/orders/status/finish-packaging/${orderId}`;
-
-  //             const response = await privateAxios.post(endpoint);
-
-  //             if (actionType === "start") {
-  //                 onStatusUpdate(orderId, "PACKAGING");
-  //                 setOrderDetail(prev => prev ? { ...prev, status: "PACKAGING" } : null);
-  //             } else if (actionType === "finish") {
-  //                 if (response.status === 400) {
-  //                     alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
-
-  //                     await privateAxios.patch("/orders/cancel", {
-  //                         orderId: orderId,
-  //                         cancelReason: "Đơn hàng gặp lỗi, cần hủy."
-  //                     });
-  //                     onStatusUpdate(orderId, "CANCELED");
-  //                     setOrderDetail(prev => prev ? { ...prev, status: "CANCELED" } : null);
-  //                     alert("Đơn hàng đã được hủy thành công.");
-  //                 } else {
-  //                     onStatusUpdate(orderId, "PACKAGING", "ready_to_pick");
-  //                     setOrderDetail(prev => prev ? {
-  //                         ...prev,
-  //                         status: "PACKAGING",
-  //                         delivery_status: "ready_to_pick"
-  //                     } : null);
-  //                     alert("Trạng thái đơn hàng đã được cập nhật thành công.");
-  //                 }
-  //             }
-  //         } catch (error : any) {
-  //             if (actionType === "finish" && error.response?.status === 400) {
-  //                 alert("Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.");
-  //                 try {
-  //                     await privateAxios.patch("/orders/cancel", {
-  //                         orderId: orderId,
-  //                         cancelReason: "Đơn hàng gặp lỗi, cần hủy."
-  //                     });
-  //                     onStatusUpdate(orderId, "CANCELED");
-  //                     setOrderDetail(prev => prev ? { ...prev, status: "CANCELED" } : null);
-  //                     alert("Đơn hàng đã được hủy thành công.");
-  //                 } catch (cancelError) {
-  //                     console.error("Error cancelling the order:", cancelError);
-  //                     alert("Có lỗi xảy ra khi hủy đơn hàng.");
-  //                 }
-  //             } else {
-  //                 console.error("Error updating order status:", error);
-  //                 alert("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.");
-  //             }
-  //         }
-  //     }
-  // };
 
   const handleConfirmAction = async (actionType: string) => {
     const confirmConfig = {
@@ -474,7 +314,6 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
       <DialogTitle
         sx={{
           p: 3,
-          // borderBottom: `1px solid ${theme.palette.divider}`,
           backgroundColor: alpha(theme.palette.background.default, 0.5),
         }}
       >
@@ -537,7 +376,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                 fontWeight: 500,
               }}
             >
-              Mã đơn hàng: {orderDetail.deliveryTrackingCode}
+              Mã đơn hàng: {orderDetail.delivery.deliveryTrackingCode}
             </Typography>
           </div>
           <div
@@ -647,10 +486,6 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                     label="Tổng tiền"
                     value={`${orderDetail.totalPrice} đ`}
                   />
-                  {/* <InfoRow
-                    label="Phí vận chuyển"
-                    value={`${orderDetail.delivery.deliveryFee} đ`}
-                  /> */}
                   <InfoRow
                     label="Phương thức thanh toán"
                     value={
@@ -749,7 +584,6 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
               </TableContainer>
             </Grid>
             <Grid size={12} sx={{ paddingLeft: "20px", paddingRight: "20px" }}>
-              {/* {orderDetail.note && ( */}
               <StyledPaper
                 sx={{
                   padding: "16px",
@@ -765,7 +599,6 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                     Ghi chú từ người mua:
                   </Typography>
                 </div>
-
                 <Typography variant="body1" marginTop={"5px"}>
                   {orderDetail.note}
                 </Typography>

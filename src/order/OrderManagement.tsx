@@ -52,6 +52,16 @@ const OrderManagement = () => {
     fetchOrders();
   }, []);
 
+  const reload = async () => {
+    try {
+      const response = await privateAxios.get("/orders/seller");
+      const data = Array.isArray(response.data) ? response.data : response.data.orders;
+      setOrders(data);  // Cập nhật lại danh sách đơn hàng sau khi reload
+    } catch (error) {
+      console.error("Error reloading orders:", error);
+    }
+  };
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -72,8 +82,19 @@ const OrderManagement = () => {
     setSelectedOrderId(orderId);
   };
 
+  // const closeOrderDetail = () => {
+  //   setSelectedOrderId(null);
+  // };
+
   const closeOrderDetail = () => {
-    setSelectedOrderId(null);
+    const selectedOrder = orders.find((order) => order.id === selectedOrderId);
+
+    // Kiểm tra nếu thỏa mãn điều kiện
+    if (selectedOrder && selectedOrder.status === "PACKAGING" && selectedOrder.delivery?.status === "ready_to_pick") {
+      reload();  // Gọi hàm reload nếu điều kiện thỏa mãn
+    }
+
+    setSelectedOrderId(null);  // Đóng modal
   };
 
   const translateStatus = (status: string, deliveryStatus?: string) => {

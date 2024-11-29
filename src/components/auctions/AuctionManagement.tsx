@@ -25,6 +25,7 @@ import { Auction } from "../../common/base.interface";
 import { notification, Popconfirm } from "antd";
 import { EyeOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import AuctionDetailModal from "../modal/AuctionDetailModal";
+import AuctionDetailModalSeller from "../modal/AuctionDetailModalSeller";
 
 const getStatusChipStyles = (status: string) => {
   switch (status) {
@@ -469,7 +470,7 @@ const AuctionManagement = () => {
           onSuccess={handleModalSuccess}
         />
       )}
-      <AuctionDetailModal
+      <AuctionDetailModalSeller
         open={openDetail}
         onClose={handleCloseDetail}
         auction={selectedAuction}

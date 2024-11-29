@@ -21,10 +21,11 @@ interface AuctionDetailModalProps {
     endTime: string;
     status: string;
     winner?: { id: string; createdAt: string; name: string };
+    currentCondition?: string;
   };
 }
 
-const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
+const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
   open,
   onClose,
   auction,
@@ -40,7 +41,6 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
           borderRadius: "8px",
           padding: "8px 20px",
           fontWeight: "bold",
-          display: "inline-block",
         };
       case "UPCOMING":
         return {
@@ -49,7 +49,6 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
           borderRadius: "8px",
           padding: "8px 20px",
           fontWeight: "bold",
-          display: "inline-block",
         };
       case "ONGOING":
         return {
@@ -58,7 +57,6 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
           borderRadius: "8px",
           padding: "8px 20px",
           fontWeight: "bold",
-          display: "inline-block",
         };
       case "FAILED":
         return {
@@ -67,7 +65,6 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
           borderRadius: "8px",
           padding: "8px 20px",
           fontWeight: "bold",
-          display: "inline-block",
         };
       case "REJECTED":
         return {
@@ -76,7 +73,6 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
           borderRadius: "8px",
           padding: "8px 20px",
           fontWeight: "bold",
-          display: "inline-block",
         };
       case "COMPLETED":
         return {
@@ -85,7 +81,6 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
           borderRadius: "8px",
           padding: "8px 20px",
           fontWeight: "bold",
-          display: "inline-block",
         };
     }
   };
@@ -93,15 +88,15 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
   const translateStatus = (status: string) => {
     switch (status) {
       case "SUCCESSFUL":
-        return "Đấu giá thành công";
+        return "Thành công";
       case "COMPLETED":
         return "Hoàn thành";
       case "ONGOING":
         return "Đang diễn ra";
       case "FAILED":
-        return "Đấu giá thất bại";
-      case "REJECTED":
-        return "Bị từ chối";
+        return "Thất bại";
+      case "CANCELED":
+        return "Bị hủy";
       default:
         return status;
     }
@@ -134,12 +129,36 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
           color: "#000",
           fontWeight: 700,
           borderBottom: "1px solid #e0e0e0",
-          textAlign: "center",
           padding: "15px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          position: "relative",
         }}
       >
-        Chi tiết đấu giá
+        <span style={{ flex: 1, textAlign: "left" }}></span>
+        <span
+          style={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          Chi tiết đấu giá
+        </span>
+
+        {/* Status at the end */}
+        <div
+          style={{
+            ...getStatusChipStyles(auction.status),
+            display: "inline-block",
+            textAlign: "center",
+          }}
+        >
+          {translateStatus(auction.status)}
+        </div>
       </DialogTitle>
+
       <DialogContent>
         <div
           style={{
@@ -164,7 +183,7 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
               border: "1px solid #e0e0e0",
             }}
           />
-          <div style={{ flex: 1, padding: "20px" }}>
+          <div style={{ flex: 1, padding: "15px" }}>
             <Typography
               variant="h5"
               style={{ color: "#000", marginBottom: "15px", fontWeight: 600 }}
@@ -177,7 +196,7 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
                 value: auction.currentPrice,
                 highlight: true,
               },
-              { label: "Giá tối đa", value: auction.maxPrice },
+              { label: "Giá mua ngay", value: auction.maxPrice },
               { label: "Giá đặt cọc", value: auction.depositAmount },
               { label: "Giá khởi điểm", value: auction.reservePrice },
               { label: "Thời gian bắt đầu", value: formattedStartTime },
@@ -209,24 +228,6 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
               </div>
             ))}
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: "15px",
-                alignItems: "center",
-                borderBottom: "1px solid #e0e0e0",
-                paddingBottom: "10px",
-              }}
-            >
-              <Typography style={{ color: "#666", fontWeight: 500 }}>
-                Trạng thái
-              </Typography>
-              <span style={getStatusChipStyles(auction.status)}>
-                {translateStatus(auction.status)}
-              </span>
-            </div>
-
             {auction.winner && (
               <div
                 style={{
@@ -241,6 +242,23 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
                 </Typography>
                 <Typography style={{ color: "#000", fontWeight: 600 }}>
                   {auction.winner.name}
+                </Typography>
+              </div>
+            )}
+            {auction.currentCondition && (
+              <div
+                style={{
+                  marginTop: "15px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Typography style={{ color: "#666", fontWeight: 500 }}>
+                  Lý do
+                </Typography>
+                <Typography style={{ color: "#000", fontWeight: 600 }}>
+                  {auction.currentCondition}
                 </Typography>
               </div>
             )}
@@ -275,4 +293,4 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
   );
 };
 
-export default AuctionDetailModal;
+export default AuctionDetailModalSeller;

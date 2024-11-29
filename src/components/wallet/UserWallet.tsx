@@ -90,8 +90,14 @@ const UserWallet = () => {
               ? `Nhận tiền đơn hàng (${transaction.note})`
               : transaction.exchange
               ? `Thanh toán tiền bù trao đổi`
-              : transaction.deposit
+              : transaction.deposit?.exchange
               ? `Hoàn trả cọc`
+              : transaction.deposit?.auction &&
+                transaction.deposit.status === "REFUNDED"
+              ? `Hoàn trả cọc đấu giá`
+              : transaction.deposit?.auction &&
+                transaction.deposit.status === "SEIZED"
+              ? `Hoàn trả cọc đấu giá do người dùng không thanh toán`
               : transaction.walletDeposit
               ? "Nạp tiền vào ví"
               : "Thông tin giao dịch không có sẵn"

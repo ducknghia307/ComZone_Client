@@ -26,17 +26,12 @@ import AuctionModal from "../comic/sellerManagement/AuctionModal";
 import { Comic } from "../../common/base.interface";
 import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
 import SellerSubsModal from "./SellerSubsModal";
-import ActionCell from "./ActionCell";
+import MoneyOffIcon from "@mui/icons-material/MoneyOff";
+import { RenderCell } from "./RenderCell";
 
 const { confirm } = Modal;
 
-const SellerManagement = ({
-  sellerSubscription,
-  fetchSellerSubscription,
-}: {
-  sellerSubscription: SellerSubscription | null;
-  fetchSellerSubscription: () => void;
-}) => {
+const SellerManagement = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
   const [selectionModel, setSelectionModel] = useState([]);
   const [comics, setComics] = useState<Comic[]>([]);
@@ -45,6 +40,8 @@ const SellerManagement = ({
   const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const [sellerSubscription, setSellerSubscription] =
+    useState<SellerSubscription | null>();
   const [isRegisteringPlan, setIsRegisteringPlan] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -71,11 +68,10 @@ const SellerManagement = ({
     setComics((prevComics) =>
       prevComics.map((prevComic) =>
         prevComic.id === selectedComic?.id
-          ? { ...prevComic, status: "AVAILABLE" }
+          ? { ...prevComic, status: "AVAILABLE", type: "AUCTION" }
           : prevComic
       )
     );
-    fetchSellerSubscription();
     notification.success({
       key: "success",
       message: "Thành công",
@@ -85,6 +81,8 @@ const SellerManagement = ({
   };
   const handleStopSelling = (comic: Comic) => {
     // Show a confirmation modal before stopping the sale
+    console.log("z", comic);
+
     confirm({
       title: "Xác nhận dừng bán sản phẩm?",
       icon: <CheckCircleOutlined style={{ color: "red" }} />,
@@ -92,21 +90,21 @@ const SellerManagement = ({
       onOk() {
         // Call the API to stop selling the comic
         privateAxios
-          .patch(`/comics/${comic.id}/stop-sell`)
-          .then(() => {
+          .get(`/comics/${comic.id}/stop-sell`)
+          .then((res) => {
             notification.success({
               key: "success",
               message: "Thành công",
               description: "Truyện đã được dừng bán thành công!",
               duration: 5,
             });
-            console.log(`Truyện "${comic.title}" đã được dừng bán`);
+            console.log("stopselling", res);
 
             // Update the comic list after stopping the sale
             setComics((prevComics) =>
               prevComics.map((prevComic) =>
                 prevComic.id === comic.id
-                  ? { ...prevComic, status: "Không khả dụng" }
+                  ? { ...prevComic, status: "UNAVAILABLE", type: "NONE" }
                   : prevComic
               )
             );
@@ -125,7 +123,6 @@ const SellerManagement = ({
       },
     });
   };
-
   const handleSell = (comic: Comic) => {
     // Show a confirmation modal before selling
     if (!sellerSubscription.canSell)
@@ -144,7 +141,7 @@ const SellerManagement = ({
           privateAxios
             .patch(`comics/${comic.id}/status`, { status: "AVAILABLE" })
             .then(async () => {
-              await privateAxios.patch("seller-subscriptions/sell", {
+              await privateAxios.patch("seller-subscriptions/seller", {
                 quantity: 1,
               });
 
@@ -163,8 +160,6 @@ const SellerManagement = ({
                     : prevComic
                 )
               );
-
-              fetchSellerSubscription();
             })
             .catch((error) => {
               console.error("Lỗi khi đưa truyện vào bán:", error);
@@ -184,6 +179,15 @@ const SellerManagement = ({
     return genreArray.map((genre) => genre.name).join(", ");
   };
 
+  const fetchSellerSubscription = async () => {
+    await privateAxios
+      .get("seller-subscriptions/user")
+      .then((res) => {
+        setSellerSubscription(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
     // Gọi API để lấy danh sách comics và genres
     Promise.all([
@@ -201,6 +205,8 @@ const SellerManagement = ({
         console.error("Error fetching data:", error);
         setLoading(false);
       });
+
+    fetchSellerSubscription();
   }, []);
 
   const handleAddComicsClick = () => {
@@ -305,12 +311,28 @@ const SellerManagement = ({
 
         if (status === "Không khả dụng") {
           return (
-            <ActionCell
-              params={params}
-              handleAuction={handleAuction}
-              handleSell={handleSell}
-              handleStopSelling={handleStopSelling}
-            />
+            <div>
+              <div>
+                <IconButton
+                  aria-label="edit"
+                  color="success"
+                  onClick={() => handleAuction(params.row)}
+                >
+                  <GavelIcon
+                    sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
+                  />
+                </IconButton>
+                <IconButton
+                  aria-label="edit"
+                  color="success"
+                  onClick={() => handleSell(params.row)}
+                >
+                  <AddBusinessIcon
+                    sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
+                  />
+                </IconButton>
+              </div>
+            </div>
           );
         }
 
@@ -344,22 +366,7 @@ const SellerManagement = ({
       headerAlign: "center",
       align: "center",
       renderCell: (params) => (
-        <>
-          <IconButton
-            aria-label="edit"
-            color="primary"
-            onClick={() => navigate(`/sellermanagement/edit/${params.row.id}`)}
-          >
-            <EditOutlinedIcon
-              sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
-            />
-          </IconButton>
-          <IconButton aria-label="delete" color="error">
-            <DeleteOutlineOutlinedIcon
-              sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
-            />
-          </IconButton>
-        </>
+        <RenderCell params={params} handleStopSelling={handleStopSelling} />
       ),
     },
   ];
@@ -378,7 +385,8 @@ const SellerManagement = ({
             variant="contained"
             sx={{
               borderRadius: "20px",
-              fontFamily: "REM",
+              backgroundColor: "#D9D9D9",
+              color: "#000",
             }}
             startIcon={<AddIcon />}
             onClick={() => handleAddComicsClick()}
@@ -392,10 +400,10 @@ const SellerManagement = ({
     switch (selectedMenuItem) {
       case "comic":
         return (
-          <div className="flex flex-col gap-4">
-            <p className="uppercase text-2xl font-semibold REM">
+          <div>
+            <Typography variant="h5" className="content-header">
               Quản lí truyện tranh
-            </p>
+            </Typography>
             <Box sx={{ marginBottom: "20px" }}>
               <div
                 style={{
@@ -408,7 +416,8 @@ const SellerManagement = ({
                   variant="contained"
                   sx={{
                     borderRadius: "20px",
-                    fontFamily: "REM",
+                    backgroundColor: "#D9D9D9",
+                    color: "#000",
                   }}
                   startIcon={<AddIcon />}
                   onClick={() => handleAddComicsClick()}
@@ -468,6 +477,7 @@ const SellerManagement = ({
               onCancel={handleModalCancel} // Event handler for closing the modal
               onSuccess={handleModalSuccess} // Event handler for successful auction creation
             />
+            ;
           </div>
         );
       case "order":
@@ -492,6 +502,7 @@ const SellerManagement = ({
         <SellerSubsModal
           isOpen={isRegisteringPlan}
           setIsOpen={setIsRegisteringPlan}
+          redirect="/sellermanagement/comic"
         />
       )}
     </div>

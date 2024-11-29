@@ -28,7 +28,7 @@ const ComicZoneMembership = ({
   callback,
 }: {
   user?: UserInfo;
-  userSubs: SellerSubscription | null;
+  userSubs?: SellerSubscription | null;
   setIsRegisterSellerModal?: React.Dispatch<React.SetStateAction<boolean>>;
   callback?: () => void;
 }) => {

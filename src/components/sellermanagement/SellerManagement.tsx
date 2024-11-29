@@ -33,8 +33,8 @@ const SellerManagement = ({
   sellerSubscription,
   fetchSellerSubscription,
 }: {
-  sellerSubscription: SellerSubscription | null;
-  fetchSellerSubscription: () => void;
+  sellerSubscription?: SellerSubscription | null;
+  fetchSellerSubscription?: () => void;
 }) => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
   const [selectionModel, setSelectionModel] = useState([]);

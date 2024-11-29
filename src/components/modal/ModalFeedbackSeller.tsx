@@ -7,6 +7,7 @@ import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import { privateAxios } from '../../middleware/axiosInstance';
 import { OrderDetailData } from '../../common/base.interface';
+import { notification } from 'antd';
 
 interface ModalFeedbackSellerProps {
     open: boolean;
@@ -75,7 +76,11 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
 
     const handleSubmitFeedback = async () => {
         if (!ratingValue || !commentText.trim() || images.length === 0) {
-            alert("Vui lòng nhập đầy đủ thông tin đánh giá và tải lên ít nhất một hình ảnh.");
+            // alert("Vui lòng nhập đầy đủ thông tin đánh giá và tải lên ít nhất một hình ảnh.");
+            notification.warning({
+                message: 'Thiếu thông tin',
+                description: 'Vui lòng nhập đầy đủ thông tin đánh giá và tải lên ít nhất một hình ảnh.',
+            });
             return;
         }
 
@@ -124,13 +129,21 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
             // onStatusUpdate(orderId, "COMPLETED");
             onStatusUpdate(orderId, "SUCCESSFUL");
 
-            alert("Đánh giá đã được gửi thành công!");
+            // alert("Đánh giá đã được gửi thành công!");
+            notification.success({
+                message: 'Thành công',
+                description: 'Đánh giá đã được gửi thành công!',
+            });
             console.log(payload);
 
             onClose();
         } catch (error) {
             console.error("Error submitting feedback:", error);
-            alert("Có lỗi xảy ra khi gửi đánh giá.");
+            // alert("Có lỗi xảy ra khi gửi đánh giá.");
+            notification.error({
+                message: 'Lỗi',
+                description: 'Có lỗi xảy ra khi gửi đánh giá.',
+            });
         }
     };
 
@@ -154,7 +167,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                     textAlign: 'center',
                     paddingTop: '30px',
                     paddingBottom: '15px',
-                    fontFamily:'REM'
+                    fontFamily: 'REM'
                 }}
             >
                 ĐÁNH GIÁ NGƯỜI BÁN
@@ -168,16 +181,16 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
             </DialogTitle>
 
             <DialogContent sx={{ padding: '0px 40px 40px 40px' }}>
-                <Typography sx={{ marginBottom: '20px', textAlign: 'center', fontFamily:'REM' }}>
+                <Typography sx={{ marginBottom: '20px', textAlign: 'center', fontFamily: 'REM' }}>
                     Hãy chia sẻ trải nghiệm của bạn để giúp người bán cải thiện dịch vụ.
                     Đánh giá của bạn rất quan trọng đối với cộng đồng!
                 </Typography>
 
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
-                    <Typography sx={{ fontWeight: '500', fontSize: '18px', fontFamily:'REM' }}>Người bán:</Typography>
+                    <Typography sx={{ fontWeight: '500', fontSize: '18px', fontFamily: 'REM' }}>Người bán:</Typography>
                     <Button
                         variant="outlined"
-                        sx={{ textTransform: 'none', borderRadius: '15px', padding: '5px 15px', color: '#fff', borderColor: '#000', gap: '5px', backgroundColor: '#000', fontFamily:'REM' }}
+                        sx={{ textTransform: 'none', borderRadius: '15px', padding: '5px 15px', color: '#fff', borderColor: '#000', gap: '5px', backgroundColor: '#000', fontFamily: 'REM' }}
                     >
                         <StoreOutlinedIcon />
                         {sellerName}
@@ -185,7 +198,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
-                    <Typography sx={{ fontSize: "18px", fontWeight: "500", fontFamily:'REM' }}>Hình ảnh (tối đa 4):</Typography>
+                    <Typography sx={{ fontSize: "18px", fontWeight: "500", fontFamily: 'REM' }}>Hình ảnh (tối đa 4):</Typography>
                     <input
                         accept="image/*"
                         type="file"
@@ -206,7 +219,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                                 border: "1px solid black",
                                 borderRadius: "10px",
                                 padding: "5px 15px",
-                                fontFamily:'REM'
+                                fontFamily: 'REM'
                             }}
                             startIcon={<CloudUploadOutlinedIcon />}
                         >
@@ -248,7 +261,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', marginTop: '0px', alignItems: 'center' }}>
-                    <Typography sx={{ fontSize: '18px', fontWeight: '500', fontFamily:'REM' }}>Đánh giá:</Typography>
+                    <Typography sx={{ fontSize: '18px', fontWeight: '500', fontFamily: 'REM' }}>Đánh giá:</Typography>
                     <Rating
                         name="simple-controlled"
                         value={ratingValue}
@@ -265,7 +278,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                     placeholder="Nhập đánh giá của bạn (tối đa 200 ký tự)"
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    sx={{ marginTop: '20px', marginBottom: '20px', borderRadius: '8px', fontFamily:'REM' }}
+                    sx={{ marginTop: '20px', marginBottom: '20px', borderRadius: '8px', fontFamily: 'REM' }}
                 />
 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
@@ -276,8 +289,8 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({ open, onClose
                             color: '#fff',
                             fontWeight: 'bold',
                             padding: '10px 30px',
-                            fontSize: '16px', 
-                            fontFamily:'REM'
+                            fontSize: '16px',
+                            fontFamily: 'REM'
                         }}
                         onClick={handleSubmitFeedback}
                     >

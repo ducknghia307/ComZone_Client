@@ -4,10 +4,11 @@ import { Button, TextField, Typography, Modal, Box } from "@mui/material";
 import "../components/ui/ProfileUser.css";
 import { privateAxios } from "../middleware/axiosInstance";
 import { useAppSelector } from "../redux/hooks";
-import { UserInfo, Address } from "../common/base.interface";
+import { UserInfo } from "../common/base.interface";
 // import { LocalizationProvider } from '@mui/x-date-pickers';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import NewAddressForm from "../components/checkout/NewAddressForm";
+import Loading from "../components/loading/Loading";
 
 interface ProfileData {
   email: string;
@@ -34,7 +35,7 @@ const modalStyle = {
 const ProfileUser: React.FC = () => {
   const [editing, setEditing] = useState(false);
   const [newAvatar, setNewAvatar] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { accessToken } = useAppSelector((state) => state.auth);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -140,7 +141,7 @@ const ProfileUser: React.FC = () => {
     fetchUserInfo();
     fetchUserAddress();
   }, [accessToken]);
-
+  if (loading) return <Loading />;
   return (
     // <LocalizationProvider dateAdapter={AdapterDayjs}>
     <div className="profile-container w-full">

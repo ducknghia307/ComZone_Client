@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
 import {
+  Exchange,
   ExchangeConfirmation,
   ExchangeDetails,
 } from "../common/interfaces/exchange.interface";
@@ -13,14 +14,16 @@ import Loading from "../components/loading/Loading";
 import ExchangeInformation from "../components/exchange/exchange-details/ExchangeInformation";
 import { Address } from "../common/base.interface";
 import { Delivery } from "../common/interfaces/delivery.interface";
+import { Avatar } from "antd";
+import { CircularProgress } from "@mui/material";
 
 const ExchangeDetail: React.FC = () => {
   const { id } = useParams();
 
   const [exchangeData, setExchangeData] = useState<ExchangeDetails>();
 
-  const [firstCurrentStage, setFirstCurrentStage] = useState<number>(1);
-  const [secondCurrentStage, setSecondCurrentStage] = useState<number>(1);
+  const [firstCurrentStage, setFirstCurrentStage] = useState<number>(-1);
+  const [secondCurrentStage, setSecondCurrentStage] = useState<number>(-1);
   const [firstAddress, setFirstAddress] = useState<string>("");
   const [secondAddress, setSecondAddress] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -56,7 +59,8 @@ const ExchangeDetail: React.FC = () => {
     isFirst: boolean,
     confirmation: ExchangeConfirmation,
     transaction: any | undefined,
-    delivery: Delivery | undefined
+    delivery: Delivery | undefined,
+    exchange: Exchange
   ) => {
     //FETCH STAGE 5
     if (confirmation && confirmation.deliveryConfirm) {
@@ -99,6 +103,19 @@ const ExchangeDetail: React.FC = () => {
       else setSecondCurrentStage(2);
       return;
     }
+
+    // FETCH STAGE 1
+    else if (exchange.status === "DEALING" && !confirmation) {
+      if (isFirst) setFirstCurrentStage(1);
+      else setSecondCurrentStage(1);
+    }
+
+    //FETCH STAGE 0
+    else if (exchange.status === "PENDING") {
+      setFirstCurrentStage(0);
+      setSecondCurrentStage(0);
+      return;
+    }
   };
 
   const fetchExchangeDetails = async () => {
@@ -118,13 +135,6 @@ const ExchangeDetail: React.FC = () => {
       const second = exchangeDetails.isRequestUser
         ? exchangeDetails.exchange.post.user
         : exchangeDetails.exchange.requestUser;
-
-      //FETCH STAGE 0
-      if (exchangeDetails.exchange.status === "PENDING") {
-        setFirstCurrentStage(0);
-        setSecondCurrentStage(0);
-        return;
-      }
 
       //FETCH STAGE 6
       if (exchangeDetails.exchange.status === "SUCCESSFUL") {
@@ -167,7 +177,8 @@ const ExchangeDetail: React.FC = () => {
         true,
         firstConfirmationResponse.data,
         selfTransactionsResponse.data,
-        firstUserDelivery
+        firstUserDelivery,
+        exchangeDetails.exchange
       );
 
       //Allocate SECOND stage
@@ -175,7 +186,8 @@ const ExchangeDetail: React.FC = () => {
         false,
         secondConfirmationResponse.data,
         otherTransactionsResponse.data,
-        secondUserDelivery
+        secondUserDelivery,
+        exchangeDetails.exchange
       );
     } catch (error) {
       console.error("Error fetching exchange details:", error);
@@ -212,55 +224,75 @@ const ExchangeDetail: React.FC = () => {
   return (
     <div className="REM min-h-[80vh] w-full flex justify-center gap-4 px-4 py-4">
       {isLoading && <Loading />}
-      <div className="basis-2/3 flex flex-col items-stretch justify-start gap-4 px-4 border-r border-gray-300">
-        <InformationCollectSection
-          exchangeDetails={exchangeData}
-          firstCurrentStage={firstCurrentStage}
-          secondCurrentStage={secondCurrentStage}
-          fetchExchangeDetails={fetchExchangeDetails}
-          selectedAddress={selectedAddress}
-          setSelectedAddress={setSelectedAddress}
-          addresses={addresses}
-          setAddresses={setAddresses}
-          fetchUserAddress={fetchUserAddress}
-          firstAddress={firstAddress}
-          secondAddress={secondAddress}
-          setIsLoading={setIsLoading}
-        />
+      {firstCurrentStage > -1 ? (
+        <>
+          <div className="basis-2/3 flex flex-col items-stretch justify-start gap-4 px-4 border-r border-gray-300">
+            <InformationCollectSection
+              exchangeDetails={exchangeData}
+              firstCurrentStage={firstCurrentStage}
+              secondCurrentStage={secondCurrentStage}
+              fetchExchangeDetails={fetchExchangeDetails}
+              selectedAddress={selectedAddress}
+              setSelectedAddress={setSelectedAddress}
+              addresses={addresses}
+              setAddresses={setAddresses}
+              fetchUserAddress={fetchUserAddress}
+              firstAddress={firstAddress}
+              secondAddress={secondAddress}
+              setIsLoading={setIsLoading}
+            />
 
-        <ActionButtons
-          exchangeDetails={exchangeData}
-          currentStage={firstCurrentStage}
-          oppositeCurrentStage={secondCurrentStage}
-          fetchExchangeDetails={fetchExchangeDetails}
-          selectedAddress={selectedAddress}
-        />
+            <ActionButtons
+              exchangeDetails={exchangeData}
+              currentStage={firstCurrentStage}
+              oppositeCurrentStage={secondCurrentStage}
+              fetchExchangeDetails={fetchExchangeDetails}
+              selectedAddress={selectedAddress}
+            />
 
-        <ExchangeInformation
-          exchangeDetails={exchangeData}
-          firstCurrentStage={firstCurrentStage}
-          secondCurrentStage={secondCurrentStage}
-          firstUser={firstUser}
-          secondUser={secondUser}
-          firstComicsGroup={firstComicsGroup?.map((item) => item.comics) || []}
-          secondComicsGroup={
-            secondComicsGroup?.map((item) => item.comics) || []
-          }
-          setIsLoading={setIsLoading}
-        />
-      </div>
+            <ExchangeInformation
+              exchangeDetails={exchangeData}
+              firstCurrentStage={firstCurrentStage}
+              secondCurrentStage={secondCurrentStage}
+              firstUser={firstUser}
+              secondUser={secondUser}
+              firstComicsGroup={
+                firstComicsGroup?.map((item) => item.comics) || []
+              }
+              secondComicsGroup={
+                secondComicsGroup?.map((item) => item.comics) || []
+              }
+              setIsLoading={setIsLoading}
+            />
+          </div>
 
-      <div className="basis-1/3 min-w-fit">
-        <ProgressSection
-          exchangeDetails={exchangeData}
-          firstUser={firstUser || undefined}
-          firstComicsGroup={firstComicsGroup || []}
-          firstCurrentStage={firstCurrentStage}
-          secondUser={secondUser || undefined}
-          secondComicsGroup={secondComicsGroup || []}
-          secondCurrentStage={secondCurrentStage}
-        />
-      </div>
+          <div className="basis-1/3 min-w-fit">
+            <ProgressSection
+              exchangeDetails={exchangeData}
+              firstUser={firstUser || undefined}
+              firstComicsGroup={firstComicsGroup || []}
+              firstCurrentStage={firstCurrentStage}
+              secondUser={secondUser || undefined}
+              secondComicsGroup={secondComicsGroup || []}
+              secondCurrentStage={secondCurrentStage}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="flex items-center justify-center gap-32 translate-y-[-10%]">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <Avatar src={firstUser.avatar} size={64} />
+            <p className="font-semibold">{firstUser.name}</p>
+          </div>
+
+          <CircularProgress size="3rem" color="inherit" />
+
+          <div className="flex flex-col items-center justify-center gap-2">
+            <Avatar src={secondUser.avatar} size={64} />
+            <p className="font-semibold">{secondUser.name}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

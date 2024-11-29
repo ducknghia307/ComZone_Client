@@ -50,18 +50,15 @@ const AllAuctions = ({
         console.log("Available Comics:", data);
 
         const ongoingComics = data.filter(
-          (auction: any) =>
-            auction.status === "ONGOING" &&
-            new Date(auction.startTime) <= new Date() &&
-            new Date(auction.endTime) > new Date()
+          (auction: any) => auction.status === "ONGOING"
         );
         setOngoingComics(ongoingComics);
 
         const upcomingComics = data.filter(
-          (auction: any) =>
-            auction.status === "UPCOMING" &&
-            new Date(auction.startTime) > new Date()
+          (auction: any) => auction.status === "UPCOMING"
         );
+        // console.log();
+
         setUpcomingComics(upcomingComics);
       } catch (error) {
         console.error("Error fetching comics:", error);
@@ -82,7 +79,7 @@ const AllAuctions = ({
       const genreMatch =
         filteredGenres.length === 0 ||
         (comic.comics.genres &&
-          comic.comics.genres.some((genre) =>
+          comic.comics.genres.some((genre: any) =>
             filteredGenres.includes(genre.name)
           ));
 
@@ -163,7 +160,7 @@ const AllAuctions = ({
                 size="medium"
               />
               <p className="text-center m-1 REM bg-orange-200">SẮP DIỄN RA</p>
-              
+
               <Button
                 className="detail-button"
                 onClick={() => handleDetailClick(comic.id)}

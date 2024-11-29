@@ -1,4 +1,3 @@
-import React from "react";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../../pages/HomePage";
 import Genres from "../../pages/Genres";
@@ -25,12 +24,10 @@ import OrderManagementSeller from "../../pages/OrderManagementSeller";
 import AuctionManagementSeller from "../../pages/AuctionManagementSeller";
 import FeedbackManagementSeller from "../../pages/FeedbackManagementSeller";
 import AllHotComics from "../../pages/HotComic";
-import ComicZoneMembership from "../membership/ComicZoneMembership";
 import NotFound from "../notFound/NotFound";
 import CurrentUserRecentAct from "../../pages/CurrentUserRecentAct";
 import CurrentUserHistoryExchange from "../../pages/CurrentUserHistoryExchange";
 import CurrentUserComicExchange from "../../pages/CurrentUserComicExchange";
-import CurrentUserPostExchange from "../../pages/CurrentUserPostExchange";
 import CurrentUserComicSelling from "../../pages/CurrentUserComicSelling";
 import ModComics from "../../pages/ModComics";
 import ModUsers from "../../pages/ModUsers";
@@ -46,6 +43,7 @@ import AdminDashboard from "../../pages/AdminDashboard";
 import AdminSubscription from "../../pages/AdminSubscription";
 import Exchange from "../../pages/Exchange";
 import ExchangeDetail from "../../pages/ExchangeDetail";
+import Announcement from "../../pages/Announcement";
 
 const AppRouter = () => {
   return (
@@ -60,6 +58,10 @@ const AppRouter = () => {
         {/* <Route path="/accountmanagement" element={<AccountManagement />} /> */}
         <Route path="/accountmanagement/purchase" element={<OrderUser />} />
         <Route path="/accountmanagement/profile" element={<Profile />} />
+        <Route
+          path="/accountmanagement/announcement"
+          element={<Announcement />}
+        />
         <Route path="/accountmanagement/auction" element={<AuctionUser />} />
         <Route path="/accountmanagement/wallet" element={<WalletUser />} />
         <Route path="/accountmanagement/exchange" element={<ExchangeUser />} />
@@ -109,15 +111,9 @@ const AppRouter = () => {
           element={<CurrentUserComicExchange />}
         />
         <Route
-          path="/profile/postExchange"
-          element={<CurrentUserPostExchange />}
-        />
-        <Route
           path="/profile/comicSelling"
           element={<CurrentUserComicSelling />}
         />
-        <Route path="/membership" element={<ComicZoneMembership />} />
-
         <Route path="*" element={<NotFound />} />
 
         <Route path="/mod/comics" element={<ModComics />} />

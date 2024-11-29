@@ -7,9 +7,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Countdown from "react-countdown";
 import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
+import { publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
-import { useAppSelector } from "../../redux/hooks";
 
 const responsive = {
   superLargeDesktop: {
@@ -89,11 +88,9 @@ const renderer = ({ days, hours, minutes, seconds }: any) => {
 
 const Auctions: React.FC = () => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAppSelector((state) => state.auth);
-  const [comics, setComics] = useState<any[]>([]);
+
   const [ongoingComics, setOngoingComics] = useState<any[]>([]);
   console.log("ongoingComics", ongoingComics);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchComics = async () => {
@@ -111,7 +108,7 @@ const Auctions: React.FC = () => {
       } catch (error) {
         console.error("Error fetching comics:", error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
 

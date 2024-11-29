@@ -1,0 +1,10 @@
+.relative.overflow-y-auto::-webkit-scrollbar {
+  width: 1px; /* Set the width for the vertical scrollbar */
+}
+
+.relative.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #f1f1f1; /* Optional: Style the scrollbar thumb */
+
+}
+
+

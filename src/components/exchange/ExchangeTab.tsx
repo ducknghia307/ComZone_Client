@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
 interface TabProps {
@@ -26,8 +26,8 @@ const Tab: React.FC<TabProps> = ({ label, path, isActive }) => {
 const ExchangeTab: React.FC = () => {
   const tabs = [
     { label: "Tất cả", path: "/exchange/all" },
-    { label: "Đang chờ", path: "/exchange/pending-request" },
-    { label: "Đã gửi", path: "/exchange/sent-request" },
+    { label: "Yêu cầu nhận được", path: "/exchange/pending-request" },
+    { label: "Yêu cầu đã gửi đi", path: "/exchange/sent-request" },
     { label: "Đang trao đổi", path: "/exchange/in-progress" },
     { label: "Đang vận chuyển", path: "/exchange/in-delivery" },
     { label: "Đã giao hàng", path: "/exchange/finished-delivery" },

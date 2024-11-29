@@ -1,7 +1,8 @@
 import { Modal } from "antd";
 import React, { useState } from "react";
-import RegisterSeller from "../RegisterSeller/RegisterSeller";
+import RegisterSeller from "./RegisterSeller";
 import Logo from "../../assets/square-logo.png";
+import ActionConfirm from "../actionConfirm/ActionConfirm";
 
 interface OpenModal {
   isRegisterSellerModal: boolean;
@@ -13,6 +14,8 @@ const RegisterSellerModal: React.FC<OpenModal> = ({
   setIsRegisterSellerModal,
 }) => {
   const [isWelcoming, setIsWelcoming] = useState<boolean>(true);
+  const [isConfirmQuitting, setIsConfirmQuitting] = useState<boolean>(false);
+
   return (
     <>
       <Modal
@@ -22,11 +25,14 @@ const RegisterSellerModal: React.FC<OpenModal> = ({
           )
         }
         open={isRegisterSellerModal}
-        // onOk={handleOk}
-        onCancel={() => setIsRegisterSellerModal(!isRegisterSellerModal)}
+        onCancel={() => {
+          if (isWelcoming) setIsRegisterSellerModal(false);
+          else setIsConfirmQuitting(true);
+        }}
         footer={null}
-        width={800}
+        width="auto"
         centered
+        style={{ margin: "10px 0" }}
       >
         {isWelcoming ? (
           <div className="w-full flex flex-col items-center justify-center gap-4 pt-8 text-center">
@@ -52,6 +58,16 @@ const RegisterSellerModal: React.FC<OpenModal> = ({
           <RegisterSeller setIsRegisterSellerModal={setIsRegisterSellerModal} />
         )}
       </Modal>
+
+      <ActionConfirm
+        isOpen={isConfirmQuitting}
+        setIsOpen={setIsConfirmQuitting}
+        title="Xác nhận hủy đăng ký?"
+        confirmCallback={() => {
+          setIsConfirmQuitting(false);
+          setIsRegisterSellerModal(false);
+        }}
+      />
     </>
   );
 };

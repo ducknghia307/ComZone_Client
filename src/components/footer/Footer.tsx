@@ -1,4 +1,3 @@
-import React from "react";
 import Logo from "../../assets/hcn-logo (1).png";
 import { Link } from "react-router-dom";
 const Footer = () => {

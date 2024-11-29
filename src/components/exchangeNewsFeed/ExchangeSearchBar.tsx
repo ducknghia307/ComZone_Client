@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { notification } from "antd";
 import { useEffect } from "react";
 

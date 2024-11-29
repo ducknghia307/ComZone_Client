@@ -40,7 +40,6 @@ interface SellerGroupDetails {
 
 const Checkout = () => {
   const [user, setUser] = useState<UserInfo>();
-  const [userInfo, setUserInfo] = useState<UserInfo>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userWalletBalance, setUserWalletBalance] = useState<number>(0);
   const [groupedSelectedComics, setGroupedSelectedComics] = useState<
@@ -73,6 +72,33 @@ const Checkout = () => {
       setUserWalletBalance(Number(data.balance));
     } catch {
       setIsLoading(false);
+      modal.error({
+        title: "Phiên đăng nhập hết hạn",
+        content: "Vui lòng đăng nhập để tiếp tục",
+        okButtonProps: {
+          className:
+            "bg-gray-500 text-white hover:bg-blue-600 rounded-lg px-4 py-2",
+          style: {
+            border: "none",
+            fontWeight: "bold",
+          },
+        },
+        cancelButtonProps: {
+          className:
+            "bg-gray-200 text-gray-800 hover:bg-gray-300 rounded-lg px-4 py-2",
+          style: {
+            border: "none",
+          },
+        },
+        onOk: () => navigate("/signin"),
+        okText: "Đăng nhập ngay",
+        cancelText: "Huỷ",
+        centered: true,
+      });
+
+      const redirectTimer = setTimeout(() => {
+        navigate("/signin");
+      }, 2000);
     }
   };
 
@@ -217,7 +243,7 @@ const Checkout = () => {
           0;
 
         const sellerDetails = sellerDetailsGroup.find(
-          (details) => details.user.id === sellerId
+          (details: SellerDetails) => details.user.id === sellerId
         );
 
         const newUserDeliveryInfo = await privateAxios
@@ -273,6 +299,7 @@ const Checkout = () => {
           note: notes[sellerId] || "",
           type: orderType,
         });
+        console.log(orderResponse);
 
         const orderId = orderResponse.data.id;
 
@@ -308,7 +335,7 @@ const Checkout = () => {
       const storedCartData = localStorage.getItem("cart");
       if (storedCartData) {
         const parsedCartData = JSON.parse(storedCartData);
-        const userId = userInfo?.id;
+        const userId = user.id;
         console.log(userId);
 
         if (userId && parsedCartData[userId]) {

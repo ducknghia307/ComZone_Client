@@ -18,11 +18,13 @@ interface RefundModalProps {
     onClose: () => void;
     refundDetails: {
         name: string;
-        orderId: string;
+        orderId?: string; // Có thể không có nếu là exchange
+        // exchangeId?: string; // Có thể không có nếu là order
         reason: string;
         images: string[];
         description: string;
         createdAt: string;
+        requestId?: string; 
     } | null;
     onApprove: () => void;
     onReject: (reason: string) => void;
@@ -48,27 +50,59 @@ const RefundModal: React.FC<RefundModalProps> = ({
     onApprove,
     onReject,
 }) => {
-    const [rejectionReason, setRejectionReason] = useState('');
     const [loading, setLoading] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
 
     useEffect(() => {
         if (refundDetails) {
             console.log('Refund Details:', refundDetails);
-            console.log('Order ID:', refundDetails.orderId); // Thêm dòng này
+            console.log('Order ID:', refundDetails.orderId);
+            console.log('Request ID for exchange:', refundDetails.requestId);
         }
     }, [refundDetails]);
+
+    // const handleApprove = async () => {
+    //     if (!refundDetails) return;
+    //     setLoading(true);
+    //     try {
+    //         await privateAxios.patch(`/refund-requests/approve/order/${refundDetails.orderId}`);
+    //         notification.success({
+    //             message: 'Thành công',
+    //             description: 'Yêu cầu đã được chấp thuận!',
+    //             placement: 'topRight',
+    //         });
+    //         onApprove();
+    //     } catch (error) {
+    //         notification.error({
+    //             message: 'Lỗi',
+    //             description: 'Lỗi khi chấp thuận yêu cầu.',
+    //             placement: 'topRight',
+    //         });
+    //     } finally {
+    //         setLoading(false);
+    //         onClose();
+    //     }
+    // };
 
     const handleApprove = async () => {
         if (!refundDetails) return;
         setLoading(true);
+
         try {
-            await privateAxios.patch(`/refund-requests/approve/order/${refundDetails.orderId}`);
+            const apiUrl = refundDetails.orderId
+                ? `/refund-requests/approve/order/${refundDetails.orderId}`
+                : refundDetails.requestId
+                ? `/refund-requests/approve/exchange/${refundDetails.requestId}`
+                : '';
+
+            await privateAxios.patch(apiUrl);
+
             notification.success({
                 message: 'Thành công',
                 description: 'Yêu cầu đã được chấp thuận!',
                 placement: 'topRight',
             });
+
             onApprove();
         } catch (error) {
             notification.error({
@@ -81,6 +115,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
             onClose();
         }
     };
+
 
     const handleRejectOpen = () => {
         setIsRejectModalOpen(true);
@@ -344,6 +379,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
                     handleRejectClose();
                 }}
                 orderId={refundDetails?.orderId || ''}
+                requestId={refundDetails?.requestId || ''}
             />
         </>
     );

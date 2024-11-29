@@ -11,11 +11,13 @@ export default function SubmitAmounts({
   self,
   theOther,
   fetchExchangeDetails,
+  setIsLoading,
 }: {
   exchangeId: string;
   self: UserInfo;
   theOther: UserInfo;
   fetchExchangeDetails: Function;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [isRequiringCompensation, setIsRequiringCompensation] =
     useState<boolean>(true);
@@ -27,6 +29,8 @@ export default function SubmitAmounts({
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
 
   const handleSubmit = async () => {
+    setIsLoading(true);
+
     await privateAxios
       .post("exchange-confirmation/dealing", {
         exchangeId,
@@ -37,7 +41,8 @@ export default function SubmitAmounts({
       .then(() => {
         fetchExchangeDetails();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
   };
 
   return (

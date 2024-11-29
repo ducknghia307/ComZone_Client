@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Comic } from "../../../common/base.interface";
 import CurrencySplitter from "../../../assistants/Spliter";
 import moment from "moment/min/moment-with-locales";
@@ -8,12 +7,7 @@ export default function ComicsMainInfo({
 }: {
   currentComics: Comic | undefined;
 }) {
-  const [countTime, setCountTime] = useState<any>();
-  useEffect(() => {
-    moment.locale("vi");
-    setCountTime(moment(currentComics?.onSaleSince).fromNow());
-    // console.log("first: ", moment.locales());
-  }, [currentComics]);
+  if (!currentComics) return;
 
   return (
     <div className="w-full flex flex-col bg-white px-4 py-4 rounded-xl drop-shadow-md">
@@ -38,10 +32,10 @@ export default function ComicsMainInfo({
             NGUYÊN SEAL
           </span>
         )}
-        {currentComics?.edition !== "REGULAR" && (
+        {currentComics.edition !== "REGULAR" && (
           <span
             className={`flex items-center gap-1 px-2 py-1 rounded-2xl ${
-              currentComics?.edition === "SPECIAL"
+              currentComics.edition === "SPECIAL"
                 ? "bg-yellow-600"
                 : "bg-red-800"
             } text-white text-xs font-light`}
@@ -65,18 +59,22 @@ export default function ComicsMainInfo({
 
       <p className="font-light text-[0.9em] py-2">{currentComics?.author}</p>
 
-      <div className="flex items-center gap-1">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          width="12"
-          height="12"
-          fill="currentColor"
-        >
-          <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM13 12H17V14H11V7H13V12Z"></path>
-        </svg>
-        <p className="font-light text-xs italic">Đăng bán từ {countTime}</p>
-      </div>
+      {currentComics.onSaleSince && (
+        <div className="flex items-center gap-1">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="12"
+            height="12"
+            fill="currentColor"
+          >
+            <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM13 12H17V14H11V7H13V12Z"></path>
+          </svg>
+          <p className="font-light text-xs italic">
+            Đăng bán từ {moment(currentComics.onSaleSince).calendar()}
+          </p>
+        </div>
+      )}
 
       <p className="font-semibold text-[2em] pt-4 flex items-start gap-1">
         {currentComics?.price ? CurrencySplitter(currentComics?.price) : ""}

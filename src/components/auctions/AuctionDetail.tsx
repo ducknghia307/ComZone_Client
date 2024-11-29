@@ -53,7 +53,13 @@ interface HighestBid {
   price: number; // Assuming there's a price field
   timestamp?: string; // Add other fields as necessary
 }
-
+interface AuctionAnnounce {
+  id: string;
+  status: string;
+  title: string;
+  auction: Auction;
+  message: string;
+}
 const ComicAuction = () => {
   const { id } = useParams<Record<string, string>>();
   const [comic, setComic] = useState<any>(null);
@@ -78,7 +84,7 @@ const ComicAuction = () => {
   const [hasDeposited, setHasDeposited] = useState(false);
   console.log("auctiondata", auctionData);
   const navigate = useNavigate();
-  const auctionAnnounce = useAppSelector(
+  const auctionAnnounce = useAppSelector<AuctionAnnounce | null>(
     (state) => state.annoucement.auctionAnnounce
   );
 
@@ -517,113 +523,119 @@ const ComicAuction = () => {
                 )}
               </p>
             )}
-            {!hasDeposited ? (
-              <div
-                style={{
-                  paddingTop: "15px",
-                  paddingBottom: "20px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "20px",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: "17px",
-                    fontFamily: "REM",
-                    fontWeight: "400",
-                  }}
-                >
-                  Số tiền cần cọc:{" "}
-                  <span style={{ fontWeight: "bold" }}>
-                    {typeof auctionData?.depositAmount === "number" &&
-                      auctionData?.depositAmount.toLocaleString("vi-VN")}
-                    đ
-                  </span>
-                </p>
-                <Chip
-                  label="Đặt cọc tại đây"
-                  onClick={handleOpenDepositModal}
-                  style={{
-                    backgroundColor: "#fff",
-                    color: "#000",
-                    fontFamily: "REM",
-                    border: "1px solid black",
-                    boxShadow: "2px 2px",
-                  }}
-                />
-              </div>
-            ) : isHighest ? (
-              <div className="highest-bid-message REM">
-                Bạn là người có giá cao nhất!
-              </div>
-            ) : (
-              <div className="bid-row">
-                <input
-                  type="text"
-                  placeholder="đ"
-                  className="bid-input"
-                  value={bidAmount}
-                  onChange={handleBidInputChange}
-                  disabled={isBidDisabled}
-                />
-                <Popconfirm
-                  title={
-                    <Typography style={{ fontSize: "18px", fontWeight: "500" }}>
-                      Bạn có chắc chắn muốn ra giá{" "}
-                      <span style={{ fontWeight: "bold" }}>
-                        {parseFloat(bidAmount).toLocaleString("vi-VN")}₫
-                      </span>{" "}
-                      không?
-                    </Typography>
-                  }
-                  onConfirm={handlePlaceBid}
-                  onCancel={() => console.log("Bid canceled")}
-                  okText="Xác nhận"
-                  cancelText="Hủy"
-                  overlayStyle={{
-                    width: "450px",
-                    borderRadius: "12px",
-                    padding: "20px",
-                  }}
-                  okButtonProps={{
-                    style: {
-                      backgroundColor: "#000",
-                      color: "#fff",
-                      fontSize: "18px",
-                      fontWeight: "bold",
-                      padding: "15px 30px",
-                      borderRadius: "10px",
-                      marginRight: "15px",
-                    },
-                  }}
-                  cancelButtonProps={{
-                    style: {
-                      backgroundColor: "#fff",
-                      color: "#000",
-                      fontSize: "18px",
-                      fontWeight: "bold",
-                      padding: "15px 30px",
-                      border: "2px solid #000",
-                      borderRadius: "10px",
-                    },
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    className="bid-button"
-                    sx={{
-                      width: "250px",
-                      height: "60px",
-                      fontSize: "20px",
-                      fontWeight: "bold",
+            {auctionData.comics.sellerId.id !== userId && (
+              <>
+                {!hasDeposited ? (
+                  <div
+                    style={{
+                      paddingTop: "15px",
+                      paddingBottom: "20px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "20px",
                     }}
-                    disabled={isBidDisabled || !bidAmount || error !== ""}
                   >
-                    RA GIÁ
-                  </Button>
-                </Popconfirm>
-              </div>
+                    <p
+                      style={{
+                        fontSize: "17px",
+                        fontFamily: "REM",
+                        fontWeight: "400",
+                      }}
+                    >
+                      Số tiền cần cọc:{" "}
+                      <span style={{ fontWeight: "bold" }}>
+                        {typeof auctionData?.depositAmount === "number" &&
+                          auctionData?.depositAmount.toLocaleString("vi-VN")}
+                        đ
+                      </span>
+                    </p>
+                    <Chip
+                      label="Đặt cọc tại đây"
+                      onClick={handleOpenDepositModal}
+                      style={{
+                        backgroundColor: "#fff",
+                        color: "#000",
+                        fontFamily: "REM",
+                        border: "1px solid black",
+                        boxShadow: "2px 2px",
+                      }}
+                    />
+                  </div>
+                ) : isHighest ? (
+                  <div className="highest-bid-message REM">
+                    Bạn là người có giá cao nhất!
+                  </div>
+                ) : (
+                  <div className="bid-row">
+                    <input
+                      type="text"
+                      placeholder="đ"
+                      className="bid-input"
+                      value={bidAmount}
+                      onChange={handleBidInputChange}
+                      disabled={isBidDisabled}
+                    />
+                    <Popconfirm
+                      title={
+                        <Typography
+                          style={{ fontSize: "18px", fontWeight: "500" }}
+                        >
+                          Bạn có chắc chắn muốn ra giá{" "}
+                          <span style={{ fontWeight: "bold" }}>
+                            {parseFloat(bidAmount).toLocaleString("vi-VN")}₫
+                          </span>{" "}
+                          không?
+                        </Typography>
+                      }
+                      onConfirm={handlePlaceBid}
+                      onCancel={() => console.log("Bid canceled")}
+                      okText="Xác nhận"
+                      cancelText="Hủy"
+                      overlayStyle={{
+                        width: "450px",
+                        borderRadius: "12px",
+                        padding: "20px",
+                      }}
+                      okButtonProps={{
+                        style: {
+                          backgroundColor: "#000",
+                          color: "#fff",
+                          fontSize: "18px",
+                          fontWeight: "bold",
+                          padding: "15px 30px",
+                          borderRadius: "10px",
+                          marginRight: "15px",
+                        },
+                      }}
+                      cancelButtonProps={{
+                        style: {
+                          backgroundColor: "#fff",
+                          color: "#000",
+                          fontSize: "18px",
+                          fontWeight: "bold",
+                          padding: "15px 30px",
+                          border: "2px solid #000",
+                          borderRadius: "10px",
+                        },
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        className="bid-button"
+                        sx={{
+                          width: "250px",
+                          height: "60px",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                        disabled={isBidDisabled || !bidAmount || error !== ""}
+                      >
+                        RA GIÁ
+                      </Button>
+                    </Popconfirm>
+                  </div>
+                )}
+              </>
             )}
 
             {error && <div className="error-message">{error}</div>}

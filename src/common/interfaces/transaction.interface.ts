@@ -5,6 +5,8 @@ import {
   UserInfo,
 } from "../base.interface";
 import { Exchange } from "./exchange.interface";
+import { ExchangeRefundRequest } from "./refund-request.interface";
+import { SellerSubscription } from "./seller-subscription.interface";
 
 export interface Transaction extends BaseInterface {
   code: string;
@@ -12,13 +14,16 @@ export interface Transaction extends BaseInterface {
   type: string;
   status: string;
   user: UserInfo;
-  note: string;
+  note?: string;
   date: string;
   auction?: Auction;
   exchange?: Exchange;
   walletDeposit?: WalletDeposit;
   order?: BaseInterface;
   deposit?: BaseInterface;
+  sellerSubscription: SellerSubscription;
+  refundRequest: ExchangeRefundRequest;
+  withdrawal: BaseInterface;
 }
 export interface Deposit extends BaseInterface {
   status: string;

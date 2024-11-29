@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Modal, Typography, TextField, Button, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { notification } from 'antd';
@@ -8,12 +8,48 @@ interface RejectReasonModalProps {
     open: boolean;
     onClose: () => void;
     orderId: string;
+    requestId?: string;
     onConfirm: (reason: string) => void;
 }
 
-const RejectReasonModal: React.FC<RejectReasonModalProps> = ({ open, onClose, orderId }) => {
+const RejectReasonModal: React.FC<RejectReasonModalProps> = ({ open, onClose, orderId, requestId, onConfirm }) => {
     const [reason, setReason] = useState('');
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        console.log('RejectReasonModal - requestId:', requestId);
+    }, [requestId]);
+
+    // const handleConfirm = async () => {
+    //     if (!reason.trim()) {
+    //         alert('Vui lòng nhập lý do từ chối.');
+    //         return;
+    //     }
+
+    //     setLoading(true);
+    //     try {
+    //         await privateAxios.patch(`/refund-requests/reject/order/${orderId}`, {
+    //             rejectReason: reason.trim(),
+    //         });
+
+    //         notification.success({
+    //             message: 'Thành công',
+    //             description: 'Yêu cầu hoàn tiền đã bị từ chối.',
+    //             placement: 'topRight',
+    //         });
+
+    //         setReason(''); // Reset textfield
+    //         onClose();
+    //     } catch (error) {
+    //         notification.error({
+    //             message: 'Lỗi',
+    //             description: 'Đã xảy ra lỗi khi từ chối yêu cầu hoàn tiền. Vui lòng thử lại.',
+    //             placement: 'topRight',
+    //         });
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const handleConfirm = async () => {
         if (!reason.trim()) {
@@ -23,18 +59,27 @@ const RejectReasonModal: React.FC<RejectReasonModalProps> = ({ open, onClose, or
 
         setLoading(true);
         try {
-            await privateAxios.patch(`/refund-requests/reject/order/${orderId}`, {
-                rejectReason: reason.trim(),
-            });
+            const apiUrl = requestId
+                ? `/refund-requests/reject/exchange/${requestId}`
+                : orderId
+                ? `/refund-requests/reject/order/${orderId}`
+                : '';
 
-            notification.success({
-                message: 'Thành công',
-                description: 'Yêu cầu hoàn tiền đã bị từ chối.',
-                placement: 'topRight',
-            });
+            if (apiUrl) {
+                await privateAxios.patch(apiUrl, {
+                    rejectReason: reason.trim(),
+                });
 
-            setReason(''); // Reset textfield
-            onClose();
+                notification.success({
+                    message: 'Thành công',
+                    description: 'Yêu cầu hoàn tiền đã bị từ chối.',
+                    placement: 'topRight',
+                });
+
+                setReason(''); // Reset textfield
+                onConfirm(reason.trim());
+                onClose();
+            }
         } catch (error) {
             notification.error({
                 message: 'Lỗi',

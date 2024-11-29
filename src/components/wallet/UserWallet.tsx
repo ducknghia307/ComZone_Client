@@ -20,17 +20,16 @@ import "../ui/UserWallet.css";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DepositForm from "./DepositForm";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { BaseInterface, UserInfo } from "../../common/base.interface";
+import { UserInfo } from "../../common/base.interface";
 import CurrencySplitter from "../../assistants/Spliter";
 import { useAppSelector } from "../../redux/hooks";
 import { Transaction } from "../../common/interfaces/transaction.interface";
-import { fontSize } from "@mui/system";
 const UserWallet = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [transactions, setTransactions] = useState([]);
   const userId = useAppSelector((state) => state.auth.userId);
@@ -56,30 +55,43 @@ const UserWallet = () => {
           "vi-VN"
         ),
         type:
-          (transaction.walletDeposit &&
-            transaction.type === "ADD" &&
-            "Nạp tiền") ||
+          (transaction.type === "ADD" &&
+            (transaction.walletDeposit
+              ? "Nạp tiền"
+              : transaction.order
+              ? "Nhận tiền"
+              : "")) ||
           (transaction.walletDeposit &&
             transaction.type === "SUBTRACT" &&
             "Rút tiền") ||
           "Thanh toán",
         amount: `${
-          transaction.walletDeposit && transaction.type === "ADD" ? "+" : "-"
+          transaction.type === "ADD" ? "+" : "-"
         }${transaction.amount.toLocaleString("vi-VN")} đ`,
         status: transaction.status,
         note:
           transaction.type === "SUBTRACT"
             ? transaction.order
-              ? `Thanh toán đơn hàng ${transaction.order.id}`
+              ? `Thanh toán đơn hàng`
               : transaction.exchange
-              ? `Trao đổi đơn hàng ${transaction.exchange.id}`
+              ? `Thanh toán trao đổi`
               : transaction.deposit
-              ? `Trao đổi đơn hàng ${transaction?.deposit.id}`
+              ? `Tiền cọc trao đổi`
+              : transaction.sellerSubscription
+              ? `Mua gói bán ComZone`
+              : transaction.withdrawal
+              ? `Rút tiền về tài khoản ngân hàng`
               : "Thông tin giao dịch không có sẵn"
-            : transaction.type === "ADD" && transaction.walletDeposit
-            ? "Nạp tiền vào ví"
-            : transaction.type === "SUBTRACT" && transaction.walletDeposit
-            ? "Rút tiền từ ví"
+            : transaction.type === "ADD"
+            ? transaction.order
+              ? `Nhận tiền đơn hàng (${transaction.note})`
+              : transaction.exchange
+              ? `Thanh toán tiền bù trao đổi`
+              : transaction.deposit
+              ? `Hoàn trả cọc`
+              : transaction.walletDeposit
+              ? "Nạp tiền vào ví"
+              : "Thông tin giao dịch không có sẵn"
             : "Thông tin giao dịch không có sẵn",
       }));
       setTransactions(formattedTransactions);
@@ -409,13 +421,13 @@ const UserWallet = () => {
                       <TableCell
                         sx={{
                           fontFamily: "REM",
-                          color: `${
-                            transaction.type === "Nạp tiền" ? "green" : "red"
-                          }`,
+                          color: transaction.amount.toString().startsWith("+")
+                            ? "green"
+                            : "red",
                         }}
                         align="center"
                       >
-                        {transaction?.amount}
+                        {transaction.amount}
                       </TableCell>
 
                       <TableCell sx={{ fontFamily: "REM" }} align="center">
@@ -432,7 +444,7 @@ const UserWallet = () => {
               </TableBody>
             </Table>
             <TablePagination
-              rowsPerPageOptions={[10, 20]}
+              rowsPerPageOptions={[20, 50]}
               component="div"
               count={transactions.length}
               rowsPerPage={rowsPerPage}

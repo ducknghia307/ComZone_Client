@@ -8,7 +8,7 @@ export default function Stage5({
 
   return (
     <div
-      className={`relative flex flex-col items-center gap-2 px-4 py-2 ${
+      className={`relative flex flex-col items-center gap-2 ${
         currentStage < stage - 1 && "opacity-20"
       }`}
     >
@@ -42,7 +42,7 @@ export default function Stage5({
           currentStage >= stage && "opacity-50"
         }`}
       >
-        Hoàn tất
+        Hoàn tất trao đổi
       </p>
     </div>
   );

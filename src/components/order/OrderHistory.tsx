@@ -8,10 +8,10 @@ import "../ui/OrderHistory.css";
 import { privateAxios } from "../../middleware/axiosInstance";
 import OrderDetailsModal from "../modal/OrderDetailModal";
 import { Comic, UserInfo } from "../../common/base.interface";
-import GavelIcon from '@mui/icons-material/Gavel';
+import GavelIcon from "@mui/icons-material/Gavel";
 import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
 import ModalRequestRefund from "../modal/ModalRequestRefund";
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 interface Order {
   id: string;
   status: string;
@@ -38,11 +38,8 @@ interface RefundRequest {
 interface Item {
   comics: Comic;
 }
-interface OrderHistoryProps {
-  orders: Order[];
-}
 
-const OrderHistory: React.FC<OrderHistoryProps> = () => {
+const OrderHistory = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [openModal, setOpenModal] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -87,7 +84,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
 
             const refundData = refundRequestResponse.data;
 
-            return { ...order, items: itemsData, refundRequest: refundData, rejectReason: refundData?.rejectedReason }; // order với order items
+            return {
+              ...order,
+              items: itemsData,
+              refundRequest: refundData,
+              rejectReason: refundData?.rejectedReason,
+            }; // order với order items
           })
         );
 
@@ -102,40 +104,40 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
   }, []);
 
   const cornerRibbonStyle = {
-    position: 'absolute' as const,
+    position: "absolute" as const,
     top: 0,
     left: 0,
-    width: '120px', // giảm kích thước
-    height: '120px', // giảm kích thước
-    overflow: 'hidden',
+    width: "120px", // giảm kích thước
+    height: "120px", // giảm kích thước
+    overflow: "hidden",
     zIndex: 1,
   };
 
   const ribbonContentStyle = {
-    position: 'absolute' as const,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '150px', // giảm độ rộng của text container
-    transform: 'rotate(-45deg)',
-    top: '20px', // điều chỉnh vị trí lên cao hơn
-    left: '-35px', // điều chỉnh vị trí sang trái
-    backgroundColor: '#f77157',
-    color: 'white',
-    padding: '4px 0', // giảm padding
-    fontFamily: 'REM',
-    fontSize: '12px', // giảm font size
-    fontWeight: 'bold',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+    position: "absolute" as const,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "150px", // giảm độ rộng của text container
+    transform: "rotate(-45deg)",
+    top: "20px", // điều chỉnh vị trí lên cao hơn
+    left: "-35px", // điều chỉnh vị trí sang trái
+    backgroundColor: "#f77157",
+    color: "white",
+    padding: "4px 0", // giảm padding
+    fontFamily: "REM",
+    fontSize: "12px", // giảm font size
+    fontWeight: "bold",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
   };
 
   const orderCardStyle = {
-    position: 'relative' as const,
-    marginBottom: '20px',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-    overflow: 'hidden',
+    position: "relative" as const,
+    marginBottom: "20px",
+    backgroundColor: "#fff",
+    borderRadius: "8px",
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+    overflow: "hidden",
   };
 
   const getStatusColor = (status: string) => {
@@ -180,16 +182,16 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           display: "inline-block",
           fontFamily: "REM",
         };
-      case "COMPLETED":
-        return {
-          color: "#395f18",
-          backgroundColor: "#fef6c7",
-          borderRadius: "8px",
-          padding: "8px 20px",
-          fontWeight: "bold",
-          display: "inline-block",
-          fontFamily: "REM",
-        };
+      // case "COMPLETED":
+      //   return {
+      //     color: "#395f18",
+      //     backgroundColor: "#fef6c7",
+      //     borderRadius: "8px",
+      //     padding: "8px 20px",
+      //     fontWeight: "bold",
+      //     display: "inline-block",
+      //     fontFamily: "REM",
+      //   };
       case "CANCELED":
         return {
           color: "#e91e63",
@@ -300,7 +302,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
           "DELIVERED",
           "SUCCESSFUL",
           "CANCELED",
-          "FAILED"
+          "FAILED",
         ].map((status) => (
           <span
             key={status}
@@ -330,15 +332,11 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
 
       <div className="purchase-history-content">
         {filteredOrders.map((order) => (
-          <div
-            key={order.id}
-            className="status-detail"
-            style={orderCardStyle}
-          >
-            {order.type === 'AUCTION' && (
+          <div key={order.id} className="status-detail" style={orderCardStyle}>
+            {order.type === "AUCTION" && (
               <div style={cornerRibbonStyle}>
                 <div style={ribbonContentStyle}>
-                  <GavelIcon sx={{ fontSize: 16, marginRight: '4px' }} />
+                  <GavelIcon sx={{ fontSize: 16, marginRight: "4px" }} />
                   Đấu giá
                 </div>
               </div>
@@ -438,22 +436,27 @@ const OrderHistory: React.FC<OrderHistoryProps> = () => {
               ))}
             </div>
 
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "20px",
-              // backgroundColor: "#fafafa",
-              borderTop: "1px solid #eee"
-            }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "20px",
+                // backgroundColor: "#fafafa",
+                borderTop: "1px solid #eee",
+              }}
+            >
               {order.status === "FAILED" && (
                 <div className="flex items-center space-x-2">
                   <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
                     <ErrorOutlineIcon className="text-red-500 mr-2" />
                     <div className="flex flex-col">
-                      <span className="text-red-600 font-semibold font-['REM']">Lý do từ chối hoàn tiền</span>
+                      <span className="text-red-600 font-semibold font-['REM']">
+                        Lý do từ chối hoàn tiền
+                      </span>
                       <span className="text-red-500 font-['REM']">
-                        {order.refundRequest?.rejectedReason || "Không có lý do cụ thể"}
+                        {order.refundRequest?.rejectedReason ||
+                          "Không có lý do cụ thể"}
                       </span>
                     </div>
                   </div>

@@ -20,27 +20,45 @@ import DeliveryManagement from "../delivery/DeliveryManagement";
 import GavelIcon from "@mui/icons-material/Gavel";
 import OrderManagement from "../../order/OrderManagement";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
-import { Modal } from "antd"; // For confirmation modal
+import { Modal, notification } from "antd"; // For confirmation modal
 import { CheckOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import AuctionModal from "../comic/sellerManagement/AuctionModal";
+import { Comic } from "../../common/base.interface";
+import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
+import SellerSubsModal from "./SellerSubsModal";
 
 const { confirm } = Modal;
 
-const SellerManagement = () => {
+const SellerManagement = ({
+  sellerSubscription,
+  fetchSellerSubscription,
+}: {
+  sellerSubscription: SellerSubscription | null;
+  fetchSellerSubscription: () => void;
+}) => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
   const [selectionModel, setSelectionModel] = useState([]);
-  const [comics, setComics] = useState([]);
+  const [comics, setComics] = useState<Comic[]>([]);
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedComic, setSelectedComic] = useState(null); // State to store the selected comic for auction modal
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
+  const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [isRegisteringPlan, setIsRegisteringPlan] = useState<boolean>(false);
+
   const navigate = useNavigate();
 
-  const handleAuction = (comic) => {
-    console.log("::::", comic);
-
-    setSelectedComic(comic); // Set the selected comic
-    setIsModalVisible(true); // Show the modal
+  const handleAuction = (comic: any) => {
+    if (!sellerSubscription.canAuction) {
+      notification.warning({
+        message:
+          "Gói đăng ký bán ComZone của bạn đã hết lượt đấu giá! Vui lòng đăng ký thêm!",
+        duration: 5,
+      });
+    } else {
+      setSelectedComic(comic); // Set the selected comic
+      setIsModalVisible(true); // Show the modal
+    }
   };
 
   const handleModalCancel = () => {
@@ -51,47 +69,76 @@ const SellerManagement = () => {
     setIsModalVisible(false); // Close the modal
     setComics((prevComics) =>
       prevComics.map((prevComic) =>
-        prevComic.id === selectedComic.id
-          ? { ...prevComic, status: "AUCTION" }
+        prevComic.id === selectedComic?.id
+          ? { ...prevComic, status: "AVAILABLE" }
           : prevComic
       )
     );
-  };
-
-  const handleViewMore = (comic) => {
-    // Logic for viewing more details about the comic
-    console.log("View more details for", comic);
+    fetchSellerSubscription();
+    notification.success({
+      key: "success",
+      message: "Thành công",
+      description: "Tạo đấu giá thành công!",
+      duration: 5,
+    });
   };
 
   const handleSell = (comic: Comic) => {
     // Show a confirmation modal before selling
-    confirm({
-      title: "Xác nhận bán sản phẩm?",
-      icon: <CheckCircleOutlined style={{ color: "green" }} />,
-      content: `Bạn có chắc chắn muốn bán truyện "${comic.title}" không?`,
-      onOk() {
-        // Update the comic status to "AVAILABLE"
-        privateAxios
-          .patch(`comics/${comic.id}/status`, { status: "AVAILABLE" })
-          .then(() => {
-            console.log(`Truyện "${comic.title}" đã được đưa vào bán`);
-            // Update the comic list after selling
-            setComics((prevComics) =>
-              prevComics.map((prevComic) =>
-                prevComic.id === comic.id
-                  ? { ...prevComic, status: "AVAILABLE" }
-                  : prevComic
-              )
-            );
-          })
-          .catch((error) => {
-            console.error("Lỗi khi đưa truyện vào bán:", error);
-          });
-      },
-      onCancel() {
-        console.log("Không bán truyện.");
-      },
-    });
+    if (!sellerSubscription.canSell)
+      notification.warning({
+        message:
+          "Gói đăng ký bán ComZone của bạn đã hết lượt bán. Vui lòng đăng ký thêm!",
+        duration: 5,
+      });
+    else
+      confirm({
+        title: "Xác nhận bán sản phẩm?",
+        icon: <CheckCircleOutlined style={{ color: "green" }} />,
+        content: `Bạn có chắc chắn muốn bán truyện "${comic.title}" không?`,
+        onOk() {
+          // Update the comic status to "AVAILABLE"
+          privateAxios
+            .patch(`comics/${comic.id}/status`, { status: "AVAILABLE" })
+            .then(async () => {
+              await privateAxios.patch("seller-subscriptions/sell", {
+                quantity: 1,
+              });
+
+              notification.success({
+                key: "success",
+                message: "Thành công",
+                description: "Truyện đăng bán thành công!",
+                duration: 5,
+              });
+              console.log(`Truyện "${comic.title}" đã được đưa vào bán`);
+              // Update the comic list after selling
+              setComics((prevComics) =>
+                prevComics.map((prevComic) =>
+                  prevComic.id === comic.id
+                    ? { ...prevComic, status: "AVAILABLE" }
+                    : prevComic
+                )
+              );
+
+              fetchSellerSubscription();
+            })
+            .catch((error) => {
+              console.error("Lỗi khi đưa truyện vào bán:", error);
+            });
+        },
+        onCancel() {
+          console.log("Không bán truyện.");
+        },
+      });
+  };
+
+  const getGenreNames = (genreArray: any) => {
+    if (!Array.isArray(genreArray) || genreArray.length === 0) {
+      return "No genres";
+    }
+    // Lấy tất cả tên thể loại
+    return genreArray.map((genre) => genre.name).join(", ");
   };
 
   useEffect(() => {
@@ -113,19 +160,22 @@ const SellerManagement = () => {
       });
   }, []);
 
-  const handleMenuItemClick = (item) => {
-    setSelectedMenuItem(item);
-    if (item === "comic") {
-      navigate("/sellermanagement/comic");
-    }
-  };
-
-  const getGenreNames = (genreArray) => {
-    if (!Array.isArray(genreArray) || genreArray.length === 0) {
-      return "No genres";
-    }
-    // Lấy tất cả tên thể loại
-    return genreArray.map((genre) => genre.name).join(", ");
+  const handleAddComicsClick = () => {
+    if (!sellerSubscription) {
+      notification.warning({
+        key: "subs",
+        message: <p>Yêu cầu đăng ký gói bán ComZone.</p>,
+        duration: 5,
+      });
+      setIsRegisteringPlan(true);
+    } else if (!sellerSubscription.isActive) {
+      notification.warning({
+        key: "subs",
+        message: <p>Gói đăng ký bán ComZone của bạn đã hết hiệu lực.</p>,
+        duration: 5,
+      });
+      setIsRegisteringPlan(true);
+    } else navigate("/sellermanagement/createcomic");
   };
 
   const columns: GridColDef[] = [
@@ -203,28 +253,17 @@ const SellerManagement = () => {
       align: "center",
       renderCell: (params) => {
         const statusMap: Record<string, string> = {
-          AVAILABLE: "Đang bán",
+          AVAILABLE: "Khả dụng",
           UNAVAILABLE: "Không khả dụng",
           SOLD: "Đã bán",
-          EXCHANGE: "Đổi",
-          AUCTION: "Đấu giá",
         };
 
         const status = statusMap[params.value] || "N/A";
 
-        // Check if the status is "Không khả dụng"
         if (status === "Không khả dụng") {
           return (
             <div>
               <div>
-                {/* <Button
-                  variant="outlined"
-                  color="primary"
-                  sx={{ marginRight: 1 }}
-                  onClick={() => handleViewMore(params.row)}
-                >
-                  Xem thêm
-                </Button> */}
                 <IconButton
                   aria-label="edit"
                   color="success"
@@ -247,6 +286,25 @@ const SellerManagement = () => {
             </div>
           );
         }
+
+        return <span>{status}</span>;
+      },
+    },
+    {
+      field: "type",
+      headerName: "Loại",
+      flex: 0.75,
+      headerClassName: "custom-header",
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => {
+        const statusMap: Record<string, string> = {
+          AUCTION: "Đấu giá",
+          SELL: "Đang bán",
+          NONE: "Không",
+        };
+
+        const status = statusMap[params.value] || "N/A";
 
         return <span>{status}</span>;
       },
@@ -293,12 +351,10 @@ const SellerManagement = () => {
             variant="contained"
             sx={{
               borderRadius: "20px",
-              backgroundColor: "#D9D9D9",
-              color: "#000",
+              fontFamily: "REM",
             }}
             startIcon={<AddIcon />}
-            component={Link}
-            to="/sellermanagement/createcomic"
+            onClick={() => handleAddComicsClick()}
           >
             Thêm truyện đầu tiên
           </Button>
@@ -309,10 +365,10 @@ const SellerManagement = () => {
     switch (selectedMenuItem) {
       case "comic":
         return (
-          <div>
-            <Typography variant="h5" className="content-header">
+          <div className="flex flex-col gap-4">
+            <p className="uppercase text-2xl font-semibold REM">
               Quản lí truyện tranh
-            </Typography>
+            </p>
             <Box sx={{ marginBottom: "20px" }}>
               <div
                 style={{
@@ -325,12 +381,10 @@ const SellerManagement = () => {
                   variant="contained"
                   sx={{
                     borderRadius: "20px",
-                    backgroundColor: "#D9D9D9",
-                    color: "#000",
+                    fontFamily: "REM",
                   }}
                   startIcon={<AddIcon />}
-                  component={Link}
-                  to="/sellermanagement/createcomic"
+                  onClick={() => handleAddComicsClick()}
                 >
                   Thêm truyện mới
                 </Button>
@@ -387,7 +441,6 @@ const SellerManagement = () => {
               onCancel={handleModalCancel} // Event handler for closing the modal
               onSuccess={handleModalSuccess} // Event handler for successful auction creation
             />
-            ;
           </div>
         );
       case "order":
@@ -405,10 +458,17 @@ const SellerManagement = () => {
     }
   };
 
-  const currentUrl = window.location.pathname;
-  console.log("URL", currentUrl);
-
-  return <div className="seller-container">{renderContent()}</div>;
+  return (
+    <div className="seller-container">
+      {renderContent()}{" "}
+      {(!sellerSubscription || !sellerSubscription.isActive) && (
+        <SellerSubsModal
+          isOpen={isRegisteringPlan}
+          setIsOpen={setIsRegisteringPlan}
+        />
+      )}
+    </div>
+  );
 };
 
 export default SellerManagement;

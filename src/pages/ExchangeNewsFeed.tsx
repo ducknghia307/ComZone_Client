@@ -6,21 +6,17 @@ import { privateAxios, publicAxios } from "../middleware/axiosInstance";
 import { ExchangePostInterface } from "../common/interfaces/exchange.interface";
 import Loading from "../components/loading/Loading";
 import ExchangeSearchBar from "../components/exchangeNewsFeed/ExchangeSearchBar";
-import CreatePostModal from "../components/exchangeNewsFeed/CreatePostModal";
+import CreatePostModal from "../components/exchangeNewsFeed/modal/CreatePostModal";
 import "../components/ui/Exchange.css";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { useAppSelector } from "../redux/hooks";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ExchangeNotFound from "../components/exchangeNewsFeed/ExchangeNotFound";
 import ChatModal from "./ChatModal";
 import EmptyExchangeList from "../components/exchangeNewsFeed/EmptyExchangeList";
-import { authSlice } from "../redux/features/auth/authSlice";
 import { Comic } from "../common/base.interface";
 
 export default function ExchangeNewsFeed() {
-  const { isLoggedIn, isLoading, userId } = useAppSelector(
-    (state) => state.auth
-  );
-  const dispatch = useAppDispatch();
+  const { isLoggedIn, userId } = useAppSelector((state) => state.auth);
 
   const [postList, setPostList] = useState<ExchangePostInterface[]>([]);
   const [userExchangeComicsList, setUserExchangeComicsList] = useState<Comic[]>(
@@ -28,7 +24,7 @@ export default function ExchangeNewsFeed() {
   );
 
   const [openCreatePost, setOpenCreatePost] = useState<boolean>(false);
-  const [isSelectModalOpen, setIsSelectModalOpen] = useState<string>("");
+
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,10 +32,13 @@ export default function ExchangeNewsFeed() {
     searchParams.get("search") || ""
   );
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const navigate = useNavigate();
 
   const fetchExchangeNewsFeed = async () => {
-    dispatch(authSlice.actions.updateIsLoading({ isLoading: true }));
+    setIsLoading(true);
+
     try {
       if (searchParams.get("search")) {
         setPostList(
@@ -76,7 +75,7 @@ export default function ExchangeNewsFeed() {
     } catch (err) {
       console.log(err);
     } finally {
-      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+      setIsLoading(false);
     }
   };
 
@@ -143,7 +142,7 @@ export default function ExchangeNewsFeed() {
             fetchExchangeNewsFeed={fetchExchangeNewsFeed}
           />
 
-          <div className="w-full grid grid-cols-[repeat(auto-fill,50em)] items-stretch justify-center gap-8 py-4">
+          <div className="w-full xl:w-2/3 flex flex-col items-center justify-start gap-8 py-4">
             {postList && postList.length > 0 ? (
               postList.map((post, index: number) => {
                 const tourIndex = postList.findIndex(
@@ -155,15 +154,13 @@ export default function ExchangeNewsFeed() {
                     post={post}
                     userExchangeComicsList={userExchangeComicsList}
                     index={index}
-                    isLoading={isLoading}
-                    isSelectModalOpen={isSelectModalOpen}
-                    setIsSelectModalOpen={setIsSelectModalOpen}
+                    setIsLoading={setIsLoading}
                     currentUserId={userId}
-                    isChatOpen={isChatOpen}
                     setIsChatOpen={setIsChatOpen}
                     tourIndex={tourIndex}
                     navigate={navigate}
                     isLoggedIn={isLoggedIn}
+                    fetchExchangeNewsFeed={fetchExchangeNewsFeed}
                   />
                 );
               })
@@ -173,7 +170,7 @@ export default function ExchangeNewsFeed() {
                 isLoading={isLoading}
               />
             ) : (
-              !isLoading && <EmptyExchangeList isLoading={isLoading} />
+              <EmptyExchangeList isLoading={isLoading} />
             )}
           </div>
         </div>

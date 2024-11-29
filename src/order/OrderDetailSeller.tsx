@@ -81,6 +81,11 @@ const StatusChip = styled("span")<{ status: string; deliveryStatus?: string }>(
             color: "#2196f3",
             backgroundColor: "#e3f2fd",
           };
+        case "SUCCESSFUL":
+          return {
+            color: "#4caf50",
+            backgroundColor: "#e8f5e9",
+          };
         case "CANCELED":
           return {
             color: "#e91e63",
@@ -165,8 +170,8 @@ const InfoRow = ({
     paymentMethod === "WALLET"
       ? "#32CD32"
       : paymentMethod === "COD"
-      ? "#ff9800"
-      : "#000";
+        ? "#ff9800"
+        : "#000";
 
   return (
     <Box
@@ -271,6 +276,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
         return "Đang đóng gói";
       case "DELIVERING":
         return "Đang giao hàng";
+      case "SUCCESSFUL":
+        return "Hoàn tất";
       case "CANCELED":
         return "Đã hủy";
       default:
@@ -703,8 +710,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
 
                   <TableBody>
                     {orders.length > 0 &&
-                    orders[0].items &&
-                    orders[0].items.length > 0 ? (
+                      orders[0].items &&
+                      orders[0].items.length > 0 ? (
                       orders[0].items.map((item: any, index: number) => (
                         <TableRow key={index}>
                           <TableCell>

@@ -39,8 +39,8 @@ const Sidebar = () => {
   }, []);
 
   return (
-    <div>
-      <div className="profile-section1">
+    <div style={{display:'flex', alignItems:'center', flexDirection:'column'}}>
+      <div className="profile-section1" style={{paddingTop:'30px'}}>
         <img src={userInfo?.avatar} alt="avatar" className="avatar-image" />
         <div>
           <p className="username">{userInfo?.name}</p>

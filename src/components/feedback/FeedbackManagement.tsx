@@ -2,9 +2,9 @@ import { Box, Chip, IconButton, InputAdornment, Paper, Table, TableBody, TableCe
 import React, { useEffect, useState } from 'react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { privateAxios } from '../../middleware/axiosInstance';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ModalFeedback from '../modal/ModalFeedback';
 import { StarTwoTone } from '@ant-design/icons';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 interface Feedback {
     createdAt: string;
     comment: string;
@@ -118,7 +118,7 @@ const FeedbackManagement = () => {
                                     <TableCell align="center">{feedback.attachedImages.length} ảnh</TableCell>
                                     <TableCell align="center">
                                         <IconButton color="primary" onClick={() => openModal(feedback)}>
-                                            <EditOutlinedIcon />
+                                            <VisibilityOutlinedIcon />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>

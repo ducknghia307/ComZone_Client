@@ -17,7 +17,7 @@ interface SidebarProps {
   currentUrl: string;
   handleMenuItemClick: (item: string) => void;
   sellerSubscription?: SellerSubscription | null;
-  fetchSellerSubscription: () => void;
+  fetchSellerSubscription?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({

@@ -31,7 +31,13 @@ import { RenderCell } from "./RenderCell";
 
 const { confirm } = Modal;
 
-const SellerManagement = () => {
+const SellerManagement = ({
+  sellerSubscription,
+  fetchSellerSubscription,
+}: {
+  sellerSubscription?: SellerSubscription | null;
+  fetchSellerSubscription?: () => void;
+}) => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
   const [selectionModel, setSelectionModel] = useState([]);
   const [comics, setComics] = useState<Comic[]>([]);

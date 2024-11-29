@@ -143,6 +143,15 @@ const ExchangeDetail: React.FC = () => {
         return;
       }
 
+      if (
+        exchangeDetails.exchange.status === "FAILED" ||
+        exchangeDetails.exchange.status === "REJECTED"
+      ) {
+        setFirstCurrentStage(0);
+        setSecondCurrentStage(0);
+        return;
+      }
+
       const firstConfirmationResponse = await privateAxios(
         `exchange-confirmation/user/exchange/${exchangeDetails.exchange.id}`
       );

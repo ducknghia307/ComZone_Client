@@ -145,10 +145,6 @@ const Genres: React.FC<GenresProps> = ({
     sortOrder === "asc" ? a.price - b.price : b.price - a.price
   );
 
-  const nonAuctionComics = sortedComics.filter(
-    (comic) => comic.status !== "AUCTION"
-  );
-
   const formatPrice = (price: number | null | undefined) => {
     if (price == null) {
       return "N/A"; // Handle null or undefined price gracefully

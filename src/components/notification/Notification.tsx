@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
 import EmptyNotification from "../../assets/no-notification.jpg";
+import { useNavigate } from "react-router-dom";
 
 const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
   const [activeTab, setActiveTab] = useState("USER");
   const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
   const [role, setRole] = useState(false);
   const [comicsData, setComicsData] = useState([]);
+  console.log(filteredAnnouncements);
 
+  const navigate = useNavigate();
   useEffect(() => {
     const hasSellerAnnouncements = announcements.some(
       (item) => item.recipientType === "SELLER"
@@ -16,13 +19,6 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
     setFilteredAnnouncements(
       announcements.filter((item) => item.recipientType === activeTab)
     );
-
-    // Fetch order items for each announcement that has an order
-    // announcements.forEach((announcement) => {
-    //   if (announcement.order && announcement.order.id) {
-    //     fetchOrderItems(announcement.order.id);
-    //   }
-    // });
   }, [announcements, activeTab]);
 
   // Mark notifications as read
@@ -37,29 +33,27 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
       console.error("Failed to mark as read:", error);
     }
   };
+  const navigateTo = async (item) => {
+    if (item.type === "ORDER") navigate("/sellermanagement/order");
 
-  // const fetchOrderItems = async (orderId) => {
-  //   try {
-  //     const response = await privateAxios.get(`/order-items/order/${orderId}`);
-  //     if (Array.isArray(response.data)) {
-  //       response.data.forEach((item) => {
-  //         if (item.comics && typeof item.comics === "object") {
-  //           setComicsData((prevData) => {
-  //             // Prevent adding duplicates based on the comic title
-  //             if (
-  //               !prevData.some((comic) => comic.title === item.comics.title)
-  //             ) {
-  //               return [...prevData, item.comics];
-  //             }
-  //             return prevData;
-  //           });
-  //         }
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to fetch order items:", error);
-  //   }
-  // };
+    privateAxios
+      .post(`/announcements/${item?.id}/read`)
+      .then(() => {
+        console.log("Announcement marked as read.");
+        setFilteredAnnouncements((prev) =>
+          prev.map((announcement) =>
+            announcement.id === item.id
+              ? { ...announcement, isRead: true }
+              : announcement
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("Error marking announcement as read:", error);
+      });
+
+    // if(item.type==="AUCTION") navigate(`/auctiondetail/${item.}`)
+  };
 
   return (
     <div className="relative max-h-96 w-96 overflow-y-auto">
@@ -102,14 +96,6 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
       <div className="mb-2">
         {filteredAnnouncements.length > 0 ? (
           filteredAnnouncements.map((item, index) => {
-            // Find comic associated with this announcement
-            // const associatedComic = comicsData.find(
-            //   (comic) =>
-            //     comic.title === item.auction?.comics?.title ||
-            //     (item.order &&
-            //       item.order.comics?.title === comic.title)
-            // );
-
             return (
               <div
                 key={index}
@@ -118,7 +104,7 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
                     ? "bg-white hover:bg-gray-50"
                     : "bg-zinc-200 hover:bg-gray-200"
                 } hover:shadow-lg border border-gray-300 cursor-pointer`}
-                onClick={() => markAsRead(item.id)}
+                onClick={() => navigateTo(item)}
               >
                 {item.type === "AUCTION" &&
                   item.auction?.comics?.coverImage && (
@@ -131,19 +117,17 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
                       />
                     </div>
                   )}
-
-                {/* Display the associated comic image only once per announcement */}
-                {/* {associatedComic && (
-                  <div key={associatedComic.title} className="comic-item">
-                    <img
-                      src={associatedComic.coverImage}
-                      alt={associatedComic.title}
-                      className="comic-cover"
-                    />
-                    <h5>{associatedComic.title}</h5>
-                  </div>
-                )} */}
-
+                {item.type === "ORDER" &&
+                  item.orderItems[0].comics.coverImage && (
+                    <div className="flex mt-1 space-x-2 mr-2">
+                      <img
+                        src={item.orderItems[0].comics.coverImage}
+                        alt="Thông báo"
+                        className="w-16 h-12 rounded-md object-cover"
+                        style={{ objectFit: "fill" }}
+                      />
+                    </div>
+                  )}
                 <div className="flex-col">
                   <h5 className="font-semibold text-gray-700">{item.title}</h5>
                   <p className="text-sm text-gray-600">{item.message}</p>

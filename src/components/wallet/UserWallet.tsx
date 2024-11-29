@@ -50,6 +50,7 @@ const UserWallet = () => {
         params: { userId },
       });
       const data = await response.data;
+      console.log("1", data);
       const formattedTransactions = data.map((transaction: Transaction) => ({
         date: new Date(transaction.createdAt ?? new Date()).toLocaleDateString(
           "vi-VN"
@@ -75,8 +76,10 @@ const UserWallet = () => {
               ? `Thanh toán đơn hàng`
               : transaction.exchange
               ? `Thanh toán trao đổi`
-              : transaction.deposit
+              : transaction.deposit?.exchange
               ? `Tiền cọc trao đổi`
+              : transaction.deposit?.auction
+              ? `Tiền cọc đấu giá`
               : transaction.sellerSubscription
               ? `Mua gói bán ComZone`
               : transaction.withdrawal

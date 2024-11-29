@@ -159,7 +159,7 @@ const AllAuctions = ({
                 icon={<ChangeCircleOutlinedIcon />}
                 size="medium"
               />
-              <p className="text-center m-1 REM bg-orange-200">SẮP DIỄN RA</p>
+              <p className="text-center m-2 REM bg-orange-200 rounded-xl">SẮP DIỄN RA</p>
 
               <Button
                 className="detail-button"

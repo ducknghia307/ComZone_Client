@@ -119,14 +119,14 @@ export interface Comic {
   page: number | null;
   publishedDate: string;
   price: number;
-  status: string;
+  status: "AVAILABLE" | "REMOVED" | "UNAVAILABLE" | "SOLD";
   quantity: number;
   previewChapter: string[];
   selected?: boolean;
   genres?: Genre[];
   sellerId: UserInfo;
   onSaleSince?: Date;
-  type: "TRADITIONAL" | "AUCTION";
+  type: "NONE" | "AUCTION" | "SELL";
   comics: {
     title: string;
     genres: Genre[];

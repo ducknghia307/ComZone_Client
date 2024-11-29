@@ -20,10 +20,22 @@ export interface Transaction extends BaseInterface {
   exchange?: Exchange;
   walletDeposit?: WalletDeposit;
   order?: BaseInterface;
-  deposit?: BaseInterface;
+  deposit?: DepositDetails;
   sellerSubscription: SellerSubscription;
   refundRequest: ExchangeRefundRequest;
   withdrawal: BaseInterface;
+}
+export interface DepositDetails {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  amount: number;
+  status: string;
+  seizedReason?: string | null;
+  user: UserInfo;
+  auction?: Auction; // Auction details associated with the deposit
+  exchange?: Exchange; // Exchange details if applicable
 }
 export interface Deposit extends BaseInterface {
   status: string;

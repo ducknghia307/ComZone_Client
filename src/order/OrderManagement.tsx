@@ -33,6 +33,14 @@ const OrderManagement = () => {
         console.log("orders seller", data);
 
         if (Array.isArray(data)) {
+
+          // Sort đơn hàng
+          const sortedOrders = data.sort((a, b) => {
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
+            return dateB.getTime() - dateA.getTime();
+          });
+
           setOrders(data);
         } else {
           console.error("API did not return an array of orders.");
@@ -81,6 +89,8 @@ const OrderManagement = () => {
         return "Đang đóng gói";
       case "DELIVERING":
         return "Đang giao hàng";
+      case "SUCCESSFUL":
+        return "Hoàn tất";
       case "CANCELED":
         return "Đã hủy";
       default:
@@ -139,6 +149,15 @@ const OrderManagement = () => {
           fontWeight: "bold",
           display: "inline-block",
         };
+      case "SUCCESSFUL":
+        return {
+          color: "#4caf50",
+          backgroundColor: "#e8f5e9",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
       case "CANCELED":
         return {
           color: "#e91e63",
@@ -174,12 +193,12 @@ const OrderManagement = () => {
       prevOrders.map((order) =>
         order.id === orderId
           ? {
-              ...order,
-              status: newStatus,
-              delivery: delivery
-                ? { ...order.delivery, status: delivery.status }
-                : order.delivery,
-            }
+            ...order,
+            status: newStatus,
+            delivery: delivery
+              ? { ...order.delivery, status: delivery.status }
+              : order.delivery,
+          }
           : order
       )
     );

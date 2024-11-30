@@ -235,6 +235,8 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  borderBottom: "1px solid #e0e0e0",
+                  paddingBottom: "15px",
                 }}
               >
                 <Typography style={{ color: "#666", fontWeight: 500 }}>

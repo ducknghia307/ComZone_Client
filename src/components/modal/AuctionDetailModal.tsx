@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,12 +6,15 @@ import {
   DialogActions,
   Typography,
   Button,
+  Chip,
 } from "@mui/material";
+import { privateAxios } from "../../middleware/axiosInstance";
 
 interface AuctionDetailModalProps {
   open: boolean;
   onClose: () => void;
   auction: {
+    id: string;
     comics: { id: string; title: string; coverImage: string };
     currentPrice?: number;
     maxPrice: number;
@@ -24,11 +27,39 @@ interface AuctionDetailModalProps {
   };
 }
 
+interface Bid {
+  id: string;
+  price: number;
+  createdAt: string;
+}
+
 const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
   open,
   onClose,
   auction,
 }) => {
+  const [userBids, setUserBids] = useState<Bid[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUserBids = async () => {
+      if (!open || !auction.id) return;
+
+      try {
+        setLoading(true);
+        const response = await privateAxios.get(`/bids/user/auction/${auction.id}`);
+        setUserBids(response.data);
+      } catch (error) {
+        console.error("Error fetching user bids:", error);
+        setUserBids([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserBids();
+  }, [open, auction.id]);
+
   if (!auction) return null;
 
   const getStatusChipStyles = (status: string) => {
@@ -134,11 +165,34 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
           color: "#000",
           fontWeight: 700,
           borderBottom: "1px solid #e0e0e0",
-          textAlign: "center",
           padding: "15px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          position: "relative",
         }}
       >
-        Chi tiết đấu giá
+        <span style={{ flex: 1, textAlign: "left" }}></span>
+        <span
+          style={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          Chi tiết đấu giá
+        </span>
+
+        {/* Status at the end */}
+        <div
+          style={{
+            ...getStatusChipStyles(auction.status),
+            display: "inline-block",
+            textAlign: "center",
+          }}
+        >
+          {translateStatus(auction.status)}
+        </div>
       </DialogTitle>
       <DialogContent>
         <div
@@ -180,8 +234,25 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
               { label: "Giá tối đa", value: auction.maxPrice },
               { label: "Giá đặt cọc", value: auction.depositAmount },
               { label: "Giá khởi điểm", value: auction.reservePrice },
-              { label: "Thời gian bắt đầu", value: formattedStartTime },
-              { label: "Thời gian kết thúc", value: formattedEndTime },
+              // { label: "Thời gian bắt đầu", value: formattedStartTime },
+              // { label: "Thời gian kết thúc", value: formattedEndTime },
+              {
+                label: "Thời gian",
+                value: (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    <span>{formattedStartTime}</span>
+                    <span style={{ margin: "0 10px", color: "#000" }}>-</span>
+                    <span>{formattedEndTime}</span>
+                  </div>
+                ),
+              },
             ].map(({ label, value, highlight }) => (
               <div
                 key={label}
@@ -208,42 +279,54 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
                 </Typography>
               </div>
             ))}
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: "15px",
-                alignItems: "center",
-                borderBottom: "1px solid #e0e0e0",
-                paddingBottom: "10px",
-              }}
-            >
-              <Typography style={{ color: "#666", fontWeight: 500 }}>
-                Trạng thái
-              </Typography>
-              <span style={getStatusChipStyles(auction.status)}>
-                {translateStatus(auction.status)}
-              </span>
-            </div>
-
-            {auction.winner && (
-              <div
+            <div style={{ marginTop: "20px" }}>
+              <Chip
+                label="Lịch sử ra giá của bạn"
                 style={{
-                  marginTop: "15px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  backgroundColor: "#fff",
+                  color: "#000",
+                  border: "1px solid black",
+                  fontWeight: 600,
+                  padding: "10px",
+                  marginBottom: "10px",
+                  boxShadow: "3px 3px rgba(0,0,0,0.3)",
                 }}
-              >
-                <Typography style={{ color: "#666", fontWeight: 500 }}>
-                  Người thắng
-                </Typography>
-                <Typography style={{ color: "#000", fontWeight: 600 }}>
-                  {auction.winner.name}
-                </Typography>
-              </div>
-            )}
+              />
+              {loading ? (
+                <Typography>Đang tải...</Typography>
+              ) : userBids.length === 0 ? (
+                <Typography>Chưa có lượt đấu giá</Typography>
+              ) : (
+                <div
+                  style={{
+                    maxHeight: "100px",
+                    overflowY: "auto",
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "8px",
+                    padding: "10px",
+                  }}
+                >
+                  {userBids.map((bid) => (
+                    <div
+                      key={bid.id}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "8px",
+                        borderBottom: "1px solid #f0f0f0",
+                      }}
+                    >
+                      <Typography style={{ color: "#666" }}>
+                        {new Date(bid.createdAt).toLocaleString("vi-VN")}
+                      </Typography>
+                      <Typography style={{ fontWeight: "bold", color: "#000" }}>
+                        {bid.price.toLocaleString("vi-VN")} đ
+                      </Typography>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>

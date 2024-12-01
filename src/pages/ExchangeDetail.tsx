@@ -143,6 +143,7 @@ const ExchangeDetail: React.FC = () => {
         return;
       }
 
+      //FETCH FAILED
       if (
         exchangeDetails.exchange.status === "FAILED" ||
         exchangeDetails.exchange.status === "REJECTED"

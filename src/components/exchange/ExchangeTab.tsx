@@ -11,10 +11,10 @@ const Tab: React.FC<TabProps> = ({ label, path, isActive }) => {
   return (
     <Link
       to={`${path}`}
-      className={`flex duration-200 items-center justify-between px-4 py-2 rounded-lg cursor-pointer 
+      className={`flex duration-200 items-center justify-between px-4 py-2 rounded-lg text-sm cursor-pointer
       ${
         isActive
-          ? "bg-blue-700 text-white"
+          ? "bg-sky-700 text-white"
           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
       }`}
     >

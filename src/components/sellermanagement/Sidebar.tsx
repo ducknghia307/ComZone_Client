@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Grid from "@mui/material/Grid2";
 import ImportContactsRoundedIcon from "@mui/icons-material/ImportContactsRounded";
 import TvOutlinedIcon from "@mui/icons-material/TvOutlined";
-import DeliveryDiningOutlinedIcon from "@mui/icons-material/DeliveryDiningOutlined";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import "../ui/SellerCreateComic.css";
 import TextSnippetOutlinedIcon from "@mui/icons-material/TextSnippetOutlined";
 import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
 import moment from "moment/min/moment-with-locales";
 import SellerSubsModal from "./SellerSubsModal";
+import StarSVG from "../../assets/svg/star-origami-paper-svgrepo-com.svg";
 
 moment.locale("vi");
 
@@ -45,26 +44,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div>
       {sellerSubscription && (
-        <div className="self-stretch REM pb-4 flex flex-col gap-2 p-2 rounded-md bg-black drop-shadow-xl text-white mb-1">
-          <p className="text-lg font-semibold flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
-              <path d="M20 3v4" />
-              <path d="M22 5h-4" />
-              <path d="M4 17v2" />
-              <path d="M5 18H3" />
-            </svg>
-            GÓI CỦA BẠN
+        <div className="self-stretch REM pb-4 flex flex-col gap-2 p-2 rounded-md bg-white drop-shadow-xl border border-gray-300 mb-1">
+          <p className="flex items-center gap-2">
+            <img src={StarSVG} alt="" className="w-8 h-8" />
+            <p className="bg-clip-text text-transparent font-bold text-xl bg-gradient-to-r from-cyan-500 to-cyan-800">
+              GÓI CỦA BẠN
+            </p>
           </p>
           {isUnlimited ? (
             <p className="italic text-sm">
@@ -104,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         <>
           <button
             onClick={() => setIsBuyingPlan(true)}
-            className="self-stretch REM py-2 px-4 mb-4 bg-red-600 text-white flex items-center gap-2 font-semibold border border-gray-300 rounded-lg duration-200 hover:bg-red-700"
+            className="self-stretch w-full REM py-1 px-4 mb-4 bg-sky-800 text-white flex items-center justify-center gap-2 font-light rounded-lg duration-200 hover:bg-sky-900"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <path d="M4 17v2" />
               <path d="M5 18H3" />
             </svg>
-            Mua gói bán ComZone
+            Mua gói ComZone
           </button>
           <SellerSubsModal
             isOpen={isBuyingPlan}

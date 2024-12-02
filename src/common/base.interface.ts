@@ -117,10 +117,11 @@ export interface Comic {
   condition: "SEALED" | "USED";
   edition: "REGULAR" | "SPECIAL" | "LIMITED";
   page: number | null;
-  publishedDate: string;
+  publishedDate: string | null;
   price: number;
   status: "AVAILABLE" | "REMOVED" | "UNAVAILABLE" | "SOLD";
   quantity: number;
+  episodesList: string[];
   previewChapter: string[];
   selected?: boolean;
   genres?: Genre[];

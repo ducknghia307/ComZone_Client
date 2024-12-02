@@ -44,6 +44,8 @@ import AdminSubscription from "../../pages/AdminSubscription";
 import Exchange from "../../pages/Exchange";
 import ExchangeDetail from "../../pages/ExchangeDetail";
 import Announcement from "../../pages/Announcement";
+import SellerManagementPage from "../../pages/SellerManagement";
+import ExchangeManagement from "../../pages/ExchangeManagement";
 
 const AppRouter = () => {
   return (
@@ -69,19 +71,19 @@ const AppRouter = () => {
         <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
         <Route
           path="/sellermanagement/comic"
-          element={<ComicManagementSeller />}
+          element={<SellerManagementPage />}
         />
         <Route
           path="/sellermanagement/order"
-          element={<OrderManagementSeller />}
+          element={<SellerManagementPage />}
         />
         <Route
           path="/sellermanagement/auction"
-          element={<AuctionManagementSeller />}
+          element={<SellerManagementPage />}
         />
         <Route
           path="/sellermanagement/feedback"
-          element={<FeedbackManagementSeller />}
+          element={<SellerManagementPage />}
         />
         <Route
           path="/sellermanagement/edit/:id"
@@ -89,7 +91,11 @@ const AppRouter = () => {
         />
         <Route path="/search" element={<Genres />} />
         <Route path="/exchange-news-feed" element={<ExchangeNewsFeed />} />
-        <Route path="/exchange/:status" element={<Exchange />} />
+        <Route
+          path="/exchange/comics-collection"
+          element={<ExchangeManagement />}
+        />
+        <Route path="/exchange/:status" element={<ExchangeManagement />} />
         <Route path="/exchange/detail/:id" element={<ExchangeDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../components/ui/AccountUser.css";
 import Grid from "@mui/material/Grid2";
 import Sidebar from "../components/sellermanagement/Sidebar";
-import SellerManagement from "../components/sellermanagement/SellerManagement";
+import SellerManagement from "../components/sellermanagement/SellerComicsManagement";
 import AuctionManagement from "../components/auctions/AuctionManagement";
 const AuctionSeller: React.FC = () => {
   const currentUrl = window.location.pathname;

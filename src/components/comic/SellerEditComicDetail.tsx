@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -18,15 +19,21 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { Grid } from "@mui/system";
+import CurrencySplitter from "../../assistants/Spliter";
+import { Comic } from "../../common/base.interface";
+import { notification } from "antd";
+import Loading from "../loading/Loading";
+import ActionConfirm from "../actionConfirm/ActionConfirm";
 
 interface EditComicFormData {
   title: string;
   author: string;
   genres: Genre[];
-  price: string;
-  quantity: string;
+  price: number;
+  quantity: number;
+  episodesList: string[];
   description: string;
-  publishedDate: Dayjs | null;
+  publishedDate: number;
   edition: string;
   condition: string;
   page: string;
@@ -40,27 +47,31 @@ const EditComicDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const coverImageInputRef = useRef<HTMLInputElement | null>(null);
-  const [genres, setGenres] = useState<Genre[]>([]); // Specify the type of genres here
+  const [currentComics, setCurrentComics] = useState<Comic>();
+  const [genres, setGenres] = useState<Genre[]>([]);
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [contentImages, setContentImages] = useState<string[]>([]);
-  const [isSeries, setIsSeries] = useState(false);
-  console.log(":", isSeries);
   const [removedImages, setRemovedImages] = useState<string[]>([]);
   const [formData, setFormData] = useState<EditComicFormData>({
     title: "",
     author: "",
     genres: [] as Genre[],
-    price: "",
-    quantity: "",
+    price: 0,
+    quantity: 1,
+    episodesList: [],
     description: "",
     publishedDate: null,
     edition: "",
     condition: "",
-    page: "",
+    page: null,
   });
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isConfirming, setIsConfirming] = useState<boolean>(false);
+
+  const isSeries = currentComics && currentComics.quantity > 1;
+
   const availableGenres = genres.filter(
     (genre) => !formData.genres.some((selected) => selected.id === genre.id)
   );
@@ -88,53 +99,15 @@ const EditComicDetail = () => {
       .get("/genres")
       .then((response) => {
         const genreData = response.data;
-        console.log("GENRE", genreData);
-        // Ensure genres is an array
         const genresData: Genre[] = genreData || [];
 
-        // Log genre names to console
-        const genreNames = genresData.map((genre) => genre.name);
-        console.log("Genre Names:", genreNames);
-
-        // Update comic to include genre names
-        const updatedComic = {
-          ...genreData,
-          genreNames: genreNames,
-        };
-
-        console.log("Updated Comic with Genres:", updatedComic);
-        setGenres(genresData); // Set genres to the array of Genre
+        setGenres(genresData);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
   }, []);
-  useEffect(() => {
-    publicAxios
-      .get("/genres")
-      .then((response) => {
-        const genreData = response.data;
 
-        // Ensure genres is an array
-        const genresData: Genre[] = genreData || [];
-
-        // Log genre names to console
-        const genreNames = genresData.map((genre) => genre.name);
-        console.log("Genre Names:", genreNames);
-
-        // Update comic to include genre names
-        const updatedComic = {
-          ...genreData,
-          genreNames: genreNames,
-        };
-
-        console.log("Updated Comic with Genres:", updatedComic);
-        setGenres(genresData); // Set genres to the array of Genre
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
   const handleUpload = async (coverImage: string, contentImages: string[]) => {
     try {
       // Ensure previous images are correctly initialized
@@ -180,7 +153,7 @@ const EditComicDetail = () => {
           newContentImages.map(async (blobUrl) => {
             const response = await fetch(blobUrl);
             const blob = await response.blob();
-            return new File([blob], "image.jpg", { type: blob.type }); // Consider using a unique name
+            return new File([blob], "image.jpg", { type: blob.type });
           })
         );
         contentBlobs.forEach((file) => contentFormData.append("images", file));
@@ -199,14 +172,17 @@ const EditComicDetail = () => {
         ]);
       }
 
-      alert("Images uploaded successfully!");
       return {
         coverImageUrl,
         previewChapterUrls,
       };
     } catch (error) {
       console.error("Error uploading images:", error);
-      alert("Failed to upload images. Please try again.");
+      notification.error({
+        key: "failed",
+        message: "Tải hình ảnh lên thất bại!",
+        duration: 5,
+      });
     }
   };
 
@@ -235,25 +211,21 @@ const EditComicDetail = () => {
   const handleRemoveImage = (index: number) => {
     const imageToRemove = contentImages[index];
 
-    // Mark the image for removal
     setRemovedImages((prev) => [...prev, imageToRemove]);
 
-    // Update the current images state
     setContentImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setLoading(true);
     setError(null);
 
-    // Ensure coverImage is a string
-    const uploadCoverImage = coverImage ?? ""; // Default to empty string if null
+    const uploadCoverImage = coverImage ?? "";
 
     const response = await handleUpload(uploadCoverImage, contentImages);
-    console.log("RESPONSE", response);
-    try {
-      await privateAxios.put(`/comics/${id}`, {
+
+    await privateAxios
+      .put(`/comics/${id}`, {
         ...formData,
         genreIds: formData.genres.map((g) => g.id),
         coverImage: response?.coverImageUrl,
@@ -265,60 +237,64 @@ const EditComicDetail = () => {
             ? response.previewChapterUrls
             : []),
         ],
+      })
+      .then(() => {
+        notification.success({
+          key: "success",
+          message: "Cập nhật thông tin truyện thành công.",
+          duration: 5,
+        });
+        setRemovedImages([]);
+        navigate("/sellermanagement/comic");
+      })
+      .catch((err) => {
+        console.error("Error updating comic:", err);
+        setError("Failed to update comic. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
-      alert("Cập nhật truyện thành công!");
-      setRemovedImages([]);
-      // navigate("/sellermanagement");
-    } catch (error) {
-      console.error("Error updating comic:", error);
-      setError("Failed to update comic. Please try again.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleGenreChange = (event: any, newValue: Genre[]) => {
     setFormData({ ...formData, genres: newValue });
   };
 
-  useEffect(() => {
-    const fetchComicData = async () => {
-      setLoading(true);
-      try {
-        const response = await privateAxios.get(`/comics/${id}`);
-        const comic = response.data;
-        console.log("123123", response.data);
+  const fetchComicData = async () => {
+    setLoading(true);
+    await privateAxios
+      .get(`/comics/${id}`)
+      .then((res) => {
+        const comic: Comic = res.data;
 
-        // Ensure publishedDate is converted to a Dayjs object if it exists
+        console.log(comic);
+        setCurrentComics(comic);
         setFormData({
-          ...comic,
-          publishedDate: comic.publishedDate
-            ? dayjs(comic.publishedDate)
-            : null,
+          title: comic.title,
+          author: comic.author,
+          genres: comic.genres,
+          price: comic.price,
+          quantity: comic.quantity,
+          episodesList: comic.episodesList,
+          description: comic.description,
+          publishedDate: comic.publishedDate && Number(comic.publishedDate),
+          edition: comic.edition,
+          condition: comic.condition,
+          page: comic.page && comic.page.toString(),
         });
+
         setCoverImage(comic.coverImage || null);
         setPreviousCoverImage(comic.coverImage);
         setContentImages(comic.previewChapter || []);
         setPreviousContentImages(comic.previewChapter);
-      } catch (error) {
-        console.error("Error fetching comic:", error);
-        setError("Failed to fetch comic details.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchComicData();
-  }, [id]);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
-    // Set `isSeries` based on the `formData.quantity` value
-    if (formData?.quantity && parseInt(formData.quantity) > 1) {
-      setIsSeries(true);
-    } else {
-      setIsSeries(false);
-    }
-  }, [formData]);
+    fetchComicData();
+  }, [id]);
 
   const renderImageUploadSection = (
     title: string,
@@ -326,11 +302,12 @@ const EditComicDetail = () => {
     setImageState: React.Dispatch<React.SetStateAction<string[]>>,
     maxImages: number
   ) => (
-    <>
-      <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
-        <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+    <div className="basis-1/2 flex flex-col">
+      <div className="flex items-center gap-2">
+        <p className="REM font-semibold">
           {title} ({images.length}/{isSeries ? 8 : 4})
-        </Typography>
+        </p>
+
         <input
           accept="image/*"
           type="file"
@@ -354,30 +331,20 @@ const EditComicDetail = () => {
             }}
             startIcon={<CloudUploadOutlinedIcon />}
           >
-            Tải lên
+            <p className="REM font-light">Tải lên</p>
           </Button>
         </label>
       </div>
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          marginTop: "15px",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="grid grid-cols-[repeat(auto-fill,8rem)] items-center justify-start gap-2 py-4">
         {images.map((image, index) => (
-          <div
-            key={index}
-            style={{ position: "relative", width: "120px", height: "120px" }}
-          >
+          <div key={index} className="relative">
             <img
               src={image}
               alt={`uploaded-${index}`}
               style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
+                width: "8em",
+                height: "10em",
+                objectFit: "cover",
                 borderRadius: "8px",
                 border: "1px solid #DCDCDC",
               }}
@@ -386,12 +353,14 @@ const EditComicDetail = () => {
               onClick={() => handleRemoveImage(index)}
               sx={{
                 position: "absolute",
-                top: "5px",
-                right: "5px",
+                top: "1px",
+                right: "0px",
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
                 color: "white",
                 padding: "2px",
-                "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.7)" },
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                },
               }}
             >
               <CloseIcon fontSize="small" />
@@ -399,76 +368,55 @@ const EditComicDetail = () => {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 
+  const isChanged =
+    currentComics &&
+    (formData.author !== currentComics.author ||
+      formData.condition !== currentComics.condition ||
+      formData.description !== currentComics.description ||
+      formData.edition !== currentComics.edition ||
+      formData.episodesList !== currentComics.episodesList ||
+      formData.genres !== currentComics.genres ||
+      formData.page !== (currentComics.page && currentComics.page.toString()) ||
+      formData.price !== currentComics.price ||
+      formData.publishedDate !==
+        (currentComics.publishedDate && Number(currentComics.publishedDate)) ||
+      formData.quantity !== currentComics.quantity ||
+      formData.title !== currentComics.title ||
+      coverImage !== currentComics.coverImage ||
+      contentImages !== currentComics.previewChapter);
+
   return (
-    <div className="form-container">
-      <form onSubmit={handleSubmit}>
-        <div className="create-comic-form">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              margin: "5px",
-            }}
-          >
-            <ArrowBackIcon
-              sx={{ fontSize: "40px", cursor: "pointer" }}
-              onClick={() => navigate("/sellermanagement/comic")}
-            />
-            <Typography
-              sx={{
-                paddingBottom: "35px",
-                color: "#000",
-                fontWeight: "bold",
-                margin: "0 auto",
-              }}
-              variant="h4"
-              className="form-title"
-            >
-              CHỈNH SỬA TRUYỆN
-            </Typography>
-          </div>
-          <div className=" form-container">
-            <div
-              className="image-upload"
-              onClick={() => coverImageInputRef.current?.click()}
-            >
+    <div className="flex flex-col items-center gap-4 border rounded-lg xl:w-2/3 mx-auto p-8 my-8 max-w-[80em] REM">
+      {loading && <Loading />}
+      <p className="font-bold text-2xl">CẬP NHẬT THÔNG TIN TRUYỆN</p>
+
+      <div>
+        <div className="flex items-center gap-4">
+          <div className="basis-1/2 flex flex-col items-center justify-start text-center">
+            <div className="flex flex-col items-center justify-center py-8 group">
               <div
-                className={`${coverImage ? "" : "image-upload-circle"} mb-4`}
+                className={`${
+                  coverImage ? "" : "image-upload-circle hover:opacity-70"
+                } cursor-pointer flex items-center justify-center mb-4`}
+                onClick={() => coverImageInputRef.current?.click()}
               >
                 {coverImage ? (
-                  <div
-                    style={{
-                      position: "relative",
-                      width: "150px",
-                      height: "150px",
-                    }}
-                  >
-                    <img
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "contain",
-                        borderRadius: "8px",
-                        border: "1px solid #DCDCDC",
-                      }}
-                      src={coverImage}
-                      alt="cover"
-                      className="uploaded-image"
-                    />
-                  </div>
+                  <img
+                    src={coverImage}
+                    alt="cover"
+                    className="object-cover w-2/3 rounded-lg duration-200 group-hover:opacity-70"
+                  />
                 ) : (
                   <CameraAltOutlinedIcon />
                 )}
               </div>
-              <Typography
-                style={{ marginBottom: "10px" }}
-                className="image-upload-text"
-              >
-                Ảnh Bìa
-              </Typography>
+              <p className="REM font-semibold pb-2">Ảnh bìa</p>
+              <p className="REM font-light text-xs">
+                Ảnh bìa sẽ được hiển thị tại các trang Kết quả tìm kiếm.
+              </p>
             </div>
             <input
               type="file"
@@ -478,302 +426,430 @@ const EditComicDetail = () => {
               ref={coverImageInputRef}
               onChange={handleImageChange}
             />
-            <Typography sx={{ color: "grey", textAlign: "center" }}>
-              (Ảnh bìa sẽ được hiển thị tại các trang Kết quả tìm kiếm. Việc sử
-              dụng ảnh bìa đẹp sẽ thu hút thêm lượt truy cập vào sản phẩm của
-              bạn)
-            </Typography>
+          </div>
+
+          <div className="w-full flex flex-col items-stretch">
             {renderImageUploadSection(
               "Ảnh nội dung",
               contentImages,
               setContentImages,
               isSeries ? 8 : 4
-            )}{" "}
-            <Grid
-              container
-              columnSpacing={7}
-              rowSpacing={3}
-              sx={{ paddingTop: "20px" }}
-            >
-              <Grid size={6}>
-                <Typography
-                  sx={{
-                    paddingBottom: "10px",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }}
+            )}
+          </div>
+        </div>
+
+        <Grid
+          container
+          columnSpacing={4}
+          rowSpacing={3}
+          sx={{ paddingTop: "20px" }}
+        >
+          <Grid size={6}>
+            <TextField
+              error={formData.title.length > 100}
+              fullWidth
+              spellCheck="false"
+              label={
+                <p className="REM">
+                  Tên truyện <span className="text-red-600">*</span>
+                </p>
+              }
+              name="title"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value.trim() })
+              }
+              variant="outlined"
+              id="outlined-error-helper-text"
+              helperText={
+                <p
+                  className={`${
+                    formData.title.length <= 100 && "hidden"
+                  } REM text-xs`}
                 >
-                  Tên Truyện
-                </Typography>
+                  Tên truyện không chứa quá 100 ký tự!
+                </p>
+              }
+            />
+          </Grid>
+
+          <Grid size={6}>
+            <TextField
+              fullWidth
+              error={formData.author.length > 50}
+              spellCheck="false"
+              label={
+                <p className="REM">
+                  Tác giả <span className="text-red-600">*</span>
+                </p>
+              }
+              name="author"
+              value={formData.author}
+              onChange={(e) =>
+                setFormData({ ...formData, author: e.target.value.trim() })
+              }
+              variant="outlined"
+              helperText={
+                <p
+                  className={`${
+                    formData.author.length <= 50 && "hidden"
+                  } REM text-xs`}
+                >
+                  Tên tác giả không chứa quá 50 ký tự!
+                </p>
+              }
+            />
+          </Grid>
+
+          <Grid size={6}>
+            <Autocomplete
+              multiple
+              options={genres}
+              getOptionLabel={(option) => option.name}
+              value={formData.genres}
+              filterSelectedOptions
+              onChange={handleGenreChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label={
+                    <p className="REM">
+                      Chọn thể loại <span className="text-red-600">*</span>
+                    </p>
+                  }
+                />
+              )}
+              renderTags={(tagValue, getTagProps) =>
+                tagValue.map((option, index) => (
+                  <Chip
+                    key={option.id}
+                    label={<p className="REM">{option.name}</p>}
+                    {...getTagProps({ index })}
+                    onDelete={() => {
+                      const newGenres = formData.genres.filter(
+                        (_, i) => i !== index
+                      );
+                      setFormData({ ...formData, genres: newGenres });
+                    }}
+                  />
+                ))
+              }
+            />
+          </Grid>
+
+          <Grid size={6}>
+            <Autocomplete
+              options={editionOptions}
+              getOptionLabel={(option) => option.label}
+              value={
+                editionOptions.find((opt) => opt.value === formData.edition) ||
+                null
+              }
+              onChange={(event, newValue) => {
+                setFormData({
+                  ...formData,
+                  edition: newValue ? newValue.value : "",
+                });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={
+                    <p className="REM">
+                      Phiên bản <span className="text-red-600">*</span>
+                    </p>
+                  }
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid size={isSeries ? 6 : 4}>
+            <Autocomplete
+              options={conditionOptions}
+              getOptionLabel={(option) => option.label}
+              value={
+                conditionOptions.find(
+                  (opt) => opt.value === formData.condition
+                ) || null
+              }
+              onChange={(event, newValue) => {
+                setFormData({
+                  ...formData,
+                  condition: newValue ? newValue.value : "",
+                });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={
+                    <p className="REM">
+                      Tình trạng <span className="text-red-600">*</span>
+                    </p>
+                  }
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid size={isSeries ? 3 : 3}>
+            <TextField
+              fullWidth
+              error={formData.price < 0 || formData.price > 999999999}
+              label={
+                <p className="REM">
+                  Giá tiền (đ) <span className="text-red-600">*</span>
+                </p>
+              }
+              type="text"
+              name="price"
+              value={CurrencySplitter(formData.price)}
+              onChange={(e) => {
+                const numberString = e.target.value.replace(/,/g, "");
+                let price = 0;
+                if (e.target.value.length === 0) price = 0;
+                else if (/^\d+$/.test(numberString)) {
+                  if (parseInt(numberString) > 999999999) price = 999999999;
+                  else price = parseInt(numberString);
+                }
+                setFormData({ ...formData, price: price });
+              }}
+              variant="outlined"
+              helperText={
+                <p
+                  className={`${
+                    (formData.price >= 0 || formData.price <= 999999999) &&
+                    "hidden"
+                  } REM text-xs`}
+                >
+                  Giá tiền không hợp lệ!
+                </p>
+              }
+            />
+          </Grid>
+
+          <Grid size={isSeries ? 3 : 3}>
+            <TextField
+              fullWidth
+              label={<p className="REM">Năm xuất bản</p>}
+              type="text"
+              name="publishedDate"
+              value={formData.publishedDate || ""}
+              onChange={(e) => {
+                let year = 0;
+                if (e.target.value.length === 0) year = 0;
+                if (parseInt(e.target.value) > new Date().getFullYear())
+                  year = new Date().getFullYear();
+                else if (/^\d+$/.test(e.target.value))
+                  year = parseInt(e.target.value);
+                setFormData({
+                  ...formData,
+                  publishedDate: year,
+                });
+              }}
+              variant="outlined"
+            />
+          </Grid>
+
+          {!isSeries ? (
+            <Grid size={2}>
+              <TextField
+                fullWidth
+                label={<p className="REM">Số trang</p>}
+                type="number"
+                name="page"
+                value={formData.page || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    page: e.target.value,
+                  })
+                }
+                variant="outlined"
+              />
+            </Grid>
+          ) : (
+            <>
+              <Grid size={4}>
                 <TextField
                   fullWidth
-                  label="Tên Truyện"
-                  name="title"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
+                  error={isSeries && Number(formData.quantity) < 2}
+                  label={
+                    <p className="REM">
+                      Số lượng cuốn trong bộ{" "}
+                      <span className="text-red-600">*</span>
+                    </p>
                   }
+                  type="number"
+                  name="quantity"
+                  value={formData.quantity || ""}
+                  onChange={(e) => {
+                    if (Number(e.target.value) > 0)
+                      setFormData({
+                        ...formData,
+                        quantity: parseInt(e.target.value),
+                      });
+                    else
+                      setFormData({
+                        ...formData,
+                        quantity: 1,
+                      });
+                  }}
                   variant="outlined"
+                  helperText={
+                    <p
+                      className={`${
+                        Number(formData.quantity) > 1 && isSeries && "hidden"
+                      } REM text-xs`}
+                    >
+                      Số lượng truyện tối thiểu trong bộ truyện là 2!
+                    </p>
+                  }
                 />
               </Grid>
-              <Grid size={6}>
-                <Typography
-                  sx={{
-                    paddingBottom: "10px",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Tác Giả
-                </Typography>
-                <TextField
-                  fullWidth
-                  label="Tác Giả"
-                  name="author"
-                  value={formData.author}
-                  onChange={(e) =>
-                    setFormData({ ...formData, author: e.target.value })
-                  }
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid size={6}>
-                <Typography
-                  sx={{
-                    paddingBottom: "10px",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Thể Loại
-                </Typography>
+
+              <Grid size={8}>
                 <Autocomplete
                   multiple
-                  options={availableGenres}
-                  getOptionLabel={(option) => option.name}
-                  value={formData.genres}
-                  onChange={handleGenreChange}
-                  filterSelectedOptions // Ngăn người dùng chọn lại các thể loại đã chọn
+                  value={formData.episodesList}
+                  onChange={(event, newValue) => {
+                    setFormData({
+                      ...formData,
+                      episodesList: newValue.map((tags) => tags.trim()),
+                    });
+                  }}
+                  selectOnFocus
+                  clearOnBlur
+                  handleHomeEndKeys
+                  options={[]}
+                  renderTags={(tagValue, getTagProps) =>
+                    tagValue.map((option, index) => {
+                      const { key, ...tagProps } = getTagProps({ index });
+                      return (
+                        <Chip
+                          key={key}
+                          variant="outlined"
+                          label={<p className="REM font-light">{option}</p>}
+                          {...tagProps}
+                        />
+                      );
+                    })
+                  }
+                  renderOption={(props, option) => {
+                    const { key, ...optionProps } = props;
+                    return (
+                      <li key={key} {...optionProps}>
+                        {option}
+                      </li>
+                    );
+                  }}
+                  freeSolo
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      variant="outlined"
-                      label="Chọn Thể Loại"
-                    />
-                  )}
-                  renderTags={(tagValue, getTagProps) =>
-                    tagValue.map((option, index) => (
-                      <Chip
-                        // key={option.id}
-                        label={option.name}
-                        {...getTagProps({ index })}
-                        onDelete={() => {
-                          const newGenres = formData.genres.filter(
-                            (_, i) => i !== index
-                          );
-                          setFormData({ ...formData, genres: newGenres });
-                        }}
-                      />
-                    ))
-                  }
-                />
-              </Grid>
-              <Grid size={2}>
-                <Typography
-                  sx={{
-                    paddingBottom: "10px",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Giá
-                </Typography>
-                <TextField
-                  fullWidth
-                  label="Giá"
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={(e) =>
-                    setFormData({ ...formData, price: e.target.value })
-                  }
-                  variant="outlined"
-                />
-              </Grid>
-
-              <Grid size={2}>
-                <Typography
-                  sx={{
-                    paddingBottom: "10px",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Ngày xuất bản
-                </Typography>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Grid>
-                    <DatePicker
-                      label="Ngày xuất bản"
-                      value={formData.publishedDate}
-                      onChange={(newValue) =>
-                        setFormData({ ...formData, publishedDate: newValue })
+                      label={
+                        <p className="REM">
+                          Tập truyện số hoặc tên tập{" "}
+                          <span className="text-red-600">*</span>
+                        </p>
                       }
-                      format="DD/MM/YYYY"
+                      helperText={
+                        <p className="REM italic ">
+                          Nhập tên tập truyện và nhấn Enter để thêm.
+                        </p>
+                      }
                     />
-                  </Grid>
-                </LocalizationProvider>
-              </Grid>
-              {!isSeries ? (
-                <Grid size={2}>
-                  <Typography
-                    sx={{
-                      paddingBottom: "10px",
-                      color: "#000",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Số trang
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    label="Số trang"
-                    type="number"
-                    name="page"
-                    value={formData.page || ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        page: e.target.value,
-                        quantity: "", // Reset quantity if it's not a series
-                      })
-                    }
-                    variant="outlined"
-                  />
-                </Grid>
-              ) : (
-                <Grid size={2}>
-                  <Typography
-                    sx={{
-                      paddingBottom: "10px",
-                      color: "#000",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Số cuốn trong bộ
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    label="Số Lượng"
-                    type="number"
-                    name="quantity"
-                    value={formData.quantity || ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        quantity: e.target.value,
-                        page: "", // Reset page if it’s a series
-                      })
-                    }
-                    variant="outlined"
-                  />
-                </Grid>
-              )}
-              <Grid size={6}>
-                <Typography
-                  sx={{
-                    paddingBottom: "10px",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Phiên bản
-                </Typography>
-                <Autocomplete
-                  options={editionOptions}
-                  getOptionLabel={(option) => option.label}
-                  value={
-                    editionOptions.find(
-                      (opt) => opt.value === formData.edition
-                    ) || null
-                  }
-                  onChange={(event, newValue) => {
-                    setFormData({
-                      ...formData,
-                      edition: newValue ? newValue.value : "",
-                    });
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Phiên bản" />
                   )}
                 />
               </Grid>
+            </>
+          )}
 
-              {/* Condition Field using Autocomplete */}
-              <Grid size={6}>
-                <Typography
-                  sx={{
-                    paddingBottom: "10px",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }}
+          <Grid size={12}>
+            <p className="REM py-2">
+              Thêm mô tả cho truyện của bạn:{" "}
+              <span className="text-red-600">*</span>
+            </p>
+            <TextField
+              fullWidth
+              error={formData.description.length > 1000}
+              placeholder="Mô tả đặc điểm thêm, tình trạng, nội dung hay trải nghiệm của bạn về truyện..."
+              multiline
+              spellCheck="false"
+              rows={4}
+              name="description"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value.trim() })
+              }
+              variant="outlined"
+              helperText={
+                <p
+                  className={`${
+                    formData.description.length <= 1000 && "hidden"
+                  } REM text-xs`}
                 >
-                  Tình trạng
-                </Typography>
-                <Autocomplete
-                  options={conditionOptions}
-                  getOptionLabel={(option) => option.label}
-                  value={
-                    conditionOptions.find(
-                      (opt) => opt.value === formData.condition
-                    ) || null
-                  }
-                  onChange={(event, newValue) => {
-                    setFormData({
-                      ...formData,
-                      condition: newValue ? newValue.value : "",
-                    });
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Tình trạng" />
-                  )}
-                />
-              </Grid>
+                  Mô tả không dài quá 1000 ký tự!
+                </p>
+              }
+            />
+          </Grid>
+        </Grid>
 
-              {/* Page Count Field */}
+        <div className="w-full flex items-stretch gap-2 mt-8 mb-4 REM">
+          {isChanged ? (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setFormData({
+                  title: currentComics.title,
+                  author: currentComics.author,
+                  genres: currentComics.genres,
+                  price: currentComics.price,
+                  quantity: currentComics.quantity,
+                  episodesList: currentComics.episodesList,
+                  description: currentComics.description,
+                  publishedDate:
+                    currentComics.publishedDate &&
+                    Number(currentComics.publishedDate),
+                  edition: currentComics.edition,
+                  condition: currentComics.condition,
+                  page: currentComics.page && currentComics.page.toString(),
+                });
+                setCoverImage(currentComics.coverImage);
+                setContentImages(currentComics.previewChapter);
+              }}
+              className="basis-1/3 py-2 min-w-max text-sm cursor-default border border-gray-300 rounded-md duration-200 hover:bg-gray-50"
+            >
+              Đặt lại
+            </button>
+          ) : (
+            <button
+              onClick={(e) => {
+                navigate(-1);
+              }}
+              className="basis-1/3 py-2 min-w-max text-sm cursor-default border border-gray-300 rounded-md duration-200 hover:bg-gray-50"
+            >
+              Quay lại
+            </button>
+          )}
 
-              <Grid size={12}>
-                <Typography
-                  sx={{
-                    paddingBottom: "10px",
-                    color: "#000",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Mô Tả
-                </Typography>
-                <TextField
-                  fullWidth
-                  label="Mô Tả"
-                  multiline
-                  rows={4}
-                  name="description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  variant="outlined"
-                />
-              </Grid>
-            </Grid>
-          </div>
+          <button
+            onClick={() => setIsConfirming(true)}
+            disabled={!isChanged}
+            className={`grow py-2 bg-black rounded-lg text-white font-semibold duration-200 hover:bg-gray-900 disabled:bg-gray-300`}
+          >
+            CẬP NHẬT
+          </button>
+          <ActionConfirm
+            isOpen={isConfirming}
+            setIsOpen={setIsConfirming}
+            title="Xác nhận cập nhật thông tin truyện?"
+            confirmCallback={handleSubmit}
+          />
         </div>
-        <div className="form-submit-section">
-          <Button type="submit" variant="contained" className="submit-button">
-            Cập nhật
-          </Button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 };

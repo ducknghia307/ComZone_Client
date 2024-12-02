@@ -34,6 +34,7 @@ type AuctionModalProps = {
   comic: Comic | null; // Null-safe typing
   onCancel: () => void;
   onSuccess: () => void;
+  fetchSellerComics: () => void;
 };
 
 const AuctionModal: React.FC<AuctionModalProps> = ({
@@ -41,6 +42,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
   onCancel,
   comic,
   onSuccess,
+  fetchSellerComics,
 }) => {
   const [form] = Form.useForm<AuctionFormValues>();
   console.log(form);

@@ -18,7 +18,7 @@ const SellerCreateComic: React.FC = () => {
     author: "",
     genre: [] as Genre[], // Specify the type of genre here
     price: 0,
-    quantity: "",
+    quantity: 1,
     episodesList: [],
     description: "",
     publishedDate: null,
@@ -70,14 +70,14 @@ const SellerCreateComic: React.FC = () => {
       author: "",
       genre: [],
       price: 0,
-      quantity: "",
+      quantity: isSeries ? 1 : 2,
       description: "",
       episodesList: [],
       publishedDate: null,
-      edition: "", // New field
-      condition: "", // New field
-      page: "", // New field
-    }); // Reset form data if necessary
+      edition: "",
+      condition: "",
+      page: "",
+    });
   };
 
   const handleGenreChange = (event: any, newValue: Genre[]) => {
@@ -140,11 +140,11 @@ const SellerCreateComic: React.FC = () => {
       return;
     }
 
-    if (formData.episodesList.length > parseInt(formData.quantity)) {
+    if (isSeries && formData.episodesList.length !== formData.quantity) {
       message.warning({
         key: "quantity-warning",
         content:
-          "Số lượng số tập, tên tập lớn hơn số lượng cuốn trong bộ truyện!",
+          "Tập truyện số hoặc tên tập không khớp với số lượng cuốn trong bộ truyện!",
         duration: 5,
       });
       return;
@@ -162,7 +162,7 @@ const SellerCreateComic: React.FC = () => {
       coverImage: response?.coverImageUrls,
       previewChapter: response?.previewChapterUrls,
       price: formData.price || 0,
-      quantity: isSeries ? parseInt(formData.quantity) || 1 : 1,
+      quantity: isSeries ? formData.quantity : 1,
       episodesList: isSeries ? formData.episodesList : null,
       edition: formData.edition,
       condition: formData.condition,

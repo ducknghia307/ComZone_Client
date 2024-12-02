@@ -124,10 +124,15 @@ export default function ExchangeNewsFeed() {
   }, [searchParams]);
 
   return (
-    <div className="w-full flex justify-center bg-[rgba(0,0,0,0.03)]">
+    <div
+      id="news-feed-container"
+      className="w-full flex justify-center bg-[rgba(0,0,0,0.03)] REM"
+    >
       {isLoading && <Loading />}
       <div className="w-full flex items-start justify-center min-h-[80vh] px-8 pb-8 REM">
-        <div className="w-full flex flex-col items-center justify-start gap-2 py-8">
+        <div className="w-full flex flex-col items-center justify-start gap-2 py-8 relative">
+          <div id="scroll-to-top" />
+
           <ExchangeSearchBar
             isLoggedIn={isLoggedIn}
             handleOpenCreatePost={handleOpenCreatePost}
@@ -173,6 +178,39 @@ export default function ExchangeNewsFeed() {
               <EmptyExchangeList isLoading={isLoading} />
             )}
           </div>
+        </div>
+      </div>
+
+      <div data-dial-init className="fixed end-6 bottom-6 group">
+        <div
+          id="speed-dial-menu-default"
+          className="flex flex-col items-center mb-4 space-y-2"
+        >
+          <button
+            type="button"
+            data-dial-toggle="speed-dial-menu-default"
+            aria-controls="speed-dial-menu-default"
+            aria-expanded="false"
+            onClick={() => {
+              document
+                .getElementById("navbar-container")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="flex items-center justify-center text-white bg-black rounded-full w-10 h-10 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 focus:ring-4 focus:ring-gray-300 focus:outline-none dark:focus:ring-gray-800"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="currentColor"
+              className="w-4 h-4 transition-transform group-hover:scale-150"
+              aria-hidden="true"
+            >
+              <path d="M12 4.83582L5.79291 11.0429L7.20712 12.4571L12 7.66424L16.7929 12.4571L18.2071 11.0429L12 4.83582ZM12 10.4857L5.79291 16.6928L7.20712 18.107L12 13.3141L16.7929 18.107L18.2071 16.6928L12 10.4857Z"></path>
+            </svg>
+            <span className="sr-only">Lên trên cùng</span>
+          </button>
         </div>
       </div>
 

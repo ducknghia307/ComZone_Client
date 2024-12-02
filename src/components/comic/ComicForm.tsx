@@ -51,7 +51,7 @@ interface ComicFormData {
   author: string;
   genre: Genre[];
   price: number;
-  quantity: string;
+  quantity: number;
   episodesList?: string[];
   description: string;
   publishedDate: number | null;
@@ -500,7 +500,6 @@ const ComicForm: React.FC<ComicFormProps> = ({
                   setFormData({
                     ...formData,
                     page: e.target.value,
-                    quantity: "",
                   })
                 }
                 variant="outlined"
@@ -511,6 +510,7 @@ const ComicForm: React.FC<ComicFormProps> = ({
               <Grid size={4}>
                 <TextField
                   fullWidth
+                  error={isSeries && Number(formData.quantity) < 2}
                   label={
                     <p className="REM">
                       Số lượng cuốn trong bộ{" "}
@@ -520,14 +520,28 @@ const ComicForm: React.FC<ComicFormProps> = ({
                   type="number"
                   name="quantity"
                   value={formData.quantity || ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      quantity: e.target.value,
-                      page: "",
-                    })
-                  }
+                  onChange={(e) => {
+                    if (Number(e.target.value) > 0)
+                      setFormData({
+                        ...formData,
+                        quantity: parseInt(e.target.value),
+                      });
+                    else
+                      setFormData({
+                        ...formData,
+                        quantity: 1,
+                      });
+                  }}
                   variant="outlined"
+                  helperText={
+                    <p
+                      className={`${
+                        Number(formData.quantity) > 1 && isSeries && "hidden"
+                      } REM text-xs`}
+                    >
+                      Số lượng truyện tối thiểu trong bộ truyện là 2!
+                    </p>
+                  }
                 />
               </Grid>
 
@@ -538,7 +552,7 @@ const ComicForm: React.FC<ComicFormProps> = ({
                   onChange={(event, newValue) => {
                     setFormData({
                       ...formData,
-                      episodesList: newValue,
+                      episodesList: newValue.map((tags) => tags.trim()),
                     });
                   }}
                   selectOnFocus
@@ -572,8 +586,13 @@ const ComicForm: React.FC<ComicFormProps> = ({
                       {...params}
                       label={
                         <p className="REM">
-                          Số tập, tên tập{" "}
+                          Tập truyện số hoặc tên tập{" "}
                           <span className="text-red-600">*</span>
+                        </p>
+                      }
+                      helperText={
+                        <p className="REM italic ">
+                          Nhập tên tập truyện và nhấn Enter để thêm.
                         </p>
                       }
                     />
@@ -622,7 +641,7 @@ const ComicForm: React.FC<ComicFormProps> = ({
                 author: "",
                 genre: [] as Genre[],
                 price: 0,
-                quantity: "",
+                quantity: isSeries ? 2 : 1,
                 episodesList: [],
                 description: "",
                 publishedDate: null,
@@ -635,7 +654,7 @@ const ComicForm: React.FC<ComicFormProps> = ({
             }}
             className="basis-1/3 min-w-max text-sm cursor-default"
           >
-            Xóa tất cả
+            Đặt lại
           </button>
           <button
             type="submit"

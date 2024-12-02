@@ -5,23 +5,30 @@ import CurrencySplitter from "../../assistants/Spliter";
 import { UserInfo } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
 import ActionConfirm from "../actionConfirm/ActionConfirm";
+import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
 
 export default function BuyPlan({
   user,
+  userSubs,
   plan,
   index,
   isOpen,
   setIsOpen,
   setIsRegisterSellerModal,
   callback,
+  setEntirelyOpen,
+  setUsedTrial,
 }: {
   user?: UserInfo;
+  userSubs: SellerSubscription;
   plan: MembershipPlan;
   index: number;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<string>>;
   setIsRegisterSellerModal?: React.Dispatch<React.SetStateAction<boolean>>;
   callback?: () => void;
+  setEntirelyOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setUsedTrial: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [isHidingBalance, setIsHidingBalance] = useState<boolean>(true);
   const [confirmCheck, setConfirmCheck] = useState<boolean>(false);
@@ -74,6 +81,22 @@ export default function BuyPlan({
   };
 
   const handleBuyPlan = async () => {
+    if (plan.price === 0) {
+      setUsedTrial(true);
+      if (userSubs && userSubs.usedTrial) {
+        notification.info({
+          key: "trial",
+          message: "Bạn đã hết lượt dùng thử.",
+          description:
+            "Vui lòng đăng ký các gói bán khác của ComZone để tiếp tục!",
+          duration: 5,
+        });
+        return;
+      }
+    }
+
+    console.log("PLAN: ", plan.id);
+
     await privateAxios
       .post("seller-subscriptions", {
         planId: plan.id,
@@ -85,6 +108,7 @@ export default function BuyPlan({
           duration: 5,
         });
         if (callback) callback();
+        setEntirelyOpen(false);
       })
       .catch((err) => {
         console.log(err);
@@ -297,7 +321,11 @@ export default function BuyPlan({
 
         {user.balance < plan.price ? (
           <button
-            disabled={!paymentGateway || amount + user.balance < plan.price}
+            disabled={
+              !paymentGateway ||
+              amount + user.balance < plan.price ||
+              !confirmCheck
+            }
             onClick={() => redirectToPay()}
             className="self-stretch py-2 mt-4 font-semibold text-lg bg-sky-900 text-white rounded-md duration-200 hover:bg-gray-800 disabled:bg-gray-300"
           >

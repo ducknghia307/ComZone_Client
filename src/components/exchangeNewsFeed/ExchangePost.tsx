@@ -167,7 +167,12 @@ export default function ExchangePost({
         onOk={handleOk}
         onCancel={handleCancel}
         footer={null}
+        closeIcon={null}
         width={1000}
+        styles={{
+          content: { padding: "0" },
+        }}
+        centered
       >
         <div
           className={`${
@@ -177,7 +182,8 @@ export default function ExchangePost({
           <div className="w-full bg-[rgba(0,0,0,0.03)] border-b border-gray-300 py-2 top-0 sticky">
             <p className="px-4 font-light">
               Danh sách truyện{" "}
-              <span className="font-semibold">{post.user.name}</span> đang có:
+              <span className="font-semibold">{post.user.name}</span> đang có
+              sẵn để trao đổi:
             </p>
           </div>
 

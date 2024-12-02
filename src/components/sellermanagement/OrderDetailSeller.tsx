@@ -1,14 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, Typography, IconButton, Box, Paper, Stack, Divider, useTheme, alpha, styled, Chip, Button } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  IconButton,
+  Box,
+  Paper,
+  Stack,
+  Divider,
+  useTheme,
+  alpha,
+  styled,
+  Chip,
+  Button,
+} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from "@mui/material";
-import { privateAxios } from "../middleware/axiosInstance";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
+import { privateAxios } from "../../middleware/axiosInstance";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { OrderDetailData } from "../common/base.interface";
+import { OrderDetailData } from "../../common/base.interface";
 import { Modal, notification } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import "../components/ui/OrderDetailSeller.css";
+import "../ui/OrderDetailSeller.css";
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
@@ -32,16 +54,26 @@ const StatusChip = styled("span")<{ status: string; deliveryStatus?: string }>(
   ({ theme, status, deliveryStatus }) => {
     const getStatusColor = () => {
       if (status === "PACKAGING" && deliveryStatus === "ready_to_pick") {
-        return { color: "#7c4af2", backgroundColor: "#e0d4fc", };
+        return { color: "#7c4af2", backgroundColor: "#e0d4fc" };
       }
       switch (status) {
-        case "PENDING": return { color: "#ff9800", backgroundColor: "#fff3e0", };
-        case "DELIVERED": return { color: "#32CD32", backgroundColor: "#ccfccc", };
-        case "PACKAGING": return { color: "#ff6b1c", backgroundColor: "#ffe8db", };
-        case "DELIVERING": return { color: "#2196f3", backgroundColor: "#e3f2fd", };
-        case "SUCCESSFUL": return { color: "#4caf50", backgroundColor: "#e8f5e9", };
-        case "CANCELED": return { color: "#e91e63", backgroundColor: "#fce4ec", };
-        default: return { color: theme.palette.info.main, bgColor: alpha(theme.palette.info.light, 0.2), };
+        case "PENDING":
+          return { color: "#ff9800", backgroundColor: "#fff3e0" };
+        case "DELIVERED":
+          return { color: "#32CD32", backgroundColor: "#ccfccc" };
+        case "PACKAGING":
+          return { color: "#ff6b1c", backgroundColor: "#ffe8db" };
+        case "DELIVERING":
+          return { color: "#2196f3", backgroundColor: "#e3f2fd" };
+        case "SUCCESSFUL":
+          return { color: "#4caf50", backgroundColor: "#e8f5e9" };
+        case "CANCELED":
+          return { color: "#e91e63", backgroundColor: "#fce4ec" };
+        default:
+          return {
+            color: theme.palette.info.main,
+            bgColor: alpha(theme.palette.info.light, 0.2),
+          };
       }
     };
 
@@ -89,8 +121,8 @@ const InfoRow = ({
     paymentMethod === "WALLET"
       ? "#32CD32"
       : paymentMethod === "COD"
-        ? "#ff9800"
-        : "#000";
+      ? "#ff9800"
+      : "#000";
 
   return (
     <Box
@@ -109,14 +141,24 @@ const InfoRow = ({
       <Typography
         color="text.secondary"
         variant="body2"
-        sx={{ whiteSpace: "nowrap", fontWeight: "bold", color: "#000", fontSize: "16px", }}
+        sx={{
+          whiteSpace: "nowrap",
+          fontWeight: "bold",
+          color: "#000",
+          fontSize: "16px",
+        }}
       >
         {label}
       </Typography>
       <Typography
         variant="body1"
         fontWeight={500}
-        sx={{ paddingLeft: 2, color: paymentMethod ? paymentStatusColor : "#000", whiteSpace: "normal", wordWrap: "break-word", }}
+        sx={{
+          paddingLeft: 2,
+          color: paymentMethod ? paymentStatusColor : "#000",
+          whiteSpace: "normal",
+          wordWrap: "break-word",
+        }}
       >
         {value}
       </Typography>
@@ -177,13 +219,20 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
       return "Hoàn tất đóng gói";
     }
     switch (status) {
-      case "PENDING": return "Đang chờ xử lý";
-      case "DELIVERED": return "Đã giao hàng";
-      case "PACKAGING": return "Đang đóng gói";
-      case "DELIVERING": return "Đang giao hàng";
-      case "SUCCESSFUL": return "Hoàn tất";
-      case "CANCELED": return "Đã hủy";
-      default: return status;
+      case "PENDING":
+        return "Đang chờ xử lý";
+      case "DELIVERED":
+        return "Đã giao hàng";
+      case "PACKAGING":
+        return "Đang đóng gói";
+      case "DELIVERING":
+        return "Đang giao hàng";
+      case "SUCCESSFUL":
+        return "Hoàn tất";
+      case "CANCELED":
+        return "Đã hủy";
+      default:
+        return status;
     }
   };
 
@@ -545,8 +594,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
 
                   <TableBody>
                     {orders.length > 0 &&
-                      orders[0].items &&
-                      orders[0].items.length > 0 ? (
+                    orders[0].items &&
+                    orders[0].items.length > 0 ? (
                       orders[0].items.map((item: any, index: number) => (
                         <TableRow key={index}>
                           <TableCell>

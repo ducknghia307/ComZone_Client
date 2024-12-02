@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../components/ui/AccountUser.css";
 import Grid from "@mui/material/Grid2";
 import Sidebar from "../components/sellermanagement/Sidebar";
-import SellerManagement from "../components/sellermanagement/SellerManagement";
+import SellerComicsManagement from "../components/sellermanagement/SellerComicsManagement";
 import { SellerSubscription } from "../common/interfaces/seller-subscription.interface";
 import { privateAxios } from "../middleware/axiosInstance";
 const ComicSeller: React.FC = () => {
@@ -42,7 +42,7 @@ const ComicSeller: React.FC = () => {
       </div>
 
       <div className="grow max-w-[80vw]">
-        <SellerManagement
+        <SellerComicsManagement
           sellerSubscription={sellerSubscription}
           fetchSellerSubscription={fetchSellerSubscription}
         />

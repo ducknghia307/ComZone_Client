@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Modal } from "antd";
 import { ReactNode } from "react";
 
@@ -14,7 +15,7 @@ export default function ActionConfirm({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   title: string;
   description?: string | ReactNode;
-  confirmCallback: () => void;
+  confirmCallback: Function;
   cancelCallback?: () => void;
   extraWarning?: string;
 }) {

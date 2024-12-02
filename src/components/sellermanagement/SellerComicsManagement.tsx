@@ -1,34 +1,31 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Button,
-  Typography,
-  TextField,
-  Box,
-  InputAdornment,
-} from "@mui/material";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Button, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import "../ui/SellerCreateComic.css";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import IconButton from "@mui/material/IconButton";
 import { privateAxios } from "../../middleware/axiosInstance";
 import AuctionManagement from "../auctions/AuctionManagement";
 import DeliveryManagement from "../delivery/DeliveryManagement";
 import GavelIcon from "@mui/icons-material/Gavel";
-import OrderManagement from "../../order/OrderManagement";
+import OrderManagement from "./OrderManagement";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
-import { Modal, notification } from "antd"; // For confirmation modal
+import { Modal, notification } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import AuctionModal from "../comic/sellerManagement/AuctionModal";
 import { Comic } from "../../common/base.interface";
 import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
 import SellerSubsModal from "./SellerSubsModal";
 import { RenderCell } from "./RenderCell";
+import moment from "moment/min/moment-with-locales";
+
+moment.locale("vi");
 
 const { confirm } = Modal;
 
-const SellerManagement = ({
+const SellerComicsManagement = ({
   sellerSubscription,
   fetchSellerSubscription,
 }: {
@@ -37,7 +34,11 @@ const SellerManagement = ({
 }) => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
   const [comics, setComics] = useState<Comic[]>([]);
+  const [filteredComics, setFilteredComics] = useState<Comic[]>([]);
   const [genres, setGenres] = useState([]);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [loading, setLoading] = useState(true);
   const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -54,45 +55,41 @@ const SellerManagement = ({
         duration: 5,
       });
     } else {
-      setSelectedComic(comic); // Set the selected comic
-      setIsModalVisible(true); // Show the modal
+      setSelectedComic(comic);
+      setIsModalVisible(true);
     }
   };
 
   const handleModalCancel = () => {
-    setIsModalVisible(false); // Close the modal
+    setIsModalVisible(false);
   };
 
   const handleModalSuccess = () => {
-    setIsModalVisible(false); // Close the modal
-    setComics((prevComics) =>
-      prevComics.map((prevComic) =>
-        prevComic.id === selectedComic?.id
-          ? { ...prevComic, status: "AVAILABLE", type: "AUCTION" }
-          : prevComic
-      )
-    );
+    setIsModalVisible(false);
+    fetchSellerComics();
     notification.success({
       key: "success",
       message: "Thành công",
       description: "Tạo đấu giá thành công!",
       duration: 5,
     });
-    fetchSellerSubscription();
   };
-  const handleStopSelling = (comic: Comic) => {
-    // Show a confirmation modal before stopping the sale
-    console.log("z", comic);
 
+  const handleStopSelling = (comic: Comic) => {
     confirm({
-      title: "Xác nhận dừng bán sản phẩm?",
+      title: <p>Xác nhận dừng bán truyện?</p>,
       icon: <CheckCircleOutlined style={{ color: "red" }} />,
       content: `Bạn có chắc chắn muốn dừng bán truyện "${comic.title}" không?`,
+      okText: "Xác nhận",
+      cancelText: "Hủy",
       onOk() {
-        // Call the API to stop selling the comic
         privateAxios
           .get(`/comics/${comic.id}/stop-sell`)
-          .then((res) => {
+          .then(async (res) => {
+            await privateAxios.patch("seller-subscriptions/sell/stop", {
+              quantity: 1,
+            });
+
             notification.success({
               key: "success",
               message: "Thành công",
@@ -101,14 +98,7 @@ const SellerManagement = ({
             });
             console.log("stopselling", res);
 
-            // Update the comic list after stopping the sale
-            setComics((prevComics) =>
-              prevComics.map((prevComic) =>
-                prevComic.id === comic.id
-                  ? { ...prevComic, status: "UNAVAILABLE", type: "NONE" }
-                  : prevComic
-              )
-            );
+            fetchSellerComics();
           })
           .catch((error) => {
             console.error("Lỗi khi dừng bán truyện:", error);
@@ -124,8 +114,8 @@ const SellerManagement = ({
       },
     });
   };
+
   const handleSell = (comic: Comic) => {
-    // Show a confirmation modal before selling
     if (!sellerSubscription.canSell)
       notification.warning({
         message:
@@ -134,15 +124,20 @@ const SellerManagement = ({
       });
     else
       confirm({
-        title: "Xác nhận bán sản phẩm?",
+        title: <p className="REM">Xác nhận bắt đầu bán truyện?</p>,
         icon: <CheckCircleOutlined style={{ color: "green" }} />,
-        content: `Bạn có chắc chắn muốn bán truyện "${comic.title}" không?`,
+        content: (
+          <p className="REM">
+            Bạn có chắc chắn muốn bán truyện "{comic.title}" không?
+          </p>
+        ),
+        okText: "Xác nhận",
+        cancelText: "Hủy",
         onOk() {
-          // Update the comic status to "AVAILABLE"
           privateAxios
             .patch(`comics/${comic.id}/status`, { status: "AVAILABLE" })
             .then(async () => {
-              await privateAxios.patch("seller-subscriptions/seller", {
+              await privateAxios.patch("seller-subscriptions/sell", {
                 quantity: 1,
               });
 
@@ -152,16 +147,7 @@ const SellerManagement = ({
                 description: "Truyện đăng bán thành công!",
                 duration: 5,
               });
-              console.log(`Truyện "${comic.title}" đã được đưa vào bán`);
-              // Update the comic list after selling
-              setComics((prevComics) =>
-                prevComics.map((prevComic) =>
-                  prevComic.id === comic.id
-                    ? { ...prevComic, status: "AVAILABLE" }
-                    : prevComic
-                )
-              );
-              fetchSellerSubscription();
+              fetchSellerComics();
             })
             .catch((error) => {
               console.error("Lỗi khi đưa truyện vào bán:", error);
@@ -173,24 +159,74 @@ const SellerManagement = ({
       });
   };
 
+  const undoDelete = async (comics: Comic) => {
+    await privateAxios.delete(`/comics/undo/${comics.id}`).then(() => {
+      notification.success({
+        key: "delete",
+        message: `Đã khôi phục truyện "${comics.title}".`,
+        duration: 5,
+      });
+      fetchSellerComics();
+    });
+  };
+
+  const handleDeleteComics = (comic: Comic) => {
+    confirm({
+      title: <p>Xác nhận xóa truyện này?</p>,
+      icon: <CheckCircleOutlined style={{ color: "red" }} />,
+      content: `Bạn có chắc chắn muốn xóa truyện "${comic.title}" không?`,
+      okText: "Xác nhận",
+      cancelText: "Hủy",
+      onOk() {
+        privateAxios
+          .delete(`/comics/soft/${comic.id}`)
+          .then(async () => {
+            notification.info({
+              key: "delete",
+              message: `Đã xóa truyện "${comic.title}".`,
+              description: (
+                <button
+                  onClick={() => undoDelete(comic)}
+                  className="REM mt-2 px-4 py-1 bg-sky-700 text-white rounded-md duration-200 hover:bg-sky-800"
+                >
+                  Hoàn tác
+                </button>
+              ),
+              duration: 5,
+            });
+
+            fetchSellerComics();
+          })
+          .catch((error) => {
+            console.error("Lỗi khi dừng bán truyện:", error);
+            notification.error({
+              message: "Lỗi",
+              description: "Không thể dừng bán truyện. Vui lòng thử lại.",
+              duration: 5,
+            });
+          });
+      },
+      onCancel() {
+        console.log("Hủy dừng bán truyện.");
+      },
+    });
+  };
+
   const getGenreNames = (genreArray: any) => {
     if (!Array.isArray(genreArray) || genreArray.length === 0) {
       return "No genres";
     }
-    // Lấy tất cả tên thể loại
     return genreArray.map((genre) => genre.name).join(", ");
   };
 
   useEffect(() => {
-    // Gọi API để lấy danh sách comics và genres
     Promise.all([
       privateAxios.get("/comics/seller").then((response) => response.data),
       privateAxios.get("/genres").then((response) => response.data),
     ])
       .then(([comicsData, genresData]) => {
-        console.log("Comics:", comicsData);
-        console.log("Genres:", genresData);
         setComics(comicsData);
+        setFilteredComics(comicsData);
         setGenres(genresData);
         setLoading(false);
       })
@@ -218,6 +254,32 @@ const SellerManagement = ({
     } else navigate("/sellermanagement/createcomic");
   };
 
+  const fetchSellerComics = async () => {
+    await privateAxios
+      .get("/comics/seller")
+      .then((res) => {
+        setComics(res.data);
+        setFilteredComics(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    fetchSellerSubscription();
+  }, [comics]);
+
+  const searchSellerComics = async (key: string) => {
+    await privateAxios
+      .get(`comics/search/seller?search=${key}`)
+      .then((res) => {
+        console.log(res.data.length);
+        setFilteredComics(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
   const columns: GridColDef[] = [
     {
       field: "coverImage",
@@ -241,6 +303,11 @@ const SellerManagement = ({
       headerClassName: "custom-header",
       headerAlign: "center",
       align: "center",
+      renderCell(params) {
+        return (
+          <p className="text-start my-auto font-semibold">{params.value}</p>
+        );
+      },
     },
     {
       field: "author",
@@ -249,6 +316,9 @@ const SellerManagement = ({
       headerClassName: "custom-header",
       headerAlign: "center",
       align: "center",
+      renderCell(params) {
+        return <p className="my-auto">{params.value}</p>;
+      },
     },
     {
       field: "price",
@@ -260,7 +330,7 @@ const SellerManagement = ({
       sortComparator: (v1, v2) => Number(v1) - Number(v2),
       renderCell: (params) => {
         const formattedPrice = Number(params.value).toLocaleString("vi-VN");
-        return <span>{formattedPrice}₫</span>; // Display the formatted price with "đ"
+        return <span className="my-auto">{formattedPrice}₫</span>;
       },
     },
     {
@@ -272,17 +342,19 @@ const SellerManagement = ({
       align: "center",
       renderCell: (params) => {
         const genres = params.row.genres;
-        return <span>{getGenreNames(genres)}</span>;
+        return <span className="my-auto">{getGenreNames(genres)}</span>;
       },
     },
     {
       field: "quantity",
-      headerName: "Tập/Bộ",
+      headerName: "Lẻ / Bộ",
       flex: 0.75,
       headerClassName: "custom-header",
       headerAlign: "center",
       align: "center",
-      renderCell: (params) => (params.value > 1 ? "Bộ" : "Tập"),
+      renderCell: (params) => (
+        <p className="my-auto">{params.value > 1 ? "Bộ" : "Truyện lẻ"}</p>
+      ),
     },
     {
       field: "status",
@@ -293,7 +365,7 @@ const SellerManagement = ({
       align: "center",
       renderCell: (params) => {
         const statusMap: Record<string, string> = {
-          AVAILABLE: "Khả dụng",
+          AVAILABLE: params.row.type === "SELL" ? "Đang bán" : "Đang đấu giá",
           UNAVAILABLE: "Không khả dụng",
           SOLD: "Đã bán",
         };
@@ -302,7 +374,7 @@ const SellerManagement = ({
 
         if (status === "Không khả dụng") {
           return (
-            <div>
+            <div className="my-auto">
               <div>
                 <IconButton
                   aria-label="edit"
@@ -327,37 +399,37 @@ const SellerManagement = ({
           );
         }
 
-        return <span>{status}</span>;
+        return <span className="my-auto">{status}</span>;
       },
     },
     {
-      field: "type",
-      headerName: "Loại",
-      flex: 0.75,
-      headerClassName: "custom-header",
-      headerAlign: "center",
-      align: "center",
-      renderCell: (params) => {
-        const statusMap: Record<string, string> = {
-          AUCTION: "Đấu giá",
-          SELL: "Đang bán",
-          NONE: "Không",
-        };
-
-        const status = statusMap[params.value] || "N/A";
-
-        return <span>{status}</span>;
-      },
-    },
-    {
-      field: "actions",
-      headerName: "Sửa/Xóa",
+      field: "onSaleSince",
+      headerName: "Đăng bán từ",
       flex: 1,
       headerClassName: "custom-header",
       headerAlign: "center",
       align: "center",
       renderCell: (params) => (
-        <RenderCell params={params} handleStopSelling={handleStopSelling} />
+        <p className="my-auto">
+          {params.value
+            ? moment(params.value).format("HH:MM - DD/MM/YYYY")
+            : "Chưa bán"}
+        </p>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "",
+      flex: 0.5,
+      headerClassName: "custom-header",
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => (
+        <RenderCell
+          params={params}
+          handleStopSelling={handleStopSelling}
+          handleDeleteComics={handleDeleteComics}
+        />
       ),
     },
   ];
@@ -366,10 +438,10 @@ const SellerManagement = ({
 
   const renderContent = () => {
     if (loading) {
-      return <Typography>Loading comics...</Typography>;
+      return <Typography>Đang tải...</Typography>;
     }
 
-    if (comics.length === 0) {
+    if (comics && comics.length === 0) {
       return (
         <Typography>
           <Button
@@ -391,64 +463,87 @@ const SellerManagement = ({
     switch (selectedMenuItem) {
       case "comic":
         return (
-          <div>
-            <Typography variant="h5" className="content-header">
-              Quản lí truyện tranh
-            </Typography>
-            <Box sx={{ marginBottom: "20px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+          <div className="REM flex flex-col gap-4">
+            <p className="text-2xl font-bold uppercase">Quản lí truyện tranh</p>
+
+            <div className="flex items-center justify-between my-2">
+              <Button
+                variant="contained"
+                sx={{
+                  borderRadius: "20px",
+                  backgroundColor: "green",
+                  color: "#fff",
+                  fontFamily: "inherit",
                 }}
+                startIcon={<AddIcon />}
+                onClick={() => handleAddComicsClick()}
               >
-                <Button
-                  variant="contained"
-                  sx={{
-                    borderRadius: "20px",
-                    backgroundColor: "#D9D9D9",
-                    color: "#000",
+                Thêm truyện mới
+              </Button>
+
+              <div className="relative basis-1/3">
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm..."
+                  value={searchParams.get("search")}
+                  onChange={(e) => {
+                    if (e.target.value.length > 0) {
+                      setSearchParams({ search: e.target.value });
+                      searchSellerComics(e.target.value);
+                    } else {
+                      searchParams.delete("search");
+                      setFilteredComics(comics);
+                    }
                   }}
-                  startIcon={<AddIcon />}
-                  onClick={() => handleAddComicsClick()}
-                >
-                  Thêm truyện mới
-                </Button>
-                <TextField
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchOutlinedIcon />
-                        </InputAdornment>
-                      ),
-                    },
-                  }}
-                  size="small"
-                  placeholder="Tìm kiếm truyện..."
-                  variant="outlined"
+                  className="w-full font-light text-sm pl-8 rounded-lg border-gray-300 focus:!border-gray-500"
                 />
+
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  className="absolute top-1/4 left-2"
+                >
+                  <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"></path>
+                </svg>
               </div>
-            </Box>
+            </div>
+
             <div style={{ height: "auto", width: "100%" }}>
               <DataGrid
-                rows={comics}
+                rows={filteredComics}
                 columns={columns}
                 initialState={{ pagination: { paginationModel } }}
-                pageSizeOptions={[5, 10]}
-                rowHeight={120}
-                // disableExtendRowFullWidth={false}
+                pageSizeOptions={[20, 30]}
+                getRowHeight={() => "auto"}
+                autosizeOptions={{
+                  columns: [
+                    "title",
+                    "author",
+                    "price",
+                    "status",
+                    "quantity",
+                    "genreIds",
+                    "onSaleSince",
+                  ],
+                  includeOutliers: true,
+                  includeHeaders: true,
+                }}
+                rowSelection={false}
                 sx={{
                   border: 1,
                   "& .MuiDataGrid-columnHeader": {
                     backgroundColor: "#000000",
                     color: "#ffffff",
+                    fontFamily: "REM",
                   },
                   "& .MuiDataGrid-cell": {
                     justifyContent: "center",
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: "start",
+                    fontFamily: "REM",
                   },
                   "& .MuiDataGrid-sortIcon": {
                     color: "#ffffff !important",
@@ -463,12 +558,12 @@ const SellerManagement = ({
               />
             </div>
             <AuctionModal
-              open={isModalVisible} // Replace 'visible' with 'open'
-              comic={selectedComic} // Passing the selected comic as a prop
-              onCancel={handleModalCancel} // Event handler for closing the modal
-              onSuccess={handleModalSuccess} // Event handler for successful auction creation
+              open={isModalVisible}
+              comic={selectedComic}
+              onCancel={handleModalCancel}
+              onSuccess={handleModalSuccess}
+              fetchSellerComics={fetchSellerComics}
             />
-            ;
           </div>
         );
       case "order":
@@ -499,4 +594,4 @@ const SellerManagement = ({
   );
 };
 
-export default SellerManagement;
+export default SellerComicsManagement;

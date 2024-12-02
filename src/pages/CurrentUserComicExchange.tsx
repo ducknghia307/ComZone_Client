@@ -50,29 +50,22 @@ const CurrentUserComicExchange = () => {
   }, []);
 
   return (
-    <>
+    <div className="w-full min-w-[50vw]">
       {isLoading && <Loading />}
-      <div className="w-full flex flex-row REM">
-        <div className="w-1/3 p-4 ">
-          <div className="">
-            {userInfo && <UserInformation userInfo={userInfo} />}
-          </div>
-        </div>
-        <div className="w-2/3 flex flex-col gap-4 p-4  ">
-          {currentUrl && <ProfileTab currentUrl={currentUrl} />}
-          <div className="w-full flex flex-col items-start px-4">
-            <h2 className="font-bold text-lg">DANH SÁCH TRUYỆN ĐỂ TRAO ĐỔI</h2>
-            <button
-              className="min-w-max border flex items-center px-4 py-2 rounded-lg bg-gray-50 text-black duration-200 hover:bg-gray-300 gap-2 mt-4"
-              onClick={showModal}
-            >
-              <p>+</p>
-              <p>Thêm truyện</p>
-            </button>
-          </div>
+      <div className="w-full flex flex-col items-stretch REM">
+        <button
+          className="min-w-max border flex items-center px-4 py-2 rounded-lg bg-gray-50 text-black duration-200 hover:bg-gray-300 gap-2 mt-4"
+          onClick={showModal}
+        >
+          <p>+</p>
+          <p>Thêm truyện</p>
+        </button>
+
+        <div className="w-full ">
           <ComicExchangeOfferList comicExchangeOffer={comicExchangeOffer} />
         </div>
       </div>
+
       {userInfo && (
         <NewComicOfferModal
           isModalOpen={isModalOpen}
@@ -81,7 +74,7 @@ const CurrentUserComicExchange = () => {
           fetchComicExchangeOffer={fetchComicExchangeOffer}
         />
       )}
-    </>
+    </div>
   );
 };
 

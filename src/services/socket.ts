@@ -24,9 +24,12 @@ export const connectSocket = () => {
 socket.on("connect", () => {
   console.log("Socket connected:", socket.id);
 
-  privateAxios
-    .patch("users/active-status/online")
-    .catch((error) => console.error("Error updating active status:", error));
+  const state = store.getState();
+  const user = state.auth.userId;
+  if (user)
+    privateAxios
+      .patch("users/active-status/online")
+      .catch((error) => console.error("Error updating active status:", error));
 });
 
 socket.on("disconnect", () => {

@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
 import EmptyNotification from "../../assets/no-notification.jpg";
+import OrderIcon from "../../assets/orderIcon.png";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "antd";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
 
-const NotificationDropdown = ({ announcements, setUnreadAnnounce }) => {
+const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
+  const [announcements, setAnnouncements] = useState(initialAnnouncements);
   const [activeTab, setActiveTab] = useState("USER");
   const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
   const [role, setRole] = useState(false);
   const [unreadUser, setUnreadUser] = useState(0);
   const [unreadSeller, setUnreadSeller] = useState(0);
+  const dispatch = useAppDispatch();
+  const unreadAnnounce = useAppSelector(
+    (state) => state.annoucement.unReadAnnounce
+  );
 
   const navigate = useNavigate();
 
@@ -19,7 +27,6 @@ const NotificationDropdown = ({ announcements, setUnreadAnnounce }) => {
     );
     setRole(hasSellerAnnouncements);
 
-    // Filter announcements based on active tab (USER or SELLER)
     const filtered = announcements.filter(
       (item) => item.recipientType === activeTab
     );
@@ -33,28 +40,32 @@ const NotificationDropdown = ({ announcements, setUnreadAnnounce }) => {
       (item) => item.recipientType === "SELLER" && !item.isRead
     ).length;
 
-    setUnreadAnnounce(unreadUserCount + unreadSellerCount);
+    dispatch(setUnreadAnnounce(unreadUserCount + unreadSellerCount));
     setUnreadUser(unreadUserCount);
     setUnreadSeller(unreadSellerCount);
-  }, [announcements, activeTab, setUnreadAnnounce]);
+  }, [announcements, activeTab]);
 
   const navigateTo = async (item) => {
     if (item.type === "ORDER") navigate("/sellermanagement/order");
+
     try {
       await privateAxios.post(`/announcements/${item?.id}/read`);
       console.log("Announcement marked as read.");
-      setFilteredAnnouncements((prev) =>
-        prev.map((announcement) =>
-          announcement.id === item.id
-            ? { ...announcement, isRead: true }
-            : announcement
-        )
+
+      // Update the announcements state
+      const updatedAnnouncements = announcements.map((announcement) =>
+        announcement.id === item.id
+          ? { ...announcement, isRead: true }
+          : announcement
       );
-      // Recalculate unread count
-      const unreadCount = announcements.filter(
-        (announcement) => announcement.id !== item.id && !announcement.isRead
-      ).length;
-      setUnreadAnnounce(unreadCount);
+
+      setAnnouncements(updatedAnnouncements); // Update the local state
+
+      // Update filtered announcements for the active tab
+      const filtered = updatedAnnouncements.filter(
+        (announcement) => announcement.recipientType === activeTab
+      );
+      setFilteredAnnouncements(filtered);
     } catch (error) {
       console.error("Error marking announcement as read:", error);
     }
@@ -81,7 +92,6 @@ const NotificationDropdown = ({ announcements, setUnreadAnnounce }) => {
               }`}
               onClick={() => setActiveTab("USER")}
             >
-              {/* Apply dot badge for unread notifications */}
               <Badge dot={unreadUser > 0}>Người dùng</Badge>
             </button>
             <button
@@ -92,7 +102,6 @@ const NotificationDropdown = ({ announcements, setUnreadAnnounce }) => {
               }`}
               onClick={() => setActiveTab("SELLER")}
             >
-              {/* Apply dot badge for unread notifications */}
               <Badge dot={unreadSeller > 0}>Người bán</Badge>
             </button>
           </div>
@@ -124,6 +133,17 @@ const NotificationDropdown = ({ announcements, setUnreadAnnounce }) => {
                       />
                     </div>
                   )}
+                {item.type === "ORDER" && (
+                  <div className="flex mt-1 space-x-2 mr-2">
+                    <img
+                      src={OrderIcon}
+                      alt="Thông báo"
+                      className="w-16 h-12 rounded-md object-cover"
+                      style={{ objectFit: "fill" }}
+                    />
+                  </div>
+                )}
+
                 <div className="flex-col">
                   <h5 className="font-semibold text-gray-700">{item.title}</h5>
                   <p className="text-sm text-gray-600">{item.message}</p>

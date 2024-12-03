@@ -3,29 +3,35 @@ import Grid from "@mui/material/Grid2";
 import Sidebar from "../components/accountmanagement/Sidebar";
 import { privateAxios } from "../middleware/axiosInstance";
 import Loading from "../components/loading/Loading";
+import { convertToVietnameseDate } from "../utils/convertDateVietnamese";
+import { useNavigate } from "react-router-dom";
+import OrderIcon from "../assets/orderIcon.png";
 
 const AnnouncementOrder = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [unreadAnnounce, setUnreadAnnounce] = useState(0);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Function to mark an announcement as read
-  const markAsRead = async (announcementId: string) => {
+  const markAsRead = async (announcementId: string, isRead) => {
     try {
-      // API call to mark the announcement as read
-      await privateAxios.post(`/announcements/${announcementId}/read`);
+      console.log(isRead);
 
-      // Update the local state to mark this announcement as read
-      setAnnouncements((prevAnnouncements) =>
-        prevAnnouncements.map((announcement) =>
-          announcement.id === announcementId
-            ? { ...announcement, isRead: true }
-            : announcement
-        )
-      );
+      navigate("/sellermanagement/order");
 
-      // Decrease unread announcements count
-      setUnreadAnnounce((prevUnread) => prevUnread - 1);
+      if (isRead === false) {
+        await privateAxios.post(`/announcements/${announcementId}/read`);
+        setAnnouncements((prevAnnouncements) =>
+          prevAnnouncements.map((announcement) =>
+            announcement.id === announcementId
+              ? { ...announcement, isRead: true }
+              : announcement
+          )
+        );
+
+        setUnreadAnnounce((prevUnread) => prevUnread - 1);
+      }
     } catch (error) {
       console.error("Error marking announcement as read:", error);
     }
@@ -67,37 +73,34 @@ const AnnouncementOrder = () => {
               announcements.map((announcement) => (
                 <div
                   key={announcement.id}
-                  className={`border-b rounded-lg p-4 cursor-pointer transition-colors duration-300 ${
+                  className={`border-b rounded-lg p-4 cursor-pointer transition-colors duration-300 flex align-middle ${
                     announcement.isRead ? "bg-white" : "bg-gray-100"
-                  } hover:bg-custom-blue`} // Using the custom color
-                  // Added hover effect
+                  } hover:bg-custom-blue`}
                   onClick={() =>
-                    !announcement.isRead && markAsRead(announcement.id)
-                  } // Mark as read on click
+                    markAsRead(announcement.id, announcement.isRead)
+                  }
                 >
-                  <p
-                    className={`font-semibold text-lg ${
-                      announcement.isRead ? "text-gray-700" : "text-gray-500"
-                    }`}
-                  >
-                    {announcement.title}
-                  </p>
-                  <p
-                    className={`text-gray-700 ${
-                      announcement.isRead
-                        ? "text-opacity-75"
-                        : "text-opacity-50"
-                    }`}
-                  >
-                    {announcement.message}
-                  </p>
-                  <p
-                    className={`text-sm ${
-                      announcement.isRead ? "text-gray-500" : "text-gray-400"
-                    }`}
-                  >
-                    {announcement.date}
-                  </p>
+                  {announcement.type === "ORDER" && (
+                    <div className="flex mt-1 space-x-2 mr-2">
+                      <img
+                        src={OrderIcon}
+                        alt="Thông báo"
+                        className="w-24 h-28 rounded-md object-cover"
+                        style={{ objectFit: "fill" }}
+                      />
+                    </div>
+                  )}
+                  <div className="flex-col mt-4 ">
+                    <p className={`font-semibold text-lg "text-gray-700`}>
+                      {announcement.title}
+                    </p>
+                    <p className={`text-gray-700 text-opacity-75 `}>
+                      {announcement.message}
+                    </p>
+                    <p className={`text-sm"text-gray-500 `}>
+                      Lúc {convertToVietnameseDate(announcement.createdAt)}
+                    </p>
+                  </div>
                 </div>
               ))
             ) : (

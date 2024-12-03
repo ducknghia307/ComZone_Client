@@ -20,18 +20,21 @@ import ChatModal from "../../pages/ChatModal";
 import { toast } from "sonner";
 import NotificationDropdown from "../notification/Notification";
 import socket from "../../services/socket";
+import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const dispatch = useAppDispatch();
   const { accessToken } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const unreadAnnounce = useAppSelector(
+    (state) => state.annoucement.unReadAnnounce
+  );
   const [cartLength, setCartLength] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [chatUnreadCount, setChatUnreadCount] = useState<number>(0);
   const [announcements, setAnnouncements] = useState([]);
-  const [unreadAnnounce, setUnreadAnnounce] = useState(0);
   const [isRegisteringSeller, setIsRegisteringSeller] =
     useState<boolean>(false);
 
@@ -88,7 +91,7 @@ const Navbar = () => {
         return prev;
       });
 
-      setUnreadAnnounce((prev) => prev + 1); // Increment count
+      dispatch(setUnreadAnnounce((prev) => prev + 1));
     });
 
     return () => {
@@ -148,7 +151,7 @@ const Navbar = () => {
       );
       console.log("1", response);
 
-      setUnreadAnnounce(response.data);
+      dispatch(setUnreadAnnounce(response.data));
     } catch (error) {
       console.error("Error fetching user info:", error);
       setLoading(false);
@@ -160,7 +163,7 @@ const Navbar = () => {
       const response = await privateAxios.get(`/announcements/user`);
       const data = response.data || [];
       setAnnouncements(data);
-      setUnreadAnnounce(data.filter((item) => !item.isRead).length);
+      dispatch(setUnreadAnnounce(data.filter((item) => !item.isRead).length));
     } catch (error) {
       console.error("Error fetching announcements:", error);
     }
@@ -200,12 +203,7 @@ const Navbar = () => {
     }
   };
 
-  const content = (
-    <NotificationDropdown
-      announcements={announcements}
-      setUnreadAnnounce={setUnreadAnnounce}
-    />
-  );
+  const content = <NotificationDropdown announcements={announcements} />;
 
   const location = useLocation();
 

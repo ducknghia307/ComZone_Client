@@ -43,10 +43,12 @@ export default function SellerSubsModal({
       footer={null}
       centered
       width="auto"
+      styles={{ content: { padding: "0", borderRadius: "10%" } }}
     >
       <ComicZoneMembership
         user={userInfo}
         callback={callback}
+        setIsOpen={setIsOpen}
         userSubs={userSubs}
       />
     </Modal>

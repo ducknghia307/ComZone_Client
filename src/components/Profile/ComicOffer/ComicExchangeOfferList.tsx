@@ -15,7 +15,7 @@ const ComicExchangeOfferList: React.FC<ComicListProps> = ({
   }, [comicExchangeOffer]);
 
   return (
-    <div className="mt-4 w-full">
+    <div className="w-full">
       {comicExchangeOffer.length > 0 ? (
         <div className="flex flex-col">
           {comicExchangeOffer.map((comic) => {

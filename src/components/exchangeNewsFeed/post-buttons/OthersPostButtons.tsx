@@ -57,7 +57,7 @@ export default function OthersPostButtons({
                     dùng để trao đổi trên hệ thống trước khi thực hiện trao đổi.
                     <br />
                     <button
-                      onClick={() => navigate("")}
+                      onClick={() => navigate("/profile/comicExchange")}
                       className="text-sky-600 underline mt-2"
                     >
                       Thêm truyện ngay

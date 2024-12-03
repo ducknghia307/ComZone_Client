@@ -313,7 +313,10 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-white border-b shadow-sm w-full ">
+      <nav
+        id="navbar-container"
+        className="bg-white border-b shadow-sm w-full "
+      >
         <div className=" flex flex-col  items-center py-4 REM list-none w-full lg:px-12 px-8 max-w-full ">
           <div className="flex items-center w-full flex-row min-w-max">
             {(window.location.pathname === "/signin" ||

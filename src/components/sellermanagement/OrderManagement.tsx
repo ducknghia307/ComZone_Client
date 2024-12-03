@@ -13,9 +13,9 @@ import {
   Typography,
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { privateAxios } from "../middleware/axiosInstance";
+import { privateAxios } from "../../middleware/axiosInstance";
 import OrderDetailSeller from "./OrderDetailSeller";
-import { OrderDetailData } from "../common/base.interface";
+import { OrderDetailData } from "../../common/base.interface";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState<OrderDetailData[]>([]);

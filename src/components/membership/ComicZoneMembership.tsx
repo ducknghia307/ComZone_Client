@@ -26,14 +26,20 @@ const ComicZoneMembership = ({
   userSubs,
   setIsRegisterSellerModal,
   callback,
+  setIsOpen,
 }: {
   user?: UserInfo;
   userSubs?: SellerSubscription | null;
   setIsRegisterSellerModal?: React.Dispatch<React.SetStateAction<boolean>>;
   callback?: () => void;
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [isBuyingPlan, setIsBuyingPlan] = useState<string>("");
+
+  const [usedTrial, setUsedTrial] = useState(
+    (userSubs && userSubs.usedTrial) || false
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -258,7 +264,7 @@ const ComicZoneMembership = ({
 
               <Button
                 onClick={() => setIsBuyingPlan(plan.id)}
-                disabled={plan.price === 0 && userSubs?.usedTrial}
+                disabled={plan.price === 0 && usedTrial}
                 variant="contained"
                 sx={{
                   mt: "auto",
@@ -290,19 +296,22 @@ const ComicZoneMembership = ({
                       style: "currency",
                       currency: "VND",
                     }).format(plan.price)
-                  : userSubs?.usedTrial
+                  : usedTrial
                   ? "Đã hết lượt sử dụng"
                   : "Bắt đầu dùng thử"}
               </Button>
             </Box>
             <BuyPlan
               user={user}
+              userSubs={userSubs}
               index={index}
               plan={plan}
               isOpen={isBuyingPlan === plan.id}
               setIsOpen={setIsBuyingPlan}
               setIsRegisterSellerModal={setIsRegisterSellerModal}
               callback={callback}
+              setUsedTrial={setUsedTrial}
+              setEntirelyOpen={setIsOpen}
             />
           </Grid>
         ))}

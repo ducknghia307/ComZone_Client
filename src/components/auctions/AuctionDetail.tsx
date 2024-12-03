@@ -565,7 +565,7 @@ const ComicAuction = () => {
                         đ
                       </span>
                     </p>
-                    {!auctionEnded && (
+                    {(!auctionEnded && auctionData.status !== "UPCOMING") && (
                       <Chip
                         label="Đặt cọc tại đây"
                         onClick={handleOpenDepositModal}

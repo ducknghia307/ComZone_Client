@@ -139,7 +139,6 @@ const AllAuctions = ({
         )}
       </div>
 
-      {/* Upcoming Auctions Section */}
       <div className="auction-section-detail2 flex justify-between items-center">
         <h2 className="text-2xl font-bold">Sắp diễn ra</h2>
       </div>
@@ -159,7 +158,9 @@ const AllAuctions = ({
                 icon={<ChangeCircleOutlinedIcon />}
                 size="medium"
               />
-              <p className="text-center m-2 REM bg-orange-200 rounded-xl">SẮP DIỄN RA</p>
+              <p className="text-center m-2 REM bg-orange-200 rounded-xl">
+                SẮP DIỄN RA
+              </p>
 
               <Button
                 className="detail-button"

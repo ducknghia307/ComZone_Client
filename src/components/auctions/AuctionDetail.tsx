@@ -71,10 +71,11 @@ const ComicAuction = () => {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [isBidDisabled, setIsBidDisabled] = useState(false);
   const userId = useAppSelector((state) => state.auth.userId);
-  // const highestBid = useAppSelector((state) => state.auction.highestBid);
+  const [auctionEnded, setAuctionEnded] = useState(false);
   const highestBid: HighestBid | null = useAppSelector(
     (state: any) => state.auction.highestBid
   );
+  const [bids, setBids] = useState([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [winner, setWinner] = useState<boolean | null>(null);
@@ -88,9 +89,15 @@ const ComicAuction = () => {
     (state) => state.annoucement.auctionAnnounce
   );
 
+  const handleAuctionEnd = (ended: boolean) => {
+    console.log(`Auction ended: ${ended}`);
+    setAuctionEnded(ended);
+  };
+
   const handleBidActionDisabled = (disabled: boolean) => {
     setIsBidDisabled(disabled);
   };
+
   const handleDepositSuccess = () => {
     setHasDeposited(true);
     notification.success({
@@ -132,7 +139,6 @@ const ComicAuction = () => {
       .catch((error) => {
         console.error("Error marking announcement as read:", error);
       });
-    console.log("winner", auctionData?.winner?.id);
     if (auctionAnnounce?.status === "SUCCESSFUL") {
       setWinner(true);
       console.log("123");
@@ -148,10 +154,8 @@ const ComicAuction = () => {
   useEffect(() => {
     const checkDepositStatus = async () => {
       try {
-        const response = await privateAxios.get(
-          `deposits/auction/user/${auctionData?.id}`
-        );
-        console.log("RESPONSE", response.data);
+        const response = await privateAxios.get(`deposits/auction/user/${id}`);
+        console.log("RESPONSE1", response.data);
 
         if (response.data) {
           setHasDeposited(true); // Set true if deposit exists
@@ -165,7 +169,7 @@ const ComicAuction = () => {
     };
 
     checkDepositStatus();
-  }, [auctionData]);
+  }, [id]);
 
   useEffect(() => {
     fetchUnreadAnnouncementForAuction();
@@ -220,6 +224,9 @@ const ComicAuction = () => {
         dispatch(setAuctionData(response.data));
 
         const responseBid = await publicAxios.get(`/bids/auction/${id}`);
+        console.log("1", responseBid);
+        const bidData = responseBid.data;
+        setBids(bidData);
         dispatch(setHighestBid(responseBid.data[0]));
       } catch (error) {
         console.error("Error fetching comic details:", error);
@@ -231,9 +238,15 @@ const ComicAuction = () => {
   }, [id, auctionAnnounce?.id, dispatch]);
   useEffect(() => {
     if (!userId) {
-      // Người dùng chưa đăng nhập, không hiển thị kết quả
       setWinner(null);
       return;
+    }
+
+    let userParticipated = false;
+
+    // Kiểm tra nếu người dùng đã tham gia bid
+    if (bids?.length > 0) {
+      userParticipated = bids.some((bid) => bid.user.id === userId);
     }
 
     if (
@@ -242,13 +255,15 @@ const ComicAuction = () => {
     ) {
       if (auctionData.winner?.id === userId) {
         setWinner(true); // Người dùng là người thắng
+      } else if (userParticipated) {
+        setWinner(false); // Người dùng không thắng nhưng có tham gia
       } else {
-        setWinner(false); // Người dùng không thắng
+        setWinner(null); // Người dùng không liên quan
       }
     } else {
       setWinner(null); // Trạng thái không xác định hoặc không liên quan
     }
-  }, [auctionData?.status, auctionData?.winner, userId]);
+  }, [auctionData?.status, auctionData?.winner, userId, bids]);
 
   useEffect(() => {
     if (userId) {
@@ -437,6 +452,7 @@ const ComicAuction = () => {
             <CountdownFlipNumbers
               auction={auctionData}
               onBidActionDisabled={handleBidActionDisabled}
+              onAuctionEnd={handleAuctionEnd}
             />
             <div
               className="current-price"
@@ -549,17 +565,19 @@ const ComicAuction = () => {
                         đ
                       </span>
                     </p>
-                    <Chip
-                      label="Đặt cọc tại đây"
-                      onClick={handleOpenDepositModal}
-                      style={{
-                        backgroundColor: "#fff",
-                        color: "#000",
-                        fontFamily: "REM",
-                        border: "1px solid black",
-                        boxShadow: "2px 2px",
-                      }}
-                    />
+                    {!auctionEnded && (
+                      <Chip
+                        label="Đặt cọc tại đây"
+                        onClick={handleOpenDepositModal}
+                        style={{
+                          backgroundColor: "#fff",
+                          color: "#000",
+                          fontFamily: "REM",
+                          border: "1px solid black",
+                          boxShadow: "2px 2px",
+                        }}
+                      />
+                    )}
                   </div>
                 ) : isHighest ? (
                   <div className="highest-bid-message REM">

@@ -2,57 +2,62 @@ import React, { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
 import EmptyNotification from "../../assets/no-notification.jpg";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "antd";
 
-const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
+const NotificationDropdown = ({ announcements, setUnreadAnnounce }) => {
   const [activeTab, setActiveTab] = useState("USER");
   const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
   const [role, setRole] = useState(false);
-  const [comicsData, setComicsData] = useState([]);
-  console.log(filteredAnnouncements);
+  const [unreadUser, setUnreadUser] = useState(0);
+  const [unreadSeller, setUnreadSeller] = useState(0);
 
   const navigate = useNavigate();
+
   useEffect(() => {
     const hasSellerAnnouncements = announcements.some(
       (item) => item.recipientType === "SELLER"
     );
     setRole(hasSellerAnnouncements);
-    setFilteredAnnouncements(
-      announcements.filter((item) => item.recipientType === activeTab)
-    );
-  }, [announcements, activeTab]);
 
-  // Mark notifications as read
-  const markAsRead = async (id) => {
-    try {
-      await privateAxios.put(`/announcements/${id}/read`);
-      setFilteredAnnouncements((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, isRead: true } : item))
-      );
-      setUnreadAnnouce((prev) => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error("Failed to mark as read:", error);
-    }
-  };
+    // Filter announcements based on active tab (USER or SELLER)
+    const filtered = announcements.filter(
+      (item) => item.recipientType === activeTab
+    );
+    setFilteredAnnouncements(filtered);
+
+    // Calculate unread counts for each tab
+    const unreadUserCount = announcements.filter(
+      (item) => item.recipientType === "USER" && !item.isRead
+    ).length;
+    const unreadSellerCount = announcements.filter(
+      (item) => item.recipientType === "SELLER" && !item.isRead
+    ).length;
+
+    setUnreadAnnounce(unreadUserCount + unreadSellerCount);
+    setUnreadUser(unreadUserCount);
+    setUnreadSeller(unreadSellerCount);
+  }, [announcements, activeTab, setUnreadAnnounce]);
+
   const navigateTo = async (item) => {
     if (item.type === "ORDER") navigate("/sellermanagement/order");
-
-    privateAxios
-      .post(`/announcements/${item?.id}/read`)
-      .then(() => {
-        console.log("Announcement marked as read.");
-        setFilteredAnnouncements((prev) =>
-          prev.map((announcement) =>
-            announcement.id === item.id
-              ? { ...announcement, isRead: true }
-              : announcement
-          )
-        );
-      })
-      .catch((error) => {
-        console.error("Error marking announcement as read:", error);
-      });
-
-    // if(item.type==="AUCTION") navigate(`/auctiondetail/${item.}`)
+    try {
+      await privateAxios.post(`/announcements/${item?.id}/read`);
+      console.log("Announcement marked as read.");
+      setFilteredAnnouncements((prev) =>
+        prev.map((announcement) =>
+          announcement.id === item.id
+            ? { ...announcement, isRead: true }
+            : announcement
+        )
+      );
+      // Recalculate unread count
+      const unreadCount = announcements.filter(
+        (announcement) => announcement.id !== item.id && !announcement.isRead
+      ).length;
+      setUnreadAnnounce(unreadCount);
+    } catch (error) {
+      console.error("Error marking announcement as read:", error);
+    }
   };
 
   return (
@@ -76,7 +81,8 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
               }`}
               onClick={() => setActiveTab("USER")}
             >
-              Người dùng
+              {/* Apply dot badge for unread notifications */}
+              <Badge dot={unreadUser > 0}>Người dùng</Badge>
             </button>
             <button
               className={`w-1/2 py-2 text-center font-bold ${
@@ -86,7 +92,8 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
               }`}
               onClick={() => setActiveTab("SELLER")}
             >
-              Người bán
+              {/* Apply dot badge for unread notifications */}
+              <Badge dot={unreadSeller > 0}>Người bán</Badge>
             </button>
           </div>
         )}
@@ -99,7 +106,7 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
             return (
               <div
                 key={index}
-                className={`mb-2 p-4 rounded-lg transition duration-200 flex ${
+                className={`my-2 p-4 rounded-lg transition duration-200 flex ${
                   item.isRead
                     ? "bg-white hover:bg-gray-50"
                     : "bg-zinc-200 hover:bg-gray-200"
@@ -111,17 +118,6 @@ const NotificationDropdown = ({ announcements, setUnreadAnnouce }) => {
                     <div className="flex mt-1 space-x-2 mr-2">
                       <img
                         src={item.auction.comics.coverImage}
-                        alt="Thông báo"
-                        className="w-16 h-12 rounded-md object-cover"
-                        style={{ objectFit: "fill" }}
-                      />
-                    </div>
-                  )}
-                {item.type === "ORDER" &&
-                  item.orderItems[0].comics.coverImage && (
-                    <div className="flex mt-1 space-x-2 mr-2">
-                      <img
-                        src={item.orderItems[0].comics.coverImage}
                         alt="Thông báo"
                         className="w-16 h-12 rounded-md object-cover"
                         style={{ objectFit: "fill" }}

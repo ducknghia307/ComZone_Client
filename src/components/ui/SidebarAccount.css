@@ -1,17 +1,32 @@
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 18px;
+  color: #555;
+  cursor: pointer;
+}
+
+.menu-item svg {
+  margin-right: 15px;
+}
+
+.menu-item.active {
+  font-weight: bold;
+  color: #000;
+}
+
+/* Thêm định dạng cho menu con */
 .sub-menu {
-    margin-left: 20px; /* Indent sub-menu */
-    list-style: none; /* Remove bullet points */
-    padding: 0;
-  }
-  
-  .sub-menu-item {
-    cursor: pointer;
-    padding: 5px 0;
-    color: #555; /* Optional: Style for sub-menu items */
-  }
-  
-  .sub-menu-item:hover {
-    color: #000; /* Optional: Hover effect */
-    font-weight: bold;
-  }
-  
+  padding-left: 30px; /* Thụt vào một ô */
+  list-style: none; /* Bỏ dấu chấm đầu dòng */
+}
+
+.sub-menu-item {
+  padding: 5px 0;
+}
+
+.sub-menu-item.active {
+  font-weight: bold;
+  color: #000;
+}

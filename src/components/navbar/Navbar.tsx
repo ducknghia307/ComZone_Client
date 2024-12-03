@@ -31,7 +31,7 @@ const Navbar = () => {
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [chatUnreadCount, setChatUnreadCount] = useState<number>(0);
   const [announcements, setAnnouncements] = useState([]);
-  const [unreadAnnouce, setUnreadAnnouce] = useState(0);
+  const [unreadAnnounce, setUnreadAnnounce] = useState(0);
   const [isRegisteringSeller, setIsRegisteringSeller] =
     useState<boolean>(false);
 
@@ -78,6 +78,8 @@ const Navbar = () => {
 
   useEffect(() => {
     socket.on("notification", (newNotification) => {
+      console.log(newNotification);
+
       setAnnouncements((prev) => {
         const exists = prev.some((item) => item.id === newNotification.id);
         if (!exists) {
@@ -86,7 +88,7 @@ const Navbar = () => {
         return prev;
       });
 
-      setUnreadAnnouce((prev) => prev + 1); // Increment count
+      setUnreadAnnounce((prev) => prev + 1); // Increment count
     });
 
     return () => {
@@ -146,7 +148,7 @@ const Navbar = () => {
       );
       console.log("1", response);
 
-      setUnreadAnnouce(response.data);
+      setUnreadAnnounce(response.data);
     } catch (error) {
       console.error("Error fetching user info:", error);
       setLoading(false);
@@ -158,7 +160,7 @@ const Navbar = () => {
       const response = await privateAxios.get(`/announcements/user`);
       const data = response.data || [];
       setAnnouncements(data);
-      setUnreadAnnouce(data.filter((item) => !item.isRead).length);
+      setUnreadAnnounce(data.filter((item) => !item.isRead).length);
     } catch (error) {
       console.error("Error fetching announcements:", error);
     }
@@ -201,7 +203,7 @@ const Navbar = () => {
   const content = (
     <NotificationDropdown
       announcements={announcements}
-      setUnreadAnnouce={setUnreadAnnouce}
+      setUnreadAnnounce={setUnreadAnnounce}
     />
   );
 
@@ -454,7 +456,7 @@ const Navbar = () => {
                           >
                             <li className="items-center cursor-pointer duration-200 hover:opacity-50 ml-4 lg:flex hidden">
                               <Badge
-                                count={unreadAnnouce}
+                                count={unreadAnnounce}
                                 overflowCount={9}
                                 showZero={false}
                               >

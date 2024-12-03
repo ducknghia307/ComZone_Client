@@ -6,6 +6,9 @@ export default {
       transitionProperty: {
         max_height: "max-height",
       },
+      colors: {
+        "custom-blue": "#f2f2f2",
+      },
     },
   },
   plugins: [],

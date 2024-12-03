@@ -9,11 +9,13 @@ import { useAppSelector } from "../../redux/hooks";
 interface CountdownFlipNumbersProps {
   auction: { id: string; status: string; endTime: string };
   onBidActionDisabled: (disabled: boolean) => void; // Optional prop to notify parent component
+  onAuctionEnd: (ended: boolean) => void;
 }
 
 const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
   auction,
   onBidActionDisabled,
+  onAuctionEnd,
 }) => {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -27,7 +29,6 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
 
   const formatEndTime = (endTime: string) => {
     const date = new Date(endTime);
-    console.log(auctionData.endTime);
 
     return date.toLocaleString("vi-VN", {
       timeZone: "Asia/Ho_Chi_Minh",
@@ -71,6 +72,7 @@ const CountdownFlipNumbers: React.FC<CountdownFlipNumbersProps> = ({
 
       // Handle auction end
       if (timeRemaining <= 0) {
+        onAuctionEnd(true);
         setAuctionEnded(true);
         onBidActionDisabled?.(true);
       }

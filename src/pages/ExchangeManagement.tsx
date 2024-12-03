@@ -1,5 +1,5 @@
 import React from "react";
-import Exchange from "./Exchange";
+import Exchange from "../components/exchange/Exchange";
 import { Tabs } from "antd";
 import CurrentUserComicExchange from "./CurrentUserComicExchange";
 
@@ -18,7 +18,21 @@ export default function ExchangeManagement() {
   ];
   return (
     <div className="py-8">
-      <Tabs defaultActiveKey="1" centered items={tabItems} />
+      <Tabs
+        defaultActiveKey={
+          window.location.pathname.includes("/exchange/comics-collection")
+            ? "2"
+            : "1"
+        }
+        centered
+        items={tabItems}
+        onChange={(key) => {
+          if (key === "1")
+            window.history.pushState(null, "", "/exchange/list/all");
+          else if (key === "2")
+            window.history.pushState(null, "", "/exchange/comics-collection");
+        }}
+      />
     </div>
   );
 }

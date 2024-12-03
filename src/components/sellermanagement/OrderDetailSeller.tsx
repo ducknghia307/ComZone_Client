@@ -31,6 +31,7 @@ import { OrderDetailData } from "../../common/base.interface";
 import { Modal, notification } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import "../ui/OrderDetailSeller.css";
+import CurrencySplitter from "../../assistants/Spliter";
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
@@ -67,8 +68,9 @@ const StatusChip = styled("span")<{ status: string; deliveryStatus?: string }>(
           return { color: "#2196f3", backgroundColor: "#e3f2fd" };
         case "SUCCESSFUL":
           return { color: "#4caf50", backgroundColor: "#e8f5e9" };
+        case "FAILED":
         case "CANCELED":
-          return { color: "#e91e63", backgroundColor: "#fce4ec" };
+          return { color: "#ff0000", backgroundColor: "#ffe1e1" };
         default:
           return {
             color: theme.palette.info.main,
@@ -96,6 +98,7 @@ const StatusChip = styled("span")<{ status: string; deliveryStatus?: string }>(
 
 interface OrderDetailProps {
   open: boolean;
+  setSelectedOrderId: React.Dispatch<React.SetStateAction<string>>;
   onClose: () => void;
   orderId: string;
   onStatusUpdate: (
@@ -104,6 +107,7 @@ interface OrderDetailProps {
     delivery?: { status: string }
   ) => void;
   order: OrderDetailData | undefined;
+  reload: () => void;
 }
 
 const InfoRow = ({
@@ -168,10 +172,12 @@ const InfoRow = ({
 
 const OrderDetailSeller: React.FC<OrderDetailProps> = ({
   open,
+  setSelectedOrderId,
   onClose,
   orderId,
   onStatusUpdate,
   order,
+  reload,
 }) => {
   const [orderDetail, setOrderDetail] = useState<OrderDetailData | null>(null);
   const theme = useTheme();
@@ -299,12 +305,16 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
               status: updatedDeliveryStatus,
             });
 
+            reload();
+
             notification.success({
               message: "Thành công",
               description: "Trạng thái đơn hàng đã được cập nhật thành công",
               duration: 3,
             });
           }
+
+          setSelectedOrderId(null);
         } catch (error: any) {
           if (actionType === "finish" && error.response?.status === 400) {
             Modal.confirm({
@@ -317,7 +327,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                 try {
                   await privateAxios.patch("/orders/cancel", {
                     orderId: orderId,
-                    cancelReason: "Đơn hàng gặp lỗi, cần hủy.",
+                    cancelReason: "Lỗi tạo đơn vận chuyển giao hàng.",
                   });
 
                   const updatedDetail = { ...orderDetail, status: "CANCELED" };
@@ -329,6 +339,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                     description: "Đơn hàng đã được hủy thành công",
                     duration: 3,
                   });
+
+                  reload();
                 } catch (cancelError) {
                   notification.error({
                     message: "Lỗi",
@@ -352,7 +364,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
 
   useEffect(() => {
     if (order) {
-      setOrderDetail(order); // Update local state with the latest order details
+      setOrderDetail(order);
     }
   }, [order]);
 
@@ -381,6 +393,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
               color: theme.palette.text.primary,
               textTransform: "uppercase",
               marginRight: "100px",
+              fontFamily: "REM",
             }}
           >
             Chi tiết đơn hàng
@@ -418,15 +431,18 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
               Ngày tạo đơn hàng:{" "}
               {new Date(orderDetail.createdAt).toLocaleString()}
             </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                color: theme.palette.text.secondary,
-                fontWeight: 500,
-              }}
-            >
-              Mã đơn hàng: {orderDetail.delivery.deliveryTrackingCode}
-            </Typography>
+
+            {orderDetail.delivery.deliveryTrackingCode && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontWeight: 500,
+                }}
+              >
+                Mã đơn hàng: {orderDetail.delivery.deliveryTrackingCode}
+              </Typography>
+            )}
           </div>
           <div
             style={{
@@ -533,7 +549,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                   />
                   <InfoRow
                     label="Tổng tiền"
-                    value={`${orderDetail.totalPrice} đ`}
+                    value={`${CurrencySplitter(orderDetail.totalPrice)} đ`}
                   />
                   <InfoRow
                     label="Phương thức thanh toán"
@@ -587,7 +603,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                         Giá (đ)
                       </TableCell>
                       <TableCell sx={{ color: "black", fontSize: "16px" }}>
-                        Tập/Bộ
+                        Truyện lẻ / Bộ
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -609,15 +625,17 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                               }}
                             />
                           </TableCell>
-                          <TableCell>{item.comics.title}</TableCell>
+                          <TableCell className="!font-semibold !text-start">
+                            {item.comics.title}
+                          </TableCell>
                           <TableCell>{item.comics.author || "N/A"}</TableCell>
                           <TableCell>
-                            {item.comics.price.toLocaleString()} đ
+                            {item.comics.price.toLocaleString()}
                           </TableCell>
                           <TableCell>
                             {item.comics.quantity > 1
                               ? "Bộ truyện"
-                              : "Tập truyện"}
+                              : "Truyện lẻ"}
                           </TableCell>
                         </TableRow>
                       ))
@@ -632,27 +650,36 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                 </Table>
               </TableContainer>
             </Grid>
-            <Grid size={12} sx={{ paddingLeft: "20px", paddingRight: "20px" }}>
-              <StyledPaper
-                sx={{
-                  padding: "16px",
-                  backgroundColor: "rgba(0, 0, 0, 0.05)",
-                  borderRadius: "8px",
-                }}
+            {orderDetail.note && (
+              <Grid
+                size={12}
+                sx={{ paddingLeft: "20px", paddingRight: "20px" }}
               >
-                <div
-                  style={{ display: "flex", gap: "5px", alignItems: "center" }}
+                <StyledPaper
+                  sx={{
+                    padding: "16px",
+                    backgroundColor: "rgba(0, 0, 0, 0.05)",
+                    borderRadius: "8px",
+                  }}
                 >
-                  <EditOutlinedIcon sx={{ fontSize: "16px" }} />
-                  <Typography fontSize="16px" fontWeight="bold">
-                    Ghi chú từ người mua:
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "5px",
+                      alignItems: "center",
+                    }}
+                  >
+                    <EditOutlinedIcon sx={{ fontSize: "16px" }} />
+                    <Typography fontSize="16px" fontWeight="bold">
+                      Ghi chú từ người mua:
+                    </Typography>
+                  </div>
+                  <Typography variant="body1" marginTop={"5px"}>
+                    {orderDetail.note}
                   </Typography>
-                </div>
-                <Typography variant="body1" marginTop={"5px"}>
-                  {orderDetail.note}
-                </Typography>
-              </StyledPaper>
-            </Grid>
+                </StyledPaper>
+              </Grid>
+            )}
           </Grid>
         </Stack>
       </DialogContent>

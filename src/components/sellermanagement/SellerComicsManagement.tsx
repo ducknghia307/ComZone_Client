@@ -32,12 +32,12 @@ const SellerComicsManagement = ({
   sellerSubscription?: SellerSubscription | null;
   fetchSellerSubscription?: () => void;
 }) => {
-  const [selectedMenuItem, setSelectedMenuItem] = useState("comic");
   const [comics, setComics] = useState<Comic[]>([]);
   const [filteredComics, setFilteredComics] = useState<Comic[]>([]);
   const [genres, setGenres] = useState([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchInput, setSearchInput] = useState<string>("");
 
   const [loading, setLoading] = useState(true);
   const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
@@ -280,6 +280,24 @@ const SellerComicsManagement = ({
       .catch((err) => console.log(err));
   };
 
+  const delayDuration = 1000;
+  let inputTimer: number;
+  const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
+
+    clearTimeout(inputTimer);
+
+    inputTimer = setTimeout(() => {
+      if (e.target.value.length > 0) {
+        setSearchParams({ search: e.target.value });
+        searchSellerComics(e.target.value);
+      } else {
+        searchParams.delete("search");
+        setFilteredComics(comics);
+      }
+    }, delayDuration);
+  };
+
   const columns: GridColDef[] = [
     {
       field: "coverImage",
@@ -441,149 +459,131 @@ const SellerComicsManagement = ({
       return <Typography>Đang tải...</Typography>;
     }
 
-    if (comics && comics.length === 0) {
+    if (!comics || (comics && comics.length === 0)) {
       return (
-        <Typography>
-          <Button
-            variant="contained"
-            sx={{
-              borderRadius: "20px",
-              backgroundColor: "#D9D9D9",
-              color: "#000",
-            }}
-            startIcon={<AddIcon />}
+        <div className="REM w-full min-h-[30vh] h-full flex flex-col items-center justify-center gap-8 bg-gray-900 rounded-lg p-4">
+          <p className="text-[2em] uppercase text-center lg:whitespace-nowrap bg-clip-text text-transparent font-bold bg-gradient-to-r from-green-500 via-red-400 to-sky-400">
+            Bắt đầu đăng bán truyện tranh ngay
+          </p>
+          <button
             onClick={() => handleAddComicsClick()}
+            className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md font-semibold text-lg duration-200 hover:bg-green-700"
           >
-            Thêm truyện đầu tiên
-          </Button>
-        </Typography>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="currentColor"
+            >
+              <path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"></path>
+            </svg>
+            TẠO TRUYỆN ĐẦU TIÊN
+          </button>
+        </div>
       );
-    }
+    } else
+      return (
+        <div className="REM flex flex-col gap-4">
+          <p className="text-2xl font-bold uppercase">Quản lí truyện tranh</p>
 
-    switch (selectedMenuItem) {
-      case "comic":
-        return (
-          <div className="REM flex flex-col gap-4">
-            <p className="text-2xl font-bold uppercase">Quản lí truyện tranh</p>
+          <div className="flex items-center justify-between my-2">
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: "20px",
+                backgroundColor: "green",
+                color: "#fff",
+                fontFamily: "inherit",
+              }}
+              startIcon={<AddIcon />}
+              onClick={() => handleAddComicsClick()}
+            >
+              Thêm truyện mới
+            </Button>
 
-            <div className="flex items-center justify-between my-2">
-              <Button
-                variant="contained"
-                sx={{
-                  borderRadius: "20px",
-                  backgroundColor: "green",
-                  color: "#fff",
-                  fontFamily: "inherit",
-                }}
-                startIcon={<AddIcon />}
-                onClick={() => handleAddComicsClick()}
-              >
-                Thêm truyện mới
-              </Button>
-
-              <div className="relative basis-1/3">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm..."
-                  value={searchParams.get("search")}
-                  onChange={(e) => {
-                    if (e.target.value.length > 0) {
-                      setSearchParams({ search: e.target.value });
-                      searchSellerComics(e.target.value);
-                    } else {
-                      searchParams.delete("search");
-                      setFilteredComics(comics);
-                    }
-                  }}
-                  className="w-full font-light text-sm pl-8 rounded-lg border-gray-300 focus:!border-gray-500"
-                />
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  className="absolute top-1/4 left-2"
-                >
-                  <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"></path>
-                </svg>
-              </div>
-            </div>
-
-            <div style={{ height: "auto", width: "100%" }}>
-              <DataGrid
-                rows={filteredComics}
-                columns={columns}
-                initialState={{ pagination: { paginationModel } }}
-                pageSizeOptions={[20, 30]}
-                getRowHeight={() => "auto"}
-                autosizeOptions={{
-                  columns: [
-                    "title",
-                    "author",
-                    "price",
-                    "status",
-                    "quantity",
-                    "genreIds",
-                    "onSaleSince",
-                  ],
-                  includeOutliers: true,
-                  includeHeaders: true,
-                }}
-                rowSelection={false}
-                sx={{
-                  border: 1,
-                  "& .MuiDataGrid-columnHeader": {
-                    backgroundColor: "#000000",
-                    color: "#ffffff",
-                    fontFamily: "REM",
-                  },
-                  "& .MuiDataGrid-cell": {
-                    justifyContent: "center",
-                    display: "flex",
-                    alignItems: "start",
-                    fontFamily: "REM",
-                  },
-                  "& .MuiDataGrid-sortIcon": {
-                    color: "#ffffff !important",
-                  },
-                  "& .MuiDataGrid-iconButtonContainer": {
-                    color: "#ffffff !important",
-                  },
-                  "& .MuiDataGrid-menuIconButton": {
-                    color: "#ffffff !important",
-                  },
-                }}
+            <div className="relative basis-1/3">
+              <input
+                type="text"
+                placeholder="Tìm kiếm theo tên truyện hoặc tác giả..."
+                value={searchInput}
+                onChange={onSearchInputChange}
+                className="w-full py-2 font-light text-sm pl-8 rounded-lg border border-gray-300"
               />
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="currentColor"
+                className="absolute top-1/4 left-2"
+              >
+                <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"></path>
+              </svg>
             </div>
-            <AuctionModal
-              open={isModalVisible}
-              comic={selectedComic}
-              onCancel={handleModalCancel}
-              onSuccess={handleModalSuccess}
-              fetchSellerComics={fetchSellerComics}
+          </div>
+
+          <div style={{ height: "auto", width: "100%" }}>
+            <DataGrid
+              rows={filteredComics}
+              columns={columns}
+              initialState={{ pagination: { paginationModel } }}
+              pageSizeOptions={[20, 30]}
+              getRowHeight={() => "auto"}
+              autosizeOptions={{
+                columns: [
+                  "title",
+                  "author",
+                  "price",
+                  "status",
+                  "quantity",
+                  "genreIds",
+                  "onSaleSince",
+                ],
+                includeOutliers: true,
+                includeHeaders: true,
+              }}
+              rowSelection={false}
+              sx={{
+                border: 1,
+                "& .MuiDataGrid-columnHeader": {
+                  backgroundColor: "#000000",
+                  color: "#ffffff",
+                  fontFamily: "REM",
+                },
+                "& .MuiDataGrid-cell": {
+                  justifyContent: "center",
+                  display: "flex",
+                  alignItems: "start",
+                  fontFamily: "REM",
+                },
+                "& .MuiDataGrid-sortIcon": {
+                  color: "#ffffff !important",
+                },
+                "& .MuiDataGrid-iconButtonContainer": {
+                  color: "#ffffff !important",
+                },
+                "& .MuiDataGrid-menuIconButton": {
+                  color: "#ffffff !important",
+                },
+              }}
             />
           </div>
-        );
-      case "order":
-        return <OrderManagement />;
-      case "auction":
-        return <AuctionManagement />;
-      case "delivery":
-        return <DeliveryManagement />;
-      default:
-        return (
-          <Typography variant="h4">
-            Chọn một mục để hiển thị nội dung
-          </Typography>
-        );
-    }
+          <AuctionModal
+            open={isModalVisible}
+            comic={selectedComic}
+            onCancel={handleModalCancel}
+            onSuccess={handleModalSuccess}
+            fetchSellerComics={fetchSellerComics}
+          />
+        </div>
+      );
   };
 
   return (
-    <div className="seller-container">
-      {renderContent()}{" "}
+    <div className="w-full bg-white p-4 rounded-lg drop-shadow-lg">
+      {renderContent()}
       {(!sellerSubscription || !sellerSubscription.isActive) && (
         <SellerSubsModal
           isOpen={isRegisteringPlan}

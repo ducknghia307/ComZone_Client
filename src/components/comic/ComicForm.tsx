@@ -609,10 +609,11 @@ const ComicForm: React.FC<ComicFormProps> = ({
             </p>
             <TextField
               fullWidth
+              spellCheck="false"
               error={formData.description.length > 1000}
               placeholder="Mô tả đặc điểm thêm, tình trạng, nội dung hay trải nghiệm của bạn về truyện..."
               multiline
-              rows={4}
+              rows={5}
               name="description"
               value={formData.description}
               onChange={(e) =>

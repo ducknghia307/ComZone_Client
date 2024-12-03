@@ -416,7 +416,7 @@ const Navbar = () => {
                     <div className="flex flex-row">
                       <div className="flex flex-row justify-center items-center lg:gap-6 md:gap-4 sm:gap-2 w-full">
                         <Link
-                          to={"/exchange/all"}
+                          to={"/exchange/list/all"}
                           className="items-center cursor-pointer duration-200 hover:opacity-50 ml-4 md:flex lg:flex hidden"
                         >
                           <svg

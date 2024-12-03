@@ -67,7 +67,6 @@ export default function ExchangeNewsFeed() {
               })
         );
 
-      //Fetch logged in user's exchange comics list
       await privateAxios
         .get("comics/exchange/user")
         .then((res) => setUserExchangeComicsList(res.data))
@@ -94,7 +93,10 @@ export default function ExchangeNewsFeed() {
             thực hiện đăng bài.
             <br />
             <button
-              onClick={() => navigate("")}
+              onClick={() => {
+                sessionStorage.setItem("create-exchange-comics", "true");
+                navigate("/exchange/comics-collection");
+              }}
               className="text-sky-600 underline mt-2"
             >
               Thêm truyện ngay

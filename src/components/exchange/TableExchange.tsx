@@ -192,7 +192,6 @@ const TableExchange: React.FC = () => {
       const response = await privateAxios(
         `/exchanges/user/status?status=${path}`
       );
-      console.log(response.data);
 
       const transformedData = (response.data || []).map(
         (item: UserExchangeList, index: number) => ({
@@ -210,7 +209,6 @@ const TableExchange: React.FC = () => {
         })
       );
 
-      console.log(transformedData);
       setData(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);

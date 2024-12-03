@@ -4,20 +4,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   TextField,
   Button,
-  Typography,
   Autocomplete,
   Chip,
   IconButton,
 } from "@mui/material";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
-import dayjs from "dayjs";
 import { Grid } from "@mui/system";
 import CurrencySplitter from "../../assistants/Spliter";
 import { Comic } from "../../common/base.interface";

@@ -192,6 +192,7 @@ const OrderHistory = () => {
       //     display: "inline-block",
       //     fontFamily: "REM",
       //   };
+      case "FAILED":
       case "CANCELED":
         return {
           color: "#e91e63",
@@ -306,8 +307,9 @@ const OrderHistory = () => {
         ].map((status) => (
           <span
             key={status}
-            className={`status-tab REM ${selectedStatus === status ? "active" : ""
-              }`}
+            className={`status-tab REM ${
+              selectedStatus === status ? "active" : ""
+            }`}
             onClick={() => setSelectedStatus(status)}
             style={{ whiteSpace: "nowrap" }}
           >
@@ -423,13 +425,13 @@ const OrderHistory = () => {
                     <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
                       {order.type === "AUCTION"
                         ? Number(order.totalPrice).toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })
+                            style: "currency",
+                            currency: "VND",
+                          })
                         : Number(item.comics.price).toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })}
+                            style: "currency",
+                            currency: "VND",
+                          })}
                     </Typography>
                   </div>
                 </div>

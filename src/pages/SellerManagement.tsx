@@ -53,8 +53,8 @@ const SellerManagementPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex items-start justify-center gap-4 md:px-8 py-4 bg-gray-50">
-      <div className="min-w-fit rounded-md self-stretch pb-8">
+    <div className="w-full flex items-stretch justify-center gap-4 md:px-8 py-4 bg-gray-50">
+      <div className="min-w-fit rounded-md">
         <Sidebar
           currentUrl={currentUrl}
           handleMenuItemClick={handleMenuItemClick}
@@ -63,7 +63,9 @@ const SellerManagementPage: React.FC = () => {
         />
       </div>
 
-      <div className="grow max-w-[80vw]">{getTable()}</div>
+      <div className="grow max-w-[80vw] flex items-stretch">
+        {getTable()}
+      </div>
     </div>
   );
 };

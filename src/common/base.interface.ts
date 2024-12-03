@@ -119,7 +119,7 @@ export interface Comic {
   page: number | null;
   publishedDate: string | null;
   price: number;
-  status: "AVAILABLE" | "REMOVED" | "UNAVAILABLE" | "SOLD";
+  status: "AVAILABLE" | "PRE_ORDER" | "UNAVAILABLE" | "SOLD";
   quantity: number;
   episodesList: string[];
   previewChapter: string[];

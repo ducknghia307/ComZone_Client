@@ -47,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="self-stretch REM pb-4 flex flex-col gap-2 p-2 rounded-md bg-white drop-shadow-xl border border-gray-300 mb-1">
           <p className="flex items-center gap-2">
             <img src={StarSVG} alt="" className="w-8 h-8" />
-            <p className="bg-clip-text text-transparent font-bold text-xl bg-gradient-to-r from-cyan-500 to-cyan-800">
+            <p className="text-sky-600 font-bold text-xl">
               GÓI CỦA BẠN
             </p>
           </p>
@@ -57,6 +57,17 @@ const Sidebar: React.FC<SidebarProps> = ({
             </p>
           ) : (
             <>
+              <p className="flex justify-between gap-2 font-light text-sm">
+                Tình trạng:{" "}
+                {sellerSubscription.isActive ? (
+                  <span className="font-semibold text-green-600">
+                    &#8226; Hoạt động
+                  </span>
+                ) : (
+                  <span className="font-semibold text-red-600">Hết hạn</span>
+                )}
+              </p>
+
               <p className="flex justify-between gap-2 font-light text-sm">
                 Số lượt bán còn lại:{" "}
                 <span className="font-semibold">
@@ -117,10 +128,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
         </>
       )}
-      <ul className="p-4 rounded-md drop-shadow-xl bg-white">
+      <ul className="REM p-4 rounded-md drop-shadow-xl bg-white">
         <li
           className={`menu-item ${
-            currentUrl === "/sellermanagement/comic" ? "active" : ""
+            currentUrl === "/sellermanagement/comic"
+              ? "active"
+              : "duration-200 opacity-60"
           } flex items-center`}
           onClick={() => {
             handleMenuItemClick("comic");
@@ -132,7 +145,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         </li>
         <li
           className={`menu-item ${
-            currentUrl === "/sellermanagement/order" ? "active" : ""
+            currentUrl === "/sellermanagement/order"
+              ? "active"
+              : "duration-200 opacity-60"
           }`}
           onClick={() => {
             handleMenuItemClick("order");
@@ -144,7 +159,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         </li>
         <li
           className={`menu-item ${
-            currentUrl === "/sellermanagement/auction" ? "active" : ""
+            currentUrl === "/sellermanagement/auction"
+              ? "active"
+              : "duration-200 opacity-60"
           }`}
           onClick={() => {
             handleMenuItemClick("auction");
@@ -156,7 +173,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         </li>
         <li
           className={`menu-item ${
-            currentUrl === "/sellermanagement/feedback" ? "active" : ""
+            currentUrl === "/sellermanagement/feedback"
+              ? "active"
+              : "duration-200 opacity-60"
           }`}
           onClick={() => {
             handleMenuItemClick("feedback");

@@ -10,12 +10,14 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { privateAxios } from "../../middleware/axiosInstance";
 import OrderDetailSeller from "./OrderDetailSeller";
 import { OrderDetailData } from "../../common/base.interface";
+import { Avatar } from "antd";
+import moment from "moment";
+import EmptyImage from "../../assets/notFound/emptybox.png";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState<OrderDetailData[]>([]);
@@ -23,8 +25,12 @@ const OrderManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchOrders = async () => {
+      setIsLoading(true);
+
       try {
         const response = await privateAxios.get("/orders/seller");
         const data = Array.isArray(response.data)
@@ -33,20 +39,20 @@ const OrderManagement = () => {
         console.log("orders seller", data);
 
         if (Array.isArray(data)) {
-
-          // Sort đơn hàng
           const sortedOrders = data.sort((a, b) => {
             const dateA = new Date(a.createdAt);
             const dateB = new Date(b.createdAt);
             return dateB.getTime() - dateA.getTime();
           });
 
-          setOrders(data);
+          setOrders(sortedOrders);
         } else {
           console.error("API did not return an array of orders.");
         }
       } catch (error) {
         console.error("Error fetching orders:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchOrders();
@@ -55,8 +61,10 @@ const OrderManagement = () => {
   const reload = async () => {
     try {
       const response = await privateAxios.get("/orders/seller");
-      const data = Array.isArray(response.data) ? response.data : response.data.orders;
-      setOrders(data);  // Cập nhật lại danh sách đơn hàng sau khi reload
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data.orders;
+      setOrders(data);
     } catch (error) {
       console.error("Error reloading orders:", error);
     }
@@ -90,11 +98,15 @@ const OrderManagement = () => {
     const selectedOrder = orders.find((order) => order.id === selectedOrderId);
 
     // Kiểm tra nếu thỏa mãn điều kiện
-    if (selectedOrder && selectedOrder.status === "PACKAGING" && selectedOrder.delivery?.status === "ready_to_pick") {
-      reload();  // Gọi hàm reload nếu điều kiện thỏa mãn
+    if (
+      selectedOrder &&
+      selectedOrder.status === "PACKAGING" &&
+      selectedOrder.delivery?.status === "ready_to_pick"
+    ) {
+      reload();
     }
 
-    setSelectedOrderId(null);  // Đóng modal
+    setSelectedOrderId(null);
   };
 
   const translateStatus = (status: string, deliveryStatus?: string) => {
@@ -103,7 +115,7 @@ const OrderManagement = () => {
     }
     switch (status) {
       case "PENDING":
-        return "Đang chờ xử lý";
+        return "Đang chờ xác nhận";
       case "DELIVERED":
         return "Đã giao hàng";
       case "PACKAGING":
@@ -191,20 +203,6 @@ const OrderManagement = () => {
     }
   };
 
-  // const handleStatusUpdate = (orderId: string, newStatus: string, delivery?: { status: string }) => {
-  //     setOrders((prevOrders) =>
-  //         prevOrders.map((order) =>
-  //             order.id === orderId
-  //                 ? {
-  //                     ...order,
-  //                     status: newStatus,
-  //                     delivery: delivery || order.delivery
-  //                 }
-  //                 : order
-  //         )
-  //     );
-  // };
-
   const handleStatusUpdate = (
     orderId: string,
     newStatus: string,
@@ -214,41 +212,25 @@ const OrderManagement = () => {
       prevOrders.map((order) =>
         order.id === orderId
           ? {
-            ...order,
-            status: newStatus,
-            delivery: delivery
-              ? { ...order.delivery, status: delivery.status }
-              : order.delivery,
-          }
+              ...order,
+              status: newStatus,
+              delivery: delivery
+                ? { ...order.delivery, status: delivery.status }
+                : order.delivery,
+            }
           : order
       )
     );
   };
 
   return (
-    <div
-      className="seller-container"
-      style={{ width: "100%", overflow: "hidden", padding: "10px 10px 0 10px" }}
-    >
-      <Typography variant="h5" className="content-header">
-        Quản Lý Đơn Hàng
-      </Typography>
-      {orders.length === 0 ? (
-        <Chip
-          label="Bạn chưa nhận được đơn hàng nào"
-          style={{
-            margin: "auto",
-            display: "inline-flex",
-            backgroundColor: "#f0f0f0",
-            color: "#000",
-            fontSize: "16px",
-            padding: "20px",
-            borderRadius: "20px",
-            fontWeight: "bold",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        />
+    <div className="REM w-full bg-white p-4 rounded-lg drop-shadow-lg flex flex-col gap-4">
+      <p className="text-2xl font-bold uppercase">Quản Lý Đơn Hàng</p>
+      {!isLoading && orders.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-4 py-16">
+          <img src={EmptyImage} alt="" className="w-32 bg-white" />
+          <p>Chưa có đơn hàng nào!</p>
+        </div>
       ) : (
         <TableContainer
           component={Paper}
@@ -259,13 +241,7 @@ const OrderManagement = () => {
             <TableHead>
               <TableRow style={{ backgroundColor: "black" }}>
                 <TableCell style={{ color: "white", textAlign: "center" }}>
-                  Mã Vận Đơn
-                </TableCell>
-                <TableCell style={{ color: "white", textAlign: "center" }}>
-                  Tên Người Đặt
-                </TableCell>
-                <TableCell style={{ color: "white", textAlign: "center" }}>
-                  Email
+                  Người dùng
                 </TableCell>
                 <TableCell style={{ color: "white", textAlign: "center" }}>
                   Số Điện Thoại
@@ -275,6 +251,12 @@ const OrderManagement = () => {
                 </TableCell>
                 <TableCell style={{ color: "white", textAlign: "center" }}>
                   Phương Thức Thanh Toán
+                </TableCell>
+                <TableCell style={{ color: "white", textAlign: "center" }}>
+                  Ngày đặt hàng
+                </TableCell>
+                <TableCell style={{ color: "white", textAlign: "center" }}>
+                  Mã Vận Đơn
                 </TableCell>
                 <TableCell style={{ color: "white", textAlign: "center" }}>
                   Trạng Thái
@@ -287,12 +269,12 @@ const OrderManagement = () => {
             <TableBody>
               {paginatedOrders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell align="center">
-                    {order.delivery?.deliveryTrackingCode || "N/A"}
+                  <TableCell align="left">
+                    <Avatar src={order.user.avatar} /> {order.user.name}
                   </TableCell>
-                  <TableCell align="center">{order.delivery.to.name}</TableCell>
-                  <TableCell align="center">{order.delivery.to.user.email}</TableCell>
-                  <TableCell align="center">{order.delivery.to.phone}</TableCell>
+                  <TableCell align="center">
+                    {order.delivery.to.phone}
+                  </TableCell>
                   <TableCell align="center">
                     {order.totalPrice.toLocaleString()} đ
                   </TableCell>
@@ -302,8 +284,17 @@ const OrderManagement = () => {
                       : order.paymentMethod}
                   </TableCell>
                   <TableCell align="center">
+                    {moment(order.createdAt).format("HH:mm DD/MM/YYYY")}
+                  </TableCell>
+                  <TableCell align="center">
+                    {order.delivery?.deliveryTrackingCode || "Chưa có"}
+                  </TableCell>
+                  <TableCell align="center">
                     <span
-                      style={getStatusChipStyles(order.status, order.delivery)}
+                      style={{
+                        ...getStatusChipStyles(order.status, order.delivery),
+                        fontFamily: "REM",
+                      }}
                     >
                       {translateStatus(order.status, order.delivery?.status)}
                     </span>
@@ -334,10 +325,12 @@ const OrderManagement = () => {
       {selectedOrderId && (
         <OrderDetailSeller
           open={Boolean(selectedOrderId)}
+          setSelectedOrderId={setSelectedOrderId}
           onClose={closeOrderDetail}
           orderId={selectedOrderId}
           onStatusUpdate={handleStatusUpdate}
           order={orders.find((order) => order.id === selectedOrderId)}
+          reload={reload}
         />
       )}
     </div>

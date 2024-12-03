@@ -57,21 +57,6 @@ const AccountUser: React.FC = () => {
     avatar: "https://cdn-icons-png.flaticon.com/512/147/147144.png",
   });
 
-  const orders = [
-    {
-      id: 1,
-      status: "pending",
-      shopName: "Tạp Hóa Truyện",
-      productName: "Thám Tử Lừng Danh Conan - Tập 102",
-      price: "29.000đ",
-      imgUrl:
-        "https://cdn0.fahasa.com/media/catalog/product/c/o/conan_bia_tap_102.jpg",
-      totalPrice: "29.000đ",
-      items: [],
-      type: "normal",
-    },
-  ];
-
   const renderContent = () => {
     switch (selectedMenuItem) {
       case "purchase":

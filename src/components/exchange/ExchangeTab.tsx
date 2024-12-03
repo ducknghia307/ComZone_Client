@@ -25,15 +25,15 @@ const Tab: React.FC<TabProps> = ({ label, path, isActive }) => {
 
 const ExchangeTab: React.FC = () => {
   const tabs = [
-    { label: "Tất cả", path: "/exchange/all" },
-    { label: "Yêu cầu nhận được", path: "/exchange/pending-request" },
-    { label: "Yêu cầu đã gửi đi", path: "/exchange/sent-request" },
-    { label: "Đang trao đổi", path: "/exchange/in-progress" },
-    { label: "Đang vận chuyển", path: "/exchange/in-delivery" },
-    { label: "Đã giao hàng", path: "/exchange/finished-delivery" },
-    { label: "Thành công", path: "/exchange/successful" },
-    { label: "Thất bại", path: "/exchange/failed" },
-    { label: "Bị từ chối", path: "/exchange/rejected" },
+    { label: "Tất cả", path: "/exchange/list/all" },
+    { label: "Yêu cầu nhận được", path: "/exchange/list/pending-request" },
+    { label: "Yêu cầu đã gửi đi", path: "/exchange/list/sent-request" },
+    { label: "Đang trao đổi", path: "/exchange/list/in-progress" },
+    { label: "Đang vận chuyển", path: "/exchange/list/in-delivery" },
+    { label: "Đã giao hàng", path: "/exchange/list/finished-delivery" },
+    { label: "Thành công", path: "/exchange/list/successful" },
+    { label: "Thất bại", path: "/exchange/list/failed" },
+    { label: "Bị từ chối", path: "/exchange/list/rejected" },
   ];
 
   const location = useLocation();

@@ -41,7 +41,7 @@ import ModRefunds from "../../pages/ModRefunds";
 import AdminUsers from "../../pages/AdminUsers";
 import AdminDashboard from "../../pages/AdminDashboard";
 import AdminSubscription from "../../pages/AdminSubscription";
-import Exchange from "../../pages/Exchange";
+import Exchange from "../exchange/Exchange";
 import ExchangeDetail from "../../pages/ExchangeDetail";
 import Announcement from "../../pages/Announcement";
 import AnnouncementOrder from "../../pages/AnnoucementOrder";
@@ -105,7 +105,7 @@ const AppRouter = () => {
           path="/exchange/comics-collection"
           element={<ExchangeManagement />}
         />
-        <Route path="/exchange/:status" element={<ExchangeManagement />} />
+        <Route path="/exchange/list/:status" element={<ExchangeManagement />} />
         <Route path="/exchange/detail/:id" element={<ExchangeDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

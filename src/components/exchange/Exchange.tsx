@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import ExchangeTab from "../components/exchange/ExchangeTab";
-import TableExchange from "../components/exchange/TableExchange";
+import ExchangeTab from "./ExchangeTab";
+import TableExchange from "./TableExchange";
 
 const Exchange = () => {
   return (

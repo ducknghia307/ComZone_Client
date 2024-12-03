@@ -172,8 +172,7 @@ const SellerCreateComic: React.FC = () => {
 
     privateAxios
       .post("/comics", comicData)
-      .then((response) => {
-        console.log("Comic Created:", response.data);
+      .then(() => {
         notification.success({
           key: "success",
           message: "Tạo truyện mới thành công",

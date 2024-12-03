@@ -19,7 +19,7 @@ const SignIn = () => {
     try {
       window.location.href = `${
         import.meta.env.VITE_SERVER_BASE_URL
-      }auth/google/login`;
+      }/auth/google/login`;
       //  window.location.reload();
     } catch (error) {
       console.log("Google login error:", error);

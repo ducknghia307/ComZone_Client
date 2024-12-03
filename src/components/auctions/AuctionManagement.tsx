@@ -26,6 +26,7 @@ import { notification, Popconfirm } from "antd";
 import { EyeOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import AuctionDetailModal from "../modal/AuctionDetailModal";
 import AuctionDetailModalSeller from "../modal/AuctionDetailModalSeller";
+import EmptyImage from "../../assets/notFound/emptybox.png";
 
 const getStatusChipStyles = (status: string) => {
   switch (status) {
@@ -214,29 +215,13 @@ const AuctionManagement = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div
-      className="seller-container"
-      style={{ width: "100%", overflow: "hidden" }}
-    >
-      <Typography variant="h5" className="content-header">
-        Quản lí đấu giá
-      </Typography>
+    <div className="REM w-full bg-white p-4 rounded-lg drop-shadow-lg flex flex-col gap-4">
+      <p className="text-2xl font-bold uppercase">Quản lý đấu giá</p>
       {auctions.length === 0 ? (
-        <Chip
-          label="Bạn chưa bắt đầu phiên đấu giá nào"
-          style={{
-            margin: "auto",
-            display: "inline-flex",
-            backgroundColor: "#f0f0f0",
-            color: "#000",
-            fontSize: "16px",
-            padding: "20px",
-            borderRadius: "20px",
-            fontWeight: "bold",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        />
+        <div className="flex flex-col items-center justify-center gap-4 py-16">
+          <img src={EmptyImage} alt="" className="w-32 bg-white" />
+          <p>Bạn chưa đăng ký cuộc đấu giá nào!</p>
+        </div>
       ) : (
         <>
           <Box sx={{ marginBottom: "20px" }}>

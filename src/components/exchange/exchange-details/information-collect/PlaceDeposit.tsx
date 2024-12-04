@@ -43,12 +43,10 @@ export default function PlaceDeposit({
       .get(`deliveries/exchange/from-user/${exchange.id}`)
       .then(async (res) => {
         const userDelivery: Delivery = res.data;
-        console.log("UD: ", userDelivery);
 
         await privateAxios
           .get(`deliveries/details/${userDelivery.id}`)
           .then((res) => {
-            console.log("DELI DETAILS: ", res.data);
             setDeliveryDetails({
               fee: res.data.deliveryFee,
               estTime: res.data.estDeliveryTime,

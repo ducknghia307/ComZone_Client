@@ -103,7 +103,7 @@ export default function InformationCollectSection({
           <p className="text-red-600">
             {exchangeDetails.exchange.status === "FAILED"
               ? "Trao đổi được hệ thống ghi nhận là thất bại khi một trong hai người trao đổi dừng trao đổi hoặc xảy ra vấn đề trong lúc trao đổi."
-              : "Trao đổi được hệ thống ghi nhận là bị từ chối khi yêu cầu của bạn không được người đăng bài chấp thuận."}
+              : "Trao đổi được hệ thống ghi nhận là bị từ chối khi yêu cầu của bạn không được người đăng bài chấp thuận hoặc người đăng bài đã chấp nhận một yêu cầu trao đổi khác."}
           </p>
         ),
       };
@@ -196,7 +196,7 @@ export default function InformationCollectSection({
     <div className="w-full flex flex-col items-stretch gap-8 mt-4">
       <div className="flex items-start justify-between gap-16">
         <div className="basis-2/3">
-          <p className="text-lg font-semibold uppercase">{getTitle()?.title}</p>
+          <p className="text-xl font-semibold uppercase">{getTitle()?.title}</p>
           <div className="text-md font-light italic">
             {getTitle()?.subTitle}
           </div>

@@ -15,7 +15,7 @@ export default function ActionButtons({
   exchangeDetails: ExchangeDetails;
   currentStage: number;
   oppositeCurrentStage: number;
-  fetchExchangeDetails: Function;
+  fetchExchangeDetails: () => void;
   selectedAddress: Address | null;
 }) {
   const isFailed = ["FAILED", "CANCELED", "REJECTED"].some(

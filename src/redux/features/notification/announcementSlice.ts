@@ -13,11 +13,9 @@ const announcementSlice = createSlice({
     },
     setUnreadAnnounce(state, action) {
       state.unReadAnnounce = action.payload;
-      console.log("unread", action.payload);
     },
     plusUnreadAnnounce(state) {
-      state.unReadAnnounce += 1; // Increment unread count
-      console.log("Updated unread count:", state.unReadAnnounce);
+      state.unReadAnnounce += 1;
     },
   },
 });

@@ -1,15 +1,22 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
-import EmptyNotification from "../../assets/no-notification.jpg";
-import OrderIcon from "../../assets/orderIcon.png";
+import EmptyNotification from "../../assets/announcement-icons/no-notification.jpg";
+import OrderIcon from "../../assets/announcement-icons/orderIcon.png";
+import NewExchangeRequestIcon from "../../assets/announcement-icons/exchange-icon.png";
+import ApproveExchangeIcon from "../../assets/announcement-icons/approve-icon.png";
+import RejectExchangeIcon from "../../assets/announcement-icons/reject-icon.png";
+import NewDealExchangeIcon from "../../assets/announcement-icons/deal-icon.png";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
+import { AnnouncementType } from "../../common/enums/announcementType.enum";
 import "../ui/Notification.css";
 
 const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
+  console.log("2", announcements);
   const [activeTab, setActiveTab] = useState("USER");
   const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
   const [role, setRole] = useState(false);
@@ -18,6 +25,9 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
+  useEffect(() => {
+    setAnnouncements(initialAnnouncements);
+  }, [initialAnnouncements]);
 
   useEffect(() => {
     const hasSellerAnnouncements = announcements.some(
@@ -41,14 +51,21 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
     dispatch(setUnreadAnnounce(unreadUserCount + unreadSellerCount));
     setUnreadUser(unreadUserCount);
     setUnreadSeller(unreadSellerCount);
-  }, [announcements, activeTab,dispatch]);
+  }, [announcements, activeTab, dispatch]);
   const navigateToAll = () => {
     navigate("/accountmanagement/announcement/orders");
   };
   const navigateTo = async (item) => {
     if (item.type === "ORDER") navigate("/sellermanagement/order");
-
+    if (item.type === "EXCHANGE" && item.exchange)
+      navigate(`/exchange/detail/${item.exchange.id}`);
+    else console.log(item);
+    if (item.type === "EXCHANGE" && item.exchange)
+      navigate(`/exchange/detail/${item.exchange.id}`);
+    else console.log(item);
     try {
+      if (item.isRead === true) return;
+
       await privateAxios.post(`/announcements/${item?.id}/read`);
       console.log("Announcement marked as read.");
 
@@ -115,37 +132,101 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
             return (
               <div
                 key={index}
-                className={`my-2 p-4 rounded-lg transition duration-200 flex ${
+                className={`my-2 p-4 rounded-lg transition duration-200 flex items-start gap-2 ${
                   item.isRead
                     ? "bg-white hover:bg-gray-50"
                     : "bg-zinc-200 hover:bg-gray-200"
                 } hover:shadow-lg border border-gray-300 cursor-pointer`}
                 onClick={() => navigateTo(item)}
               >
-                {item.type === "AUCTION" &&
-                  item.auction?.comics?.coverImage && (
-                    <div className="flex mt-1 space-x-2 mr-2">
+                {/* ICON */}
+                <div className="shrink-0 space-x-2">
+                  {item.type === AnnouncementType.AUCTION &&
+                    item.auction?.comics?.coverImage && (
                       <img
                         src={item.auction.comics.coverImage}
                         alt="Thông báo"
-                        className="w-16 h-12 rounded-md object-cover"
-                        style={{ objectFit: "fill" }}
+                        className="w-16 h-12 rounded-md object-contain"
                       />
-                    </div>
-                  )}
-                {item.type === "ORDER" && (
-                  <div className="flex mt-1 space-x-2 mr-2">
+                    )}
+
+                  {item.type === AnnouncementType.ORDER && (
                     <img
                       src={OrderIcon}
                       alt="Thông báo"
-                      className="w-16 h-12 rounded-md object-cover"
-                      style={{ objectFit: "fill" }}
+                      className="w-16 h-12 rounded-md object-contain"
                     />
-                  </div>
-                )}
+                  )}
 
-                <div className="flex-col">
-                  <h5 className="font-semibold text-gray-700">{item.title}</h5>
+                  {item.type === AnnouncementType.EXCHANGE_NEW_REQUEST && (
+                    <img
+                      src={NewExchangeRequestIcon}
+                      alt="Thông báo"
+                      className="w-16 h-12 rounded-md object-contain"
+                    />
+                  )}
+
+                  {item.type === AnnouncementType.EXCHANGE_APPROVED && (
+                    <img
+                      src={ApproveExchangeIcon}
+                      alt="Thông báo"
+                      className="w-12 h-8 rounded-md object-contain"
+                    />
+                  )}
+
+                  {item.type === AnnouncementType.EXCHANGE_REJECTED && (
+                    <img
+                      src={RejectExchangeIcon}
+                      alt="Thông báo"
+                      className="w-12 h-8 rounded-md object-contain"
+                    />
+                  )}
+
+                  {item.type === AnnouncementType.EXCHANGE_NEW_DEAL && (
+                    <img
+                      src={NewDealExchangeIcon}
+                      alt="Thông báo"
+                      className="w-12 h-8 rounded-md object-contain"
+                    />
+                  )}
+
+                  {item.type === AnnouncementType.EXCHANGE_NEW_REQUEST && (
+                    <img
+                      src={NewExchangeRequestIcon}
+                      alt="Thông báo"
+                      className="w-16 h-12 rounded-md object-contain"
+                    />
+                  )}
+
+                  {item.type === AnnouncementType.EXCHANGE_APPROVED && (
+                    <img
+                      src={ApproveExchangeIcon}
+                      alt="Thông báo"
+                      className="w-12 h-8 rounded-md object-contain"
+                    />
+                  )}
+
+                  {item.type === AnnouncementType.EXCHANGE_REJECTED && (
+                    <img
+                      src={RejectExchangeIcon}
+                      alt="Thông báo"
+                      className="w-12 h-8 rounded-md object-contain"
+                    />
+                  )}
+
+                  {item.type === AnnouncementType.EXCHANGE_NEW_DEAL && (
+                    <img
+                      src={NewDealExchangeIcon}
+                      alt="Thông báo"
+                      className="w-12 h-8 rounded-md object-contain"
+                    />
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <h5 className="font-semibold text-gray-700 uppercase">
+                    {item.title}
+                  </h5>
                   <p className="text-sm text-gray-600">{item.message}</p>
                 </div>
               </div>

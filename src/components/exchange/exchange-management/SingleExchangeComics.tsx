@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useRef, useState } from "react";
 import { Comic } from "../../../common/base.interface";
 
 export default function SingleExchangeComics({
@@ -8,17 +9,26 @@ export default function SingleExchangeComics({
   comics: Comic;
   setIsShowingDetails: React.Dispatch<React.SetStateAction<Comic>>;
 }) {
-  const [currentImage, setCurrentImage] = useState(comics.coverImage);
+  const [currentComics, setCurrentComics] = useState<Comic>(comics);
+
+  const imagesList = [currentComics.coverImage].concat(
+    currentComics.previewChapter
+  );
+
+  const [currentImage, setCurrentImage] = useState(imagesList[0]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0);
 
-  const imagesList = [comics.coverImage].concat(comics.previewChapter);
+  useEffect(() => {
+    setCurrentComics(comics);
+    setCurrentImage(comics.coverImage);
+  }, [comics]);
 
   const imageListRef = useRef<HTMLDivElement>();
   const singleImageRef = useRef<HTMLImageElement>();
 
   const getComicsExchangeStatus = () => {
-    switch (comics.status) {
+    switch (currentComics.status) {
       case "UNAVAILABLE":
         return <p>Không khả dụng</p>;
       case "AVAILABLE":
@@ -78,13 +88,13 @@ export default function SingleExchangeComics({
   return (
     <div
       className={`${
-        comics.quantity > 1
+        currentComics.quantity > 1
           ? "bg-gradient-to-r from-pink-400 via-yellow-400 to-blue-400 p-[0.2em]"
           : "bg-gray-800 p-[0.1em]"
       } text-white font-semibold rounded-md duration-200`}
     >
       <div
-        key={comics.id}
+        key={currentComics.id}
         className={`relative flex items-start gap-2 bg-white text-black p-[0.2em] rounded-md duration-200 group hover:bg-gray-50`}
       >
         <div className="shrink-0 flex items-start gap-2">
@@ -161,14 +171,16 @@ export default function SingleExchangeComics({
         <div className="self-stretch max-w-96 ml-2 flex flex-col justify-center gap-2 py-2">
           <div className="flex flex-col leading-tight">
             <p className="text-lg font-semibold uppercase leading-tight">
-              {comics.title}
+              {currentComics.title}
             </p>
-            <p className="font-light uppercase text-sm">{comics.author}</p>
+            <p className="font-light uppercase text-sm">
+              {currentComics.author}
+            </p>
           </div>
 
-          {comics.quantity > 1 && comics.episodesList && (
+          {currentComics.quantity > 1 && currentComics.episodesList && (
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              {comics.episodesList.slice(0, 8).map((episode) => (
+              {currentComics.episodesList.slice(0, 8).map((episode) => (
                 <span className="font-light text-xs italic border border-gray-300 p-1 rounded-md">
                   {episode}
                 </span>
@@ -182,7 +194,7 @@ export default function SingleExchangeComics({
           </div>
 
           <button
-            onClick={() => setIsShowingDetails(comics)}
+            onClick={() => setIsShowingDetails(currentComics)}
             className="self-baseline px-4 py-1 border border-gray-500 bg-gray-900 text-white rounded-md font-light text-sm duration-200 hover:bg-white hover:text-black"
           >
             Xem chi tiết

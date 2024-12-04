@@ -37,9 +37,9 @@ const AllAuctions = ({
   filteredConditions,
 }: any) => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAppSelector((state) => state.auth);
   const [ongoingComics, setOngoingComics] = useState<any[]>([]);
   const [upcomingComics, setUpcomingComics] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("ONGOING");
 

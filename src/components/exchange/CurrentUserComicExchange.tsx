@@ -1,21 +1,34 @@
-import { useEffect, useState } from "react";
-import { privateAxios } from "../middleware/axiosInstance";
-import { Comic, UserInfo } from "../common/base.interface";
-import Loading from "../components/loading/Loading";
-import NewComicOfferModal from "../components/exchange/exchange-management/NewComicOfferModal";
-import SingleExchangeComics from "../components/exchange/exchange-management/SingleExchangeComics";
-import ExchangeComicsDetails from "../components/exchange/exchange-management/ExchangeComicsDetails";
-import UpdateExchangeComics from "../components/exchange/exchange-management/UpdateExchangeComics";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useRef, useState } from "react";
+import { privateAxios } from "../../middleware/axiosInstance";
+import { Comic, UserInfo } from "../../common/base.interface";
+import Loading from "../loading/Loading";
+import NewComicOfferModal from "./exchange-management/NewComicOfferModal";
+import SingleExchangeComics from "./exchange-management/SingleExchangeComics";
+import ExchangeComicsDetails from "./exchange-management/ExchangeComicsDetails";
+import UpdateExchangeComics from "./exchange-management/UpdateExchangeComics";
+import { notification, Pagination } from "antd";
+import { useSearchParams } from "react-router-dom";
 
 const CurrentUserComicExchange = () => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [isLoading, setIsLoading] = useState(false);
   const [comicExchangeOffer, setComicExchangeOffer] = useState<Comic[]>([]);
+  const [currentComicsList, setCurrentComicsList] = useState<Comic[]>([]);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchInput, setSearchInput] = useState<string>(
+    searchParams.get("search") || ""
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isShowingDetails, setIsShowingDetails] = useState<Comic>();
 
   const [isUpdating, setIsUpdating] = useState<Comic>();
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const comicsPerPage = 10;
+  const topListPosition = useRef<HTMLDivElement>();
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -24,12 +37,15 @@ const CurrentUserComicExchange = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
   const fetchComicExchangeOffer = async () => {
     try {
       setIsLoading(true);
       const res = await privateAxios("/comics/exchange/user");
       const exchangeComicsList: Comic[] = res.data;
       setComicExchangeOffer(exchangeComicsList);
+
+      if (!searchParams.get("search")) setCurrentComicsList(exchangeComicsList);
 
       if (isShowingDetails)
         setIsShowingDetails(
@@ -41,6 +57,7 @@ const CurrentUserComicExchange = () => {
       setIsLoading(false);
     }
   };
+
   const fetchUserInfo = async () => {
     try {
       setIsLoading(true);
@@ -51,6 +68,54 @@ const CurrentUserComicExchange = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const searchExchangeComics = async (searchKey?: string) => {
+    if (!searchKey && searchInput.length === 0) return;
+
+    await privateAxios
+      .get(`comics/exchange/search/self?key=${searchKey || searchInput}`)
+      .then((res) => {
+        setSearchParams({ search: searchKey || searchInput });
+        setCurrentComicsList(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleSearchExchangeComics = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter" && searchInput.length > 0) {
+      searchExchangeComics();
+    }
+  };
+
+  useEffect(() => {
+    if (searchParams.get("search") && searchParams.get("search").length > 0) {
+      searchExchangeComics(searchParams.get("search"));
+      setSearchInput(searchParams.get("search"));
+    }
+  }, []);
+
+  const handleUndoDelete = async (comics: Comic) => {
+    await privateAxios
+      .delete(`comics/undo/${comics.id}`)
+      .then(() => {
+        notification.success({
+          key: "delete",
+          message: <p className="REM">Khôi phục thành công</p>,
+          description: (
+            <p className="REM">
+              Truyện <span className="font-semibold">"{comics.title}"</span> đã
+              được khôi phục!
+            </p>
+          ),
+          duration: 5,
+        });
+
+        fetchComicExchangeOffer();
+      })
+      .catch((err) => console.log(err));
   };
 
   useEffect(() => {
@@ -76,6 +141,17 @@ const CurrentUserComicExchange = () => {
               type="text"
               placeholder="Tìm kiếm theo tên truyện, tác giả..."
               className="w-full border border-gray-300 rounded-md p-2 pl-12 font-light"
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+
+                if (e.target.value.length === 0) {
+                  searchParams.delete("search");
+                  setSearchParams(searchParams);
+                  setCurrentComicsList(comicExchangeOffer);
+                }
+              }}
+              onKeyDown={handleSearchExchangeComics}
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -106,13 +182,38 @@ const CurrentUserComicExchange = () => {
           </button>
         </div>
 
-        <div className="w-full flex flex-col gap-1">
-          {comicExchangeOffer.map((comics) => (
-            <SingleExchangeComics
-              comics={comics}
-              setIsShowingDetails={setIsShowingDetails}
-            />
-          ))}
+        <div className="w-full flex flex-col gap-1 items-stretch">
+          <div ref={topListPosition} />
+          {currentComicsList
+            .slice(
+              currentPage * comicsPerPage,
+              currentPage * comicsPerPage + comicsPerPage
+            )
+            .map((comics) => (
+              <SingleExchangeComics
+                comics={comics}
+                setIsShowingDetails={setIsShowingDetails}
+              />
+            ))}
+
+          {searchParams.get("search") && (
+            <p className="mt-2">Hiển thị {currentComicsList.length} kết quả</p>
+          )}
+
+          <Pagination
+            align="center"
+            defaultCurrent={1}
+            pageSize={comicsPerPage}
+            total={comicExchangeOffer.length}
+            hideOnSinglePage
+            onChange={(page) => {
+              setCurrentPage(page - 1);
+              if (topListPosition.current) {
+                topListPosition.current.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+            className="mt-4"
+          />
         </div>
       </div>
 
@@ -122,6 +223,7 @@ const CurrentUserComicExchange = () => {
           setIsShowingDetails={setIsShowingDetails}
           fetchComicExchangeOffer={fetchComicExchangeOffer}
           setIsUpdating={setIsUpdating}
+          handleUndoDelete={handleUndoDelete}
         />
       )}
 

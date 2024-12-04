@@ -83,24 +83,27 @@ const Navbar = () => {
   }, [userInfo]);
 
   useEffect(() => {
-    socket.on("notification", (newNotification) => {
+    const handleNewNotification = (newNotification) => {
       console.log(newNotification);
 
       setAnnouncements((prev) => {
         const exists = prev.some((item) => item.id === newNotification.id);
         if (!exists) {
-          return [newNotification, ...prev];
+          const updatedAnnouncements = [newNotification, ...prev];
+          return updatedAnnouncements;
         }
         return prev;
       });
 
       dispatch(plusUnreadAnnounce());
-    });
+    };
+
+    socket.on("notification", handleNewNotification);
 
     return () => {
-      socket.off("notification");
+      socket.off("notification", handleNewNotification);
     };
-  }, []);
+  }, [dispatch]);
 
   const handleSubscribePlan = async (planId: string) => {
     await privateAxios

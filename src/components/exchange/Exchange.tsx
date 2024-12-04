@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import ExchangeTab from "./ExchangeTab";
 import TableExchange from "./TableExchange";
 

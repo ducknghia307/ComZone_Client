@@ -36,7 +36,7 @@ const TableExchange: React.FC = () => {
 
   const columns: TableColumnsType<Exchange> = [
     {
-      title: "No",
+      title: "Thứ tự",
       dataIndex: "index",
       render: (no: number) => <p className="">{no}</p>,
     },
@@ -125,7 +125,7 @@ const TableExchange: React.FC = () => {
         switch (status) {
           case "PENDING":
             color = "orange";
-            translatedStatus = "Đang chờ";
+            translatedStatus = "Đang chờ xác nhận";
             break;
           case "DEALING":
             color = "blue";

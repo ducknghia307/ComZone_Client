@@ -29,7 +29,7 @@ export default function CreatePostModal({
     if (e.target.files) {
       const fileArray = Array.from(e.target.files);
       fileArray.map((file, index) => {
-        if (index + uploadedImagesFile.length < 8) {
+        if (index + uploadedImagesFile.length < 4) {
           const url = URL.createObjectURL(file);
           setPreviewImages((prev) => [...prev, url]);
           setUploadedImagesFile((prev) => [...prev, file]);
@@ -115,6 +115,15 @@ export default function CreatePostModal({
           ĐĂNG BÀI TÌM KIẾM TRUYỆN ĐỂ TRAO ĐỔI
         </h2>
 
+        <div className="flex items-start gap-2 text-sm text-red-600">
+          <span className="font-semibold underline">Lưu ý: </span>
+          <p className="font-light italic">
+            Một bài viết chỉ dùng để tìm kiếm một truyện (bộ truyện) duy nhất.
+            <br />
+            Bạn chỉ có thể chấp nhận MỘT yêu cầu trao đổi cho mỗi bài viết.
+          </p>
+        </div>
+
         <div className="flex flex-row gap-1 mt-4">
           <h2>Nội dung bài viết:</h2>
           <p className="text-red-500">*</p>
@@ -156,14 +165,6 @@ export default function CreatePostModal({
           </Popover>
         </div>
 
-        <p
-          className={`${
-            postContent.trim().length > 0 && "invisible"
-          } text-xs font-light italic text-green-600 mt-2`}
-        >
-          Việc mô tả chi tiết sẽ giúp người khác hiểu rõ hơn về truyện bạn đang
-          tìm kiếm.
-        </p>
         {postContentError && (
           <p className="text-red-500 text-xs mt-1">
             Cần nhập nội dung bài đăng
@@ -172,30 +173,30 @@ export default function CreatePostModal({
 
         <div className="flex flex-col mt-4">
           <p>
-            Ảnh đi kèm:{" "}
-            <span className="text-xs font-light italic">(Tối đa 8 ảnh)</span>
+            Ảnh bài viết:{" "}
+            <span className="text-xs font-light italic">(Tối đa 4 ảnh)</span>
           </p>
-          <p className="text-xs">
+          <p className="text-xs font-light italic text-green-600">
             Sử dụng hình ảnh để người khác nhận diện truyện bạn tìm kiếm dễ hơn.
           </p>
 
-          <div className="grid grid-cols-[repeat(auto-fill,10rem)] gap-2 mt-2">
+          <div className="grid grid-cols-4 gap-2 mt-2">
             {previewImages.map((imgUrl, index) => (
               <div key={index} className="relative group">
                 <img
                   src={imgUrl}
                   alt={`preview chapter ${index}`}
-                  className="w-[10em] h-[15em] object-cover transition-opacity duration-200 ease-in-out group-hover:opacity-50 rounded-md border p-1"
+                  className="w-[10em] h-[15em] object-cover transition-opacity duration-200 ease-in-out group-hover:opacity-80 rounded-md border p-1"
                 />
                 <button
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-1 rounded-full text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                   onClick={() => handleRemovePreviewChapterImage(index)}
                 >
                   <DeleteOutlined style={{ fontSize: 16 }} />
                 </button>
               </div>
             ))}
-            {uploadedImagesFile.length < 8 && (
+            {uploadedImagesFile.length < 4 && (
               <button
                 className="w-[10em] h-[15em] p-4 border bg-gray-100 hover:opacity-75 duration-200 rounded-lg flex flex-col items-center justify-center gap-2"
                 onClick={() =>
@@ -225,7 +226,7 @@ export default function CreatePostModal({
           </div>
         </div>
 
-        <div className="w-full flex justify-end mt-4 flex-row gap-10">
+        <div className="w-full flex justify-end mt-4 flex-row gap-10 mt-4">
           <button
             className="border-none hover:opacity-70 duration-200"
             onClick={() => setOpenCreatePost(false)}

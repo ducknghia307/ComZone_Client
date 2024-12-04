@@ -13,9 +13,8 @@ export default function ConfirmDeliveryButton({
 }: {
   selectedAddress: Address | null;
   exchangeId: string;
-  fetchExchangeDetails: Function;
+  fetchExchangeDetails: () => void;
 }) {
-  const [isRejecting, setIsRejecting] = useState<boolean>(false);
   const [isAccepting, setIsAccepting] = useState<boolean>(false);
 
   const navigate = useNavigate();

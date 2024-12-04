@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Modal, Radio, notification, Select, message } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CoverImagePlaceholder from "../../../assets/image-placeholder.jpg";
 import { UserInfo } from "../../../common/base.interface";
 import { privateAxios } from "../../../middleware/axiosInstance";
@@ -45,6 +46,19 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
     []
   );
 
+  const maxPreviewChapters = quantity > 1 ? 8 : 4;
+
+  useEffect(() => {
+    if (quantity === 1) {
+      setPreviewChapterImages(
+        previewChapterImages.slice(0, maxPreviewChapters)
+      );
+      setUploadedPreviewChapterImageFiles(
+        uploadedPreviewChapterImageFiles.slice(0, maxPreviewChapters)
+      );
+    }
+  }, [quantity]);
+
   const isDisabled =
     title.length === 0 ||
     author.length === 0 ||
@@ -72,7 +86,10 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
     if (e.target.files) {
       const fileArray = Array.from(e.target.files);
       fileArray.map((file, index) => {
-        if (index + uploadedPreviewChapterImageFiles.length < 4) {
+        if (
+          index + uploadedPreviewChapterImageFiles.length <
+          maxPreviewChapters
+        ) {
           const url = URL.createObjectURL(file);
           setPreviewChapterImages((prev) => [...prev, url]);
           setUploadedPreviewChapterImageFiles((prev) => [...prev, file]);
@@ -214,7 +231,10 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
     <Modal
       title={<h2 className="text-xl">Thêm truyện để trao đổi</h2>}
       open={isModalOpen}
-      onCancel={handleCancel}
+      onCancel={() => {
+        reset();
+        handleCancel();
+      }}
       width={1000}
       centered
       footer={null}
@@ -441,7 +461,9 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
           <div className="flex items-center gap-1 mt-6">
             <h2 className="font-sm">Ảnh xem trước nội dung truyện:</h2>
             <p className="text-red-500">*</p>
-            <p className="font-light text-xs italic">(Tối đa 4 ảnh)</p>
+            <p className="font-light text-xs italic">
+              (Tối đa {maxPreviewChapters} ảnh)
+            </p>
           </div>
 
           <div className="flex gap-2 mt-2">
@@ -460,7 +482,7 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
                 </button>
               </div>
             ))}
-            {previewChapterImages.length < 4 && (
+            {previewChapterImages.length < maxPreviewChapters && (
               <label htmlFor="previewChapterUpload">
                 <button
                   className=" h-20 w-20 p-4 border bg-gray-100 hover:opacity-75 duration-200 rounded-lg flex flex-col items-center justify-center gap-2"

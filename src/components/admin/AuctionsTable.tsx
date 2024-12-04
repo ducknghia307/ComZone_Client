@@ -74,9 +74,9 @@ const AuctionsTable: React.FC = () => {
     fetchComics();
   }, []);
 
-//   const handleChangePage = (event: unknown, newPage: number) => {
-//     setPage(newPage);
-//   };
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -181,10 +181,10 @@ const AuctionsTable: React.FC = () => {
     }
   };
 
-//   const handleOpenBanModal = (comicId: string) => {
-//     setSelectedComicId(comicId);
-//     setOpenBanModal(true);
-//   };
+  const handleOpenBanModal = (comicId: string) => {
+    setSelectedComicId(comicId);
+    setOpenBanModal(true);
+  };
 
   const handleBanComic = async (reason: string) => {
     if (selectedComicId !== null) {
@@ -207,9 +207,9 @@ const AuctionsTable: React.FC = () => {
     }
   };
 
-//   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-//     setSearchTerm(event.target.value);
-//   };
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
   const filteredComics = comics.filter(
     (comic) =>
@@ -244,9 +244,15 @@ const AuctionsTable: React.FC = () => {
                 <StyledTableCell align="right" style={{ whiteSpace: "nowrap" }}>
                   Giá
                 </StyledTableCell>
-                {/* <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Trạng Thái</StyledTableCell> */}
-                {/* <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Tập/Bộ</StyledTableCell> */}
-                {/* <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Chỉnh Sửa</StyledTableCell> */}
+                <StyledTableCell align="right" style={{ whiteSpace: "nowrap" }}>
+                  Trạng Thái
+                </StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: "nowrap" }}>
+                  Tập/Bộ
+                </StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: "nowrap" }}>
+                  Chỉnh Sửa
+                </StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -272,19 +278,22 @@ const AuctionsTable: React.FC = () => {
                       <StyledTableCell align="right">
                         {comic.price}
                       </StyledTableCell>
-                      {/* <StyledTableCell align="right">
-                      <span style={getStatusColor(comic.status)}>
-                        {translateStatus(comic.status)}
-                      </span>
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      {comic.quantity > 1 ? 'Bộ Truyện' : 'Tập Truyện'}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      <IconButton color="error" onClick={() => handleOpenBanModal(comic.id)}>
-                        <DeleteOutlineOutlinedIcon />
-                      </IconButton>
-                    </StyledTableCell> */}
+                      <StyledTableCell align="right">
+                        <span style={getStatusColor(comic.status)}>
+                          {translateStatus(comic.status)}
+                        </span>
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        {comic.quantity > 1 ? "Bộ Truyện" : "Tập Truyện"}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        <IconButton
+                          color="error"
+                          onClick={() => handleOpenBanModal(comic.id)}
+                        >
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
+                      </StyledTableCell>
                     </StyledTableRow>
                   ))
               )}
@@ -315,4 +324,4 @@ const AuctionsTable: React.FC = () => {
   );
 };
 
-// export default AuctionsTable;
+export default AuctionsTable;

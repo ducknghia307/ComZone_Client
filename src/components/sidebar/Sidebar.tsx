@@ -13,7 +13,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useAppSelector } from "../../redux/hooks";
 import { useLocation } from "react-router-dom";
-import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
+import { publicAxios } from "../../middleware/axiosInstance";
 import "../ui/Sidebar.css";
 import { Comic, Genre } from "../../common/base.interface";
 
@@ -22,6 +22,7 @@ interface SidebarProps {
   onAuthorFilterChange?: (updatedAuthors: string[]) => void;
   onConditionFilterChange?: (updatedConditions: string[]) => void;
 }
+
 const conditions = ["ALL", "SEALED", "USED"];
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -38,9 +39,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
   const [selectedCondition, setSelectedCondition] = useState<string[]>([]);
+
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const location = useLocation();
-
   const shouldShowConditionSection = ["/genres", "/auctions"].includes(
     location.pathname
   );
@@ -52,11 +53,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         const genreResponse = await publicAxios("/genres");
         setGenres(genreResponse.data);
 
+        // Fetch comics and extract authors from them
         const comicsResponse = await publicAxios.get<Comic[]>(
           "/comics/status/available"
         );
-
         const comicsData = comicsResponse.data;
+
+        // Extract authors from comics data
         const authorsData: string[] = [
           ...new Set(comicsData.map((comic: any) => comic.author)),
         ];
@@ -67,7 +70,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         setLoading(false);
       }
     };
-
     fetchGenresAndAuthors();
   }, [isLoggedIn]);
 
@@ -78,11 +80,14 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleGenreChange = (event: any) => {
     const genre = event.target.name;
     const isChecked = event.target.checked;
+
     const updatedSelectedGenres = isChecked
       ? [...selectedGenres, genre]
       : selectedGenres.filter((g) => g !== genre);
 
     setSelectedGenres(updatedSelectedGenres);
+
+    // Notify parent component of the updated selected genres
     if (typeof onGenreFilterChange === "function") {
       onGenreFilterChange(updatedSelectedGenres);
     }
@@ -91,11 +96,14 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleAuthorChange = (event: any) => {
     const author = event.target.name;
     const isChecked = event.target.checked;
+
     const updatedSelectedAuthors = isChecked
       ? [...selectedAuthors, author]
       : selectedAuthors.filter((a) => a !== author);
 
     setSelectedAuthors(updatedSelectedAuthors);
+
+    // Notify parent component of the updated selected authors
     if (typeof onAuthorFilterChange === "function") {
       onAuthorFilterChange(updatedSelectedAuthors);
     }

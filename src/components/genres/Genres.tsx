@@ -86,13 +86,16 @@ const Genres: React.FC<GenresProps> = ({
 
     const genreMatch =
       filteredGenres.length > 0
-        ? comic.genres &&
-          comic.genres.some((genre) => filteredGenres.includes(genre.name))
+        ? filteredGenres.every((genre) =>
+            comic.genres.some((comicGenre) => comicGenre.name === genre)
+          )
         : true;
+
     const authorMatch =
       filteredAuthors.length > 0
-        ? filteredAuthors.includes(comic.author)
+        ? filteredAuthors.every((author) => comic.author.includes(author))
         : true;
+
     const conditionMatch =
       filteredConditions.length > 0
         ? filteredConditions.includes(comic.condition)

@@ -20,7 +20,10 @@ import ChatModal from "../../pages/ChatModal";
 import { toast } from "sonner";
 import NotificationDropdown from "../notification/Notification";
 import socket from "../../services/socket";
-import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
+import {
+  plusUnreadAnnounce,
+  setUnreadAnnounce,
+} from "../../redux/features/notification/announcementSlice";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -91,7 +94,7 @@ const Navbar = () => {
         return prev;
       });
 
-      dispatch(setUnreadAnnounce((prev) => prev + 1));
+      dispatch(plusUnreadAnnounce());
     });
 
     return () => {

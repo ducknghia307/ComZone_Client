@@ -11,6 +11,7 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { convertToVietnameseDate } from "../../utils/convertDateVietnamese";
 import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
 import AuctionDetailModal from "../modal/AuctionDetailModal";
+import Loading from "../loading/Loading";
 interface AuctionHistoryProps {
   auctions?: Auction[];
 }
@@ -32,9 +33,10 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   useEffect(() => {
     const fetchAuctionsAndBids = async () => {
       try {
+        setLoading(true);
         if (!userId) {
           console.error("User ID not found");
-          setLoading(false);
+
           return;
         }
 
@@ -47,7 +49,6 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
 
         if (!Array.isArray(auctionsData) || auctionsData.length === 0) {
           console.error("No auctions data or unexpected format:", auctionsData);
-          setLoading(false);
           return;
         }
 
@@ -182,7 +183,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   const renderAuctionContent = () => {
     // Ensure data is loaded before rendering
     if (loading) {
-      return <Typography>Loading...</Typography>;
+      return <Loading/>
     }
 
     // If there are no auctions after filtering, display a message
@@ -190,8 +191,8 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
       selectedAuctionStatus === "all"
         ? auctions
         : auctions.filter(
-          (auction: Auction) => auction.status === selectedAuctionStatus
-        );
+            (auction: Auction) => auction.status === selectedAuctionStatus
+          );
 
     if (filteredAuctions.length === 0) {
       return <Typography>Không có dữ liệu đấu giá phù hợp.</Typography>;
@@ -473,7 +474,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
               </Button>
             )}
             {auction.status === "SUCCESSFUL" &&
-              auction.winner?.id === userId ? (
+            auction.winner?.id === userId ? (
               <div>
                 <Button
                   size="large"
@@ -512,23 +513,26 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
     <div>
       <div className="status-auction-tabs">
         <span
-          className={`status-auction-tab ${selectedAuctionStatus === "all" ? "active" : ""
-            }`}
+          className={`status-auction-tab ${
+            selectedAuctionStatus === "all" ? "active" : ""
+          }`}
           onClick={() => setSelectedAuctionStatus("all")}
         >
           Tất cả
         </span>
 
         <span
-          className={`status-auction-tab ${selectedAuctionStatus === "ONGOING" ? "active" : ""
-            }`}
+          className={`status-auction-tab ${
+            selectedAuctionStatus === "ONGOING" ? "active" : ""
+          }`}
           onClick={() => setSelectedAuctionStatus("ONGOING")}
         >
           Đang diễn ra
         </span>
         <span
-          className={`status-auction-tab ${selectedAuctionStatus === "SUCCESSFUL" ? "active" : ""
-            }`}
+          className={`status-auction-tab ${
+            selectedAuctionStatus === "SUCCESSFUL" ? "active" : ""
+          }`}
           onClick={() => setSelectedAuctionStatus("SUCCESSFUL")}
         >
           Kết Thúc
@@ -542,8 +546,9 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           Hoàn thành
         </span>
         <span
-          className={`status-auction-tab ${selectedAuctionStatus === "FAILED" ? "active" : ""
-            }`}
+          className={`status-auction-tab ${
+            selectedAuctionStatus === "FAILED" ? "active" : ""
+          }`}
           onClick={() => setSelectedAuctionStatus("FAILED")}
         >
           Bị Hủy
@@ -562,7 +567,8 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           }}
         />
       </div>
-      <div className="auction-history-content">{renderAuctionContent()}
+      <div className="auction-history-content">
+        {renderAuctionContent()}
         {selectedAuction && (
           <AuctionDetailModal
             open={isModalOpen}

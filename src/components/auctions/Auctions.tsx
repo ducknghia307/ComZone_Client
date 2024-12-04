@@ -41,6 +41,7 @@ const AllAuctions = ({
   const [ongoingComics, setOngoingComics] = useState<any[]>([]);
   const [upcomingComics, setUpcomingComics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("ONGOING");
 
   useEffect(() => {
     const fetchComics = async () => {
@@ -57,7 +58,11 @@ const AllAuctions = ({
         const upcomingComics = data.filter(
           (auction: any) => auction.status === "UPCOMING"
         );
-        // console.log();
+
+        const finishedAndFailed = data.filter(
+          (auction: any) =>
+            auction.status === "FAILED" || auction.status === "COMPLETED"
+        );
 
         setUpcomingComics(upcomingComics);
       } catch (error) {
@@ -76,17 +81,21 @@ const AllAuctions = ({
 
   const filteredComics = (comics: any[]) => {
     return comics.filter((comic) => {
+      // Genre Match (AND Logic)
       const genreMatch =
         filteredGenres.length === 0 ||
-        (comic.comics.genres &&
-          comic.comics.genres.some((genre: any) =>
-            filteredGenres.includes(genre.name)
-          ));
+        filteredGenres.every((genre) =>
+          comic.comics.genres?.some(
+            (comicGenre: any) => comicGenre.name === genre
+          )
+        );
 
+      // Author Match (AND Logic)
       const authorMatch =
         filteredAuthors.length === 0 ||
-        filteredAuthors.includes(comic.comics.author);
+        filteredAuthors.every((author) => comic.comics.author.includes(author));
 
+      // Condition Match
       const conditionMatch =
         filteredConditions.length === 0 ||
         filteredConditions.includes(comic.comics.condition);
@@ -103,14 +112,39 @@ const AllAuctions = ({
         <h2 className="text-2xl font-bold">Các Cuộc Đấu Giá Ở ComZone</h2>
       </div>
 
-      {/* Ongoing Auctions Section */}
-      <div className="auction-section-detail1 flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Đang diễn ra</h2>
+      <div className="flex justify-around border-b">
+        <button
+          className={`w-1/2 py-2 text-center font-bold ${
+            activeTab === "ONGOING"
+              ? "text-blue-500 border-b-2 border-blue-500"
+              : "text-gray-600"
+          }`}
+          onClick={() => setActiveTab("ONGOING")}
+        ></button>
+        <button
+          className={`w-1/2 py-2 text-center font-bold ${
+            activeTab === "UPCOMING"
+              ? "text-blue-500 border-b-2 border-blue-500"
+              : "text-gray-600"
+          }`}
+          onClick={() => setActiveTab("UPCOMING")}
+        ></button>
+      </div>
+
+      {/* Ongoing or Upcoming Auctions Section */}
+      <div className="auction-section-detail flex justify-between items-center">
+        <h2 className="text-2xl font-bold">
+          {activeTab === "ONGOING" ? "Đang diễn ra" : "Sắp diễn ra"}
+        </h2>
       </div>
 
       <div className="auction-cards mt-4">
-        {filteredComics(ongoingComics).length > 0 ? (
-          filteredComics(ongoingComics).map((comic) => (
+        {filteredComics(
+          activeTab === "ONGOING" ? ongoingComics : upcomingComics
+        ).length > 0 ? (
+          filteredComics(
+            activeTab === "ONGOING" ? ongoingComics : upcomingComics
+          ).map((comic) => (
             <div className="auction-card" key={comic.id}>
               <img
                 src={comic.comics.coverImage}
@@ -123,45 +157,19 @@ const AllAuctions = ({
                 icon={<ChangeCircleOutlinedIcon />}
                 size="medium"
               />
-              <p className="endtime">KẾT THÚC TRONG</p>
-              <Countdown date={new Date(comic.endTime)} renderer={renderer} />
-              <Button
-                className="detail-button"
-                onClick={() => handleDetailClick(comic.id)}
-                variant="contained"
-              >
-                Xem Chi Tiết
-              </Button>
-            </div>
-          ))
-        ) : (
-          <p>Không tìm thấy kết quả phù hợp</p>
-        )}
-      </div>
-
-      <div className="auction-section-detail2 flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Sắp diễn ra</h2>
-      </div>
-
-      <div className="auction-cards mt-4">
-        {filteredComics(upcomingComics).length > 0 ? (
-          filteredComics(upcomingComics).map((comic) => (
-            <div className="auction-card" key={comic.id}>
-              <img
-                src={comic.comics.coverImage}
-                alt={comic.comics.title}
-                className="object-cover mx-auto"
-              />
-              <p className="title">{comic.comics.title}</p>
-              <Chip
-                label={comic.comics.condition}
-                icon={<ChangeCircleOutlinedIcon />}
-                size="medium"
-              />
-              <p className="text-center m-2 REM bg-orange-200 rounded-xl">
-                SẮP DIỄN RA
-              </p>
-
+              {activeTab === "ONGOING" ? (
+                <>
+                  <p className="endtime">KẾT THÚC TRONG</p>
+                  <Countdown
+                    date={new Date(comic.endTime)}
+                    renderer={renderer}
+                  />
+                </>
+              ) : (
+                <p className="text-center m-2 REM bg-orange-200 rounded-xl">
+                  SẮP DIỄN RA
+                </p>
+              )}
               <Button
                 className="detail-button"
                 onClick={() => handleDetailClick(comic.id)}

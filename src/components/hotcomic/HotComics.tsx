@@ -52,13 +52,11 @@ const HotComics: React.FC<GenresProps> = ({
       try {
         const response = await publicAxios.get("/comics/status/available");
         const data = response.data;
-        console.log("hot comics", data);
-        
 
         const hotComics = data.filter(
           (comic: any) => comic.condition === "SEALED"
         );
-
+        console.log("hot comics", hotComics);
         setComics(hotComics);
       } catch (error) {
         console.error("Error fetching comics:", error);
@@ -73,13 +71,16 @@ const HotComics: React.FC<GenresProps> = ({
   const filteredComics = comics.filter((comic) => {
     const genreMatch =
       filteredGenres.length > 0
-        ? comic.genres &&
-          comic.genres.some((genre) => filteredGenres.includes(genre.name))
+        ? filteredGenres.every((genre) =>
+            comic.genres.some((comicGenre) => comicGenre.name === genre)
+          )
         : true;
+
     const authorMatch =
       filteredAuthors.length > 0
-        ? filteredAuthors.includes(comic.author)
+        ? filteredAuthors.every((author) => comic.author.includes(author))
         : true;
+
     const titleMatch = searchQuery
       ? comic.title.toLowerCase().includes(searchQuery.toLowerCase())
       : true;

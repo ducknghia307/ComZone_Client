@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
-import { AnnouncementType } from "../../common/enums/AnnouncementType.enum";
+import { AnnouncementType } from "../../common/enums/announcementType.enum";
 import "../ui/Notification.css"
 
 const NotificationDropdown = ({ announcements: initialAnnouncements }) => {

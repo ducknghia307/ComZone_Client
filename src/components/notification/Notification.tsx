@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
 import EmptyNotification from "../../assets/announcement-icons/no-notification.jpg";
 import OrderIcon from "../../assets/announcement-icons/orderIcon.png";
@@ -54,15 +54,11 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
 
   const navigateTo = async (item) => {
     if (item.type === "ORDER") navigate("/sellermanagement/order");
-    if (item.type === "EXCHANGE" && item.exchange)
-      navigate(`/exchange/detail/${item.exchange.id}`);
-    else console.log(item);
-    if (item.type === "EXCHANGE" && item.exchange)
-      navigate(`/exchange/detail/${item.exchange.id}`);
-    else console.log(item);
-    try {
-      if (item.isRead === true) return;
 
+    if (item.type === "EXCHANGE" && item.exchange)
+      navigate(`/exchange/detail/${item.exchange.id}`);
+
+    try {
       if (item.isRead === true) return;
 
       await privateAxios.post(`/announcements/${item?.id}/read`);
@@ -154,38 +150,6 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
                       src={OrderIcon}
                       alt="Thông báo"
                       className="w-16 h-12 rounded-md object-contain"
-                    />
-                  )}
-
-                  {item.type === AnnouncementType.EXCHANGE_NEW_REQUEST && (
-                    <img
-                      src={NewExchangeRequestIcon}
-                      alt="Thông báo"
-                      className="w-16 h-12 rounded-md object-contain"
-                    />
-                  )}
-
-                  {item.type === AnnouncementType.EXCHANGE_APPROVED && (
-                    <img
-                      src={ApproveExchangeIcon}
-                      alt="Thông báo"
-                      className="w-12 h-8 rounded-md object-contain"
-                    />
-                  )}
-
-                  {item.type === AnnouncementType.EXCHANGE_REJECTED && (
-                    <img
-                      src={RejectExchangeIcon}
-                      alt="Thông báo"
-                      className="w-12 h-8 rounded-md object-contain"
-                    />
-                  )}
-
-                  {item.type === AnnouncementType.EXCHANGE_NEW_DEAL && (
-                    <img
-                      src={NewDealExchangeIcon}
-                      alt="Thông báo"
-                      className="w-12 h-8 rounded-md object-contain"
                     />
                   )}
 

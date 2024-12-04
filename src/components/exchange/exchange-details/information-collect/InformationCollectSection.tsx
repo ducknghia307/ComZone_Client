@@ -41,7 +41,6 @@ export default function InformationCollectSection({
   secondAddress: string;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  console.log(firstCurrentStage);
   const [refundRequestsList, setRefundRequestsList] = useState<
     ExchangeRefundRequest[]
   >([]);

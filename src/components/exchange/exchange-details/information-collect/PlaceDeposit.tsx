@@ -43,6 +43,7 @@ export default function PlaceDeposit({
       .get(`deliveries/exchange/from-user/${exchange.id}`)
       .then(async (res) => {
         const userDelivery: Delivery = res.data;
+
         await privateAxios
           .get(`deliveries/details/${userDelivery.id}`)
           .then((res) => {
@@ -60,13 +61,12 @@ export default function PlaceDeposit({
                   : 0)
             );
           })
-          .catch((err) => console.log(err))
-          .finally(() => setIsLoading(false));
+          .catch((err) => console.log(err));
       })
       .catch((err) => {
         console.log(err);
-        setIsLoading(false);
-      });
+      })
+      .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {

@@ -7,6 +7,7 @@ import NewExchangeRequestIcon from "../../assets/announcement-icons/exchange-ico
 import ApproveExchangeIcon from "../../assets/announcement-icons/approve-icon.png";
 import RejectExchangeIcon from "../../assets/announcement-icons/reject-icon.png";
 import NewDealExchangeIcon from "../../assets/announcement-icons/deal-icon.png";
+import ExchangeDeliveryIcon from "../../assets/announcement-icons/truck-icon.png";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -58,8 +59,7 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
   const navigateTo = async (item) => {
     if (item.type === "ORDER") navigate("/sellermanagement/order");
 
-    if (item.type === "EXCHANGE" && item.exchange)
-      navigate(`/exchange/detail/${item.exchange.id}`);
+    if (item.exchange) navigate(`/exchange/detail/${item.exchange.id}`);
 
     try {
       if (item.isRead === true) return;
@@ -183,6 +183,14 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
                   {item.type === AnnouncementType.EXCHANGE_NEW_DEAL && (
                     <img
                       src={NewDealExchangeIcon}
+                      alt="Thông báo"
+                      className="w-12 h-8 rounded-md object-contain"
+                    />
+                  )}
+
+                  {item.type === AnnouncementType.EXCHANGE_DELIVERY && (
+                    <img
+                      src={ExchangeDeliveryIcon}
                       alt="Thông báo"
                       className="w-12 h-8 rounded-md object-contain"
                     />

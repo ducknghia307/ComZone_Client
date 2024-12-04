@@ -39,39 +39,41 @@ export default function PlaceDeposit({
   const fetchDeliveryFeeAndDeliveryTime = async () => {
     setIsLoading(true);
 
-    await privateAxios
-      .get(`deliveries/exchange/from-user/${exchange.id}`)
-      .then(async (res) => {
-        const userDelivery: Delivery = res.data;
+    try {
+      const deliveryRes = await privateAxios.get(
+        `deliveries/exchange/from-user/${exchange.id}`
+      );
 
-        await privateAxios
-          .get(`deliveries/details/${userDelivery.id}`)
-          .then((res) => {
-            setDeliveryDetails({
-              fee: res.data.deliveryFee,
-              estTime: res.data.estDeliveryTime,
-            });
+      const deliDetailsRes = await privateAxios.get(
+        `deliveries/details/${deliveryRes.data.id}`
+      );
 
-            setTotal(
-              exchange.depositAmount! +
-                res.data.deliveryFee +
-                (exchangeDetails.exchange.compensateUser &&
-                exchangeDetails.exchange.compensateUser.id === firstUser.id
-                  ? exchange.compensationAmount
-                  : 0)
-            );
-          })
-          .catch((err) => console.log(err));
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => setIsLoading(false));
+      const deliveryDetails = deliDetailsRes.data;
+      console.log(deliveryDetails);
+
+      setDeliveryDetails({
+        fee: deliveryDetails.deliveryFee,
+        estTime: deliveryDetails.estDeliveryTime,
+      });
+
+      setTotal(
+        exchange.depositAmount! +
+          deliveryDetails.deliveryFee +
+          (exchangeDetails.exchange.compensateUser &&
+          exchangeDetails.exchange.compensateUser.id === firstUser.id
+            ? exchange.compensationAmount
+            : 0)
+      );
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchDeliveryFeeAndDeliveryTime();
-  }, [exchangeDetails]);
+  }, []);
 
   const formatDate =
     moment(deliveryDetails?.estTime)
@@ -241,7 +243,7 @@ export default function PlaceDeposit({
         />
         <p className="text-[0.65em] font-light italic">
           Chúng tôi chỉ hỗ trợ hình thức thanh toán bằng Ví ComZone để đảm bảo
-          quyền lợi cho người tham gia trao đổi.
+          quyền lợi và an toàn cho người tham gia trao đổi.
         </p>
       </div>
     </div>

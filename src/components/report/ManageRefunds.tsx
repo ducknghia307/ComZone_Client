@@ -187,6 +187,51 @@ const ManageRefunds: React.FC = () => {
         refundRequest.user.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const getStatusChipStyles = (status: string) => {
+        switch (status) {
+            case "APPROVED":
+                return {
+                    color: "#4caf50",
+                    backgroundColor: "#e8f5e9",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                };
+            case "PENDING":
+                return {
+                    color: "#ff9800",
+                    backgroundColor: "#fff3e0",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                };
+            case "REJECTED":
+                return {
+                    color: "#e91e63",
+                    backgroundColor: "#fce4ec",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                };
+        }
+    };
+
+    const translateStatus = (status: string) => {
+        switch (status) {
+            case "APPROVED":
+                return "Thành công";
+            case "PENDING":
+                return "Đang xử lí";
+            case "REJECTED":
+                return "Bị từ chối";
+            default:
+                return status;
+        }
+    };
+
     return (
         <div style={{ paddingBottom: '40px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -221,10 +266,11 @@ const ManageRefunds: React.FC = () => {
                             <TableRow>
                                 <StyledTableCell>Tên Người Dùng</StyledTableCell>
                                 <StyledTableCell>Mã Đơn Hàng</StyledTableCell>
-                                <StyledTableCell align="right">Ngày Yêu Cầu</StyledTableCell>
+                                <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Ngày Yêu Cầu</StyledTableCell>
                                 <StyledTableCell align="right">Lý Do</StyledTableCell>
                                 <StyledTableCell align="right">Chi Tiết Lý Do (nếu có)</StyledTableCell>
                                 <StyledTableCell align="right">Hình Ảnh</StyledTableCell>
+                                <StyledTableCell align="right">Trạng Thái</StyledTableCell>
                                 <StyledTableCell align="right">Chỉnh Sửa</StyledTableCell>
                             </TableRow>
                         </TableHead>
@@ -232,10 +278,10 @@ const ManageRefunds: React.FC = () => {
                             {filteredRefunds.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((refund) => (
                                 <StyledTableRow key={refund.id}>
                                     <StyledTableCell>{refund.user.name}</StyledTableCell>
-                                    <StyledTableCell>{refund.order?.id}</StyledTableCell>
-                                    <StyledTableCell align="right">{formatDateTime(refund.createdAt)}</StyledTableCell>
-                                    <StyledTableCell align="right">{refund.reason}</StyledTableCell>
-                                    <StyledTableCell align="right">{refund.description}</StyledTableCell>
+                                    <StyledTableCell>{refund.order?.id || refund.exchange.id}</StyledTableCell>
+                                    <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>{formatDateTime(refund.createdAt)}</StyledTableCell>
+                                    <StyledTableCell align="right">{refund.reason.length > 50 ? `${refund.reason.substring(0, 50)}...` : refund.reason}</StyledTableCell>
+                                    <StyledTableCell align="right">{refund.description.length > 50 ? `${refund.description.substring(0, 50)}...` : refund.description}</StyledTableCell>
                                     <StyledTableCell align="right">
                                         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                                             {refund.images?.length > 0 ? (
@@ -257,6 +303,11 @@ const ManageRefunds: React.FC = () => {
                                                 <span style={{ fontStyle: 'italic', color: '#999' }}>Không có hình ảnh</span>
                                             )}
                                         </div>
+                                    </StyledTableCell>
+                                    <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                                        <span style={getStatusChipStyles(refund.status)}>
+                                            {translateStatus(refund.status)}
+                                        </span>
                                     </StyledTableCell>
                                     <StyledTableCell align="right">
                                         <IconButton color="primary" onClick={() => handleOpenModal(refund)}>
@@ -297,6 +348,7 @@ const ManageRefunds: React.FC = () => {
                             createdAt: selectedRefund.createdAt,
                             description: selectedRefund.description,
                             requestId: selectedRefund.id || '',
+                            status: selectedRefund.status
                         }
                         : null
                 }

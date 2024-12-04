@@ -35,7 +35,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
   const currentUrl = window.location.pathname;
   const dispatch = useAppDispatch();
   const { accessToken } = useAppSelector((state) => state.auth);
-  const drawerWidth = isCollapsed ? '5%' : 'auto';
+  const drawerWidth = isCollapsed ? '5%' : '300px';
 
   const fetchUserInfo = async () => {
     try {

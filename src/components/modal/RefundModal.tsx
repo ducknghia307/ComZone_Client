@@ -7,6 +7,7 @@ import {
     TextField,
     Divider,
     IconButton,
+    Chip,
 } from '@mui/material';
 import { notification } from 'antd';
 import CloseIcon from '@mui/icons-material/Close';
@@ -24,7 +25,8 @@ interface RefundModalProps {
         images: string[];
         description: string;
         createdAt: string;
-        requestId?: string; 
+        requestId?: string;
+        status: string;
     } | null;
     onApprove: () => void;
     onReject: (reason: string) => void;
@@ -61,29 +63,6 @@ const RefundModal: React.FC<RefundModalProps> = ({
         }
     }, [refundDetails]);
 
-    // const handleApprove = async () => {
-    //     if (!refundDetails) return;
-    //     setLoading(true);
-    //     try {
-    //         await privateAxios.patch(`/refund-requests/approve/order/${refundDetails.orderId}`);
-    //         notification.success({
-    //             message: 'Thành công',
-    //             description: 'Yêu cầu đã được chấp thuận!',
-    //             placement: 'topRight',
-    //         });
-    //         onApprove();
-    //     } catch (error) {
-    //         notification.error({
-    //             message: 'Lỗi',
-    //             description: 'Lỗi khi chấp thuận yêu cầu.',
-    //             placement: 'topRight',
-    //         });
-    //     } finally {
-    //         setLoading(false);
-    //         onClose();
-    //     }
-    // };
-
     const handleApprove = async () => {
         if (!refundDetails) return;
         setLoading(true);
@@ -92,8 +71,8 @@ const RefundModal: React.FC<RefundModalProps> = ({
             const apiUrl = refundDetails.orderId
                 ? `/refund-requests/approve/order/${refundDetails.orderId}`
                 : refundDetails.requestId
-                ? `/refund-requests/approve/exchange/${refundDetails.requestId}`
-                : '';
+                    ? `/refund-requests/approve/exchange/${refundDetails.requestId}`
+                    : '';
 
             await privateAxios.patch(apiUrl);
 
@@ -125,6 +104,54 @@ const RefundModal: React.FC<RefundModalProps> = ({
         setIsRejectModalOpen(false);
     };
 
+    const getStatusChipStyles = (status: string) => {
+        switch (status) {
+            case "APPROVED":
+                return {
+                    color: "#4caf50",
+                    backgroundColor: "#e8f5e9",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                    whiteSpace: "nowrap",
+                };
+            case "PENDING":
+                return {
+                    color: "#ff9800",
+                    backgroundColor: "#fff3e0",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                    whiteSpace: "nowrap",
+                };
+            case "REJECTED":
+                return {
+                    color: "#e91e63",
+                    backgroundColor: "#fce4ec",
+                    borderRadius: "8px",
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    display: "inline-block",
+                    whiteSpace: "nowrap",
+                };
+        }
+    };
+
+    const translateStatus = (status: string) => {
+        switch (status) {
+            case "APPROVED":
+                return "Thành công";
+            case "PENDING":
+                return "Chờ duyệt";
+            case "REJECTED":
+                return "Đã từ chối";
+            default:
+                return status;
+        }
+    };
+
     return (
         <>
             <Modal
@@ -142,7 +169,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
                         bgcolor: '#fff',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
                         p: 4,
-                        width: '600px',
+                        width: '650px',
                         borderRadius: '16px',
                         border: '2px solid #c66a7a',
                         '&:focus-visible': {
@@ -158,7 +185,11 @@ const RefundModal: React.FC<RefundModalProps> = ({
                                 justifyContent: 'space-between',
                                 mb: 3
                             }}>
-                                <Box sx={{ flex: 1 }} />
+                                <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+                                    <span style={getStatusChipStyles(refundDetails.status)}>
+                                        {translateStatus(refundDetails.status)}
+                                    </span>
+                                </Box>
                                 <Typography
                                     id="refund-modal-title"
                                     variant="h5"
@@ -169,7 +200,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
                                         fontWeight: 'bold',
                                         flex: 2,
                                         textAlign: 'center',
-                                        whiteSpace: 'nowrap'
+                                        whiteSpace: 'nowrap',
                                     }}
                                 >
                                     Chi tiết yêu cầu hoàn tiền
@@ -274,7 +305,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
                             }} />
                             <Box>
                                 <TextField
-                                    label="Lý do từ chối"
+                                    label="Chi tiết lý do từ chối"
                                     fullWidth
                                     multiline
                                     rows={3}
@@ -309,44 +340,49 @@ const RefundModal: React.FC<RefundModalProps> = ({
                                     gap: 2,
                                     padding: '0 70px'
                                 }}>
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleApprove}
-                                        disabled={loading}
-                                        sx={{
-                                            flex: 1,
-                                            bgcolor: '#c66a7a',
-                                            color: '#fff',
-                                            fontFamily: 'REM',
-                                            '&:hover': {
-                                                bgcolor: '#71002b',
-                                            },
-                                            '&.Mui-disabled': {
-                                                bgcolor: '#c66a7a80',
-                                            }
-                                        }}
-                                    >
-                                        {loading ? 'Đang xử lý...' : 'Chấp thuận'}
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        onClick={handleRejectOpen}
-                                        disabled={loading}
-                                        sx={{
-                                            flex: 1,
-                                            borderColor: '#c66a7a',
-                                            color: '#c66a7a',
-                                            fontFamily: 'REM',
-                                            '&:hover': {
-                                                borderColor: '#71002b',
-                                                color: '#71002b',
-                                                bgcolor: 'transparent',
-                                            },
-                                        }}
-                                    >
-                                        Từ chối
-                                    </Button>
+                                    {refundDetails?.status !== 'APPROVED' && refundDetails?.status !== 'REJECTED' && (
+                                        <>
+                                            <Button
+                                                variant="contained"
+                                                onClick={handleApprove}
+                                                disabled={loading}
+                                                sx={{
+                                                    flex: 1,
+                                                    bgcolor: '#c66a7a',
+                                                    color: '#fff',
+                                                    fontFamily: 'REM',
+                                                    '&:hover': {
+                                                        bgcolor: '#71002b',
+                                                    },
+                                                    '&.Mui-disabled': {
+                                                        bgcolor: '#c66a7a80',
+                                                    }
+                                                }}
+                                            >
+                                                {loading ? 'Đang xử lý...' : 'Chấp thuận'}
+                                            </Button>
+                                            <Button
+                                                variant="outlined"
+                                                onClick={handleRejectOpen}
+                                                disabled={loading}
+                                                sx={{
+                                                    flex: 1,
+                                                    borderColor: '#c66a7a',
+                                                    color: '#c66a7a',
+                                                    fontFamily: 'REM',
+                                                    '&:hover': {
+                                                        borderColor: '#71002b',
+                                                        color: '#71002b',
+                                                        bgcolor: 'transparent',
+                                                    },
+                                                }}
+                                            >
+                                                Từ chối
+                                            </Button>
+                                        </>
+                                    )}
                                 </Box>
+
                             </Box>
                         </>
                     ) : (
@@ -361,7 +397,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
                         </Typography>
                     )}
                 </Box>
-            </Modal>
+            </Modal >
             {/* <RejectReasonModal
                 open={isRejectModalOpen}
                 onClose={() => setIsRejectModalOpen(false)}
@@ -371,7 +407,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
                     onClose();
                 }}
             /> */}
-            <RejectReasonModal
+            < RejectReasonModal
                 open={isRejectModalOpen}
                 onClose={handleRejectClose}
                 onConfirm={(reason) => {

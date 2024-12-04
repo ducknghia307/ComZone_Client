@@ -9,11 +9,12 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { IconButton, Typography, Box, TextField, InputAdornment } from '@mui/material';
+import { IconButton, Typography, Box, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import BanUserModal from '../modal/BanUserModal';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { SelectChangeEvent } from '@mui/material/Select';
 interface User {
   id: number;
   name: string;
@@ -59,12 +60,15 @@ const ManageUsers: React.FC = () => {
   const [openBanModal, setOpenBanModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState<string>('ALL');
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await privateAxios.get('/users');
-        setUsers(response.data);
+        const filteredUsers = response.data.filter((user: User) => user.role !== 'ADMIN' && user.role !== 'MODERATOR');
+        setUsers(filteredUsers);
+        // setUsers(response.data);
       } catch (error) {
         console.error('Error fetching users data:', error);
       } finally {
@@ -158,11 +162,25 @@ const ManageUsers: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleRoleFilterChange = (event: SelectChangeEvent<string>) => {
+    setRoleFilter(event.target.value);
+  };
+
+  // const filteredUsers = users.filter((user) =>
+  //   user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   user.role.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
+
+  const filteredUsers = users.filter((user) => {
+    const matchesSearchTerm = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.role.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesRoleFilter = roleFilter === 'ALL' || user.role === roleFilter;
+
+    return matchesSearchTerm && matchesRoleFilter;
+  });
 
   return (
     <div style={{ paddingBottom: '40px' }}>
@@ -181,9 +199,31 @@ const ManageUsers: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: '#fff' }} />
               </InputAdornment>
             ),
-            style: { color: '#fff' },
+            style: { color: '#fff', fontFamily:'REM' },
           }}
         />
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography variant="subtitle2" sx={{ marginRight: '10px', fontWeight: 'bold', color: '#71002b', fontFamily: 'REM' }}>
+            Phân Loại:
+          </Typography>
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <Select
+              value={roleFilter}
+              onChange={handleRoleFilterChange}
+              sx={{
+                // backgroundColor: '#c66a7a',
+                color: '#000',
+                borderRadius: '4px',
+                fontFamily: 'REM',
+              }}
+            >
+              <MenuItem sx={{fontFamily: 'REM'}} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="MEMBER">Người Mua</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="SELLER">Người Bán</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
       </Box>
       <Typography
         variant="h5"

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TablePagination, tableCellClasses, Box, TextField, InputAdornment } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TablePagination, tableCellClasses, Box, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { styled } from "@mui/material/styles";
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import { SelectChangeEvent } from '@mui/material/Select';
 
-// Styled Components
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: '#c66a7a',
@@ -38,6 +38,7 @@ const ManageWallet: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [transactionType, setTransactionType] = useState<string>('ALL');
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -143,10 +144,20 @@ const ManageWallet: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
+  const handleTransactionTypeChange = (event: SelectChangeEvent<string>) => {
+    setTransactionType(event.target.value as string);
+  };
+
   const filteredWallet = transactions.filter((transaction) =>
-    transaction.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    transaction.type.toLowerCase().includes(searchTerm.toLowerCase())
+    (transaction.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transaction.type.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (transactionType === 'ALL' || transaction.type === transactionType)
   );
+
+  // const filteredWallet = transactions.filter((transaction) =>
+  //   transaction.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   transaction.type.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   return (
     <div style={{ paddingBottom: '40px' }}>
@@ -165,9 +176,26 @@ const ManageWallet: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: '#fff' }} />
               </InputAdornment>
             ),
-            style: { color: '#fff' },
+            style: { color: '#fff', fontFamily: 'REM' },
           }}
         />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Filter theo trạng thái */}
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#71002b', fontFamily: 'REM', paddingRight: '10px' }}>
+            Trạng Thái:
+          </Typography>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <Select
+              value={transactionType}
+              onChange={handleTransactionTypeChange}
+              sx={{ fontFamily: 'REM' }}
+            >
+              <MenuItem sx={{ fontFamily: 'REM' }} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="Nạp Tiền">Nạp Tiền</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="Thanh Toán">Thanh Toán</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
       <Typography
         variant="h5"

@@ -14,6 +14,7 @@ interface SubscriptionPlan {
     price: number;
     duration: number;
     offeredResource: number;
+    auctionTime: number;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -55,6 +56,8 @@ const SubscriptionPlans: React.FC = () => {
             try {
                 const response = await privateAxios.get('/seller-subs-plans');
                 setPlans(response.data);
+                console.log("plans", response.data);
+                
             } catch (error) {
                 console.error('Error fetching subscription plans:', error);
             } finally {
@@ -165,7 +168,7 @@ const SubscriptionPlans: React.FC = () => {
                                         <StyledTableCell>{plan.id}</StyledTableCell>
                                         <StyledTableCell align="center">{plan.price.toLocaleString()}</StyledTableCell>
                                         <StyledTableCell align="center">{plan.duration}</StyledTableCell>
-                                        <StyledTableCell align="center">{plan.offeredResource}</StyledTableCell>
+                                        <StyledTableCell align="center">{plan.auctionTime}</StyledTableCell>
                                         <StyledTableCell align="right">
                                             <IconButton color="error" onClick={() => handleEditClick(plan)}>
                                                 <EditOutlinedIcon />

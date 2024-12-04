@@ -16,6 +16,7 @@ interface SubscriptionPlan {
     price: number;
     duration: number;
     offeredResource: number;
+    auctionTime: number;
 }
 
 interface EditModalProps {
@@ -151,7 +152,7 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                         fullWidth
                         label="Lượt Bán Đấu Giá"
                         name="offeredResource"
-                        value={editedPlan.offeredResource}
+                        value={editedPlan.auctionTime}
                         onChange={handleChange}
                         variant="outlined"
                         sx={{

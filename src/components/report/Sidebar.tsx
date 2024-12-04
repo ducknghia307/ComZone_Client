@@ -156,7 +156,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, onSelect }: SidebarProps) => {
   const currentUrl = window.location.pathname;
   const dispatch = useAppDispatch();
   const { accessToken } = useAppSelector((state) => state.auth);
-  const drawerWidth = isCollapsed ? "5%" : "auto";
+  const drawerWidth = isCollapsed ? "5%" : "300px";
 
   const fetchUserInfo = async () => {
     try {
@@ -189,7 +189,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, onSelect }: SidebarProps) => {
     {
       title: "Quản Lý Truyện",
       path: "/mod/comics",
-      icon: <PersonOutlineOutlinedIcon sx={{ color: "inherit" }} />,
+      icon: <AirplayOutlinedIcon sx={{ color: "inherit" }} />,
     },
     {
       title: "Quản Lý Đơn Hàng",
@@ -363,7 +363,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, onSelect }: SidebarProps) => {
         disablePadding
         sx={{
           whiteSpace: "nowrap",
-          position: "absolute",
+          // position: "absolute",
           bottom: "10px",
           width: "100%",
           padding: "0 20px",

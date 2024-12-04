@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
+import "../ui/Notification.css"
 
 const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
   const [announcements, setAnnouncements] = useState(initialAnnouncements);

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import { Avatar, Checkbox, message } from "antd";
+import { Avatar, Checkbox, message, notification } from "antd";
 import { useState } from "react";
 import CurrencySplitter from "../../../../assistants/Spliter";
 import ActionConfirm from "../../../actionConfirm/ActionConfirm";
@@ -40,6 +40,13 @@ export default function SubmitAmounts({
       })
       .then(() => {
         fetchExchangeDetails();
+        notification.success({
+          key: "deal-sent",
+          message: "Gửi thỏa thuận thành công.",
+          description:
+            "Bạn sẽ nhận được thông báo khi thỏa thuận của bạn sẽ được người đăng bài xác nhận hoặc từ chối.",
+          duration: 5,
+        });
       })
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
@@ -67,7 +74,7 @@ export default function SubmitAmounts({
                 }}
                 className="px-8 py-2 w-full my-2 border border-gray-300 rounded-lg"
               />
-              <span className="absolute top-1/2 left-3 translate-y-[-50%]">
+              <span className="absolute top-1/2 left-3 translate-y-[-50%] underline">
                 đ
               </span>
             </div>
@@ -157,7 +164,7 @@ export default function SubmitAmounts({
                   }}
                   className="px-8 py-2 w-full my-2 border border-gray-300 rounded-lg"
                 />
-                <span className="absolute top-1/2 left-3 translate-y-[-50%]">
+                <span className="absolute top-1/2 left-3 translate-y-[-50%] underline">
                   đ
                 </span>
               </div>
@@ -192,13 +199,14 @@ export default function SubmitAmounts({
 
       <div className="flex flex-col items-start gap-2 my-8">
         <p className="text-sm font-semibold">GIAO HÀNG & NHẬN HÀNG</p>
-        <div className="flex items-center gap-2 px-8">
+        <div className="flex items-stretch gap-2 px-8">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             width="16"
             height="16"
             fill="currentColor"
+            className="mt-1"
           >
             <path d="M14.5998 8.00033H21C22.1046 8.00033 23 8.89576 23 10.0003V12.1047C23 12.3659 22.9488 12.6246 22.8494 12.8662L19.755 20.3811C19.6007 20.7558 19.2355 21.0003 18.8303 21.0003H2C1.44772 21.0003 1 20.5526 1 20.0003V10.0003C1 9.44804 1.44772 9.00033 2 9.00033H5.48184C5.80677 9.00033 6.11143 8.84246 6.29881 8.57701L11.7522 0.851355C11.8947 0.649486 12.1633 0.581978 12.3843 0.692483L14.1984 1.59951C15.25 2.12534 15.7931 3.31292 15.5031 4.45235L14.5998 8.00033ZM7 10.5878V19.0003H18.1606L21 12.1047V10.0003H14.5998C13.2951 10.0003 12.3398 8.77128 12.6616 7.50691L13.5649 3.95894C13.6229 3.73105 13.5143 3.49353 13.3039 3.38837L12.6428 3.0578L7.93275 9.73038C7.68285 10.0844 7.36341 10.3746 7 10.5878ZM5 11.0003H3V19.0003H5V11.0003Z"></path>
           </svg>
@@ -225,8 +233,8 @@ export default function SubmitAmounts({
       <button
         disabled={!confirmCheck}
         onClick={() => {
-          if (depositAmount < 10000)
-            message.warning("Số tiền cọc không thể ít hơn 10,000đ!", 5);
+          if (depositAmount < 50000)
+            message.warning("Số tiền cọc không thể ít hơn 50,000đ!", 5);
           else if (isRequiringCompensation && compensationAmount < 10000)
             message.warning("Số tiền bù không thể ít hơn 10,000đ!", 5);
           else setIsConfirming(true);

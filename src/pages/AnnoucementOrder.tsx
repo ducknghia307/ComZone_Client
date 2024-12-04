@@ -5,7 +5,7 @@ import { privateAxios } from "../middleware/axiosInstance";
 import Loading from "../components/loading/Loading";
 import { convertToVietnameseDate } from "../utils/convertDateVietnamese";
 import { useNavigate } from "react-router-dom";
-import OrderIcon from "../assets/orderIcon.png";
+import OrderIcon from "../assets/announcement-icons/orderIcon.png";
 
 const AnnouncementOrder = () => {
   const [announcements, setAnnouncements] = useState([]);

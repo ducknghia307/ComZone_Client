@@ -1,4 +1,4 @@
-import { Modal, notification } from "antd";
+import { message, Modal, notification } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { Comic } from "../../../common/base.interface";
 import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
@@ -84,7 +84,7 @@ export default function UpdateExchangeComics({
     try {
       let coverImageUrl: string = comics.coverImage;
 
-      if (coverImage !== comics.coverImage) {
+      if (coverImage !== coverImageUrl) {
         const coverResponse = await privateAxios.post(
           "/file/upload/image",
           { image: uploadedCoverImageFile },
@@ -136,15 +136,18 @@ export default function UpdateExchangeComics({
   const handleUploadPreviewChapters = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
+    const max = comics.quantity > 1 ? 8 : 4;
     if (e.target.files) {
-      const newImages = Array.from(e.target.files).map((file) =>
-        URL.createObjectURL(file)
-      );
-      setChaptersImagePlaceholder((prevImages) => {
-        return [...prevImages, ...newImages];
-      });
+      Array.from(e.target.files).map((file, index) => {
+        if (index + previewChapters.length < max) {
+          setChaptersImagePlaceholder((prev) => [
+            ...prev,
+            URL.createObjectURL(file),
+          ]);
 
-      setUploadedChaptersFile(Array.from(e.target.files));
+          setUploadedChaptersFile((prev) => [...prev, file]);
+        }
+      });
     }
   };
 
@@ -162,31 +165,77 @@ export default function UpdateExchangeComics({
   };
 
   const handleSubmit = async () => {
-    setLoading(true);
+    if (!coverImage || coverImage.length === 0) {
+      message.warning("Vui lòng thêm ảnh bìa!", 5);
+      return;
+    }
 
-    const uploadResponse = await handleUpload();
+    if (previewChapters.length === 0 && uploadedChaptersFile.length === 0) {
+      message.warning("Vui lòng thêm ít nhất 1 ảnh xem trước truyện!", 5);
+      return;
+    }
 
-    await privateAxios
-      .put(`/comics/${comics.id}`, {
-        ...formData,
-        coverImage: uploadResponse.coverImageUrl,
-        previewChapter: uploadResponse.previewChapterUrls,
-      })
-      .then(() => {
-        notification.success({
-          key: "success",
-          message: "Cập nhật thông tin truyện thành công.",
-          duration: 5,
-        });
-        setIsOpen(null);
-        fetchComicExchangeOffer();
-      })
-      .catch((err) => {
-        console.error("Error updating comic:", err);
-      })
-      .finally(() => {
-        setLoading(false);
+    if (
+      formData.title.length === 0 ||
+      formData.author.length === 0 ||
+      formData.description.length === 0
+    ) {
+      message.warning("Vui lòng điền đầy đủ những thông tin bắt buộc!", 5);
+      return;
+    }
+
+    if (
+      formData.quantity > 1 &&
+      formData.quantity !== formData.episodesList.length
+    ) {
+      message.warning({
+        key: "series",
+        content: (
+          <p className="REM">
+            Số lượng tên tập không trùng khợp với số truyện trong bộ!{" "}
+            <span className="font-light italic text-sm">
+              (
+              {formData.episodesList.length - formData.quantity > 0
+                ? "Dư"
+                : "Thiếu"}{" "}
+              {Math.abs(formData.episodesList.length - formData.quantity)} tập)
+            </span>
+          </p>
+        ),
+        duration: 8,
       });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const uploadResponse = await handleUpload();
+
+      console.log("UPLOAD: ", uploadResponse);
+
+      await privateAxios
+        .put(`/comics/${comics.id}`, {
+          ...formData,
+          coverImage: uploadResponse.coverImageUrl,
+          previewChapter: uploadResponse.previewChapterUrls,
+        })
+        .then(() => {
+          notification.success({
+            key: "success",
+            message: "Cập nhật thông tin truyện thành công.",
+            duration: 5,
+          });
+          setIsOpen(null);
+          fetchComicExchangeOffer();
+        })
+        .catch((err) => {
+          console.error("Error updating comic:", err);
+        });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isChanged =
@@ -202,7 +251,7 @@ export default function UpdateExchangeComics({
       formData.quantity !== comics.quantity ||
       formData.title !== comics.title ||
       coverImage !== comics.coverImage ||
-      //   previewChapters !== comics.previewChapter ||
+      previewChapters.length !== comics.previewChapter.length ||
       uploadedChaptersFile.length > 0);
 
   const reset = () => {
@@ -212,13 +261,16 @@ export default function UpdateExchangeComics({
       quantity: comics.quantity,
       episodesList: comics.episodesList,
       description: comics.description,
-      publishedDate: comics.publishedDate && Number(comics.publishedDate),
+      publishedDate: comics.publishedDate ? Number(comics.publishedDate) : null,
       edition: comics.edition,
       condition: comics.condition,
-      page: comics.page || 0,
+      page: comics.page || null,
     });
     setCoverImage(comics.coverImage);
+    setUploadedCoverImageFile(null);
     setPreviewChapters(comics.previewChapter);
+    setUploadedChaptersFile([]);
+    setChaptersImagePlaceholder([]);
   };
 
   return (

@@ -1,7 +1,7 @@
 import React from "react";
 import Exchange from "../components/exchange/Exchange";
 import { Tabs } from "antd";
-import CurrentUserComicExchange from "./CurrentUserComicExchange";
+import CurrentUserComicExchange from "../components/exchange/CurrentUserComicExchange";
 
 export default function ExchangeManagement() {
   const tabItems = [

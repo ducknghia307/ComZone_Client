@@ -46,7 +46,7 @@ const BanComicModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =
         <Modal open={open} onClose={onClose}>
             <Box sx={modalStyle}>
                 <Box sx={{ position: 'relative', mb: 2 }}>
-                    <Typography variant="h6" component="h2" sx={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold' }}>
+                    <Typography variant="h6" component="h2" sx={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold', color: '#71002b' }}>
                         Lý Do Cấm Bán Truyện
                     </Typography>
                     <IconButton onClick={onClose} sx={{ position: 'absolute', top: 0, right: 0 }}>
@@ -69,15 +69,22 @@ const BanComicModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =
                             variant="outlined"
                             value={otherReason}
                             onChange={(e) => setOtherReason(e.target.value)}
-                            sx={{ mt: 2 }}
+                            sx={{ mt: 2, backgroundColor: '#ffe3d842' }}
                         />
                     )}
                 </FormControl>
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
                     <Button
                         onClick={handleBan}
-                        sx={{ color: '#fff', backgroundColor: '#000', '&:hover': { backgroundColor: '#333' } }}
-                        disabled={loading} // Disable khi đang loading
+                        sx={{
+                            color: '#fff',
+                            backgroundColor: '#c66a7a',
+                            '&:hover': { backgroundColor: '#a84e61' },
+                            padding: '10px 20px',
+                            borderRadius: '4px',
+                            fontWeight: 'bold',
+                        }}
+                        disabled={loading}
                     >
                         {loading ? 'Đang cập nhật...' : 'Cấm Bán Truyện'}
                     </Button>

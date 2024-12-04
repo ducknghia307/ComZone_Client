@@ -1,26 +1,20 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import TablePagination from "@mui/material/TablePagination";
-import { privateAxios } from "../../middleware/axiosInstance";
-import { Comic } from "../../common/base.interface";
-import {
-  Box,
-  IconButton,
-  InputAdornment,
-  TextField,
-  Typography,
-} from "@mui/material";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import BanComicModal from "../modal/BanComicModal";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import TablePagination from '@mui/material/TablePagination';
+import { privateAxios } from '../../middleware/axiosInstance';
+import { Comic } from '../../common/base.interface';
+import { Box, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import BanComicModal from '../modal/BanComicModal';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 
 // Styled Components for Moderator
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -57,7 +51,10 @@ const ManageComics: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openBanModal, setOpenBanModal] = useState(false);
   const [selectedComicId, setSelectedComicId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [typeFilter, setTypeFilter] = useState<string>('ALL');
+
 
   useEffect(() => {
     const fetchComics = async () => {
@@ -203,11 +200,34 @@ const ManageComics: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredComics = comics.filter(
-    (comic) =>
+  // Lọc theo status
+  const filterByStatus = (comic: Comic) => {
+    if (statusFilter === 'ALL') return true;
+    return comic.status === statusFilter;
+  };
+
+  // Lọc theo tập/bộ
+  const filterByType = (comic: Comic) => {
+    if (typeFilter === 'ALL') return true;
+    if (typeFilter === 'TAP' && comic.quantity === 1) return true;
+    if (typeFilter === 'BO' && comic.quantity > 1) return true;
+    return false;
+  };
+
+  // search và filter
+  const filteredComics = comics.filter((comic) => {
+    // Apply status and type filters
+    const statusMatch = filterByStatus(comic);
+    const typeMatch = filterByType(comic);
+
+    // Apply search term filter
+    const searchMatch =
       comic.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      comic.author.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      comic.author.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Return comic only if all filters match
+    return statusMatch && typeMatch && searchMatch;
+  });
 
   return (
     <div style={{ paddingBottom: "40px" }}>
@@ -238,9 +258,48 @@ const ManageComics: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: "#fff" }} />
               </InputAdornment>
             ),
-            style: { color: "#fff" },
+            style: { color: '#fff', fontFamily:'REM' },
           }}
         />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Filter theo trạng thái */}
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#71002b', fontFamily: 'REM', paddingRight: '10px' }}>
+            Trạng Thái:
+          </Typography>
+          <FormControl size="small" sx={{ width: '180px' }}>
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              sx={{fontFamily: 'REM'}}
+            >
+              <MenuItem sx={{fontFamily: 'REM'}} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="AVAILABLE">Có sẵn</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="UNAVAILABLE">Không khả dụng</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="AUCTION">Đang đấu giá</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="EXCHANGE">Trao đổi</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="EXCHANGE_OFFER">Đề xuất trao đổi</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="SOLD">Đã bán</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="REMOVED">Đã gỡ</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Filter theo Tập/Bộ */}
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#71002b', fontFamily: 'REM', paddingRight: '10px', paddingLeft: '20px' }}>
+            Tập/Bộ:
+          </Typography>
+          <FormControl size="small" sx={{ width: '180px' }}>
+            <Select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              sx={{fontFamily: 'REM'}}
+            >
+              <MenuItem sx={{fontFamily: 'REM'}} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="TAP">Tập Truyện</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="BO">Bộ Truyện</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
       </Box>
       <Typography
         variant="h5"
@@ -286,39 +345,28 @@ const ManageComics: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredComics
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((comic) => (
-                    <StyledTableRow key={comic.id}>
-                      <StyledTableCell>
-                        <img
-                          style={{ width: "80px", height: "120px" }}
-                          src={comic.coverImage}
-                          alt={comic.title}
-                        />
-                      </StyledTableCell>
-                      <StyledTableCell>{comic.title}</StyledTableCell>
-                      <StyledTableCell align="right">
-                        {comic.author}
-                      </StyledTableCell>
-                      <StyledTableCell align="right">
-                        <span style={getStatusColor(comic.status)}>
-                          {translateStatus(comic.status)}
-                        </span>
-                      </StyledTableCell>
-                      <StyledTableCell align="right">
-                        {comic.quantity > 1 ? "Bộ Truyện" : "Tập Truyện"}
-                      </StyledTableCell>
-                      <StyledTableCell align="right">
-                        <IconButton
-                          color="error"
-                          onClick={() => handleOpenBanModal(comic.id)}
-                        >
-                          <DeleteOutlineOutlinedIcon />
-                        </IconButton>
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))
+                filteredComics.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((comic) => (
+                  <StyledTableRow key={comic.id}>
+                    <StyledTableCell>
+                      <img style={{ width: '80px', height: '120px' }} src={comic.coverImage} alt={comic.title} />
+                    </StyledTableCell>
+                    <StyledTableCell>{comic.title}</StyledTableCell>
+                    <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>{comic.author}</StyledTableCell>
+                    <StyledTableCell align="right">
+                      <span style={getStatusColor(comic.status)}>
+                        {translateStatus(comic.status)}
+                      </span>
+                    </StyledTableCell>
+                    <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                      {comic.quantity > 1 ? 'Bộ Truyện' : 'Tập Truyện'}
+                    </StyledTableCell>
+                    <StyledTableCell align="right">
+                      <IconButton color="error" onClick={() => handleOpenBanModal(comic.id)}>
+                        <DeleteOutlineOutlinedIcon />
+                      </IconButton>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))
               )}
             </TableBody>
           </Table>

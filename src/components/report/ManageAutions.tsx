@@ -11,8 +11,12 @@ import TablePagination from "@mui/material/TablePagination";
 import { privateAxios } from "../../middleware/axiosInstance";
 import {
   Box,
+  FormControl,
   IconButton,
   InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -20,6 +24,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import AuctionDetailMod from "../modal/AuctionDetailMod";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Auction, UserInfo } from "../../common/base.interface";
+import { SelectChangeEvent } from '@mui/material/Select';
 interface Order {
   id: number;
   customerName: string;
@@ -62,13 +67,7 @@ const ManageAuctions: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAuction, setSelectedAuction] = useState<SelectedAuction | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  // const openOrderDetail = (orderId: string) => {
-  //   setSelectedOrderId(orderId);
-  // };
-
-  // const closeOrderDetail = () => {
-  //   setSelectedOrderId(null);
-  // };
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
 
   useEffect(() => {
     const fetchOrdersWithItems = async () => {
@@ -111,16 +110,6 @@ const ManageAuctions: React.FC = () => {
     setIsModalOpen(false);
     setSelectedAuction(null);
   };
-
-  // const handleEditClick = (auction: SelectedAuction) => {
-  //   const sellerInfo = auction.comics.sellerId || {};
-  //   setSelectedAuction({
-  //     ...auction,
-  //     sellerInfo: sellerInfo,
-  //     comics: auction.comics,
-  //   });
-  //   setIsModalOpen(true);
-  // };
 
   const handleEditClick = (auction: SelectedAuction) => {
     const sellerInfo: UserInfo = auction.comics.sellerId
@@ -254,10 +243,19 @@ const ManageAuctions: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredAuctions = auctions.filter((auction) =>
-    auction.comics.sellerId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    auction.comics.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleStatusFilterChange = (event: SelectChangeEvent<string>) => {
+    setSelectedStatus(event.target.value as string);
+  };
+
+  const filteredAuctions = auctions.filter((auction) => {
+    const statusMatch = selectedStatus
+      ? auction.status === selectedStatus
+      : true;
+    const searchMatch =
+      auction.comics.sellerId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      auction.comics.title.toLowerCase().includes(searchTerm.toLowerCase());
+    return statusMatch && searchMatch;
+  });
 
   return (
     <div style={{ paddingBottom: "40px" }}>
@@ -276,9 +274,31 @@ const ManageAuctions: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: '#fff' }} />
               </InputAdornment>
             ),
-            style: { color: '#fff' },
+            style: { color: '#fff', fontFamily: 'REM' },
           }}
         />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Filter theo trạng thái */}
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#71002b', fontFamily: 'REM', paddingRight: '10px' }}>
+            Trạng Thái:
+          </Typography>
+          <FormControl size="small" sx={{ minWidth: 150, marginLeft: 1 }}>
+            <Select
+              value={selectedStatus}
+              onChange={handleStatusFilterChange}
+              displayEmpty
+              sx={{fontFamily: 'REM'}}
+            >
+              <MenuItem sx={{fontFamily: 'REM'}} value="">Tất Cả</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="UPCOMING">Sắp diễn ra</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="ONGOING">Đang diễn ra</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="SUCCESSFUL">Thành công</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="FAILED">Thất bại</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="CANCELED">Đã hủy</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="COMPLETED">Hoàn thành</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
       <Typography
         variant="h5"

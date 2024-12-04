@@ -338,7 +338,7 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                 fontWeight: 500
                             }}
                         >
-                            Mã đơn hàng: {orderDetail.deliveryTrackingCode}
+                            Mã đơn hàng: {orderDetail.delivery.deliveryTrackingCode}
                         </Typography>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px', alignItems: 'center' }}>

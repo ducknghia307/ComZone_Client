@@ -9,7 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { Box, IconButton, InputAdornment, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, FormControl, IconButton, InputAdornment, Menu, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import BanUserModal from '../modal/BanUserModal';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -58,12 +58,16 @@ const ManageUsers: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openBanModal, setOpenBanModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState<string>('ALL');
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await privateAxios.get('/users');
-        setUsers(response.data);
+        const filteredUsers = response.data.filter((user: User) => user.role !== 'ADMIN');
+        setUsers(filteredUsers);
+        // setUsers(response.data);
         console.log(response.data);
 
       } catch (error) {
@@ -143,6 +147,24 @@ const ManageUsers: React.FC = () => {
     }
   };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleRoleFilterChange = (event: SelectChangeEvent<string>) => {
+    setRoleFilter(event.target.value);
+  };
+
+  const filteredUsers = users.filter((user) => {
+    const matchesSearchTerm = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.role.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesRoleFilter = roleFilter === 'ALL' || user.role === roleFilter;
+
+    return matchesSearchTerm && matchesRoleFilter;
+  });
+
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -150,8 +172,8 @@ const ManageUsers: React.FC = () => {
         <TextField
           variant="outlined"
           placeholder="Tìm kiếm..."
-          // value={searchTerm}
-          // onChange={handleSearch}
+          value={searchTerm}
+          onChange={handleSearch}
           size="small"
           sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
           InputProps={{
@@ -160,9 +182,30 @@ const ManageUsers: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: '#fff' }} />
               </InputAdornment>
             ),
-            style: { color: '#fff' },
+            style: { color: '#fff', fontFamily:'REM' },
           }}
         />
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography variant="subtitle2" sx={{ marginRight: '10px', fontWeight: 'bold', color: '#71002b', fontFamily: 'REM' }}>
+            Phân Loại:
+          </Typography>
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <Select
+              value={roleFilter}
+              onChange={handleRoleFilterChange}
+              sx={{
+                // backgroundColor: '#c66a7a',
+                color: '#000',
+                borderRadius: '4px',
+                fontFamily: 'REM',
+              }}
+            >
+              <MenuItem sx={{ fontFamily: 'REM' }} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="MEMBER">Người Mua</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="SELLER">Người Bán</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
 
       <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color: '#71002b' }}>
@@ -189,7 +232,7 @@ const ManageUsers: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
+                filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
                   <StyledTableRow key={user.id}>
                     <StyledTableCell align="center" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                       <img style={{ width: '50px', height: '50px', borderRadius: '50%' }} src={user.avatar || '/placeholder.png'} alt={user.name} />

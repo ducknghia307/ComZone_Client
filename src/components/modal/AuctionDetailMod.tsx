@@ -162,6 +162,15 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
           fontWeight: "bold",
           display: "inline-block",
         };
+      case "UPCOMING":
+        return {
+          color: "#6226EF",
+          backgroundColor: "#EDE7F6",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
       case "ONGOING":
         return {
           color: "#2196f3",
@@ -200,6 +209,8 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
         return "Hoàn thành";
       case "PROCESSING":
         return "Đang xử lí";
+      case "UPCOMING":
+        return "Sắp diễn ra";
       case "ONGOING":
         return "Đang diễn ra";
       case "FAILED":

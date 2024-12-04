@@ -192,7 +192,6 @@ const OrderHistory = () => {
       //     display: "inline-block",
       //     fontFamily: "REM",
       //   };
-      case "FAILED":
       case "CANCELED":
         return {
           color: "#e91e63",

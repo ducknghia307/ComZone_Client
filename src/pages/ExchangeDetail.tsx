@@ -16,6 +16,7 @@ import { Address } from "../common/base.interface";
 import { Delivery } from "../common/interfaces/delivery.interface";
 import { Avatar } from "antd";
 import { CircularProgress } from "@mui/material";
+import ExchangeLoader from "../components/exchange/exchange-details/ExchangeLoader";
 
 const ExchangeDetail: React.FC = () => {
   const { id } = useParams();
@@ -119,9 +120,9 @@ const ExchangeDetail: React.FC = () => {
   };
 
   const fetchExchangeDetails = async () => {
-    try {
-      setIsLoading(true);
+    setIsLoading(true);
 
+    try {
       const response = await privateAxios(`exchange-comics/exchange/${id}`);
       const exchangeDetails: ExchangeDetails = response.data;
       setExchangeData(exchangeDetails);
@@ -140,7 +141,6 @@ const ExchangeDetail: React.FC = () => {
       if (exchangeDetails.exchange.status === "SUCCESSFUL") {
         setFirstCurrentStage(6);
         setSecondCurrentStage(6);
-        setIsLoading(false);
         return;
       }
 
@@ -151,7 +151,6 @@ const ExchangeDetail: React.FC = () => {
       ) {
         setFirstCurrentStage(0);
         setSecondCurrentStage(0);
-        setIsLoading(false);
         return;
       }
 
@@ -231,31 +230,13 @@ const ExchangeDetail: React.FC = () => {
     }
   }, [id]);
 
-  const exchangeLoader = () => {
-    return (
-      <div className="w-full self-stretch flex items-center justify-center gap-32 translate-y-[-10%]">
-        <div className="flex flex-col items-center justify-center gap-2">
-          <Avatar src={firstUser.avatar} size={64} />
-          <p className="font-semibold">{firstUser.name}</p>
-        </div>
-
-        <CircularProgress size="3rem" color="inherit" />
-
-        <div className="flex flex-col items-center justify-center gap-2">
-          <Avatar src={secondUser.avatar} size={64} />
-          <p className="font-semibold">{secondUser.name}</p>
-        </div>
-      </div>
-    );
-  };
-
   if (!exchangeData) return;
 
   return (
     <div className="REM min-h-[80vh] w-full flex justify-center gap-4 px-4 py-4">
-      {isLoading && exchangeLoader()}
+      {isLoading && <Loading />}
 
-      {firstCurrentStage > -1 && !isLoading && (
+      {firstCurrentStage > -1 ? (
         <>
           <div className="basis-2/3 flex flex-col items-stretch justify-start gap-4 px-4 border-r border-gray-300">
             <InformationCollectSection
@@ -309,6 +290,8 @@ const ExchangeDetail: React.FC = () => {
             />
           </div>
         </>
+      ) : (
+        <ExchangeLoader firstUser={firstUser} secondUser={secondUser} />
       )}
     </div>
   );

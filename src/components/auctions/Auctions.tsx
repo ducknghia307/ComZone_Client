@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../ui/AuctionSidebar.css";
 import Countdown from "react-countdown";
-import { Button, Chip } from "@mui/material";
+import { Button, Chip, Badge } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
@@ -114,21 +114,35 @@ const AllAuctions = ({
 
       <div className="flex justify-around border-b">
         <button
-          className={`w-1/2 py-2 text-center font-bold ${
+          className={`w-1/3 py-2 text-center font-bold ${
             activeTab === "ONGOING"
               ? "text-blue-500 border-b-2 border-blue-500"
               : "text-gray-600"
           }`}
           onClick={() => setActiveTab("ONGOING")}
-        ></button>
+        >
+          <Badge>Đang diễn ra</Badge>
+        </button>
         <button
-          className={`w-1/2 py-2 text-center font-bold ${
+          className={`w-1/3 py-2 text-center font-bold ${
             activeTab === "UPCOMING"
               ? "text-blue-500 border-b-2 border-blue-500"
               : "text-gray-600"
           }`}
           onClick={() => setActiveTab("UPCOMING")}
-        ></button>
+        >
+          <Badge>Sắp diễn ra</Badge>
+        </button>
+        <button
+          className={`w-1/3 py-2 text-center font-bold ${
+            activeTab === "COMPLETED"
+              ? "text-blue-500 border-b-2 border-blue-500"
+              : "text-gray-600"
+          }`}
+          onClick={() => setActiveTab("COMPLETED")}
+        >
+          <Badge>Đã kết thúc</Badge>
+        </button>
       </div>
 
       {/* Ongoing or Upcoming Auctions Section */}

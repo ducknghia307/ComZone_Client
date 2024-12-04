@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
-import "../ui/Notification.css"
+import "../ui/Notification.css";
 
 const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
@@ -16,9 +16,6 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
   const [unreadUser, setUnreadUser] = useState(0);
   const [unreadSeller, setUnreadSeller] = useState(0);
   const dispatch = useAppDispatch();
-  const unreadAnnounce = useAppSelector(
-    (state) => state.annoucement.unReadAnnounce
-  );
 
   const navigate = useNavigate();
 
@@ -44,8 +41,10 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
     dispatch(setUnreadAnnounce(unreadUserCount + unreadSellerCount));
     setUnreadUser(unreadUserCount);
     setUnreadSeller(unreadSellerCount);
-  }, [announcements, activeTab]);
-
+  }, [announcements, activeTab,dispatch]);
+  const navigateToAll = () => {
+    navigate("/accountmanagement/announcement/orders");
+  };
   const navigateTo = async (item) => {
     if (item.type === "ORDER") navigate("/sellermanagement/order");
 
@@ -166,7 +165,10 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
 
       {/* Footer */}
       <div className="border-t p-1 text-center sticky bottom-0 bg-white z-10">
-        <button className="text-blue-500 text-sm font-semibold hover:underline">
+        <button
+          className="text-blue-500 text-sm font-semibold hover:underline"
+          onClick={navigateToAll}
+        >
           Xem tất cả
         </button>
       </div>

@@ -44,10 +44,11 @@ import AdminSubscription from "../../pages/AdminSubscription";
 import Exchange from "../exchange/Exchange";
 import ExchangeDetail from "../../pages/ExchangeDetail";
 import Announcement from "../../pages/Announcement";
-import AnnouncementOrder from "../../pages/AnnoucementOrder";
+import AnnouncementOrder from "../../pages/AnnouncementOrder";
 import AnnouncementAuction from "../../pages/AnnouncementAuction";
 import SellerManagementPage from "../../pages/SellerManagement";
 import ExchangeManagement from "../../pages/ExchangeManagement";
+import AnnouncementExchange from "../../pages/AnnoucementExchange";
 
 const AppRouter = () => {
   return (
@@ -69,11 +70,17 @@ const AppRouter = () => {
         <Route
           path="/accountmanagement/announcement/orders"
           element={<AnnouncementOrder />}
-        />\
-            <Route
+        />
+        \
+        <Route
           path="/accountmanagement/announcement/auctions"
           element={<AnnouncementAuction />}
         />
+         <Route
+          path="/accountmanagement/announcement/exchanges"
+          element={<AnnouncementExchange />}
+        />
+        
         <Route path="/accountmanagement/auction" element={<AuctionUser />} />
         <Route path="/accountmanagement/wallet" element={<WalletUser />} />
         <Route path="/accountmanagement/exchange" element={<ExchangeUser />} />
@@ -113,7 +120,6 @@ const AppRouter = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/order/complete" element={<OrderComplete />} />
-
         <Route
           path="/profile/recentActivities"
           element={<CurrentUserRecentAct />}
@@ -131,7 +137,6 @@ const AppRouter = () => {
           element={<CurrentUserComicSelling />}
         />
         <Route path="*" element={<NotFound />} />
-
         <Route path="/mod/comics" element={<ModComics />} />
         <Route path="/mod/users" element={<ModUsers />} />
         <Route path="/mod/orders" element={<ModOrders />} />
@@ -140,7 +145,6 @@ const AppRouter = () => {
         <Route path="/mod/deposits" element={<ModDeposits />} />
         <Route path="/mod/feedbacks" element={<ModFeedbacks />} />
         <Route path="/mod/refunds" element={<ModRefunds />} />
-
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/subscription" element={<AdminSubscription />} />

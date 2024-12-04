@@ -42,6 +42,7 @@ const AnnouncementOrder = () => {
     try {
       const response = await privateAxios.get(`/announcements/user`);
       const data = response.data || [];
+      console.log(data);
 
       // Filter announcements of type 'ORDER'
       const orderAnnouncements = data.filter((item) => item.type === "ORDER");

@@ -1,47 +1,53 @@
-import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import TablePagination from '@mui/material/TablePagination';
-import { privateAxios } from '../../middleware/axiosInstance';
-import { Comic } from '../../common/base.interface';
-import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import BanComicModal from '../modal/BanComicModal';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { styled } from "@mui/material/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import TablePagination from "@mui/material/TablePagination";
+import { privateAxios } from "../../middleware/axiosInstance";
+import { Comic } from "../../common/base.interface";
+import {
+  Box,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import BanComicModal from "../modal/BanComicModal";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 // Styled Components for Moderator
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#c66a7a',
-    color: '#fff',
-    fontWeight: 'bold',
-    fontFamily: 'REM',
-    fontSize: '1rem',
+    backgroundColor: "#c66a7a",
+    color: "#fff",
+    fontWeight: "bold",
+    fontFamily: "REM",
+    fontSize: "1rem",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    color: '#000',
-    fontFamily: 'REM',
+    color: "#000",
+    fontFamily: "REM",
   },
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  backgroundColor: '#fff',
-  '&:nth-of-type(odd)': {
-    backgroundColor: '#ffe3d842',
+  backgroundColor: "#fff",
+  "&:nth-of-type(odd)": {
+    backgroundColor: "#ffe3d842",
   },
 }));
 
 const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
-  backgroundColor: '#fff',
-  color: '#000',
+  backgroundColor: "#fff",
+  color: "#000",
 }));
 
 const ManageComics: React.FC = () => {
@@ -51,12 +57,12 @@ const ManageComics: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openBanModal, setOpenBanModal] = useState(false);
   const [selectedComicId, setSelectedComicId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     const fetchComics = async () => {
       try {
-        const response = await privateAxios.get('/comics');
+        const response = await privateAxios.get("/comics");
         setComics(response.data);
         console.log(response.data);
       } catch (error) {
@@ -72,7 +78,9 @@ const ManageComics: React.FC = () => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -80,32 +88,94 @@ const ManageComics: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "UNAVAILABLE":
-        return { color: '#e91e63', backgroundColor: '#fce4ec', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
+        return {
+          color: "#e91e63",
+          backgroundColor: "#fce4ec",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
       case "AVAILABLE":
-        return { color: '#4caf50', backgroundColor: '#e8f5e9', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
+        return {
+          color: "#4caf50",
+          backgroundColor: "#e8f5e9",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
       case "AUCTION":
-        return { color: '#ff9800', backgroundColor: '#fff3e0', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
+        return {
+          color: "#ff9800",
+          backgroundColor: "#fff3e0",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
       case "EXCHANGE":
-        return { color: '#52a7bf', backgroundColor: '#daf4ff', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
+        return {
+          color: "#52a7bf",
+          backgroundColor: "#daf4ff",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
       case "EXCHANGE_OFFER":
-        return { color: '#673ab7', backgroundColor: '#ede7f6', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
+        return {
+          color: "#673ab7",
+          backgroundColor: "#ede7f6",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
       case "SOLD":
-        return { color: '#757575', backgroundColor: '#eeeeee', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
+        return {
+          color: "#757575",
+          backgroundColor: "#eeeeee",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
       case "REMOVED":
-        return { color: '#f44336', backgroundColor: '#ffebee', padding: '8px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap' };
+        return {
+          color: "#f44336",
+          backgroundColor: "#ffebee",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
     }
   };
 
   const translateStatus = (status: string) => {
     switch (status) {
-      case "UNAVAILABLE": return "Không khả dụng";
-      case "AVAILABLE": return "Có sẵn";
-      case "AUCTION": return "Đang đấu giá";
-      case "EXCHANGE": return "Trao đổi";
-      case "EXCHANGE_OFFER": return "Đề xuất trao đổi";
-      case "SOLD": return "Đã bán";
-      case "REMOVED": return "Đã gỡ";
-      default: return status;
+      case "UNAVAILABLE":
+        return "Không khả dụng";
+      case "AVAILABLE":
+        return "Có sẵn";
+      case "AUCTION":
+        return "Đang đấu giá";
+      case "EXCHANGE":
+        return "Trao đổi";
+      case "PRE_ORDER":
+        return "Đang được đặt trước";
+      case "SOLD":
+        return "Đã bán";
+      default:
+        return status;
     }
   };
 
@@ -117,21 +187,14 @@ const ManageComics: React.FC = () => {
   const handleBanComic = async (reason: string) => {
     if (selectedComicId !== null) {
       try {
-        await privateAxios.patch(`/comics/${selectedComicId}/status`, {
-          status: 'REMOVED', // Trạng thái mới là REMOVED
-        });
-        console.log(`Comic ID: ${selectedComicId} đã được chuyển sang REMOVED với lý do: ${reason}`);
-
-        // Cập nhật danh sách sau khi cấm
-        setComics((prevComics) =>
-          prevComics.map((comic) =>
-            comic.id === selectedComicId ? { ...comic, status: 'REMOVED' } : comic
-          )
+        await privateAxios.delete(`/comics/soft/${selectedComicId}`);
+        console.log(
+          `Comic ID: ${selectedComicId} đã bị xóa với lý do: ${reason}`
         );
       } catch (error) {
-        console.error('Lỗi khi cập nhật trạng thái:', error);
+        console.error("Lỗi khi cập nhật trạng thái:", error);
       } finally {
-        setOpenBanModal(false); // Đóng modal sau khi hoàn tất
+        setOpenBanModal(false);
       }
     }
   };
@@ -140,14 +203,22 @@ const ManageComics: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredComics = comics.filter((comic) =>
-    comic.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    comic.author.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredComics = comics.filter(
+    (comic) =>
+      comic.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      comic.author.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div style={{ paddingBottom: '40px' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+    <div style={{ paddingBottom: "40px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "30px",
+        }}
+      >
         {/* Search Box */}
         <TextField
           variant="outlined"
@@ -155,18 +226,31 @@ const ManageComics: React.FC = () => {
           value={searchTerm}
           onChange={handleSearch}
           size="small"
-          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+          sx={{
+            backgroundColor: "#c66a7a",
+            borderRadius: "4px",
+            color: "#fff",
+            width: "300px",
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchOutlinedIcon sx={{ color: '#fff' }} />
+                <SearchOutlinedIcon sx={{ color: "#fff" }} />
               </InputAdornment>
             ),
-            style: { color: '#fff' },
+            style: { color: "#fff" },
           }}
         />
       </Box>
-      <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color: '#71002b' }}>
+      <Typography
+        variant="h5"
+        sx={{
+          marginBottom: "20px",
+          fontWeight: "bold",
+          fontFamily: "REM",
+          color: "#71002b",
+        }}
+      >
         Quản lý truyện tranh
       </Typography>
       <Paper>
@@ -174,12 +258,24 @@ const ManageComics: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell style={{ whiteSpace: 'nowrap' }}>Ảnh Bìa</StyledTableCell>
-                <StyledTableCell style={{ whiteSpace: 'nowrap' }}>Tên Truyện</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Tác Giả</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Trạng Thái</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Tập/Bộ</StyledTableCell>
-                <StyledTableCell align="right" style={{ whiteSpace: 'nowrap' }}>Chỉnh Sửa</StyledTableCell>
+                <StyledTableCell style={{ whiteSpace: "nowrap" }}>
+                  Ảnh Bìa
+                </StyledTableCell>
+                <StyledTableCell style={{ whiteSpace: "nowrap" }}>
+                  Tên Truyện
+                </StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: "nowrap" }}>
+                  Tác Giả
+                </StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: "nowrap" }}>
+                  Trạng Thái
+                </StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: "nowrap" }}>
+                  Tập/Bộ
+                </StyledTableCell>
+                <StyledTableCell align="right" style={{ whiteSpace: "nowrap" }}>
+                  Chỉnh Sửa
+                </StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -190,28 +286,39 @@ const ManageComics: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredComics.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((comic) => (
-                  <StyledTableRow key={comic.id}>
-                    <StyledTableCell>
-                      <img style={{ width: '80px', height: '120px' }} src={comic.coverImage} alt={comic.title} />
-                    </StyledTableCell>
-                    <StyledTableCell>{comic.title}</StyledTableCell>
-                    <StyledTableCell align="right">{comic.author}</StyledTableCell>
-                    <StyledTableCell align="right">
-                      <span style={getStatusColor(comic.status)}>
-                        {translateStatus(comic.status)}
-                      </span>
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      {comic.quantity > 1 ? 'Bộ Truyện' : 'Tập Truyện'}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      <IconButton color="error" onClick={() => handleOpenBanModal(comic.id)}>
-                        <DeleteOutlineOutlinedIcon />
-                      </IconButton>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))
+                filteredComics
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((comic) => (
+                    <StyledTableRow key={comic.id}>
+                      <StyledTableCell>
+                        <img
+                          style={{ width: "80px", height: "120px" }}
+                          src={comic.coverImage}
+                          alt={comic.title}
+                        />
+                      </StyledTableCell>
+                      <StyledTableCell>{comic.title}</StyledTableCell>
+                      <StyledTableCell align="right">
+                        {comic.author}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        <span style={getStatusColor(comic.status)}>
+                          {translateStatus(comic.status)}
+                        </span>
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        {comic.quantity > 1 ? "Bộ Truyện" : "Tập Truyện"}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        <IconButton
+                          color="error"
+                          onClick={() => handleOpenBanModal(comic.id)}
+                        >
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))
               )}
             </TableBody>
           </Table>
@@ -219,10 +326,10 @@ const ManageComics: React.FC = () => {
         <StyledTablePagination
           rowsPerPageOptions={[5, 10, 15]}
           sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end",
           }}
           count={comics.length}
           rowsPerPage={rowsPerPage}

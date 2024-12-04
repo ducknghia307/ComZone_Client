@@ -22,8 +22,6 @@ import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { privateAxios } from '../../middleware/axiosInstance';
 import { Pie, Bar } from 'react-chartjs-2';
 import { ArcElement, BarElement } from 'chart.js';
-import TransactionTable from './TransactionTable';
-import AuctionsTable from './AuctionsTable';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement);
 

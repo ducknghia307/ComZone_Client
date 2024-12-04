@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface TabProps {
   label: string;
@@ -8,9 +8,14 @@ interface TabProps {
 }
 
 const Tab: React.FC<TabProps> = ({ label, path, isActive }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   return (
-    <Link
-      to={`${path}`}
+    <button
+      onClick={() => {
+        if (location.pathname !== path) navigate(path);
+      }}
       className={`flex duration-200 items-center justify-between px-4 py-2 rounded-lg text-sm cursor-pointer
       ${
         isActive
@@ -19,11 +24,13 @@ const Tab: React.FC<TabProps> = ({ label, path, isActive }) => {
       }`}
     >
       <span>{label}</span>
-    </Link>
+    </button>
   );
 };
 
 const ExchangeTab: React.FC = () => {
+  const location = useLocation();
+
   const tabs = [
     { label: "Tất cả", path: "/exchange/list/all" },
     { label: "Yêu cầu nhận được", path: "/exchange/list/pending-request" },
@@ -35,8 +42,6 @@ const ExchangeTab: React.FC = () => {
     { label: "Thất bại", path: "/exchange/list/failed" },
     { label: "Bị từ chối", path: "/exchange/list/rejected" },
   ];
-
-  const location = useLocation();
 
   return (
     <div className="flex justify-center space-x-4 REM w-full">

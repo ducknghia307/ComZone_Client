@@ -27,7 +27,7 @@ import AllHotComics from "../../pages/HotComic";
 import NotFound from "../notFound/NotFound";
 import CurrentUserRecentAct from "../../pages/CurrentUserRecentAct";
 import CurrentUserHistoryExchange from "../../pages/CurrentUserHistoryExchange";
-import CurrentUserComicExchange from "../../pages/CurrentUserComicExchange";
+import CurrentUserComicExchange from "../exchange/CurrentUserComicExchange";
 import CurrentUserComicSelling from "../../pages/CurrentUserComicSelling";
 import ModComics from "../../pages/ModComics";
 import ModUsers from "../../pages/ModUsers";

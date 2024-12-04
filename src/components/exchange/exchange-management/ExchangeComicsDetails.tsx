@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Comic } from "../../../common/base.interface";
-import { Modal } from "antd";
+import { Modal, notification, Popconfirm } from "antd";
+import { privateAxios } from "../../../middleware/axiosInstance";
+import { DeleteFilled } from "@ant-design/icons";
 
 export default function ExchangeComicsDetails({
   comics,
   setIsShowingDetails,
   setIsUpdating,
+  fetchComicExchangeOffer,
+  handleUndoDelete,
 }: {
   comics: Comic;
   setIsShowingDetails: React.Dispatch<React.SetStateAction<Comic>>;
   setIsUpdating: React.Dispatch<React.SetStateAction<Comic>>;
   fetchComicExchangeOffer: () => void;
+  handleUndoDelete: (comics: Comic) => void;
 }) {
   const [currentComics, setCurrentComics] = useState<Comic>(comics);
   const [currentImage, setCurrentImage] = useState(comics.coverImage);
@@ -18,7 +23,39 @@ export default function ExchangeComicsDetails({
     comics.description.length < 100
   );
 
-  useEffect(() => setCurrentComics(comics), [comics]);
+  useEffect(() => {
+    setCurrentComics(comics);
+    setCurrentImage(comics.coverImage);
+  }, [comics]);
+
+  const handleDeleteExchangeComics = async () => {
+    await privateAxios
+      .delete(`comics/soft/${currentComics.id}`)
+      .then(() => {
+        notification.info({
+          key: "delete",
+          message: (
+            <p className="REM">
+              Đã xóa truyện{" "}
+              <span className="font-semibold">"{comics.title}"</span>!
+            </p>
+          ),
+          description: (
+            <button
+              onClick={() => handleUndoDelete(currentComics)}
+              className="bg-sky-700 text-white px-2 py-1 rounded-md duration-200 hover:bg-sky-800"
+            >
+              Hoàn tác
+            </button>
+          ),
+          duration: 5,
+        });
+
+        setIsShowingDetails(null);
+        fetchComicExchangeOffer();
+      })
+      .catch((err) => console.log(err));
+  };
 
   const getEdition = () => {
     switch (comics.edition) {
@@ -136,6 +173,31 @@ export default function ExchangeComicsDetails({
               <p className="font-semibold">{getComicsExchangeStatus()}</p>
             </div>
 
+            {currentComics.quantity > 1 && currentComics.episodesList && (
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <p className="font-light text-xs">Danh sách truyện:</p>
+                {currentComics.episodesList.slice(0, 8).map((episode) => (
+                  <span className="font-light text-xs italic border border-gray-300 p-1 rounded-md">
+                    {episode}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {currentComics.publishedDate && (
+              <div className="flex items-center justify-between gap-2 pr-4">
+                <p className="font-light text-xs">Năm xuất bản:</p>
+                <p className="font-semibold">{currentComics.publishedDate}</p>
+              </div>
+            )}
+
+            {currentComics.page && (
+              <div className="flex items-center justify-between gap-2 pr-4">
+                <p className="font-light text-xs">Số trang:</p>
+                <p className="font-semibold">{currentComics.page}</p>
+              </div>
+            )}
+
             <p className="font-light text-xs">
               Mô tả:{" "}
               <span
@@ -155,30 +217,29 @@ export default function ExchangeComicsDetails({
               )}
             </p>
 
-            {currentComics.quantity > 1 && currentComics.episodesList && (
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <p className="font-light text-xs">Danh sách truyện:</p>
-                {currentComics.episodesList.slice(0, 8).map((episode) => (
-                  <span className="font-light text-xs italic border border-gray-300 p-1 rounded-md">
-                    {episode}
-                  </span>
-                ))}
-              </div>
-            )}
-
             <div className="flex items-center gap-2 mt-auto text-sm">
-              <button className="grow flex items-center justify-center gap-1 py-2 rounded-md text-white bg-red-600 duration-200 hover:bg-red-800">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                >
-                  <path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z"></path>
-                </svg>
-                Xóa
-              </button>
+              <Popconfirm
+                title={<p>Xóa truyện</p>}
+                description={<p>Bạn có chắc chắn muốn xóa truyện này không?</p>}
+                okText={<p>Xóa</p>}
+                okType="danger"
+                cancelText={<p>Quay lại</p>}
+                onConfirm={handleDeleteExchangeComics}
+                icon={<DeleteFilled style={{ color: "red" }} />}
+              >
+                <button className="grow flex items-center justify-center gap-1 py-2 rounded-md text-white bg-red-600 duration-200 hover:bg-red-800">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                  >
+                    <path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z"></path>
+                  </svg>
+                  Xóa
+                </button>
+              </Popconfirm>
 
               <button
                 onClick={() => setIsUpdating(currentComics)}

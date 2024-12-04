@@ -57,7 +57,7 @@ const ModUsers: React.FC = () => {
                 container
                 sx={{
                     padding: '30px 40px',
-                    '& .MuiGrid2-root': { // Target Grid items
+                    '& .MuiGrid2-root': { 
                         paddingLeft: '24px',
                     },
                     backgroundColor: '#fedddb24'
@@ -67,7 +67,7 @@ const ModUsers: React.FC = () => {
                     size={isCollapsed ? 0.5 : 2.5}
                     className="account-menu2"
                     sx={{
-                        paddingLeft: '0 !important', // Remove left padding from sidebar
+                        paddingLeft: '0 !important',
                     }}
                 >
                     <Sidebar

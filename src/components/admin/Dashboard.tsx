@@ -20,14 +20,19 @@ import {
 } from 'chart.js';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { privateAxios } from '../../middleware/axiosInstance';
+import { Pie, Bar } from 'react-chartjs-2';
+import { ArcElement, BarElement } from 'chart.js';
+import TransactionTable from './TransactionTable';
+import AuctionsTable from './AuctionsTable';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement);
 
 // Định nghĩa các kiểu dữ liệu
 interface Transaction {
     status: string;
     amount: number;
     createdAt: string;
+    profitAmount: number;
 }
 
 interface Order {
@@ -51,7 +56,22 @@ const Dashboard = () => {
         labels: [],
         datasets: [],
     });
+    const [transactionBarData, setTransactionBarData] = useState<ChartData<'bar'>>({
+        labels: [],
+        datasets: [],
+    });
     const [filter, setFilter] = useState('week');
+    const [orderStatusData, setOrderStatusData] = useState({
+        PENDING: 0,
+        PACKAGING: 0,
+        DELIVERING: 0,
+        DELIVERED: 0,
+        SUCCESSFUL: 0,
+        FAILED: 0,
+        CANCELED: 0
+    });
+
+    const [transactionsData, setTransactionsData] = useState<Transaction[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -61,20 +81,29 @@ const Dashboard = () => {
                 const usersResponse = await privateAxios.get('/users');
                 const auctionsResponse = await privateAxios.get('/auction');
                 const transactionsResponse = await privateAxios.get('/transactions/all');
-                console.log("transactionsResponse", transactionsResponse);
-                
+                console.log("transactionsResponse", transactionsResponse.data);
+
                 const ordersResponse = await privateAxios.get('/orders');
 
                 setTotalComics(comicsResponse.data.length);
-                setTotalUsers(usersResponse.data.length);
+                // setTotalUsers(usersResponse.data.length);
+
+                const nonAdminUsers = usersResponse.data.filter((user: any) => user.role !== 'ADMIN');
+                setTotalUsers(nonAdminUsers.length);
+
                 setTotalAuctions(auctionsResponse.data.length);
 
-                const successfulTransactions = transactionsResponse.data.filter(
-                    (transaction: Transaction) => transaction.status === "SUCCESSFUL"
-                );
+                // const successfulTransactions = transactionsResponse.data.filter(
+                //     (transaction: Transaction) => transaction.status === "SUCCESSFUL"
+                // );
 
-                const totalRevenue = successfulTransactions.reduce(
-                    (sum: number, transaction: Transaction) => sum + (transaction.amount || 0),
+                // const totalRevenue = successfulTransactions.reduce(
+                //     (sum: number, transaction: Transaction) => sum + (transaction.amount || 0),
+                //     0
+                // );
+
+                const totalRevenue = transactionsResponse.data.reduce(
+                    (sum: number, transaction: Transaction) => sum + (transaction.profitAmount || 0),
                     0
                 );
 
@@ -85,7 +114,27 @@ const Dashboard = () => {
                 setTotalTransactions(totalRevenue);
                 setTotalOrders(successfulOrders.length);
 
-                // Xử lý dữ liệu biểu đồ
+                // pie chart
+                const orderStatusCounts = ordersResponse.data.reduce((acc: any, order: Order) => {
+                    if (acc[order.status]) {
+                        acc[order.status]++;
+                    } else {
+                        acc[order.status] = 1;
+                    }
+                    return acc;
+                }, {});
+
+                setOrderStatusData({
+                    PENDING: orderStatusCounts['PENDING'] || 0,
+                    PACKAGING: orderStatusCounts['PACKAGING'] || 0,
+                    DELIVERING: orderStatusCounts['DELIVERING'] || 0,
+                    DELIVERED: orderStatusCounts['DELIVERED'] || 0,
+                    SUCCESSFUL: orderStatusCounts['SUCCESSFUL'] || 0,
+                    FAILED: orderStatusCounts['FAILED'] || 0,
+                    CANCELED: orderStatusCounts['CANCELED'] || 0,
+                });
+
+                // Xử lý dữ liệu biểu đồ line
                 let dateRange: string[];
                 if (filter === 'week') {
                     dateRange = Array.from({ length: 7 }, (_, i) => {
@@ -111,6 +160,9 @@ const Dashboard = () => {
                 const transactionsData = processDataForChart(transactionsResponse.data as DataItem[], dateRange);
                 const ordersData = processDataForChart(ordersResponse.data as DataItem[], dateRange);
 
+                // const transactionBarDataProcessed = processDataForBarChart(successfulTransactions, dateRange);
+                const transactionBarDataProcessed = processDataForBarChart(transactionsResponse.data as Transaction[], dateRange);
+
                 setChartData({
                     labels: dateRange,
                     datasets: [
@@ -133,6 +185,17 @@ const Dashboard = () => {
                             backgroundColor: 'rgba(255, 159, 64, 0.2)',
                         },
                     ],
+                });
+
+                setTransactionBarData({
+                    labels: dateRange,
+                    datasets: [
+                        {
+                            label: 'Doanh Thu',
+                            data: transactionBarDataProcessed,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        }
+                    ]
                 });
             } catch (err: any) {
                 setError(err.message);
@@ -159,6 +222,67 @@ const Dashboard = () => {
             }
         });
         return counts;
+    };
+
+    // const processDataForBarChart = (transactions: Transaction[], dateRange: string[]) => {
+    //     const amounts = dateRange.map(() => 0);
+    //     transactions.forEach(transaction => {
+    //         const createdAt = new Date(transaction.createdAt).toLocaleDateString('vi-VN');
+    //         const dateStr =
+    //             filter === 'year'
+    //                 ? new Date(transaction.createdAt).toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' })
+    //                 : createdAt;
+    //         const dayIndex = dateRange.indexOf(dateStr);
+    //         if (dayIndex !== -1) {
+    //             amounts[dayIndex] += transaction.amount || 0;
+    //         }
+    //     });
+    //     return amounts;
+    // };
+
+    const processDataForBarChart = (transactions: Transaction[], dateRange: string[]) => {
+        const amounts = dateRange.map(() => 0);
+        transactions.forEach(transaction => {
+            const createdAt = new Date(transaction.createdAt).toLocaleDateString('vi-VN');
+            const dateStr =
+                filter === 'year'
+                    ? new Date(transaction.createdAt).toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' })
+                    : createdAt;
+            const dayIndex = dateRange.indexOf(dateStr);
+            if (dayIndex !== -1) {
+                amounts[dayIndex] += transaction.profitAmount || 0;
+            }
+        });
+        return amounts;
+    };
+
+    // Pie chart data for order statuses
+    const pieChartData = {
+        labels: [
+            'Chờ xử lí', 'Đang đóng gói', 'Đang giao hàng', 'Đã giao thành công', 'Hoàn tất', 'Bị hủy'
+        ],
+        datasets: [
+            {
+                data: [
+                    orderStatusData.PENDING,
+                    orderStatusData.PACKAGING,
+                    orderStatusData.DELIVERING,
+                    orderStatusData.DELIVERED,
+                    orderStatusData.SUCCESSFUL,
+                    orderStatusData.FAILED,
+                    orderStatusData.CANCELED
+                ],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 99, 255, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+            },
+        ],
     };
 
     if (loading) {
@@ -212,16 +336,68 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Chart Section */}
-            <div className="bg-white p-4 rounded-lg shadow-md">
-                {/* Dòng chứa Data Overview và Filter */}
+            {/* Container for Pie and Line Chart */}
+            <div className="flex space-x-6">
+                {/* Line Chart Section */}
+                <div className="bg-white p-4 rounded-lg shadow-md flex-1">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xl font-semibold ml-2">Dữ Liệu Tổng Quan</h3>
+                        <FormControl size="small">
+                            <InputLabel id="filter-label">Filter</InputLabel>
+                            <Select
+                                labelId="filter-label"
+                                id="filter"
+                                value={filter}
+                                label="Filter"
+                                onChange={(e) => setFilter(e.target.value)}
+                            >
+                                <MenuItem value="week">Tuần</MenuItem>
+                                <MenuItem value="month">Tháng</MenuItem>
+                                <MenuItem value="year">Năm</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
+
+                    {/* Line */}
+                    <Line data={chartData} options={{ plugins: { legend: { position: 'bottom' } } }} />
+                </div>
+
+                {/* Pie */}
+                <div className="bg-white p-4 rounded-lg shadow-md w-full sm:w-1/2 md:w-1/3">
+                    <h3 className="text-xl font-semibold mb-4">Tình trạng đơn hàng</h3>
+                    <div className="flex justify-center">
+                        <Pie data={pieChartData} options={{
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    align: 'center',
+                                    labels: {
+                                        boxWidth: 20,
+                                        padding: 10,
+                                    }
+                                }
+                            }
+                        }} />
+                    </div>
+                </div>
+            </div>
+            {/* <div className="space-x-6 mt-6"> */}
+            {/* <div className='bg-white p-4 rounded-lg shadow-md flex-1'> */}
+            {/* <TransactionTable /> */}
+            {/* </div> */}
+            {/* <div className='bg-white p-4 rounded-lg shadow-md w-full sm:w-1/2 md:w-1/3'>
+                    <AuctionsTable />
+                </div> */}
+            {/* </div> */}
+            <div className="bg-white p-4 rounded-lg shadow-md mt-6">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold ml-2">Data Overview</h3>
+                    <h3 className="text-xl font-semibold ml-2">Doanh Thu Giao Dịch</h3>
+                    {/* Reuse existing filter */}
                     <FormControl size="small">
-                        <InputLabel id="filter-label">Filter</InputLabel>
+                        <InputLabel id="transaction-filter-label">Filter</InputLabel>
                         <Select
-                            labelId="filter-label"
-                            id="filter"
+                            labelId="transaction-filter-label"
+                            id="transaction-filter"
                             value={filter}
                             label="Filter"
                             onChange={(e) => setFilter(e.target.value)}
@@ -232,9 +408,30 @@ const Dashboard = () => {
                         </Select>
                     </FormControl>
                 </div>
-
-                {/* Biểu đồ */}
-                <Line data={chartData} options={{ plugins: { legend: { position: 'bottom' } } }} />
+                <Bar
+                    data={transactionBarData}
+                    options={{
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return `Doanh Thu: ${context.formattedValue} đ`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Doanh Thu (đ)'
+                                }
+                            }
+                        },
+                    }}
+                    height={100}
+                />
             </div>
         </div>
     );

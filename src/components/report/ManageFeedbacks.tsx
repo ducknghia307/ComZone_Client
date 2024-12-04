@@ -13,6 +13,9 @@ import {
   TextField,
   Typography,
   TablePagination,
+  FormControl,
+  InputLabel,
+  MenuItem,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
@@ -20,6 +23,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { privateAxios } from '../../middleware/axiosInstance';
 import ModalFeedback from './ModalFeedback';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 interface Feedback {
   id: string;
   user: { name: string };
@@ -67,6 +71,8 @@ const ManageFeedbacks: React.FC = () => {
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [ratingFilter, setRatingFilter] = useState<number | string>('ALL');
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
@@ -125,10 +131,22 @@ const ManageFeedbacks: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredFeedbacks = feedbacks.filter((feedback) =>
-    feedback.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    feedback.seller.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleStatusFilterChange = (event: SelectChangeEvent<string>) => {
+    setStatusFilter(event.target.value);
+  };
+
+  const handleRatingFilterChange = (event: SelectChangeEvent<string>) => {
+    setRatingFilter(event.target.value);
+  };
+
+  const filteredFeedbacks = feedbacks.filter((feedback) => {
+    return (
+      (feedback.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        feedback.seller.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (statusFilter === 'ALL' || (statusFilter === 'APPROVED' ? feedback.isApprove : !feedback.isApprove)) &&
+      (ratingFilter === 'ALL' || feedback.rating === Number(ratingFilter))
+    );
+  });
 
   const paginatedData = filteredFeedbacks.slice(
     page * rowsPerPage,
@@ -152,9 +170,45 @@ const ManageFeedbacks: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: '#fff' }} />
               </InputAdornment>
             ),
-            style: { color: '#fff' },
+            style: { color: '#fff', fontFamily: 'REM' },
           }}
         />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Status Filter */}
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#71002b', fontFamily: 'REM', paddingRight: '10px' }}>
+            Trạng Thái:
+          </Typography>
+          <FormControl size="small" sx={{ minWidth: 150, borderRadius: '4px' }}>
+            <Select
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+              sx={{ color: '#000' }}
+            >
+              <MenuItem value="ALL">Tất cả</MenuItem>
+              <MenuItem value="APPROVED">Đã duyệt</MenuItem>
+              <MenuItem value="PENDING">Chưa duyệt</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Rating Filter */}
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#71002b', fontFamily: 'REM', paddingRight: '10px', paddingLeft: '20px' }}>
+            Đánh giá:
+          </Typography>
+          <FormControl size="small" sx={{ minWidth: 150, borderRadius: '4px' }}>
+            <Select
+              value={ratingFilter}
+              onChange={handleRatingFilterChange}
+              sx={{ color: '#000' }}
+            >
+              <MenuItem value="ALL">Tất cả</MenuItem>
+              <MenuItem value={1}>1 ⭐</MenuItem>
+              <MenuItem value={2}>2 ⭐</MenuItem>
+              <MenuItem value={3}>3 ⭐</MenuItem>
+              <MenuItem value={4}>4 ⭐</MenuItem>
+              <MenuItem value={5}>5 ⭐</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
       <Typography
         variant="h5"
@@ -198,7 +252,7 @@ const ManageFeedbacks: React.FC = () => {
                     <StyledTableCell align="center">{feedback.user?.name || 'Unknown'}</StyledTableCell>
                     <StyledTableCell align="center">{feedback.seller?.name || 'Unknown'}</StyledTableCell>
                     <StyledTableCell align="center">
-                      {feedback.comment.length > 100 ? feedback.comment.substring(0, 50) + '...' : feedback.comment}
+                      {feedback.comment.length > 50 ? feedback.comment.substring(0, 50) + '...' : feedback.comment}
                     </StyledTableCell>
 
                     <StyledTableCell align="center">

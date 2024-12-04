@@ -9,12 +9,12 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
+import { Box, FormControl, IconButton, InputAdornment, MenuItem, Select, TextField, Typography } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import OrderDetailMod from './OrderDetailMod';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { OrderDetailData } from '../../common/base.interface';
-
+import { SelectChangeEvent } from '@mui/material/Select';
 interface Delivery {
   deliveryTrackingCode: string;
   from: { name: string };
@@ -67,6 +67,7 @@ const ManageOrders: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
   const openOrderDetail = (orderId: string) => {
     setSelectedOrderId(orderId);
@@ -193,7 +194,7 @@ const ManageOrders: React.FC = () => {
           display: 'inline-block',
           fontFamily: "REM"
         };
-      case "COMPLETED":
+      case "SUCCESSFUL":
         return {
           color: '#fef6c7',
           backgroundColor: '#395f18',
@@ -207,6 +208,16 @@ const ManageOrders: React.FC = () => {
         return {
           color: '#e91e63',
           backgroundColor: '#fce4ec',
+          borderRadius: '8px',
+          padding: '8px 20px',
+          fontWeight: 'bold',
+          display: 'inline-block',
+          fontFamily: "REM"
+        };
+      case "FAILED":
+        return {
+          color: "#f44336",
+          backgroundColor: "#ffebee",
           borderRadius: '8px',
           padding: '8px 20px',
           fontWeight: 'bold',
@@ -229,10 +240,12 @@ const ManageOrders: React.FC = () => {
         return "Đang giao hàng";
       case "DELIVERED":
         return "Đã giao thành công";
-      case "COMPLETED":
+      case "SUCCESSFUL":
         return "Hoàn tất";
       case "CANCELED":
         return "Bị hủy";
+      case "FAILED":
+        return "Thất bại";
       default:
         return "Tất cả";
     }
@@ -242,10 +255,24 @@ const ManageOrders: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredOrders = orders.filter((order) =>
-    order.delivery.to.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.delivery.from.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredOrders = orders.filter((order) =>
+  //   order.delivery.to.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   order.delivery.from.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
+
+  const handleStatusFilterChange = (event: SelectChangeEvent<string>) => {
+    setStatusFilter(event.target.value as string);
+  };
+
+  const filteredOrders = orders
+    .filter((order) => {
+      const matchesStatus =
+        statusFilter === 'ALL' || order.status === statusFilter;
+      const matchesSearch =
+        order.delivery.to.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.delivery.from.name.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesStatus && matchesSearch;
+    });
 
   return (
     <div style={{ paddingBottom: '40px' }}>
@@ -264,9 +291,32 @@ const ManageOrders: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: '#fff' }} />
               </InputAdornment>
             ),
-            style: { color: '#fff' },
+            style: { color: '#fff', fontFamily:'REM' },
           }}
         />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Filter theo trạng thái */}
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#71002b', fontFamily: 'REM', paddingRight: '10px' }}>
+            Trạng Thái:
+          </Typography>
+          <FormControl size="small" sx={{ minWidth: 160, borderRadius: '4px' }}>
+            <Select
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+              displayEmpty
+              sx={{fontFamily: 'REM'}}
+            >
+              <MenuItem sx={{fontFamily: 'REM'}} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="PENDING">Chờ xử lí</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="PACKAGING">Đang đóng gói</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="DELIVERING">Đang giao hàng</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="DELIVERED">Đã giao thành công</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="SUCCESSFUL">Hoàn tất</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="FAILED">Thất bại</MenuItem>
+              <MenuItem sx={{fontFamily: 'REM'}} value="CANCELED">Bị hủy</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
       <Typography variant="h5" sx={{ marginBottom: '20px', fontWeight: 'bold', fontFamily: 'REM', color: '#71002b' }}>
         Quản lý đơn hàng

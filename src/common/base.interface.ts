@@ -220,3 +220,20 @@ export interface SellerDetails extends BaseInterface {
   detailedAddress: string;
   fullAddress: string;
 }
+
+export interface ExchangeData extends BaseInterface {
+  compensationAmount: number | null;
+  depositAmount: number | null;
+  status: "PENDING" | "DEALING" | "DELIVERING" | "SUCCESSFUL" | "FAILED" | "REJECTED";
+  post: Post;
+  requestUser: UserInfo;
+  compensateUser: UserInfo | null;
+  images: string[];
+}
+
+export interface Post extends BaseInterface {
+  postContent: string;
+  images: string[];
+  status: "AVAILABLE" | "UNAVAILABLE";
+  user: UserInfo;
+}

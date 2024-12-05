@@ -309,6 +309,7 @@ const Navbar = () => {
     "/mod/deposits",
     "/mod/feedbacks",
     "/mod/refunds",
+    "/mod/exchanges",
   ];
 
   if (adminAndModPaths.includes(location1.pathname)) {

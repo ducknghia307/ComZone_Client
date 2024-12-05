@@ -5,12 +5,16 @@ import { LinearProgress } from "@mui/material";
 import moment from "moment/min/moment-with-locales";
 import { ExchangeDetails } from "../../../../common/interfaces/exchange.interface";
 import { privateAxios } from "../../../../middleware/axiosInstance";
-import { Delivery } from "../../../../common/interfaces/delivery.interface";
+import {
+  Delivery,
+  DeliveryOverallStatus,
+} from "../../../../common/interfaces/delivery.interface";
 import SuccessfulOrFailedButton from "./buttons/SuccessfulOrFailedButton";
 import { UserInfo } from "../../../../common/base.interface";
 import FailedDeliveryButton from "./buttons/FailedDeliveryButton";
 import { ExchangeRefundRequest } from "../../../../common/interfaces/refund-request.interface";
 import ViewRefundButton from "./buttons/ViewRefundButton";
+import { notification } from "antd";
 moment.locale("vi");
 
 export default function DeliveryProcessInfo({
@@ -30,7 +34,10 @@ export default function DeliveryProcessInfo({
   fetchExchangeDetails: Function;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [userDelivery, setUserDelivery] = useState<Delivery>();
+  const [isShowingReceivedDelivery, setIsShowingReceivedDelivery] =
+    useState(true);
+  const [receiveDelivery, setReceiveDelivery] = useState<Delivery>();
+  const [sendDelivery, setSendDelivery] = useState<Delivery>();
   const [refundRequestsList, setRefundRequestsList] = useState<
     ExchangeRefundRequest[]
   >([]);
@@ -39,17 +46,50 @@ export default function DeliveryProcessInfo({
 
   const exchange = exchangeDetails.exchange;
 
-  const fetchUserDelivery = async () => {
+  const fetchReceiveDelivery = async () => {
+    setIsLoading(true);
+
+    await privateAxios
+      .get(`deliveries/exchange/to-user/${exchange.id}`)
+      .then(async (res) => {
+        const delivery: Delivery = res.data;
+        if (delivery.deliveryTrackingCode) setReceiveDelivery(delivery);
+        else await attemptToRegisterGHN(delivery.id);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  };
+
+  const fetchSendDelivery = async () => {
     setIsLoading(true);
 
     await privateAxios
       .get(`deliveries/exchange/from-user/${exchange.id}`)
-      .then((res) => {
-        console.log("RES: ", res.data);
-        setUserDelivery(res.data);
+      .then(async (res) => {
+        const delivery: Delivery = res.data;
+        if (delivery.deliveryTrackingCode) setSendDelivery(delivery);
+        else await attemptToRegisterGHN(delivery.id);
       })
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
+  };
+
+  const attemptToRegisterGHN = async (deliveryId: string) => {
+    await privateAxios
+      .post(`deliveries/attempt/register/${deliveryId}`)
+      .then(() => {
+        fetchExchangeDetails();
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response.data.code === 400)
+          notification.error({
+            key: "error",
+            message: err.response.data.code_message_value,
+            description: err.response.data.message,
+            duration: 5,
+          });
+      });
   };
 
   const fetchUserRefundRequest = async () => {
@@ -68,17 +108,20 @@ export default function DeliveryProcessInfo({
   };
 
   useEffect(() => {
-    fetchUserDelivery();
+    fetchReceiveDelivery();
+    fetchSendDelivery();
     fetchUserRefundRequest();
   }, [exchangeDetails]);
 
-  const getDeliveryStatus = () => {
-    if (userDelivery && userDelivery.overallStatus) {
-      switch (userDelivery?.overallStatus) {
+  const getDeliveryStatus = (delivery: Delivery) => {
+    if (delivery && delivery.overallStatus) {
+      switch (delivery.overallStatus) {
         case "PICKING":
           return (
             <p className="text-yellow-500 font-medium p-2 border border-yellow-500 w-fit rounded-md">
-              Đang nhận hàng từ người gửi
+              {isShowingReceivedDelivery
+                ? "Đang nhận hàng từ người gửi"
+                : "Đang nhận hàng từ bạn"}
             </p>
           );
         case "DELIVERING":
@@ -103,32 +146,72 @@ export default function DeliveryProcessInfo({
     }
   };
 
-  const formatDate =
-    moment(userDelivery?.estimatedDeliveryTime)
-      .format("dddd DD/MM")
-      .charAt(0)
-      .toUpperCase() +
-    moment(userDelivery?.estimatedDeliveryTime)
-      .format("dddd, DD/MM/yyyy")
-      .slice(1);
+  const formatDate = (delivery: Delivery) => {
+    return (
+      moment(delivery.estimatedDeliveryTime)
+        .format("dddd DD/MM")
+        .charAt(0)
+        .toUpperCase() +
+      moment(delivery.estimatedDeliveryTime).format("dddd, DD/MM/yyyy").slice(1)
+    );
+  };
+
+  const isDeliveryCompleted = (delivery: Delivery) => {
+    return [
+      DeliveryOverallStatus.DELIVERED,
+      DeliveryOverallStatus.FAILED,
+      DeliveryOverallStatus.RETURN,
+    ].includes(delivery.overallStatus);
+  };
+
+  if (
+    (isShowingReceivedDelivery && !receiveDelivery) ||
+    (!isDeliveryCompleted && !sendDelivery)
+  )
+    return;
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-lg REM overflow-hidden">
-      <h2 className="text-lg font-bold text-gray-700 mb-4">
-        Thông tin giao hàng
-      </h2>
+    <div className="p-6 bg-white rounded-lg shadow-lg REM overflow-hidden border">
+      <div className="flex items-center justify-between gap-4 pr-4 mb-4">
+        <h2 className="text-xl text-gray-700 font-bold uppercase">
+          Thông tin giao hàng (
+          {isShowingReceivedDelivery ? "Đơn nhận" : "Đơn gửi"})
+        </h2>
+
+        <button
+          onClick={() =>
+            setIsShowingReceivedDelivery(!isShowingReceivedDelivery)
+          }
+          className="underline rounded-md text-sm px-4 py-2 uppercase duration-200 hover:font-semibold"
+        >
+          {isShowingReceivedDelivery ? "Xem đơn gửi" : "Xem đơn nhận"}
+        </button>
+      </div>
+
       <div className="w-full flex flex-row gap-4">
         <div className="grow flex flex-col">
           <div className="mb-4">
-            <h3 className="font-semibold text-gray-800">Người gửi:</h3>
-            <p className="font-light">{firstUser.name}</p>
-            <p className="font-light">{firstAddress}</p>
+            <h3 className="font-semibold text-gray-800">
+              Người gửi {!isShowingReceivedDelivery && "(Bạn)"}:
+            </h3>
+            <p className="font-light">
+              {isShowingReceivedDelivery ? secondUser.name : firstUser.name}
+            </p>
+            <p className="font-light">
+              {isShowingReceivedDelivery ? secondAddress : firstAddress}
+            </p>
           </div>
 
           <div className="mb-4">
-            <h3 className="font-semibold text-gray-800">Người nhận:</h3>
-            <p className="font-light">{secondUser.name}</p>
-            <p className="font-light">{secondAddress}</p>
+            <h3 className="font-semibold text-gray-800">
+              Người nhận {isShowingReceivedDelivery && "(Bạn)"}:
+            </h3>
+            <p className="font-light">
+              {isShowingReceivedDelivery ? firstUser.name : secondUser.name}
+            </p>
+            <p className="font-light">
+              {isShowingReceivedDelivery ? firstAddress : secondAddress}
+            </p>
           </div>
         </div>
 
@@ -137,14 +220,20 @@ export default function DeliveryProcessInfo({
             <h3 className="font-semibold text-gray-800">
               Mã vận đơn: &emsp;{" "}
               <span className="font-light">
-                {userDelivery?.deliveryTrackingCode}
+                {isShowingReceivedDelivery
+                  ? receiveDelivery.deliveryTrackingCode
+                  : sendDelivery.deliveryTrackingCode}
               </span>
             </h3>
             <button
               onClick={() =>
                 window
                   .open(
-                    `https://tracking.ghn.dev/?order_code=${userDelivery?.deliveryTrackingCode}`,
+                    `https://tracking.ghn.dev/?order_code=${
+                      isShowingReceivedDelivery
+                        ? receiveDelivery.deliveryTrackingCode
+                        : sendDelivery.deliveryTrackingCode
+                    }`,
                     "_blank"
                   )
                   ?.focus()
@@ -167,45 +256,57 @@ export default function DeliveryProcessInfo({
           <div className="flex items-center gap-4">
             <h3 className="font-semibold text-gray-800">Trạng thái:</h3>
 
-            {getDeliveryStatus()}
+            {getDeliveryStatus(
+              isShowingReceivedDelivery ? receiveDelivery : sendDelivery
+            )}
           </div>
 
-          <div
-            className={`${
-              (userDelivery?.overallStatus === "DELIVERED" ||
-                userDelivery?.overallStatus === "FAILED") &&
-              "hidden"
-            } flex items-center gap-4`}
-          >
-            <h3 className="font-semibold text-gray-800">Thời gian dự kiến:</h3>
-            <p className="font-light">{formatDate}</p>
-          </div>
+          {!isDeliveryCompleted(
+            isShowingReceivedDelivery ? receiveDelivery : sendDelivery
+          ) && (
+            <div className={`flex items-center gap-4`}>
+              <h3 className="font-semibold text-gray-800">
+                Thời gian dự kiến:
+              </h3>
+              <p className="font-light">
+                {formatDate(
+                  isShowingReceivedDelivery ? receiveDelivery : sendDelivery
+                )}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {userDelivery?.overallStatus === "DELIVERED" ? (
-        !userRefundRequest ? (
-          <SuccessfulOrFailedButton
-            exchange={exchangeDetails.exchange}
-            fetchExchangeDetails={fetchExchangeDetails}
-            setIsLoading={setIsLoading}
-          />
+      {isShowingReceivedDelivery &&
+        (receiveDelivery.overallStatus === "DELIVERED" ? (
+          !userRefundRequest ? (
+            <SuccessfulOrFailedButton
+              exchange={exchangeDetails.exchange}
+              fetchExchangeDetails={fetchExchangeDetails}
+              setIsLoading={setIsLoading}
+            />
+          ) : (
+            <ViewRefundButton
+              refundRequest={userRefundRequest}
+              requestsList={refundRequestsList}
+            />
+          )
+        ) : receiveDelivery.overallStatus === "FAILED" ? (
+          <FailedDeliveryButton />
         ) : (
-          <ViewRefundButton
-            refundRequest={userRefundRequest}
-            requestsList={refundRequestsList}
-          />
-        )
-      ) : userDelivery?.overallStatus === "FAILED" ? (
-        <FailedDeliveryButton />
-      ) : (
-        <div className="mt-5 r">
-          <p className="w-full text-center text-sm font-light italic pb-4">
-            Trên đường giao hàng đến bạn...
-          </p>
-          <LinearProgress />
-        </div>
-      )}
+          <div
+            className={`${
+              (!receiveDelivery || !receiveDelivery.deliveryTrackingCode) &&
+              "hidden"
+            } mt-5 r`}
+          >
+            <p className="w-full text-center text-sm font-light italic pb-4">
+              Trên đường giao hàng đến bạn...
+            </p>
+            <LinearProgress />
+          </div>
+        ))}
     </div>
   );
 }

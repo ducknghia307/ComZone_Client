@@ -47,10 +47,17 @@ export default function ConfirmDeliveryButton({
       });
       fetchExchangeDetails();
     } catch (error) {
-      notification.error({
-        message: "Lỗi khi thêm thông tin nhận hàng",
-        duration: 2,
-      });
+      if (error.response.data.statusCode === 400)
+        notification.error({
+          message: "Địa chỉ ngoài vùng dịch vụ",
+          description: error.response.data.message,
+          duration: 5,
+        });
+      else
+        notification.error({
+          message: "Lỗi khi thêm thông tin nhận hàng",
+          duration: 5,
+        });
     }
   };
 

@@ -220,6 +220,11 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, onSelect }: SidebarProps) => {
       path: "/mod/refunds",
       icon: <CurrencyExchangeOutlinedIcon sx={{ color: "inherit" }} />,
     },
+    {
+        title: "Quản Lý Trao Đổi",
+        path: "/mod/exchanges",
+        icon: <MultipleStopOutlinedIcon sx={{ color: 'inherit' }} />
+    },
   ];
 
   return (

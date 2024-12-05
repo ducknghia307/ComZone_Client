@@ -258,7 +258,7 @@ const ManageComics: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: "#fff" }} />
               </InputAdornment>
             ),
-            style: { color: '#fff', fontFamily:'REM' },
+            style: { color: '#fff', fontFamily: 'REM' },
           }}
         />
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -270,16 +270,16 @@ const ManageComics: React.FC = () => {
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              sx={{fontFamily: 'REM'}}
+              sx={{ fontFamily: 'REM' }}
             >
-              <MenuItem sx={{fontFamily: 'REM'}} value="ALL">Tất cả</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="AVAILABLE">Có sẵn</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="UNAVAILABLE">Không khả dụng</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="AUCTION">Đang đấu giá</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="EXCHANGE">Trao đổi</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="EXCHANGE_OFFER">Đề xuất trao đổi</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="SOLD">Đã bán</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="REMOVED">Đã gỡ</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="AVAILABLE">Có sẵn</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="UNAVAILABLE">Không khả dụng</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="AUCTION">Đang đấu giá</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="EXCHANGE">Trao đổi</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="EXCHANGE_OFFER">Đề xuất trao đổi</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="SOLD">Đã bán</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="REMOVED">Đã gỡ</MenuItem>
             </Select>
           </FormControl>
 
@@ -291,15 +291,14 @@ const ManageComics: React.FC = () => {
             <Select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              sx={{fontFamily: 'REM'}}
+              sx={{ fontFamily: 'REM' }}
             >
-              <MenuItem sx={{fontFamily: 'REM'}} value="ALL">Tất cả</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="TAP">Tập Truyện</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="BO">Bộ Truyện</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="TAP">Tập Truyện</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="BO">Bộ Truyện</MenuItem>
             </Select>
           </FormControl>
         </Box>
-
       </Box>
       <Typography
         variant="h5"

@@ -42,6 +42,7 @@ const Navbar = () => {
   const [isRegisteringSeller, setIsRegisteringSeller] =
     useState<boolean>(false);
 
+  const navigate = useNavigate();
   const location1 = useLocation();
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -173,7 +174,9 @@ const Navbar = () => {
     try {
       const response = await privateAxios.get(`/announcements/user`);
       const data = response.data || [];
-      console.log(response.data);
+      console.log("ANNOUNCEMENT", data);
+
+      setAnnouncements(data);
       dispatch(setUnreadAnnounce(data.filter((item) => !item.isRead).length));
     } catch (error) {
       console.error("Error fetching announcements:", error);

@@ -4,13 +4,15 @@ import EmptyNotification from "../../assets/announcement-icons/no-notification.j
 import OrderIcon from "../../assets/announcement-icons/orderIcon.png";
 import AuctionIcon from "../../assets/announcement-icons/auction-icon.png";
 import NewExchangeRequestIcon from "../../assets/announcement-icons/exchange-icon.png";
-import ApproveExchangeIcon from "../../assets/announcement-icons/approve-icon.png";
-import RejectExchangeIcon from "../../assets/announcement-icons/reject-icon.png";
+import ApproveIcon from "../../assets/announcement-icons/approve-icon.png";
+import RejectIcon from "../../assets/announcement-icons/reject-icon.png";
 import NewDealExchangeIcon from "../../assets/announcement-icons/deal-icon.png";
 import ExchangeWalletPayIcon from "../../assets/announcement-icons/wallet-icon.png";
 import ExchangeDeliveryIcon from "../../assets/announcement-icons/truck-icon.png";
 import DeliveryReturnIcon from "../../assets/announcement-icons/delivery-return-icon.png";
 import PackageIcon from "../../assets/announcement-icons/package-icon.png";
+import WalletAddIcon from "../../assets/announcement-icons/wallet-add-icon.png";
+import PayMoneyIcon from "../../assets/announcement-icons/pay-icon.png";
 import DefaultIcon from "../../assets/announcement-icons/notification-icon-462x512-tqwyit2p.png";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "antd";
@@ -52,16 +54,22 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
     setUnreadUser(unreadUserCount);
     setUnreadSeller(unreadSellerCount);
   }, [announcements, activeTab, dispatch]);
+
   const navigateToAll = () => {
     navigate("/accountmanagement/announcement/orders");
   };
+
   const navigateTo = async (item) => {
-    if (item.type === "ORDER" && item.order)
-      navigate("/sellermanagement/order");
+    if (item.order) {
+      if (item.recipientType === "SELLER") navigate("/sellermanagement/order");
+      else navigate("/accountmanagement/purchase");
+    }
 
     if (item.exchange)
       navigate(`/exchange/detail/${item.exchange.id || item.exchange}`);
     console.log(item);
+
+    if (item.transaction) navigate("/accountmanagement/wallet");
 
     try {
       if (item.isRead === true) return;
@@ -85,33 +93,51 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
 
   const getAnnouncementIcon = (item: any, type: AnnouncementType) => {
     switch (type) {
-      case AnnouncementType.ORDER:
+      case AnnouncementType.ORDER_NEW:
         return OrderIcon;
+
       case AnnouncementType.AUCTION:
         return item.auction?.comics?.coverImage || AuctionIcon;
+
       case AnnouncementType.EXCHANGE_NEW_REQUEST:
         return NewExchangeRequestIcon;
+
+      case AnnouncementType.ORDER_CONFIRMED:
       case AnnouncementType.EXCHANGE_APPROVED:
       case AnnouncementType.EXCHANGE_SUCCESSFUL:
       case AnnouncementType.DELIVERY_FINISHED_SEND:
       case AnnouncementType.DELIVERY_FINISHED_RECEIVE:
-        return ApproveExchangeIcon;
+        return ApproveIcon;
+
       case AnnouncementType.EXCHANGE_REJECTED:
       case AnnouncementType.EXCHANGE_FAILED:
       case AnnouncementType.DELIVERY_FAILED_RECEIVE:
       case AnnouncementType.DELIVERY_FAILED_SEND:
-        return RejectExchangeIcon;
+        return RejectIcon;
+
       case AnnouncementType.EXCHANGE_NEW_DEAL:
         return NewDealExchangeIcon;
+
       case AnnouncementType.EXCHANGE_PAY_AVAILABLE:
         return ExchangeWalletPayIcon;
+
       case AnnouncementType.DELIVERY_PICKING:
         return PackageIcon;
+
+      case AnnouncementType.ORDER_DELIVERY:
       case AnnouncementType.EXCHANGE_DELIVERY:
       case AnnouncementType.DELIVERY_ONGOING:
         return ExchangeDeliveryIcon;
+
       case AnnouncementType.DELIVERY_RETURN:
         return DeliveryReturnIcon;
+
+      case AnnouncementType.TRANSACTION_ADD:
+        return WalletAddIcon;
+
+      case AnnouncementType.TRANSACTION_SUBTRACT:
+        return PayMoneyIcon;
+
       default:
         return DefaultIcon;
     }

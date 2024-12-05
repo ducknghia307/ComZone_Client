@@ -1,16 +1,20 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
 import EmptyNotification from "../../assets/announcement-icons/no-notification.jpg";
 import OrderIcon from "../../assets/announcement-icons/orderIcon.png";
+import AuctionIcon from "../../assets/announcement-icons/auction-icon.png";
 import NewExchangeRequestIcon from "../../assets/announcement-icons/exchange-icon.png";
 import ApproveExchangeIcon from "../../assets/announcement-icons/approve-icon.png";
 import RejectExchangeIcon from "../../assets/announcement-icons/reject-icon.png";
 import NewDealExchangeIcon from "../../assets/announcement-icons/deal-icon.png";
+import ExchangeWalletPayIcon from "../../assets/announcement-icons/wallet-icon.png";
 import ExchangeDeliveryIcon from "../../assets/announcement-icons/truck-icon.png";
+import DeliveryReturnIcon from "../../assets/announcement-icons/delivery-return-icon.png";
+import PackageIcon from "../../assets/announcement-icons/package-icon.png";
+import DefaultIcon from "../../assets/announcement-icons/notification-icon-462x512-tqwyit2p.png";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "antd";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { useAppDispatch } from "../../redux/hooks";
 import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
 import { AnnouncementType } from "../../common/enums/announcementType.enum";
 import "../ui/Notification.css";
@@ -57,9 +61,12 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
     navigate("/accountmanagement/announcement/orders");
   };
   const navigateTo = async (item) => {
-    if (item.type === "ORDER") navigate("/sellermanagement/order");
+    if (item.type === "ORDER" && item.order)
+      navigate("/sellermanagement/order");
 
-    if (item.exchange) navigate(`/exchange/detail/${item.exchange.id}`);
+    if (item.exchange)
+      navigate(`/exchange/detail/${item.exchange.id || item.exchange}`);
+    console.log(item);
 
     try {
       if (item.isRead === true) return;
@@ -83,6 +90,40 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
       setFilteredAnnouncements(filtered);
     } catch (error) {
       console.error("Error marking announcement as read:", error);
+    }
+  };
+
+  const getAnnouncementIcon = (item: any, type: AnnouncementType) => {
+    switch (type) {
+      case AnnouncementType.ORDER:
+        return OrderIcon;
+      case AnnouncementType.AUCTION:
+        return item.auction?.comics?.coverImage || AuctionIcon;
+      case AnnouncementType.EXCHANGE_NEW_REQUEST:
+        return NewExchangeRequestIcon;
+      case AnnouncementType.EXCHANGE_APPROVED:
+      case AnnouncementType.EXCHANGE_SUCCESSFUL:
+      case AnnouncementType.DELIVERY_FINISHED_SEND:
+      case AnnouncementType.DELIVERY_FINISHED_RECEIVE:
+        return ApproveExchangeIcon;
+      case AnnouncementType.EXCHANGE_REJECTED:
+      case AnnouncementType.EXCHANGE_FAILED:
+      case AnnouncementType.DELIVERY_FAILED_RECEIVE:
+      case AnnouncementType.DELIVERY_FAILED_SEND:
+        return RejectExchangeIcon;
+      case AnnouncementType.EXCHANGE_NEW_DEAL:
+        return NewDealExchangeIcon;
+      case AnnouncementType.EXCHANGE_PAY_AVAILABLE:
+        return ExchangeWalletPayIcon;
+      case AnnouncementType.DELIVERY_PICKING:
+        return PackageIcon;
+      case AnnouncementType.EXCHANGE_DELIVERY:
+      case AnnouncementType.DELIVERY_ONGOING:
+        return ExchangeDeliveryIcon;
+      case AnnouncementType.DELIVERY_RETURN:
+        return DeliveryReturnIcon;
+      default:
+        return DefaultIcon;
     }
   };
 
@@ -130,78 +171,39 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
             return (
               <div
                 key={index}
-                className={`my-2 p-4 rounded-lg transition duration-200 flex items-start gap-2 ${
+                className={`relative my-2 p-4 rounded-lg transition duration-200 flex items-start gap-2 ${
                   item.isRead
-                    ? "bg-white hover:bg-gray-50"
-                    : "bg-zinc-200 hover:bg-gray-200"
-                } hover:shadow-lg border border-gray-300 cursor-pointer`}
+                    ? "bg-white border-gray-300"
+                    : "border-black hover:bg-gray-100"
+                } hover:shadow-lg border cursor-pointer`}
                 onClick={() => navigateTo(item)}
               >
-                {/* ICON */}
+                {!item.isRead && (
+                  <span className="w-3 h-3 bg-red-600 absolute top-0 right-0 rounded-full -translate-y-1/2" />
+                )}
                 <div className="shrink-0 space-x-2">
-                  {item.type === AnnouncementType.AUCTION &&
-                    item.auction?.comics?.coverImage && (
-                      <img
-                        src={item.auction.comics.coverImage}
-                        alt="Thông báo"
-                        className="w-16 h-12 rounded-md object-contain"
-                      />
-                    )}
-
-                  {item.type === AnnouncementType.ORDER && (
-                    <img
-                      src={OrderIcon}
-                      alt="Thông báo"
-                      className="w-16 h-12 rounded-md object-contain"
-                    />
-                  )}
-
-                  {item.type === AnnouncementType.EXCHANGE_NEW_REQUEST && (
-                    <img
-                      src={NewExchangeRequestIcon}
-                      alt="Thông báo"
-                      className="w-16 h-12 rounded-md object-contain"
-                    />
-                  )}
-
-                  {item.type === AnnouncementType.EXCHANGE_APPROVED && (
-                    <img
-                      src={ApproveExchangeIcon}
-                      alt="Thông báo"
-                      className="w-12 h-8 rounded-md object-contain"
-                    />
-                  )}
-
-                  {item.type === AnnouncementType.EXCHANGE_REJECTED && (
-                    <img
-                      src={RejectExchangeIcon}
-                      alt="Thông báo"
-                      className="w-12 h-8 rounded-md object-contain"
-                    />
-                  )}
-
-                  {item.type === AnnouncementType.EXCHANGE_NEW_DEAL && (
-                    <img
-                      src={NewDealExchangeIcon}
-                      alt="Thông báo"
-                      className="w-12 h-8 rounded-md object-contain"
-                    />
-                  )}
-
-                  {item.type === AnnouncementType.EXCHANGE_DELIVERY && (
-                    <img
-                      src={ExchangeDeliveryIcon}
-                      alt="Thông báo"
-                      className="w-12 h-8 rounded-md object-contain"
-                    />
-                  )}
+                  <img
+                    src={getAnnouncementIcon(item, item.type)}
+                    alt="Thông báo"
+                    className="w-16 h-12 rounded-md object-contain"
+                  />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <h5 className="font-semibold text-gray-700 uppercase">
+                  <h5
+                    className={`${
+                      item.isRead ? "font-semibold" : "font-bold"
+                    } text-gray-700 uppercase`}
+                  >
                     {item.title}
                   </h5>
-                  <p className="text-sm text-gray-600">{item.message}</p>
+                  <p
+                    className={`${
+                      item.isRead ? "font-light" : "font-medium"
+                    } text-sm text-gray-600`}
+                  >
+                    {item.message}
+                  </p>
                 </div>
               </div>
             );

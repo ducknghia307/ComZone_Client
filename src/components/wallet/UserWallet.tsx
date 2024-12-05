@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -52,6 +53,7 @@ const UserWallet = () => {
       const data = await response.data;
       console.log("1", data);
       const formattedTransactions = data.map((transaction: Transaction) => ({
+        code: transaction.code,
         date: new Date(transaction.createdAt ?? new Date()).toLocaleDateString(
           "vi-VN"
         ),
@@ -123,6 +125,7 @@ const UserWallet = () => {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+
   useEffect(() => {
     fetchUserInfo();
     fetchUserTransactions();
@@ -377,6 +380,15 @@ const UserWallet = () => {
                       fontFamily: "REM",
                     }}
                   >
+                    Mã giao dịch
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontFamily: "REM",
+                    }}
+                  >
                     Ngày giao dịch
                   </TableCell>
                   <TableCell
@@ -421,6 +433,9 @@ const UserWallet = () => {
                 {paginatedTransactions.map(
                   (transaction: Transaction, index) => (
                     <TableRow key={index}>
+                      <TableCell sx={{ fontFamily: "REM" }} align="center">
+                        #{transaction.code}
+                      </TableCell>
                       <TableCell sx={{ fontFamily: "REM" }} align="center">
                         {transaction.date}
                       </TableCell>

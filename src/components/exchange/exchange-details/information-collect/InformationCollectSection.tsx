@@ -163,9 +163,7 @@ export default function InformationCollectSection({
           subTitle: (
             <p className="leading-relaxed max-w-1/2">
               Quá trình giao hàng sẽ tự động bắt đầu sau khi hệ thống ghi nhận
-              được giao dịch thanh toán của cả hai. <br />
-              Hãy đảm bảo bạn đã hoàn thành việc đóng gói trước khi nhân viên
-              giao hàng đến.
+              được giao dịch thanh toán và đặt cọc của hai bên.
             </p>
           ),
         };

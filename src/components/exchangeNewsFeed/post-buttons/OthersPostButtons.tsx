@@ -14,6 +14,7 @@ export default function OthersPostButtons({
   setIsChatOpen,
   setIsLoading,
   navigate,
+  fetchExchangeNewsFeed,
 }: {
   handleOpenModal: () => void;
   post: ExchangePostInterface;
@@ -22,6 +23,7 @@ export default function OthersPostButtons({
   navigate: NavigateFunction;
   setIsChatOpen: Function;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchExchangeNewsFeed: () => void;
 }) {
   const [isSelectModalOpen, setIsSelectModalOpen] = useState<string>("");
 
@@ -88,6 +90,7 @@ export default function OthersPostButtons({
           setIsSelectModalOpen={setIsSelectModalOpen}
           setIsChatOpen={setIsChatOpen}
           setIsLoading={setIsLoading}
+          fetchExchangeNewsFeed={fetchExchangeNewsFeed}
         />
       )}
     </>

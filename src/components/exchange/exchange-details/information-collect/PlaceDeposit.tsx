@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import CurrencySplitter from "../../../../assistants/Spliter";
 import { ExchangeDetails } from "../../../../common/interfaces/exchange.interface";
 import { privateAxios } from "../../../../middleware/axiosInstance";
-import { Delivery } from "../../../../common/interfaces/delivery.interface";
 import moment from "moment/min/moment-with-locales";
 import PayButton from "./buttons/PayButton";
 import { UserInfo } from "../../../../common/base.interface";
@@ -41,7 +40,7 @@ export default function PlaceDeposit({
 
     try {
       const deliveryRes = await privateAxios.get(
-        `deliveries/exchange/from-user/${exchange.id}`
+        `deliveries/exchange/to-user/${exchange.id}`
       );
 
       const deliDetailsRes = await privateAxios.get(
@@ -49,7 +48,6 @@ export default function PlaceDeposit({
       );
 
       const deliveryDetails = deliDetailsRes.data;
-      console.log(deliveryDetails);
 
       setDeliveryDetails({
         fee: deliveryDetails.deliveryFee,
@@ -117,10 +115,10 @@ export default function PlaceDeposit({
           <div className="mt-2 flex flex-col gap-2 font-light">
             <p>
               Tên người gửi:{" "}
-              <span className="font-medium">{firstUser.name}</span>
+              <span className="font-medium">{secondUser.name}</span>
             </p>
             <h2>
-              Địa chỉ: <span className="font-medium">{firstAddress}</span>
+              Địa chỉ: <span className="font-medium">{secondAddress}</span>
             </h2>
           </div>
         </div>
@@ -153,10 +151,10 @@ export default function PlaceDeposit({
           <div className="mt-2 flex flex-col gap-2 font-light">
             <p>
               Tên người nhận:{" "}
-              <span className="font-medium">{secondUser.name}</span>
+              <span className="font-medium">{firstUser.name}</span>
             </p>
             <h2>
-              Địa chỉ: <span className="font-medium">{secondAddress}</span>
+              Địa chỉ: <span className="font-medium">{firstAddress}</span>
             </h2>
           </div>
         </div>

@@ -1,8 +1,7 @@
 import { Modal, notification, Popover } from "antd";
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { SetStateAction, useState } from "react";
 import { ExchangePostInterface } from "../../../common/interfaces/exchange.interface";
 import { privateAxios } from "../../../middleware/axiosInstance";
-import { useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import TextArea from "antd/es/input/TextArea";
 import { DeleteOutlined } from "@ant-design/icons";

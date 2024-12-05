@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { useState } from "react";
 import ActionConfirm from "../../../../actionConfirm/ActionConfirm";
 import { privateAxios } from "../../../../../middleware/axiosInstance";
@@ -39,7 +40,7 @@ export default function AcceptOrRejectButtons({
       await privateAxios
         .patch(`exchange-comics/rejected/${exchangeId}`)
         .then(() => {
-          navigate("/exchange/all");
+          navigate("/exchange/list/all");
           notification.info({
             key: "reject-info",
             message: "Bạn đã từ chối yêu cầu trao đổi này.",

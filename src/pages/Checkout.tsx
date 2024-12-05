@@ -218,6 +218,7 @@ const Checkout = () => {
   const handlePaymentMethodSelect = (method: string) => {
     setSelectedPaymentMethod(method);
   };
+
   const handleSubmit = async () => {
     setIsLoading(true);
 
@@ -278,26 +279,37 @@ const Checkout = () => {
           .post("deliveries/order", {
             fromAddressId: newSellerDeliveryInfo.id,
             toAddressId: newUserDeliveryInfo.id,
+            deliveryFee: sellerDeliveryPrice,
           })
           .then((res) => {
             return res.data;
           })
           .catch((err) => console.log(err));
 
+        console.log(newDelivery);
+
         const orderType = sellerGroup.comics.some(({ auctionId }) => auctionId)
           ? "AUCTION"
           : "TRADITIONAL";
 
-        console.log("orderType", orderType);
+        console.log({
+          sellerId: sellerId,
+          deliveryId: newDelivery.id,
+          totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
+          paymentMethod: selectedPaymentMethod.toUpperCase(),
+          addressId: selectedAddress?.id,
+          type: orderType,
+          note: notes[sellerId] || null,
+        });
 
         const orderResponse = await privateAxios.post("/orders", {
           sellerId: sellerId,
+          deliveryId: newDelivery.id,
           totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
           paymentMethod: selectedPaymentMethod.toUpperCase(),
-          deliveryId: newDelivery.id,
           addressId: selectedAddress?.id,
-          note: notes[sellerId] || "",
           type: orderType,
+          note: notes[sellerId] || null,
         });
 
         const orderId = orderResponse.data.id;

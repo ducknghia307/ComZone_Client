@@ -299,7 +299,6 @@ const Checkout = () => {
           note: notes[sellerId] || "",
           type: orderType,
         });
-        console.log(orderResponse);
 
         const orderId = orderResponse.data.id;
 

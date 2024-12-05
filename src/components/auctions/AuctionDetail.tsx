@@ -83,7 +83,6 @@ const ComicAuction = () => {
   const [error, setError] = useState<string>("");
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [hasDeposited, setHasDeposited] = useState(false);
-  console.log("auctiondata", auctionData);
   const navigate = useNavigate();
   const auctionAnnounce = useAppSelector<AuctionAnnounce | null>(
     (state) => state.annoucement.auctionAnnounce
@@ -184,21 +183,17 @@ const ComicAuction = () => {
   }, [highestBid, userId]);
 
   useEffect(() => {
-    socket.on("notification", (data) => {
-      dispatch(auctionAnnouncement(data));
-    });
-    socket.on("auctionUpdated", (data) => {
+    const handleAuctionUpdated = (data) => {
       dispatch(setAuctionData(data));
       dispatch(setHighestBid(data.bids[0].price));
-    });
-    // Clean up the listener on component unmount
-    return () => {
-      if (socket) {
-        socket.off("notification");
-        socket.off("auctionUpdated");
-      }
     };
-  }, [userId, socket, dispatch]);
+
+    socket.on("auctionUpdated", handleAuctionUpdated);
+
+    return () => {
+      socket.off("auctionUpdated", handleAuctionUpdated);
+    };
+  }, [dispatch]);
 
   const fetchUnreadAnnouncementForAuction = async () => {
     try {
@@ -276,7 +271,6 @@ const ComicAuction = () => {
       socket.connect();
     }
     socket.on("bidUpdate", (data: any) => {
-      console.log("Received bid update:", data.placeBid.auction);
       dispatch(setHighestBid(data.placeBid));
       dispatch(setAuctionData(data.placeBid.auction));
     });
@@ -565,7 +559,7 @@ const ComicAuction = () => {
                         đ
                       </span>
                     </p>
-                    {(!auctionEnded && auctionData.status !== "UPCOMING") && (
+                    {!auctionEnded && auctionData.status !== "UPCOMING" && (
                       <Chip
                         label="Đặt cọc tại đây"
                         onClick={handleOpenDepositModal}

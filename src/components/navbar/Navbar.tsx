@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import NotificationDropdown from "../notification/Notification";
 import socket from "../../services/socket";
 import {
+  auctionAnnouncement,
   plusUnreadAnnounce,
   setUnreadAnnounce,
 } from "../../redux/features/notification/announcementSlice";
@@ -84,17 +85,15 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleNewNotification = (newNotification) => {
-      console.log(newNotification);
-
+      console.log("Notification received:", newNotification);
       setAnnouncements((prev) => {
         const exists = prev.some((item) => item.id === newNotification.id);
         if (!exists) {
-          const updatedAnnouncements = [newNotification, ...prev];
-          return updatedAnnouncements;
+          return [newNotification, ...prev];
         }
         return prev;
       });
-
+      dispatch(auctionAnnouncement(newNotification));
       dispatch(plusUnreadAnnounce());
     };
 

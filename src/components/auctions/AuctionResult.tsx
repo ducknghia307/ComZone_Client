@@ -8,8 +8,6 @@ export const AuctionResult = ({
   if (isWinner === null) {
     return null;
   }
-  console.log(isWinner);
-  console.log(auctionStatus);
 
   return (
     <div

@@ -7,7 +7,7 @@ import { Auction } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { useAppSelector } from "../../redux/hooks";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCartOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { convertToVietnameseDate } from "../../utils/convertDateVietnamese";
 import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
 import AuctionDetailModal from "../modal/AuctionDetailModal";
@@ -34,38 +34,55 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
     const fetchAuctionsAndBids = async () => {
       try {
         setLoading(true);
+
         if (!userId) {
           console.error("User ID not found");
-
           return;
         }
 
-        // Lấy danh sách các cuộc đấu giá đã tham gia
-        const response = await privateAxios.get(`/auction/user/joined`, {
-          params: { userId },
-        });
+        // Fetch deposits with auctions
+        const response = await privateAxios.get(`deposits/user/auction`);
+        console.log("Deposits response:", response);
 
-        const auctionsData = response.data;
+        const depositsData = response.data;
+
+        if (!Array.isArray(depositsData) || depositsData.length === 0) {
+          console.error("No deposits data or unexpected format:", depositsData);
+          return;
+        }
+
+        // Extract auctions from deposits
+        const auctionsData = depositsData.map((deposit) => deposit.auction);
 
         if (!Array.isArray(auctionsData) || auctionsData.length === 0) {
-          console.error("No auctions data or unexpected format:", auctionsData);
+          console.error("No auctions found in deposits:", auctionsData);
           return;
         }
 
         setAuctions(auctionsData);
 
-        // Lấy lượt đấu giá cao nhất cho từng auctionId
+        // Fetch the highest bid for each auction
         const highestBids = await Promise.all(
           auctionsData.map(async (auction) => {
-            const responseBid = await privateAxios.get(
-              `/bids/highest-bid/${auction.id}`
-            );
-            return responseBid.data;
+            try {
+              const responseBid = await privateAxios.get(
+                `/bids/highest-bid/${auction.id}`
+              );
+              return responseBid.data;
+            } catch (error) {
+              console.error(
+                `Error fetching highest bid for auction ${auction.id}:`,
+                error
+              );
+              return null; // Handle missing data gracefully
+            }
           })
         );
 
         console.log("Highest bids for auctions:", highestBids);
-        setHighestBid(highestBids); // Lưu dữ liệu vào state nếu cần
+
+        // Set the highest bids to state
+        setHighestBid(highestBids);
       } catch (error) {
         console.error("Error fetching auctions or bids:", error);
       } finally {
@@ -75,6 +92,18 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
 
     fetchAuctionsAndBids();
   }, [userId]);
+
+  // useEffect(() => {
+  //   const fetchUserDepositAuction = async () => {
+  //     try {
+  //       const reponse = await privateAxios.get("deposits/user/auction");
+  //       console.log("deposit", reponse);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   fetchUserDepositAuction();
+  // }, [userId]);
 
   const getStatusChipStyles = (status: string) => {
     switch (status) {
@@ -183,7 +212,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   const renderAuctionContent = () => {
     // Ensure data is loaded before rendering
     if (loading) {
-      return <Loading/>
+      return <Loading />;
     }
 
     // If there are no auctions after filtering, display a message
@@ -342,40 +371,47 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                   )}
 
                   {highestBid &&
-                    highestBid.some(
-                      (bid) => bid.auction?.id === auction.id
-                    ) && (
-                      <div>
-                        <Typography
-                          sx={{ fontSize: "20px", marginTop: "8px" }}
-                          variant="body2"
-                        >
-                          {highestBid.find(
-                            (bid) => bid.auction?.id === auction.id
-                          )?.price === auction.currentPrice ? (
-                            <div className="inline-block text-lg text-green-600 font-bold py-2 px-4 rounded-md bg-green-100 mb-2 max-w-full">
-                              Bạn là người đặt giá cao nhất với{" "}
+                  highestBid.some((bid) => bid.auction?.id === auction.id) ? (
+                    <div>
+                      <Typography
+                        sx={{ fontSize: "20px", marginTop: "8px" }}
+                        variant="body2"
+                      >
+                        {highestBid.find(
+                          (bid) => bid.auction?.id === auction.id
+                        )?.price === auction.currentPrice ? (
+                          <div className="inline-block text-lg text-green-600 font-bold py-2 px-4 rounded-md bg-green-100 mb-2 max-w-full">
+                            Bạn là người đặt giá cao nhất với{" "}
+                            {highestBid
+                              .find((bid) => bid.auction?.id === auction.id)
+                              ?.price.toLocaleString("vi-VN")}{" "}
+                            đ
+                          </div>
+                        ) : (
+                          // Otherwise, show the normal bid message
+                          <span>
+                            Bạn đã đặt giá:{" "}
+                            <span style={{ color: "#FF7F00" }}>
                               {highestBid
                                 .find((bid) => bid.auction?.id === auction.id)
                                 ?.price.toLocaleString("vi-VN")}{" "}
                               đ
-                            </div>
-                          ) : (
-                            // Otherwise, show the normal bid message
-                            <span>
-                              Bạn đã đặt giá:{" "}
-                              <span style={{ color: "#FF7F00" }}>
-                                {highestBid
-                                  .find((bid) => bid.auction?.id === auction.id)
-                                  ?.price.toLocaleString("vi-VN")}{" "}
-                                đ
-                              </span>
                             </span>
-                          )}
-                        </Typography>
-                      </div>
-                    )}
-
+                          </span>
+                        )}
+                      </Typography>
+                    </div>
+                  ) : (
+                    // Fallback when there is no highest bid
+                    <Typography
+                      sx={{ fontSize: "20px", marginTop: "8px" }}
+                      variant="body2"
+                      className="inline-block text-lg text-orange-500 font-bold  rounded-md mb-2 max-w-full flex align-middle"
+                    >
+                     <ExclamationCircleOutlined className="mr-2" />
+                      Bạn chưa ra giá
+                    </Typography>
+                  )}
                   {(auction.status === "SUCCESSFUL" ||
                     auction.status === "COMPLETED") && (
                     <div>

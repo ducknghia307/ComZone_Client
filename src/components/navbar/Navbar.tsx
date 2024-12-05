@@ -87,11 +87,18 @@ const Navbar = () => {
     const handleNewNotification = (newNotification) => {
       console.log("Notification received:", newNotification);
       setAnnouncements((prev) => {
+        const updatedAnnouncements = prev.map((item) =>
+          item.id === newNotification.id
+            ? { ...item, ...newNotification }
+            : item
+        );
+
         const exists = prev.some((item) => item.id === newNotification.id);
         if (!exists) {
-          return [newNotification, ...prev];
+          updatedAnnouncements.unshift(newNotification);
         }
-        return prev;
+
+        return updatedAnnouncements;
       });
       dispatch(auctionAnnouncement(newNotification));
       dispatch(plusUnreadAnnounce());
@@ -208,7 +215,12 @@ const Navbar = () => {
     }
   };
 
-  const content = <NotificationDropdown announcements={announcements} />;
+  const content = (
+    <NotificationDropdown
+      announcements={announcements}
+      setAnnouncements={setAnnouncements}
+    />
+  );
 
   const location = useLocation();
 

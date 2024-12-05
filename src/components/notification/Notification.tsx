@@ -19,9 +19,7 @@ import { setUnreadAnnounce } from "../../redux/features/notification/announcemen
 import { AnnouncementType } from "../../common/enums/announcementType.enum";
 import "../ui/Notification.css";
 
-const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
-  const [announcements, setAnnouncements] = useState(initialAnnouncements);
-  console.log("2", announcements);
+const NotificationDropdown = ({ announcements, setAnnouncements }) => {
   const [activeTab, setActiveTab] = useState("USER");
   const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
   const [role, setRole] = useState(false);
@@ -30,9 +28,6 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
-  useEffect(() => {
-    setAnnouncements(initialAnnouncements);
-  }, [initialAnnouncements]);
 
   useEffect(() => {
     const hasSellerAnnouncements = announcements.some(
@@ -75,19 +70,14 @@ const NotificationDropdown = ({ announcements: initialAnnouncements }) => {
       console.log("Announcement marked as read.");
 
       // Update the announcements state
-      const updatedAnnouncements = announcements.map((announcement) =>
-        announcement.id === item.id
-          ? { ...announcement, isRead: true }
-          : announcement
+      setAnnouncements((prev) =>
+        prev.map((announcement) =>
+          announcement.id === item.id
+            ? { ...announcement, isRead: true }
+            : announcement
+        )
       );
-
-      setAnnouncements(updatedAnnouncements); // Update the local state
-
       // Update filtered announcements for the active tab
-      const filtered = updatedAnnouncements.filter(
-        (announcement) => announcement.recipientType === activeTab
-      );
-      setFilteredAnnouncements(filtered);
     } catch (error) {
       console.error("Error marking announcement as read:", error);
     }

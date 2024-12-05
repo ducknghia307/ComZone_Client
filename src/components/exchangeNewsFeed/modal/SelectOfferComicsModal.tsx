@@ -15,6 +15,7 @@ export default function SelectOfferComicsModal({
   setIsSelectModalOpen,
   setIsChatOpen,
   setIsLoading,
+  fetchExchangeNewsFeed,
 }: {
   post: ExchangePostInterface;
   userExchangeComicsList: Comic[];
@@ -22,6 +23,7 @@ export default function SelectOfferComicsModal({
   setIsSelectModalOpen: Function;
   setIsChatOpen: Function;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchExchangeNewsFeed: () => void;
 }) {
   const [requestSelectOptionValues, setRequestSelectOptionValues] = useState<
     { label: string; value: string; image: string }[]
@@ -50,7 +52,11 @@ export default function SelectOfferComicsModal({
         setRequestSelectOptionValues([]);
         setPostSelectOptionValues([]);
 
-        userExchangeComicsList.map((comics: Comic) => {
+        const filterSelfAvailable = userExchangeComicsList.filter(
+          (comics) => comics.status === "AVAILABLE"
+        );
+
+        filterSelfAvailable.map((comics: Comic) => {
           setRequestSelectOptionValues((prev) => [
             ...(prev as []),
             {
@@ -124,6 +130,7 @@ export default function SelectOfferComicsModal({
           duration: 5,
         });
         handleModalClose();
+        fetchExchangeNewsFeed();
       });
     setIsLoading(false);
   };

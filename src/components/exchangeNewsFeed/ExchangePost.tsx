@@ -5,10 +5,9 @@ import styles from "./style.module.css";
 import { ExchangePostInterface } from "../../common/interfaces/exchange.interface";
 import moment from "moment/min/moment-with-locales";
 import dateFormat from "../../assistants/date.format";
-import { Modal, notification } from "antd";
+import { Modal } from "antd";
 import { publicAxios } from "../../middleware/axiosInstance";
 import { Comic } from "../../common/base.interface";
-import SelectOfferComicsModal from "./modal/SelectOfferComicsModal";
 import { NavigateFunction } from "react-router-dom";
 import OthersPostButtons from "./post-buttons/OthersPostButtons";
 import SelfPostButton from "./post-buttons/SelfPostButton";
@@ -131,13 +130,14 @@ export default function ExchangePost({
                 navigate={navigate}
                 setIsChatOpen={setIsChatOpen}
                 setIsLoading={setIsLoading}
+                fetchExchangeNewsFeed={fetchExchangeNewsFeed}
               />
             ) : (
               post.already &&
               post.alreadyExchange && (
                 <button
                   onClick={() => {
-                    navigate("/exchange/sent-request");
+                    navigate("/exchange/list/sent-request");
                   }}
                   className="text-[0.7em] font-light min-w-fit underline"
                 >
@@ -162,6 +162,7 @@ export default function ExchangePost({
           </div>
         )}
       </div>
+
       <Modal
         open={isModalOpen}
         onOk={handleOk}

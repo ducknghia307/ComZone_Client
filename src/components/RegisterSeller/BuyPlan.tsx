@@ -259,7 +259,7 @@ export default function BuyPlan({
                   )}
                 </div>
 
-                <div className="flex flex-wrap justify-start gap-2 mb-4 w-full max-w-lg mx-auto">
+                <div className="grid grid-cols-4 justify-start gap-2 mb-4 w-full max-w-lg mx-auto">
                   {[
                     20000, 50000, 100000, 200000, 500000, 1000000, 1500000,
                     2000000,
@@ -275,10 +275,10 @@ export default function BuyPlan({
                 </div>
 
                 <p className="font-semibold">Chọn cổng thanh toán:</p>
-                <div className="flex items-stretch gap-2">
+                <div className="w-full flex items-stretch gap-2">
                   <button
                     onClick={() => setPaymentGateway("zalopay")}
-                    className={`flex items-center gap-2 ${
+                    className={`grow flex items-center gap-2 ${
                       paymentGateway === "zalopay"
                         ? "bg-gray-900 text-white font-semibold"
                         : "border border-gray-400 hover:bg-gray-100"
@@ -289,11 +289,11 @@ export default function BuyPlan({
                       alt=""
                       className="w-[3em] h-[3em]"
                     />
-                    Nạp thêm qua ZaloPay
+                    Nạp qua ZALOPAY
                   </button>
                   <button
                     onClick={() => setPaymentGateway("vnpay")}
-                    className={`flex items-center gap-2 ${
+                    className={`grow flex items-center gap-2 ${
                       paymentGateway === "vnpay"
                         ? "bg-gray-900 text-white font-semibold"
                         : "border border-gray-400 hover:bg-gray-100"
@@ -304,14 +304,14 @@ export default function BuyPlan({
                       alt=""
                       className="w-[3em] h-[3em]"
                     />
-                    Nạp thêm qua VNPay
+                    Nạp qua VNPAY
                   </button>
                 </div>
               </div>
             )}
           </div>
         )}
-        <div className="flex items-center gap-2 mt-4">
+        <div className="flex items-center gap-2 mt-4 px-4">
           <Checkbox
             checked={confirmCheck}
             onChange={() => setConfirmCheck(!confirmCheck)}

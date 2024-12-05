@@ -1,8 +1,11 @@
 import React, { SetStateAction, useState } from "react";
-import { Modal, notification } from "antd";
+import { Modal, notification, Popover } from "antd";
 import { ExchangePostInterface } from "../../../../common/interfaces/exchange.interface";
 import { privateAxios } from "../../../../middleware/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { DeleteOutlined } from "@ant-design/icons";
+import EmojiPicker from "emoji-picker-react";
+import TextArea from "antd/es/input/TextArea";
 
 export default function UpdateAndRevealPost({
   open,
@@ -22,23 +25,42 @@ export default function UpdateAndRevealPost({
   const [uploadedImageFiles, setUploadedImageFiles] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
 
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-
   const navigate = useNavigate();
 
-  const handleRemoveImage = (index: number) => {
-    setNewImages(newImages.filter((value, i) => i !== index));
+  const reset = () => {
+    setNewPostContent(post.postContent);
+    setNewImages(post.images || []);
+    setUploadedImageFiles([]);
+    setPreviewImages([]);
   };
 
-  const handleRemoveFile = (index: number) => {
+  const handleUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const fileArray = Array.from(e.target.files);
+      fileArray.map((file, index) => {
+        if (index + uploadedImageFiles.length < 4) {
+          const url = URL.createObjectURL(file);
+          setPreviewImages((prev) => [...prev, url]);
+          setUploadedImageFiles((prev) => [...prev, file]);
+        }
+      });
+    }
+  };
+  const handleRemoveUploadImage = (index: number) => {
+    setPreviewImages(previewImages.filter((value, i) => i !== index));
     setUploadedImageFiles(uploadedImageFiles.filter((value, i) => i !== index));
+  };
+
+  const handleClose = () => {
+    reset();
+    setOpen(false);
   };
 
   const handleRepost = async () => {
     setOpen(false);
     setIsLoading(true);
-    const newUpdatedImages: string[] = [];
 
+    const newUpdatedImages: string[] = [];
     if (uploadedImageFiles.length > 0) {
       await Promise.all(
         uploadedImageFiles.map(async (file) => {
@@ -68,36 +90,36 @@ export default function UpdateAndRevealPost({
         images: newImages.concat(newUpdatedImages),
       })
       .then(() => {
-        navigate("/exchange/all");
         notification.success({
-          key: "success-repost",
+          key: "repost",
           message: "Đăng lại bài viết thành công",
           duration: 5,
         });
+        navigate("/exchange/list/all");
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err);
+        notification.error({
+          key: "repost",
+          message: "Đã xảy ra lỗi. Vui lòng thử lại sau!",
+          duration: 5,
+        });
+      })
       .finally(() => setIsLoading(false));
   };
 
   return (
     <Modal
       open={open}
-      onCancel={(e) => {
-        e.stopPropagation();
-        setOpen(false);
-      }}
+      onCancel={handleClose}
       footer={null}
       centered
       width={800}
     >
       <div className="flex flex-col gap-4 pt-4">
-        <p className="text-xl font-semibold">HIỆN BÀI VIẾT TRAO ĐỔI</p>
+        <p className="text-xl font-semibold">CHỈNH SỬA BÀI VIẾT TRAO ĐỔI</p>
 
-        <p className="text-lg">
-          Bạn có muốn đăng lại bài viết tìm kiếm trao đổi không?
-        </p>
-
-        <div className="flex flex-col gap-4 px-2 py-2 border border-gray-400 rounded-lg">
+        <div className="flex flex-col gap-4 px-2 py-2rounded-lg">
           <div className="flex items-center justify-between gap-4">
             <div className="w-full flex items-center gap-4">
               <img
@@ -109,161 +131,125 @@ export default function UpdateAndRevealPost({
                   {post.user.name}
                 </p>
               </div>
+            </div>
+          </div>
 
-              {!isEditing ? (
+          <div className="relative">
+            <TextArea
+              value={newPostContent}
+              onChange={(e) => {
+                setNewPostContent(e.target.value);
+              }}
+              placeholder="Mô tả truyện mà bạn đang tìm kiếm để trao đổi..."
+              autoSize={{ minRows: 3, maxRows: 10 }}
+              className="font-light mt-2 p-3"
+            />
+            <Popover
+              content={
+                <EmojiPicker
+                  onEmojiClick={(emojiData) => {
+                    setNewPostContent((prev) => prev + emojiData.emoji);
+                  }}
+                  lazyLoadEmojis={true}
+                  skinTonesDisabled={true}
+                />
+              }
+              trigger="click"
+              className="absolute bottom-1 right-1"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM7 13H9C9 14.6569 10.3431 16 12 16C13.6569 16 15 14.6569 15 13H17C17 15.7614 14.7614 18 12 18C9.23858 18 7 15.7614 7 13ZM8 11C7.17157 11 6.5 10.3284 6.5 9.5C6.5 8.67157 7.17157 8 8 8C8.82843 8 9.5 8.67157 9.5 9.5C9.5 10.3284 8.82843 11 8 11ZM16 11C15.1716 11 14.5 10.3284 14.5 9.5C14.5 8.67157 15.1716 8 16 8C16.8284 8 17.5 8.67157 17.5 9.5C17.5 10.3284 16.8284 11 16 11Z"></path>
+              </svg>
+            </Popover>
+          </div>
+
+          <div className="flex flex-col mt-4">
+            <p>
+              Ảnh bài viết:{" "}
+              <span className="text-xs font-light italic">(Tối đa 4 ảnh)</span>
+            </p>
+            <p className="text-xs">
+              Sử dụng hình ảnh để người khác nhận diện truyện bạn tìm kiếm dễ
+              hơn.
+            </p>
+
+            <div className="grid grid-cols-4 gap-2 mt-2">
+              {newImages.map((imgUrl, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={imgUrl}
+                    alt={`preview chapter ${index}`}
+                    className="w-full h-[15em] object-cover transition-opacity duration-200 ease-in-out group-hover:opacity-50 rounded-md border p-1"
+                  />
+                  <button
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={() =>
+                      setNewImages(newImages.filter((value, i) => i !== index))
+                    }
+                  >
+                    <DeleteOutlined style={{ fontSize: 16 }} />
+                  </button>
+                </div>
+              ))}
+
+              {previewImages.map((imgUrl, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={imgUrl}
+                    alt={`preview chapter ${index}`}
+                    className="w-[10em] h-[15em] object-cover transition-opacity duration-200 ease-in-out group-hover:opacity-50 rounded-md border p-1"
+                  />
+                  <button
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={() => handleRemoveUploadImage(index)}
+                  >
+                    <DeleteOutlined style={{ fontSize: 16 }} />
+                  </button>
+                </div>
+              ))}
+
+              {uploadedImageFiles.length < 4 && (
                 <button
-                  onClick={() => setIsEditing(true)}
-                  className="ml-auto pr-8 flex items-center gap-1 hover:opacity-80"
+                  className="w-full h-[15em] p-4 border bg-gray-100 hover:opacity-75 duration-200 rounded-lg flex flex-col items-center justify-center gap-2"
+                  onClick={() =>
+                    document.getElementById("previewChapterUpload")?.click()
+                  }
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
+                    width="32"
+                    height="32"
                     fill="currentColor"
                   >
-                    <path d="M6.41421 15.89L16.5563 5.74785L15.1421 4.33363L5 14.4758V15.89H6.41421ZM7.24264 17.89H3V13.6473L14.435 2.21231C14.8256 1.82179 15.4587 1.82179 15.8492 2.21231L18.6777 5.04074C19.0682 5.43126 19.0682 6.06443 18.6777 6.45495L7.24264 17.89ZM3 19.89H21V21.89H3V19.89Z"></path>
+                    <path d="M21 15V18H24V20H21V23H19V20H16V18H19V15H21ZM21.0082 3C21.556 3 22 3.44495 22 3.9934V13H20V5H4V18.999L14 9L17 12V14.829L14 11.8284L6.827 19H14V21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082ZM8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7Z"></path>
                   </svg>
-                  <p className="text-xs">Chỉnh sửa</p>
-                </button>
-              ) : (
-                <div className="ml-auto pr-8 flex items-center gap-4">
-                  <button
-                    onClick={() => {
-                      setNewPostContent(post.postContent);
-                      setNewImages(post.images || []);
-                      setUploadedImageFiles([]);
-                      setPreviewImages([]);
-                    }}
-                    className="text-xs hover:undeline"
-                  >
-                    Đặt lại
-                  </button>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="text-xs hover:undeline"
-                  >
-                    Xong
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <input
-            disabled={!isEditing}
-            type="text"
-            value={newPostContent}
-            onChange={(e) => {
-              setNewPostContent(e.target.value);
-            }}
-            className={`bg-white pl-2 py-1 ${
-              isEditing && "border border-gray-300"
-            }`}
-          />
-
-          {newImages.length > 0 && (
-            <div className="flex items-center gap-2">
-              {newImages.map((image, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    key={image}
-                    src={image}
-                    className="rounded-lg w-[10em] h-[15em] object-cover"
-                  />
-                  {isEditing && (
-                    <button
-                      onClick={() => handleRemoveImage(index)}
-                      className="hidden group-hover:inline absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] p-2 rounded-full bg-white duration-200 hover:opacity-80"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        height="24"
-                        fill="rgba(239,6,6,1)"
-                      >
-                        <path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z"></path>
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              ))}
-
-              {previewImages.map((image, index) => {
-                return (
-                  <div className="relative group">
-                    <img
-                      key={image}
-                      src={image}
-                      className="rounded-lg w-[10em] h-[15em] object-cover"
-                    />
-                    {isEditing && (
-                      <button
-                        onClick={() => handleRemoveFile(index)}
-                        className="hidden group-hover:inline absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] p-2 rounded-full bg-white duration-200 hover:opacity-80"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          width="24"
-                          height="24"
-                          fill="rgba(239,6,6,1)"
-                        >
-                          <path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z"></path>
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-
-              {isEditing && (
-                <>
+                  <p className="text-nowrap">Thêm ảnh</p>
                   <input
                     type="file"
                     hidden
-                    id="add-image"
+                    multiple
                     accept="image/png, image/gif, image/jpeg"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files[0])
-                        setUploadedImageFiles((prev) => [
-                          ...prev,
-                          e.target.files![0],
-                        ]);
-                      setPreviewImages((prev) => [
-                        ...prev,
-                        URL.createObjectURL(e.target.files![0]),
-                      ]);
-                    }}
+                    onChange={handleUploadChange}
+                    id="previewChapterUpload"
                   />
-                  <button
-                    onClick={() => {
-                      document.getElementById("add-image")?.click();
-                    }}
-                    className="px-8 text-gray-800 duration-200 hover:text-gray-600"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      width="48"
-                      height="48"
-                      fill="currentColor"
-                    >
-                      <path d="M11 11V7H13V11H17V13H13V17H11V13H7V11H11ZM12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"></path>
-                    </svg>
-                  </button>
-                </>
+                </button>
               )}
             </div>
-          )}
+          </div>
         </div>
 
         <div className="self-stretch flex items-center gap-2">
           <button
             onClick={() => {
               setOpen(false);
-              navigate("/exchange/all");
+              navigate("/exchange/list/all");
             }}
             className="grow py-2 border border-gray-400 rounded-md duration-200 hover:bg-gray-100"
           >

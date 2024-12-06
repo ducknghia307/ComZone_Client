@@ -99,6 +99,7 @@
   flex-direction: column; /* Stack images vertically */
   gap: 10px; /* Add space between the images */
   max-height: 600px; /* Set a maximum height for the container */
+  max-width: 160px;
   overflow-y: auto; /* Enable vertical scrolling */
   padding: 10px;
   scrollbar-width: thin; /* For Firefox: make scrollbar thinner */

@@ -7,6 +7,7 @@ import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import Loading from "../loading/Loading";
 import { useAppSelector } from "../../redux/hooks";
+import EmptyIcon from "../../assets/notFound/empty.png";
 
 const renderer = ({ days, hours, minutes, seconds }: any) => {
   return (
@@ -59,11 +60,6 @@ const AllAuctions = ({
           (auction: any) => auction.status === "UPCOMING"
         );
 
-        const finishedAndFailed = data.filter(
-          (auction: any) =>
-            auction.status === "FAILED" || auction.status === "COMPLETED"
-        );
-
         setUpcomingComics(upcomingComics);
       } catch (error) {
         console.error("Error fetching comics:", error);
@@ -112,9 +108,9 @@ const AllAuctions = ({
         <h2 className="text-2xl font-bold">Các Cuộc Đấu Giá Ở ComZone</h2>
       </div>
 
-      <div className="flex justify-around border-b">
+      <div className="flex justify-around border-b mb-3">
         <button
-          className={`w-1/3 py-2 text-center font-bold ${
+          className={`w-1/3 py-5 text-center font-bold text-lg ${
             activeTab === "ONGOING"
               ? "text-blue-500 border-b-2 border-blue-500"
               : "text-gray-600"
@@ -124,7 +120,7 @@ const AllAuctions = ({
           <Badge>Đang diễn ra</Badge>
         </button>
         <button
-          className={`w-1/3 py-2 text-center font-bold ${
+          className={`w-1/3 py-5 text-center font-bold text-lg ${
             activeTab === "UPCOMING"
               ? "text-blue-500 border-b-2 border-blue-500"
               : "text-gray-600"
@@ -133,30 +129,14 @@ const AllAuctions = ({
         >
           <Badge>Sắp diễn ra</Badge>
         </button>
-        <button
-          className={`w-1/3 py-2 text-center font-bold ${
-            activeTab === "COMPLETED"
-              ? "text-blue-500 border-b-2 border-blue-500"
-              : "text-gray-600"
-          }`}
-          onClick={() => setActiveTab("COMPLETED")}
-        >
-          <Badge>Đã kết thúc</Badge>
-        </button>
       </div>
 
       {/* Ongoing or Upcoming Auctions Section */}
-      <div className="auction-section-detail flex justify-between items-center">
-        <h2 className="text-2xl font-bold">
-          {activeTab === "ONGOING" ? "Đang diễn ra" : "Sắp diễn ra"}
-        </h2>
-      </div>
 
-      <div className="auction-cards mt-4">
-        {filteredComics(
-          activeTab === "ONGOING" ? ongoingComics : upcomingComics
-        ).length > 0 ? (
-          filteredComics(
+      {filteredComics(activeTab === "ONGOING" ? ongoingComics : upcomingComics)
+        .length > 0 ? (
+        <div className="auction-cards mt-4">
+          {filteredComics(
             activeTab === "ONGOING" ? ongoingComics : upcomingComics
           ).map((comic) => (
             <div className="auction-card" key={comic.id}>
@@ -192,11 +172,18 @@ const AllAuctions = ({
                 Xem Chi Tiết
               </Button>
             </div>
-          ))
-        ) : (
-          <p>Không tìm thấy kết quả phù hợp</p>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-gray-500 p-4">
+          <img
+            className="h-64 w-full object-contain"
+            src={EmptyIcon}
+            alt="No Announcements"
+          />
+          <p>Không có dữ liệu phù hợp</p>
+        </div>
+      )}
     </div>
   );
 };

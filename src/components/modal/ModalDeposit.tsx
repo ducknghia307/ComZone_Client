@@ -47,6 +47,7 @@ const ModalDeposit: React.FC<ModalDepositProps> = ({
       const response = await privateAxios.post(
         `/deposits/auction/${auctionId}`
       );
+
       return response.data;
     } catch (error) {
       throw new Error("Deposit failed");

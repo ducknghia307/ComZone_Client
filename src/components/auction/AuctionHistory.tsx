@@ -7,7 +7,12 @@ import { Auction } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { useAppSelector } from "../../redux/hooks";
 import { useNavigate } from "react-router-dom";
-import { ExclamationCircleOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import EmptyIcon from "../../assets/notFound/empty.png";
+
+import {
+  ExclamationCircleOutlined,
+  ShoppingCartOutlined,
+} from "@ant-design/icons";
 import { convertToVietnameseDate } from "../../utils/convertDateVietnamese";
 import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
 import AuctionDetailModal from "../modal/AuctionDetailModal";
@@ -58,9 +63,16 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           console.error("No auctions found in deposits:", auctionsData);
           return;
         }
+        const filteredAuctions = auctionsData.filter(
+          (auction) => auction.status !== "UPCOMING"
+        );
 
-        setAuctions(auctionsData);
+        if (filteredAuctions.length === 0) {
+          console.error("No auctions available that are not 'UPCOMING'");
+          return;
+        }
 
+        setAuctions(filteredAuctions);
         // Fetch the highest bid for each auction
         const highestBids = await Promise.all(
           auctionsData.map(async (auction) => {
@@ -143,7 +155,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           fontWeight: "bold",
           display: "inline-block",
         };
-      case "REJECTED":
+      case "CANCELED":
         return {
           color: "#f44336",
           backgroundColor: "#ffebee",
@@ -174,6 +186,10 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
         return "Đang diễn ra";
       case "FAILED":
         return "Đấu giá thất bại";
+      case "UPCOMING":
+        return "Sắp diễn ra";
+      case "CANCELED":
+        return "Bị hủy";
       case "REJECTED":
         return "Bị từ chối";
       default:
@@ -224,7 +240,16 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           );
 
     if (filteredAuctions.length === 0) {
-      return <Typography>Không có dữ liệu đấu giá phù hợp.</Typography>;
+      return (
+        <div className="text-center text-gray-500 p-4">
+          <img
+            className="h-64 w-full object-contain"
+            src={EmptyIcon}
+            alt="No Announcements"
+          />
+          <p>Không có dữ liệu phù hợp</p>
+        </div>
+      );
     }
 
     // Map through the filtered auctions and render each auction
@@ -408,7 +433,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                       variant="body2"
                       className="inline-block text-lg text-orange-500 font-bold  rounded-md mb-2 max-w-full flex align-middle"
                     >
-                     <ExclamationCircleOutlined className="mr-2" />
+                      <ExclamationCircleOutlined className="mr-2" />
                       Bạn chưa ra giá
                     </Typography>
                   )}

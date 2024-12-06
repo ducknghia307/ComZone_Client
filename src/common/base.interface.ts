@@ -102,6 +102,7 @@ export interface Auction {
     name: string;
     createdAt: string;
   };
+  currentCondition?: string;
 }
 
 //comic
@@ -224,7 +225,13 @@ export interface SellerDetails extends BaseInterface {
 export interface ExchangeData extends BaseInterface {
   compensationAmount: number | null;
   depositAmount: number | null;
-  status: "PENDING" | "DEALING" | "DELIVERING" | "SUCCESSFUL" | "FAILED" | "REJECTED";
+  status:
+    | "PENDING"
+    | "DEALING"
+    | "DELIVERING"
+    | "SUCCESSFUL"
+    | "FAILED"
+    | "REJECTED";
   post: Post;
   requestUser: UserInfo;
   compensateUser: UserInfo | null;

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Box } from "@mui/material";
 import {
   Form,
@@ -43,6 +43,22 @@ const AuctionModalEdit = ({
       });
     }
   }, [auctionData, form]);
+  const validateStartTime = (rule: RuleObject, value: dayjs.Dayjs) => {
+    const now = dayjs();
+
+    if (value) {
+      // Ensure that the start time is at least 1 hour and 1 minute after the current time
+      const oneHourAndOneMinuteFromNow = now.add(59, "minute");
+
+      if (value.isBefore(oneHourAndOneMinuteFromNow)) {
+        return Promise.reject(
+          "Thời gian bắt đầu phải ít nhất 1 giờ 1 phút sau thời gian hiện tại"
+        );
+      }
+    }
+
+    return Promise.resolve();
+  };
 
   const validateEndTime = (rule: RuleObject, value: dayjs.Dayjs) => {
     const startTime = form.getFieldValue("startTime");
@@ -62,6 +78,7 @@ const AuctionModalEdit = ({
         "Thời gian kết thúc không được vượt quá 7 ngày kể từ thời gian bắt đầu"
       );
     }
+
     return Promise.resolve();
   };
 
@@ -74,6 +91,9 @@ const AuctionModalEdit = ({
     endTime: string;
   }) => {
     try {
+      const startTime = dayjs(values.startTime);
+      const now = dayjs();
+
       const updatedAuctionData: Auction = {
         ...auctionData,
         id: auctionData.id,
@@ -84,6 +104,7 @@ const AuctionModalEdit = ({
         startTime: dayjs(values.startTime).format("YYYY-MM-DDTHH:mm:ssZ"),
         endTime: dayjs(values.endTime).format("YYYY-MM-DDTHH:mm:ssZ"),
         status: "UPCOMING",
+        currentCondition:''
       };
 
       await privateAxios.put(`/auction/${auctionData.id}`, updatedAuctionData);
@@ -288,6 +309,7 @@ const AuctionModalEdit = ({
               }
               rules={[
                 { required: true, message: "Vui lòng chọn thời gian bắt đầu" },
+                { validator: validateStartTime }, // Custom validation for start time
               ]}
             >
               <DatePicker
@@ -298,14 +320,13 @@ const AuctionModalEdit = ({
                 style={{ width: "100%" }}
                 placeholder="Chọn thời gian bắt đầu"
                 disabledDate={(current) => {
-                  // Disable all dates before now
-                  return current && current.isBefore(dayjs().startOf("day"));
+                  return current && current.isBefore(now.startOf("day"));
                 }}
                 disabledTime={(current) => {
-                  // Only allow times that are at least 1 hour after the current time
-                  if (!current) return {};
                   const now = dayjs();
                   const oneHourFromNow = now.add(1, "hour");
+
+                  // Disable times that are less than 1 hour ahead of now
                   if (current.isSame(now, "day")) {
                     return {
                       disabledHours: () =>
@@ -320,7 +341,8 @@ const AuctionModalEdit = ({
                           : [],
                     };
                   }
-                  return {};
+
+                  return {}; // Otherwise, allow all times
                 }}
               />
             </Form.Item>
@@ -333,7 +355,9 @@ const AuctionModalEdit = ({
                   required: true,
                   message: "Vui lòng chọn thời gian kết thúc",
                 },
-                { validator: validateEndTime }, // Custom validation for end time
+                {
+                  validator: validateEndTime,
+                },
               ]}
             >
               <DatePicker
@@ -355,6 +379,27 @@ const AuctionModalEdit = ({
                     current.isBefore(oneDayAfter.startOf("day")) ||
                     current.isAfter(sevenDaysAfter.endOf("day"))
                   );
+                }}
+                disabledTime={() => {
+                  const startTime = form.getFieldValue("startTime");
+                  if (!startTime) return {};
+
+                  const startDayjs = dayjs(startTime);
+                  const oneDayAfter = startDayjs.add(1, "day");
+                  const hour = oneDayAfter.hour();
+                  const minute = oneDayAfter.minute();
+
+                  return {
+                    disabledHours: () => {
+                      return Array.from({ length: hour }, (_, i) => i); // Disable all hours before the required start time
+                    },
+                    disabledMinutes: (hour) => {
+                      if (hour === hour) {
+                        return Array.from({ length: minute }, (_, i) => i); // Disable minutes before the required start time
+                      }
+                      return [];
+                    },
+                  };
                 }}
               />
             </Form.Item>

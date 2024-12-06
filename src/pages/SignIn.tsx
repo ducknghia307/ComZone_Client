@@ -33,9 +33,13 @@ const SignIn = () => {
 
       const loginSuccessful = await dispatch(LoginUser(formValues));
 
-      if (loginSuccessful) {
+      if (loginSuccessful === true) {
         // Only navigate if login was successful
         window.location.href = navigateUrl ? `${navigateUrl}` : "/";
+      } else if (loginSuccessful === "MOD") {
+        window.location.href = "/mod/users";
+      } else if (loginSuccessful === "ADMIN") {
+        window.location.href = "/admin/dashboard";
       } else {
         // Handle login failure (this case may depend on how you handle responses)
         setErrorMessage("Invalid email or password. Please try again.");

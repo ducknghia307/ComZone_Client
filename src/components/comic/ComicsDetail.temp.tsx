@@ -30,8 +30,8 @@ export default function ComicsDetailTemp() {
   const [imageList, setImageList] = useState<string[]>([]);
   const [currentImage, setCurrentImage] = useState<string>("");
   const [relatedComicsList, setRelatedComicsList] = useState<Comic[]>([]);
-  const [averageRating, setAverageRating] = useState<number>();
   const [feedbackList, setFeedbackList] = useState<SellerFeedback[]>([]);
+  const [averageRating, setAverageRating] = useState<number>();
   const [totalFeedback, setTotalFeedback] = useState<number>(0);
   const [comicsListFromSeller, setComicsListFromSeller] = useState<
     Comic[] | []

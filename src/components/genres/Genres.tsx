@@ -313,7 +313,7 @@ const Genres: React.FC<GenresProps> = ({
                 </div>
               }
             >
-              <div className="mt-4 REM grid items-stretch justify-stretch grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-5 px-5 place-items-center">
+              <div className="mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4">
                 {sortedComics.length > 0 ? (
                   sortedComics.map((comic) => (
                     <LazyLoad key={comic.id} once>

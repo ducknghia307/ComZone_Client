@@ -106,7 +106,7 @@ export default function SingleExchangeComics({
 
           <div
             ref={imageListRef}
-            className={`}relative flex flex-col gap-[${imageListGap}px] h-full max-h-36 overflow-hidden`}
+            className={`relative flex flex-col gap-[${imageListGap}px] h-full max-h-36 overflow-hidden`}
           >
             <button
               onClick={() => scrollHandler("UP")}
@@ -139,7 +139,7 @@ export default function SingleExchangeComics({
                   currentImage === preview
                     ? "border border-gray-500"
                     : "duration-200 hover:scale-110 hover:z-20"
-                } rounded-md object-cover `}
+                } rounded-md object-cover`}
               />
             ))}
 

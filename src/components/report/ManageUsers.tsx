@@ -158,6 +158,21 @@ const ManageUsers: React.FC = () => {
     }
   };
 
+  const translateRole = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return "Quản trị viên";
+      case "MODERATOR":
+        return "Giám sát viên";
+      case "SELLER":
+        return "Người Bán";
+      case "MEMBER":
+        return "Người Mua";
+      default:
+        return role;
+    }
+  };
+
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
@@ -199,7 +214,7 @@ const ManageUsers: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: '#fff' }} />
               </InputAdornment>
             ),
-            style: { color: '#fff', fontFamily:'REM' },
+            style: { color: '#fff', fontFamily: 'REM' },
           }}
         />
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -217,9 +232,9 @@ const ManageUsers: React.FC = () => {
                 fontFamily: 'REM',
               }}
             >
-              <MenuItem sx={{fontFamily: 'REM'}} value="ALL">Tất cả</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="MEMBER">Người Mua</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="SELLER">Người Bán</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="MEMBER">Người Mua</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="SELLER">Người Bán</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -267,7 +282,7 @@ const ManageUsers: React.FC = () => {
                       <StyledTableCell align="right">{user.email}</StyledTableCell>
                       <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM' }}>
                         <span style={getRoleStyle(user.role)}>
-                          {user.role}
+                          {translateRole(user.role)}
                         </span>
                       </StyledTableCell>
                       <StyledTableCell align="right">

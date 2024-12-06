@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
+import { useNavigate } from "react-router-dom";
 import { Comic, UserInfo } from "../../../common/base.interface";
 
 export default function ComicsSeller({
@@ -16,6 +17,8 @@ export default function ComicsSeller({
   totalFeedback: number;
   averageRating?: number;
 }) {
+  const navigate = useNavigate();
+
   return (
     <div className="w-full">
       <div
@@ -51,13 +54,18 @@ export default function ComicsSeller({
             <p className="font-light text-xs italic">
               {totalFeedback > 0
                 ? `(${totalFeedback} lượt đánh giá)`
-                : "Chưa có đánh giá nào"}
+                : "(Chưa có đánh giá nào)"}
             </p>
           </div>
         </div>
         {currentId !== seller?.id && (
           <div className="ml-auto flex items-center justify-center gap-2">
-            <button className="flex flex-col items-center justify-center p-2 border rounded-xl duration-200 hover:bg-gray-100">
+            <button
+              onClick={() => {
+                navigate(`/seller/shop/all/${seller.id}`);
+              }}
+              className="flex flex-col items-center justify-center p-2 border rounded-xl duration-200 hover:bg-gray-100"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

@@ -7,10 +7,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import "../ui/SellerCreateComic.css";
 import IconButton from "@mui/material/IconButton";
 import { privateAxios } from "../../middleware/axiosInstance";
-import AuctionManagement from "../auctions/AuctionManagement";
-import DeliveryManagement from "../delivery/DeliveryManagement";
 import GavelIcon from "@mui/icons-material/Gavel";
-import OrderManagement from "./OrderManagement";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import { Modal, notification } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
@@ -34,7 +31,6 @@ const SellerComicsManagement = ({
 }) => {
   const [comics, setComics] = useState<Comic[]>([]);
   const [filteredComics, setFilteredComics] = useState<Comic[]>([]);
-  const [genres, setGenres] = useState([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState<string>("");
@@ -220,20 +216,7 @@ const SellerComicsManagement = ({
   };
 
   useEffect(() => {
-    Promise.all([
-      privateAxios.get("/comics/seller").then((response) => response.data),
-      privateAxios.get("/genres").then((response) => response.data),
-    ])
-      .then(([comicsData, genresData]) => {
-        setComics(comicsData);
-        setFilteredComics(comicsData);
-        setGenres(genresData);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      });
+    fetchSellerComics();
   }, []);
 
   const handleAddComicsClick = () => {
@@ -255,6 +238,7 @@ const SellerComicsManagement = ({
   };
 
   const fetchSellerComics = async () => {
+    setLoading(true);
     await privateAxios
       .get("/comics/seller")
       .then((res) => {
@@ -263,7 +247,8 @@ const SellerComicsManagement = ({
       })
       .catch((err) => {
         console.log(err);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -274,28 +259,20 @@ const SellerComicsManagement = ({
     await privateAxios
       .get(`comics/search/seller?search=${key}`)
       .then((res) => {
-        console.log(res.data.length);
+        setSearchParams({ search: searchInput });
         setFilteredComics(res.data);
       })
       .catch((err) => console.log(err));
   };
 
-  const delayDuration = 1000;
-  let inputTimer: number;
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
 
-    clearTimeout(inputTimer);
-
-    inputTimer = setTimeout(() => {
-      if (e.target.value.length > 0) {
-        setSearchParams({ search: e.target.value });
-        searchSellerComics(e.target.value);
-      } else {
-        searchParams.delete("search");
-        setFilteredComics(comics);
-      }
-    }, delayDuration);
+    if (e.target.value.length === 0) {
+      searchParams.delete("search");
+      setSearchParams(searchParams);
+      setFilteredComics(comics);
+    }
   };
 
   const columns: GridColDef[] = [
@@ -508,6 +485,11 @@ const SellerComicsManagement = ({
                 placeholder="Tìm kiếm theo tên truyện hoặc tác giả..."
                 value={searchInput}
                 onChange={onSearchInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchInput.length > 0) {
+                    searchSellerComics(searchInput);
+                  }
+                }}
                 className="w-full py-2 font-light text-sm pl-8 rounded-lg border border-gray-300"
               />
 

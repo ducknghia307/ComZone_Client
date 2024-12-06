@@ -19,10 +19,6 @@ import Profile from "../../pages/Profile";
 import AuctionUser from "../../pages/AuctionUser";
 import WalletUser from "../../pages/WalletUser";
 import ExchangeUser from "../../pages/ExchangeUser";
-import ComicManagementSeller from "../../pages/ComicManagementSeller";
-import OrderManagementSeller from "../../pages/OrderManagementSeller";
-import AuctionManagementSeller from "../../pages/AuctionManagementSeller";
-import FeedbackManagementSeller from "../../pages/FeedbackManagementSeller";
 import AllHotComics from "../../pages/HotComic";
 import NotFound from "../notFound/NotFound";
 import CurrentUserRecentAct from "../../pages/CurrentUserRecentAct";
@@ -41,7 +37,6 @@ import ModRefunds from "../../pages/ModRefunds";
 import AdminUsers from "../../pages/AdminUsers";
 import AdminDashboard from "../../pages/AdminDashboard";
 import AdminSubscription from "../../pages/AdminSubscription";
-import Exchange from "../exchange/Exchange";
 import ExchangeDetail from "../../pages/ExchangeDetail";
 import Announcement from "../../pages/Announcement";
 import AnnouncementOrder from "../../pages/AnnouncementOrder";
@@ -49,6 +44,7 @@ import AnnouncementAuction from "../../pages/AnnouncementAuction";
 import SellerManagementPage from "../../pages/SellerManagement";
 import ExchangeManagement from "../../pages/ExchangeManagement";
 import AnnouncementExchange from "../../pages/AnnoucementExchange";
+import SellerShopPage from "../../pages/SellerShopPage";
 
 const AppRouter = () => {
   return (
@@ -76,11 +72,10 @@ const AppRouter = () => {
           path="/accountmanagement/announcement/auctions"
           element={<AnnouncementAuction />}
         />
-         <Route
+        <Route
           path="/accountmanagement/announcement/exchanges"
           element={<AnnouncementExchange />}
         />
-        
         <Route path="/accountmanagement/auction" element={<AuctionUser />} />
         <Route path="/accountmanagement/wallet" element={<WalletUser />} />
         <Route path="/accountmanagement/exchange" element={<ExchangeUser />} />
@@ -136,6 +131,7 @@ const AppRouter = () => {
           path="/profile/comicSelling"
           element={<CurrentUserComicSelling />}
         />
+        <Route path="/seller/shop/:category/:id" element={<SellerShopPage />} />
         <Route path="*" element={<NotFound />} />
         <Route path="/mod/comics" element={<ModComics />} />
         <Route path="/mod/users" element={<ModUsers />} />

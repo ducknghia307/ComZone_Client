@@ -13,7 +13,6 @@ interface SubscriptionPlan {
     id: string;
     price: number;
     duration: number;
-    offeredResource: number;
     auctionTime: number;
     sellTime: number;
 }

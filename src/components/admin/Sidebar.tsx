@@ -222,7 +222,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           </ListItemIcon>
           {!isCollapsed && (
             <ListItemText
-              primary="Logout"
+              primary="Đăng Xuất"
               sx={{
                 '& .MuiTypography-root': {
                   fontFamily: 'REM',

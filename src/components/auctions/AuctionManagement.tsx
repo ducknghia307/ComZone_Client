@@ -335,7 +335,7 @@ const AuctionManagement = () => {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    Action
+                    Chỉnh Sửa
                   </TableCell>
                 </TableRow>
               </TableHead>

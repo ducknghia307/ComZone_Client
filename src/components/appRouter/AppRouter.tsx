@@ -45,6 +45,7 @@ import SellerManagementPage from "../../pages/SellerManagement";
 import ExchangeManagement from "../../pages/ExchangeManagement";
 import AnnouncementExchange from "../../pages/AnnoucementExchange";
 import SellerShopPage from "../../pages/SellerShopPage";
+import ModDeliveries from "../../pages/ModDeliveries";
 
 const AppRouter = () => {
   return (
@@ -138,6 +139,7 @@ const AppRouter = () => {
         <Route path="/mod/orders" element={<ModOrders />} />
         <Route path="/mod/auctions" element={<ModAuctions />} />
         <Route path="/mod/exchanges" element={<ModExchanges />} />
+        <Route path="/mod/deliveries" element={<ModDeliveries />} />
         <Route path="/mod/deposits" element={<ModDeposits />} />
         <Route path="/mod/feedbacks" element={<ModFeedbacks />} />
         <Route path="/mod/refunds" element={<ModRefunds />} />

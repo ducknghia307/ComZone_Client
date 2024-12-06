@@ -40,6 +40,8 @@ export function LoginUser(formValues: FormValues) {
 
       // Update loading state after successful login
       dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+      if (response.data.isMod === true) return "MOD";
+      if (response.data.isAdmin === true) return "ADMIN";
       return true;
     } catch (error: any) {
       console.log(error);

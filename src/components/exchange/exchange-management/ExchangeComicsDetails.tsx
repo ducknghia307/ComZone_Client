@@ -93,6 +93,7 @@ export default function ExchangeComicsDetails({
         centered
         closeIcon={null}
         styles={{ content: { padding: "2px" } }}
+        width={800}
       >
         <div
           key={currentComics.id}
@@ -102,11 +103,11 @@ export default function ExchangeComicsDetails({
             <img
               src={currentImage}
               alt=""
-              className="w-40 h-56 rounded-md object-cover"
+              className="w-64 h-96 rounded-md object-cover"
             />
 
             <div
-              className={`relative flex gap-2 h-full max-w-40 overflow-x-auto overflow-y-hidden`}
+              className={`relative flex gap-2 h-full max-w-64 overflow-x-auto overflow-y-hidden snap-x snap-mandatory`}
             >
               <img
                 onClick={() => setCurrentImage(currentComics.coverImage)}
@@ -115,8 +116,8 @@ export default function ExchangeComicsDetails({
                 className={`w-16 h-20 ${
                   currentImage === currentComics.coverImage
                     ? "border border-gray-500"
-                    : "duration-200 hover:scale-110 hover:z-20"
-                } rounded-md object-cover`}
+                    : "duration-200 hover:brightness-50 cursor-pointer"
+                } rounded-md object-cover snap-center snap-always`}
               />
 
               {currentComics.previewChapter.map((preview, index) => (
@@ -128,8 +129,8 @@ export default function ExchangeComicsDetails({
                   className={`w-16 h-20 ${
                     currentImage === preview
                       ? "border border-gray-500"
-                      : "duration-200 hover:scale-110 hover:z-20"
-                  } rounded-md object-cover`}
+                      : "duration-200 hover:brightness-50 cursor-pointer"
+                  } rounded-md object-cover snap-center snap-always`}
                 />
               ))}
             </div>

@@ -14,7 +14,7 @@ const OrderComplete = () => {
         <h2 className="text-black">
           Bạn có thể kiểm tra lại đơn hàng trong{" "}
           <Link
-            to="/accountManagement/purchase"
+            to="/accountmanagement/purchase"
             className="hover:opacity-60 duration-200 underline"
           >
             lịch sử mua hàng

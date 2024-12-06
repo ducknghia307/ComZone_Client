@@ -15,7 +15,6 @@ interface SubscriptionPlan {
     id: string;
     price: number;
     duration: number;
-    offeredResource: number;
     auctionTime: number;
     sellTime: number;
 }
@@ -46,7 +45,7 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
 
         setEditedPlan((prev) => ({
             ...prev,
-            [name]: ["price", "duration", "offeredResource"].includes(name)
+            [name]: ["price", "duration", "auctionTime", "sellTime"].includes(name)
                 ? Number(value)
                 : value
         }));
@@ -172,7 +171,8 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                     <TextField
                         fullWidth
                         label="Lượt Bán Đấu Giá"
-                        name="offeredResource"
+                        name="auctionTime"
+                        type="number"
                         value={editedPlan.auctionTime}
                         onChange={handleChange}
                         variant="outlined"

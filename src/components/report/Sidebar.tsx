@@ -27,7 +27,8 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
 import EventNoteOutlinedIcon from "@mui/icons-material/EventNoteOutlined";
 import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined";
-interface SidebarProps {
+import AllInboxOutlinedIcon from '@mui/icons-material/AllInboxOutlined';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';interface SidebarProps {
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
   onSelect?: (item: string) => void;
@@ -77,7 +78,12 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, onSelect }: SidebarProps) => {
     {
       title: "Quản Lý Đơn Hàng",
       path: "/mod/orders",
-      icon: <TvOutlinedIcon sx={{ color: "inherit" }} />,
+      icon: <AllInboxOutlinedIcon sx={{ color: "inherit" }} />,
+    },
+    {
+      title: "Quản Lý Giao Hàng",
+      path: "/mod/deliveries",
+      icon: <LocalShippingOutlinedIcon sx={{ color: "inherit" }} />,
     },
     {
       title: "Quản Lý Đấu Giá",
@@ -85,7 +91,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, onSelect }: SidebarProps) => {
       icon: <GavelOutlinedIcon sx={{ color: "inherit" }} />,
     },
     {
-      title: "Quản Lý Ví",
+      title: "Quản Lý Giao Dịch",
       path: "/mod/deposits",
       icon: <AccountBalanceWalletOutlinedIcon sx={{ color: "inherit" }} />,
     },
@@ -274,7 +280,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, onSelect }: SidebarProps) => {
           </ListItemIcon>
           {!isCollapsed && (
             <ListItemText
-              primary="Logout"
+              primary="Đăng Xuất"
               sx={{
                 "& .MuiTypography-root": {
                   fontFamily: "REM",

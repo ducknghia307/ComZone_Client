@@ -4,6 +4,7 @@ import { privateAxios } from "../../middleware/axiosInstance";
 import { styled } from "@mui/material/styles";
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { SelectChangeEvent } from '@mui/material/Select';
+import { Transaction } from "../../common/interfaces/transaction.interface";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -44,18 +45,59 @@ const ManageWallet: React.FC = () => {
     const fetchTransactions = async () => {
       try {
         const response = await privateAxios.get("/transactions/all");
-        const formattedTransactions = response.data.map((transaction: any) => ({
+        const formattedTransactions = response.data.map((transaction: Transaction) => ({
           date: new Date(transaction.createdAt).toLocaleDateString("vi-VN"),
           userName: transaction.user?.name || "N/A",
-          // type: transaction.amount > 0 ? "Nạp Tiền" : "Rút Tiền",
-          type: transaction.type === "ADD" ? "Nạp Tiền" : "Thanh Toán",
-          // amount: `${transaction.amount > 0 ? "+" : ""}${transaction.amount.toLocaleString("vi-VN")} đ`,
-          // amount: `${transaction.type === "ADD" ? "+" : "-"}${Math.abs(transaction.amount).toLocaleString("vi-VN")} đ`,
-          amount: transaction.amount,
+          type:
+            (transaction.type === "ADD" &&
+              (transaction.walletDeposit
+                ? "Nạp tiền"
+                : transaction.order
+                  ? "Nhận tiền"
+                  : "")) ||
+            (transaction.walletDeposit &&
+              transaction.type === "SUBTRACT" &&
+              "Rút tiền") ||
+            "Thanh toán",
+          amount: `${transaction.type === "ADD" ? "+" : "-"
+            }${transaction.amount.toLocaleString("vi-VN")} đ`,
           status: transaction.status,
-          note: transaction.note || "Không có ghi chú",
+          note:
+            transaction.type === "SUBTRACT"
+              ? transaction.order
+                ? `Thanh toán đơn hàng`
+                : transaction.exchange
+                  ? `Thanh toán trao đổi`
+                  : transaction.deposit?.exchange
+                    ? `Tiền cọc trao đổi`
+                    : transaction.deposit?.auction
+                      ? `Tiền cọc đấu giá`
+                      : transaction.sellerSubscription
+                        ? `Mua gói bán ComZone`
+                        : transaction.withdrawal
+                          ? `Rút tiền về tài khoản ngân hàng`
+                          : "Thông tin giao dịch không có sẵn"
+              : transaction.type === "ADD"
+                ? transaction.order
+                  ? `Nhận tiền đơn hàng (${transaction.note})`
+                  : transaction.exchange
+                    ? `Thanh toán tiền bù trao đổi`
+                    : transaction.deposit?.exchange
+                      ? `Hoàn trả cọc`
+                      : transaction.deposit?.auction &&
+                        transaction.deposit.status === "REFUNDED"
+                        ? `Hoàn trả cọc đấu giá`
+                        : transaction.deposit?.auction &&
+                          transaction.deposit.status === "SEIZED"
+                          ? `Hoàn trả cọc đấu giá do người dùng không thanh toán`
+                          : transaction.walletDeposit
+                            ? "Nạp tiền vào ví"
+                            : "Thông tin giao dịch không có sẵn"
+                : "Thông tin giao dịch không có sẵn",
         }));
         setTransactions(formattedTransactions);
+        console.log("Trans", formattedTransactions);
+
       } catch (error) {
         console.error("Error fetching transactions:", error);
       } finally {
@@ -201,7 +243,7 @@ const ManageWallet: React.FC = () => {
         variant="h5"
         sx={{ marginBottom: "20px", fontWeight: "bold", fontFamily: "REM", color: "#71002b" }}
       >
-        Quản lý ví
+        Quản lý giao dịch
       </Typography>
       <Paper>
         <TableContainer>
@@ -229,8 +271,15 @@ const ManageWallet: React.FC = () => {
                     <StyledTableCell>{transaction.date}</StyledTableCell>
                     <StyledTableCell align="left">{transaction.userName}</StyledTableCell>
                     <StyledTableCell align="left">{transaction.type}</StyledTableCell>
-                    <StyledTableCell align="right" style={getAmountStyle(transaction.amount, transaction.type)}>
-                      {transaction.type === "Nạp Tiền" ? `+${transaction.amount.toLocaleString("vi-VN")}` : `-${Math.abs(transaction.amount).toLocaleString("vi-VN")}`} đ
+                    <StyledTableCell align="right" >
+                      <span style={{
+                        fontFamily: "REM",
+                        color: transaction.amount.toString().startsWith("+")
+                          ? "green"
+                          : "red",
+                      }}>
+                        {transaction.amount}
+                      </span>
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       <span style={getStatusChipStyles(transaction.status)}>

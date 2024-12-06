@@ -135,46 +135,52 @@ const Auctions: React.FC = () => {
           </h2>
           <div className="line"></div>
         </div>
-        <Carousel
-          responsive={responsive}
-          customButtonGroup={
-            <CustomButtonGroup
-              next={() => {}}
-              previous={() => {}}
-              carouselState={{
-                currentSlide: 0,
-                totalItems: 0,
-                slidesToShow: 0,
-              }}
-            />
-          }
-          renderButtonGroupOutside={true}
-        >
-          {ongoingComics.map((comic, index) => (
-            <div className="auction-card" key={index}>
-              <img
-                src={comic.comics.coverImage}
-                // alt={comic.title}
-                className=" object-fill mx-auto"
+        {ongoingComics.length === 0 ? (
+          <div className="no-auctions">
+            <p style={{ color: "#fff", textAlign: "center" }}>Hiện tại không có sản phẩm đấu giá.</p>
+          </div>
+        ) : (
+          <Carousel
+            responsive={responsive}
+            customButtonGroup={
+              <CustomButtonGroup
+                next={() => { }}
+                previous={() => { }}
+                carouselState={{
+                  currentSlide: 0,
+                  totalItems: 0,
+                  slidesToShow: 0,
+                }}
               />
-              <p className="title">{comic.title}</p>
-              <Chip
-                label={comic.comics.condition}
-                icon={<ChangeCircleOutlinedIcon />}
-                size="medium"
-              />
-              <p className="endtime">KẾT THÚC TRONG</p>
-              <Countdown date={new Date(comic.endTime)} renderer={renderer} />
-              <Button
-                className="detail-button"
-                onClick={() => handleDetailClick(comic.id)}
-                variant="contained"
-              >
-                Xem Chi Tiết
-              </Button>
-            </div>
-          ))}
-        </Carousel>
+            }
+            renderButtonGroupOutside={true}
+          >
+            {ongoingComics.map((comic, index) => (
+              <div className="auction-card" key={index}>
+                <img
+                  src={comic.comics.coverImage}
+                  // alt={comic.title}
+                  className=" object-fill mx-auto"
+                />
+                <p className="title">{comic.title}</p>
+                <Chip
+                  label={comic.comics.condition}
+                  icon={<ChangeCircleOutlinedIcon />}
+                  size="medium"
+                />
+                <p className="endtime">KẾT THÚC TRONG</p>
+                <Countdown date={new Date(comic.endTime)} renderer={renderer} />
+                <Button
+                  className="detail-button"
+                  onClick={() => handleDetailClick(comic.id)}
+                  variant="contained"
+                >
+                  Xem Chi Tiết
+                </Button>
+              </div>
+            ))}
+          </Carousel>
+        )}
       </div>
     </div>
   );

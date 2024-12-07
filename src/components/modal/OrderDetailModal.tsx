@@ -386,7 +386,6 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                   label="Số điện thoại"
                   value={order.delivery.from.phone}
                 />
-                <InfoRow label="Địa chỉ" value={order.delivery.from.address} />
               </Box>
 
               <Divider orientation="vertical" flexItem />
@@ -551,27 +550,32 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
               paddingBottom: "10px",
             }}
           >
-            {/* {orderDetail.note && ( */}
-            <StyledPaper
-              sx={{
-                padding: "16px",
-                backgroundColor: "rgba(0, 0, 0, 0.05)",
-                borderRadius: "8px",
-              }}
-            >
-              <div
-                style={{ display: "flex", gap: "5px", alignItems: "center" }}
+            {order.note && (
+              <StyledPaper
+                sx={{
+                  padding: "16px",
+                  backgroundColor: "rgba(0, 0, 0, 0.05)",
+                  borderRadius: "8px",
+                }}
               >
-                <EditOutlinedIcon sx={{ fontSize: "16px" }} />
-                <Typography fontSize="16px" fontWeight="bold" fontFamily="REM">
-                  Ghi chú từ người mua:
-                </Typography>
-              </div>
+                <div
+                  style={{ display: "flex", gap: "5px", alignItems: "center" }}
+                >
+                  <EditOutlinedIcon sx={{ fontSize: "16px" }} />
+                  <Typography
+                    fontSize="16px"
+                    fontWeight="bold"
+                    fontFamily="REM"
+                  >
+                    Ghi chú từ người mua:
+                  </Typography>
+                </div>
 
-              <Typography variant="body1" marginTop={"5px"} fontFamily="REM">
-                {order.note}
-              </Typography>
-            </StyledPaper>
+                <Typography variant="body1" marginTop={"5px"} fontFamily="REM">
+                  {order.note}
+                </Typography>
+              </StyledPaper>
+            )}
           </Grid>
         </Box>
 
@@ -631,7 +635,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
             <Typography
               sx={{ fontSize: "22px", color: "#f77157", fontFamily: "REM" }}
             >
-              {Number(order.totalPrice).toLocaleString("vi-VN", {
+              {Number(
+                order.totalPrice + (order.delivery?.deliveryFee || 0)
+              ).toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
               })}

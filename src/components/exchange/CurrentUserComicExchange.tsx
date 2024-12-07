@@ -9,6 +9,7 @@ import ExchangeComicsDetails from "./exchange-management/ExchangeComicsDetails";
 import UpdateExchangeComics from "./exchange-management/UpdateExchangeComics";
 import { notification, Pagination } from "antd";
 import { useSearchParams } from "react-router-dom";
+import EmptyIcon from "../../assets/notFound/empty-book-collection.png";
 
 const CurrentUserComicExchange = () => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -86,6 +87,7 @@ const CurrentUserComicExchange = () => {
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === "Enter" && searchInput.length > 0) {
+      setCurrentPage(0);
       searchExchangeComics();
     }
   };
@@ -139,6 +141,7 @@ const CurrentUserComicExchange = () => {
           <div className="grow relative">
             <input
               type="text"
+              disabled={comicExchangeOffer.length === 0}
               placeholder="Tìm kiếm theo tên truyện, tác giả..."
               className="w-full border border-gray-300 rounded-md p-2 pl-12 font-light"
               value={searchInput}
@@ -182,39 +185,52 @@ const CurrentUserComicExchange = () => {
           </button>
         </div>
 
-        <div className="w-full flex flex-col gap-1 items-stretch">
-          <div ref={topListPosition} />
-          {currentComicsList
-            .slice(
-              currentPage * comicsPerPage,
-              currentPage * comicsPerPage + comicsPerPage
-            )
-            .map((comics) => (
-              <SingleExchangeComics
-                comics={comics}
-                setIsShowingDetails={setIsShowingDetails}
-              />
-            ))}
+        {comicExchangeOffer.length > 0 ? (
+          <div className="w-full flex flex-col gap-1 items-stretch">
+            <div ref={topListPosition} />
+            {currentComicsList
+              .slice(
+                currentPage * comicsPerPage,
+                currentPage * comicsPerPage + comicsPerPage
+              )
+              .map((comics) => (
+                <SingleExchangeComics
+                  comics={comics}
+                  setIsShowingDetails={setIsShowingDetails}
+                />
+              ))}
 
-          {searchParams.get("search") && (
-            <p className="mt-2">Hiển thị {currentComicsList.length} kết quả</p>
-          )}
+            {searchParams.get("search") && (
+              <p className="mt-2">
+                Hiển thị {currentComicsList.length} kết quả
+              </p>
+            )}
 
-          <Pagination
-            align="center"
-            defaultCurrent={1}
-            pageSize={comicsPerPage}
-            total={comicExchangeOffer.length}
-            hideOnSinglePage
-            onChange={(page) => {
-              setCurrentPage(page - 1);
-              if (topListPosition.current) {
-                topListPosition.current.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-            className="mt-4"
-          />
-        </div>
+            <Pagination
+              align="center"
+              defaultCurrent={1}
+              pageSize={comicsPerPage}
+              total={currentComicsList.length}
+              hideOnSinglePage
+              onChange={(page) => {
+                setCurrentPage(page - 1);
+                if (topListPosition.current) {
+                  topListPosition.current.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }
+              }}
+              className="mt-4"
+            />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-4 py-8 opacity-60">
+            <img src={EmptyIcon} alt="" className="w-1/6" />
+            <p className="font-light sm:text-xl text-center">
+              CHƯA CÓ TRUYỆN NÀO ĐỂ TRAO ĐỔI!
+            </p>
+          </div>
+        )}
       </div>
 
       {isShowingDetails && (

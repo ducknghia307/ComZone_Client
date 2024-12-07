@@ -9,6 +9,7 @@ import {
   Chip,
 } from "@mui/material";
 import { privateAxios } from "../../middleware/axiosInstance";
+import { useAppSelector } from "../../redux/hooks";
 
 interface AuctionDetailModalProps {
   open: boolean;
@@ -40,6 +41,7 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
 }) => {
   const [userBids, setUserBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(false);
+  const userId = useAppSelector((state) => state.auth.userId);
 
   useEffect(() => {
     const fetchUserBids = async () => {
@@ -143,6 +145,22 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
   );
   const formattedEndTime = new Date(auction.endTime).toLocaleString("vi-VN");
 
+  const isWin = auction.status === "SUCCESSFUL" && auction.winner?.id === userId;
+
+  const statusText = isWin
+    ? "Đấu giá thành công"
+    : auction.status === "SUCCESSFUL" ||
+      (auction.status === "COMPLETED" && auction.winner?.id !== userId)
+      ? "Đấu giá thất bại"
+      : translateStatus(auction.status);
+
+  const statusStyles = isWin
+    ? getStatusChipStyles("SUCCESSFUL")
+    : auction.status === "SUCCESSFUL" ||
+      (auction.status === "COMPLETED" && auction.winner?.id !== userId)
+      ? getStatusChipStyles("FAILED")
+      : getStatusChipStyles(auction.status);
+
   return (
     <Dialog
       open={open}
@@ -184,14 +202,10 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
         </span>
 
         {/* Status at the end */}
-        <div
-          style={{
-            ...getStatusChipStyles(auction.status),
-            display: "inline-block",
-            textAlign: "center",
-          }}
-        >
-          {translateStatus(auction.status)}
+        <div style={statusStyles}>
+          <Typography sx={{ fontSize: "16px", fontWeight: "bold" }}>
+            {statusText}
+          </Typography>
         </div>
       </DialogTitle>
       <DialogContent>

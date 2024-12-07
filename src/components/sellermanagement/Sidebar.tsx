@@ -17,6 +17,8 @@ interface SidebarProps {
   handleMenuItemClick: (item: string) => void;
   sellerSubscription?: SellerSubscription | null;
   fetchSellerSubscription?: () => void;
+  loading?: boolean;
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -24,6 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   handleMenuItemClick,
   sellerSubscription,
   fetchSellerSubscription,
+  loading,
 }) => {
   const [isBuyingPlan, setIsBuyingPlan] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -47,9 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="self-stretch REM pb-4 flex flex-col gap-2 p-2 rounded-md bg-white drop-shadow-xl border border-gray-300 mb-1">
           <p className="flex items-center gap-2">
             <img src={StarSVG} alt="" className="w-8 h-8" />
-            <p className="text-sky-600 font-bold text-xl">
-              GÓI CỦA BẠN
-            </p>
+            <p className="text-sky-600 font-bold text-xl">GÓI CỦA BẠN</p>
           </p>
           {isUnlimited ? (
             <p className="italic text-sm">
@@ -57,17 +58,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             </p>
           ) : (
             <>
-              <p className="flex justify-between gap-2 font-light text-sm">
-                Tình trạng:{" "}
-                {sellerSubscription.isActive ? (
-                  <span className="font-semibold text-green-600">
-                    &#8226; Hoạt động
-                  </span>
-                ) : (
-                  <span className="font-semibold text-red-600">Hết hạn</span>
-                )}
-              </p>
-
               <p className="flex justify-between gap-2 font-light text-sm">
                 Số lượt bán còn lại:{" "}
                 <span className="font-semibold">
@@ -83,24 +73,36 @@ const Sidebar: React.FC<SidebarProps> = ({
             </>
           )}
 
-          {sellerSubscription.plan.duration > 0 && (
-            <p className="flex justify-between gap-2 font-light text-sm">
-              Hết hạn sau:
-              <span className="font-semibold">
-                {moment(sellerSubscription.activatedTime)
-                  .add(sellerSubscription.plan.duration * 30, "days")
-                  .fromNow(true)}
+          <p className="flex justify-between gap-2 font-light text-sm">
+            Tình trạng:{" "}
+            {sellerSubscription.isActive ? (
+              <span className="font-semibold text-green-600">
+                &#8226; Hoạt động
               </span>
-            </p>
-          )}
+            ) : (
+              <span className="font-semibold text-red-600">Hết hạn</span>
+            )}
+          </p>
+
+          {sellerSubscription.plan.duration > 0 &&
+            sellerSubscription.isActive && (
+              <p className="flex justify-between gap-2 font-light text-sm">
+                Hết hạn sau:
+                <span className="font-semibold">
+                  {moment(sellerSubscription.activatedTime)
+                    .add(sellerSubscription.plan.duration * 30, "days")
+                    .fromNow(true)}
+                </span>
+              </p>
+            )}
         </div>
       )}
 
-      {!fullActive && !isUnlimited && (
+      {(!fullActive || !isUnlimited) && (
         <>
           <button
             onClick={() => setIsBuyingPlan(true)}
-            className="self-stretch w-full REM py-1 px-4 mb-4 bg-sky-800 text-white flex items-center justify-center gap-2 font-light rounded-lg duration-200 hover:bg-sky-900"
+            className="self-stretch w-full REM py-2 px-4 mb-4 uppercase font-semibold bg-sky-800 text-white flex items-center justify-center gap-2 rounded-lg duration-200 hover:bg-sky-900"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -119,7 +121,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <path d="M4 17v2" />
               <path d="M5 18H3" />
             </svg>
-            Mua gói ComZone
+            Đăng ký gói bán
           </button>
           <SellerSubsModal
             isOpen={isBuyingPlan}

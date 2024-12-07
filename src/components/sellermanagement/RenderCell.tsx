@@ -11,8 +11,6 @@ export const RenderCell = ({
   handleStopSelling,
   handleDeleteComics,
 }) => {
-  console.log(params);
-
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 

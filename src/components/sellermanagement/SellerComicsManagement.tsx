@@ -131,7 +131,7 @@ const SellerComicsManagement = ({
         cancelText: "Hủy",
         onOk() {
           privateAxios
-            .patch(`comics/${comic.id}/status`, { status: "AVAILABLE" })
+            .patch(`comics/${comic.id}/startSelling`, { status: "AVAILABLE" })
             .then(async () => {
               await privateAxios.patch("seller-subscriptions/sell", {
                 quantity: 1,

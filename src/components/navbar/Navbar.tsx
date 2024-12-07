@@ -232,7 +232,7 @@ const Navbar = () => {
     {
       key: "1",
       label: (
-        <Link to={"/accountManagement/profile"} className="REM text-base ">
+        <Link to={"/accountmanagement/profile"} className="REM text-base ">
           Hồ sơ của tôi
         </Link>
       ),
@@ -256,7 +256,7 @@ const Navbar = () => {
     {
       key: "3",
       label: (
-        <Link to={"/accountManagement/profile"} className="REM text-base ">
+        <Link to={"/accountmanagement/profile"} className="REM text-base ">
           Quản lí tài khoản
         </Link>
       ),

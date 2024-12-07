@@ -523,8 +523,8 @@ const ComicAuction = () => {
                 {isHighest ? null : (
                   <>
                     {/* Display the minimum bid if it's still valid */}
-                    {auctionData.currentPrice + auctionData.priceStep <
-                    auctionData.maxPrice ? (
+                    {auctionData.currentPrice + auctionData.priceStep <=
+                      auctionData.maxPrice ? (
                       <p
                         style={{
                           fontSize: "17px",
@@ -569,22 +569,22 @@ const ComicAuction = () => {
               <>
                 {!hasDeposited ? (
                   <div>
-                    {auctionData.currentPrice + auctionData.priceStep >=
+                    {auctionData.currentPrice + auctionData.priceStep >
                       auctionData.maxPrice && (
-                      <p
-                        style={{
-                          fontSize: "17px",
-                          paddingTop: "10px",
-                          fontFamily: "REM",
-                          fontWeight: "400",
-                          color: "red",
-                        }}
-                      >
-                        Chỉ có thể mua ngay với giá{" "}
-                        {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
-                        thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
-                      </p>
-                    )}
+                        <p
+                          style={{
+                            fontSize: "17px",
+                            paddingTop: "10px",
+                            fontFamily: "REM",
+                            fontWeight: "400",
+                            color: "red",
+                          }}
+                        >
+                          Chỉ có thể mua ngay với giá{" "}
+                          {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
+                          thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
+                        </p>
+                      )}
                     <div
                       style={{
                         paddingTop: "15px",
@@ -633,8 +633,22 @@ const ComicAuction = () => {
                       type="number"
                       placeholder="đ"
                       className="bid-input"
-                      value={bidAmount}
-                      onChange={handleBidInputChange}
+                      value={
+                        bidAmount
+                          ? parseFloat(bidAmount).toLocaleString('vi-VN')
+                          : bidAmount
+                      }
+                      onChange={(event) => {
+                        // Remove non-numeric characters before setting the state
+                        const numericValue = event.target.value.replace(/\./g, '');
+                        handleBidInputChange({
+                          ...event,
+                          target: {
+                            ...event.target,
+                            value: numericValue
+                          }
+                        });
+                      }}
                       disabled={isBidDisabled}
                       min={0}
                     />

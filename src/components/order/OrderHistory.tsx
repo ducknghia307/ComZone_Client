@@ -7,13 +7,16 @@ import "../ui/OrderHistory.css";
 // import ModalOrder from "../modal/ModalOrder";
 import { privateAxios } from "../../middleware/axiosInstance";
 import OrderDetailsModal from "../modal/OrderDetailModal";
-import { Comic, UserInfo } from "../../common/base.interface";
+import { Comic, Delivery, UserInfo } from "../../common/base.interface";
 import GavelIcon from "@mui/icons-material/Gavel";
 import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
 import ModalRequestRefund from "../modal/ModalRequestRefund";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import CurrencySplitter from "../../assistants/Spliter";
+import { Link } from "react-router-dom";
 interface Order {
   id: string;
+  delivery?: Delivery;
   status: string;
   shopName: string;
   productName: string;
@@ -348,14 +351,15 @@ const OrderHistory = () => {
                 <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
                   {order.items[0]?.comics.sellerId.name || "N/A"}
                 </Typography>
-                <div style={{ marginLeft: "20px" }} className="chat-button">
-                  <ChatOutlinedIcon />
-                  <Typography sx={{ fontFamily: "REM" }}>Chat</Typography>
-                </div>
-                <div style={{ marginLeft: "10px" }} className="shop-button">
+
+                <Link
+                  to={`/seller/shop/all/${order.items[0]?.comics.sellerId.id}`}
+                  style={{ marginLeft: "10px" }}
+                  className="shop-button duration-200 hover:bg-gray-100"
+                >
                   <StoreOutlinedIcon />
                   <Typography sx={{ fontFamily: "REM" }}>Xem Shop</Typography>
-                </div>
+                </Link>
               </div>
               <Typography
                 sx={{
@@ -464,14 +468,31 @@ const OrderHistory = () => {
                 </div>
               )}
 
-              <div className="flex items-center gap-3 ml-auto">
-                <span className="font-['REM'] text-lg">Thành tiền:</span>
-                <span className="font-['REM'] text-2xl font-medium text-[#f77157]">
-                  {Number(order.totalPrice).toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })}
-                </span>
+              <div className="flex flex-col items-end gap-1 ml-auto">
+                {order.delivery?.deliveryFee && (
+                  <p className="REM font-light italic">
+                    Phí vận chuyển:&emsp;
+                    {Number(order.delivery.deliveryFee).toLocaleString(
+                      "vi-VN",
+                      {
+                        style: "currency",
+                        currency: "VND",
+                      }
+                    )}
+                  </p>
+                )}
+
+                <div className="flex items-center gap-3">
+                  <span className="font-['REM'] text-lg">Tổng tiền:</span>
+                  <span className="font-['REM'] text-2xl font-medium text-[#f77157]">
+                    {Number(
+                      order.totalPrice + order.delivery?.deliveryFee || 0
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </span>
+                </div>
               </div>
             </div>
 

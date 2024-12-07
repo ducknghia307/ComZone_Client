@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -25,9 +25,13 @@ const { confirm } = Modal;
 const SellerComicsManagement = ({
   sellerSubscription,
   fetchSellerSubscription,
+  loading,
+  setLoading,
 }: {
   sellerSubscription?: SellerSubscription | null;
   fetchSellerSubscription?: () => void;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [comics, setComics] = useState<Comic[]>([]);
   const [filteredComics, setFilteredComics] = useState<Comic[]>([]);
@@ -35,7 +39,6 @@ const SellerComicsManagement = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState<string>("");
 
-  const [loading, setLoading] = useState(true);
   const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -92,8 +95,6 @@ const SellerComicsManagement = ({
               description: "Truyện đã được dừng bán thành công!",
               duration: 5,
             });
-            console.log("stopselling", res);
-
             fetchSellerComics();
           })
           .catch((error) => {
@@ -432,11 +433,7 @@ const SellerComicsManagement = ({
   const paginationModel = { page: 0, pageSize: 10 };
 
   const renderContent = () => {
-    if (loading) {
-      return <Typography>Đang tải...</Typography>;
-    }
-
-    if (!comics || (comics && comics.length === 0)) {
+    if (!loading && (!comics || (comics && comics.length === 0))) {
       return (
         <div className="REM w-full min-h-[30vh] h-full flex flex-col items-center justify-center gap-8 bg-gray-900 rounded-lg p-4">
           <p className="text-[2em] uppercase text-center lg:whitespace-nowrap bg-clip-text text-transparent font-bold bg-gradient-to-r from-green-500 via-red-400 to-sky-400">
@@ -570,6 +567,7 @@ const SellerComicsManagement = ({
         <SellerSubsModal
           isOpen={isRegisteringPlan}
           setIsOpen={setIsRegisteringPlan}
+          callback={fetchSellerSubscription}
         />
       )}
     </div>

@@ -450,7 +450,7 @@ export default function UpdateExchangeComics({
                 name="title"
                 value={formData.title}
                 onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value.trim() })
+                  setFormData({ ...formData, title: e.target.value })
                 }
                 variant="outlined"
                 id="outlined-error-helper-text"
@@ -479,7 +479,7 @@ export default function UpdateExchangeComics({
                 name="author"
                 value={formData.author}
                 onChange={(e) =>
-                  setFormData({ ...formData, author: e.target.value.trim() })
+                  setFormData({ ...formData, author: e.target.value })
                 }
                 variant="outlined"
                 helperText={
@@ -704,7 +704,7 @@ export default function UpdateExchangeComics({
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    description: e.target.value.trim(),
+                    description: e.target.value,
                   })
                 }
                 variant="outlined"

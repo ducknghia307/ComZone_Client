@@ -6,6 +6,7 @@ import { SetStateAction, useState } from "react";
 import ViewBothComicsLists from "./information-collect/ViewBothComicsLists";
 import UpdateAndRevealPost from "./information-collect/UpdateAndRevealPost";
 import { privateAxios } from "../../../middleware/axiosInstance";
+import { useAppSelector } from "../../../redux/hooks";
 
 export default function ExchangeInformation({
   exchangeDetails,
@@ -26,6 +27,8 @@ export default function ExchangeInformation({
   secondComicsGroup: Comic[];
   setIsLoading: React.Dispatch<SetStateAction<boolean>>;
 }) {
+  const { userId } = useAppSelector((state) => state.auth);
+
   const [isViewingComics, setIsViewingComics] = useState<boolean>(false);
   const [isCancelingExchange, setIsCancelingExchange] =
     useState<boolean>(false);
@@ -40,7 +43,8 @@ export default function ExchangeInformation({
     await privateAxios
       .patch(`exchange-confirmation/cancel/${exchangeDetails.exchange.id}`)
       .then(() => {
-        setIsAskingToRevealPost(true);
+        if (exchangeDetails.exchange.post.user.id === userId)
+          setIsAskingToRevealPost(true);
       })
       .catch((err) => {
         console.log(err);

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { Modal, notification } from "antd";
 import ChatRoomList from "../components/chat/ChatRoomList";
 import { SetStateAction, useEffect, useRef, useState } from "react";

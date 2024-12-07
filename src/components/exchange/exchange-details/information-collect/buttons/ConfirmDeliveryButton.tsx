@@ -5,6 +5,7 @@ import { notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ExchangeDetails } from "../../../../../common/interfaces/exchange.interface";
 import { Address } from "../../../../../common/base.interface";
+import { useAppSelector } from "../../../../../redux/hooks";
 
 export default function ConfirmDeliveryButton({
   selectedAddress,
@@ -15,9 +16,9 @@ export default function ConfirmDeliveryButton({
   exchangeId: string;
   fetchExchangeDetails: () => void;
 }) {
-  const [isAccepting, setIsAccepting] = useState<boolean>(false);
+  const { userId } = useAppSelector((state) => state.auth);
 
-  const navigate = useNavigate();
+  const [isAccepting, setIsAccepting] = useState<boolean>(false);
 
   const handleConfirm = async () => {
     console.log("address", selectedAddress);
@@ -25,6 +26,7 @@ export default function ConfirmDeliveryButton({
       const resDeliveryInformation = await privateAxios.post(
         "/delivery-information",
         {
+          userId,
           name: selectedAddress?.fullName,
           phone: selectedAddress?.phone,
           provinceId: selectedAddress?.province.id,

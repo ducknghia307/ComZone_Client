@@ -15,7 +15,7 @@ import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import { Grid } from "@mui/system";
 import CurrencySplitter from "../../assistants/Spliter";
 import { Comic } from "../../common/base.interface";
-import { notification } from "antd";
+import { message, notification } from "antd";
 import Loading from "../loading/Loading";
 import ActionConfirm from "../actionConfirm/ActionConfirm";
 
@@ -64,7 +64,7 @@ const EditComicDetail = () => {
   const [error, setError] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
 
-  const isSeries = currentComics && currentComics.quantity > 1;
+  const isSeries = currentComics && formData.quantity > 1;
 
   const availableGenres = genres.filter(
     (genre) => !formData.genres.some((selected) => selected.id === genre.id)
@@ -211,6 +211,30 @@ const EditComicDetail = () => {
   };
 
   const handleSubmit = async () => {
+    console.log(formData);
+    if (!coverImage) {
+      message.warning({
+        key: "image-warning",
+        content: "Yêu cầu phải thêm ảnh bìa và ảnh nội dung!",
+        duration: 5,
+      });
+      return;
+    }
+
+    if (
+      formData.quantity > 1 &&
+      (!formData.episodesList ||
+        formData.episodesList?.length !== formData.quantity)
+    ) {
+      message.warning({
+        key: "quantity-warning",
+        content:
+          "Tập truyện số hoặc tên tập không khớp với số lượng cuốn trong bộ truyện!",
+        duration: 5,
+      });
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -231,6 +255,10 @@ const EditComicDetail = () => {
             ? response.previewChapterUrls
             : []),
         ],
+        episodesList:
+          formData.episodesList && formData.episodesList.length > 0
+            ? formData.episodesList
+            : null,
       })
       .then(() => {
         notification.success({
@@ -451,7 +479,7 @@ const EditComicDetail = () => {
               name="title"
               value={formData.title}
               onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value.trim() })
+                setFormData({ ...formData, title: e.target.value })
               }
               variant="outlined"
               id="outlined-error-helper-text"
@@ -480,7 +508,7 @@ const EditComicDetail = () => {
               name="author"
               value={formData.author}
               onChange={(e) =>
-                setFormData({ ...formData, author: e.target.value.trim() })
+                setFormData({ ...formData, author: e.target.value })
               }
               variant="outlined"
               helperText={
@@ -646,6 +674,34 @@ const EditComicDetail = () => {
             />
           </Grid>
 
+          <Grid size={4}>
+            <TextField
+              fullWidth
+              error={isSeries && Number(formData.quantity) < 2}
+              label={
+                <p className="REM">
+                  Số lượng cuốn trong bộ <span className="text-red-600">*</span>
+                </p>
+              }
+              type="number"
+              name="quantity"
+              value={formData.quantity || ""}
+              onChange={(e) => {
+                if (Number(e.target.value) > 0)
+                  setFormData({
+                    ...formData,
+                    quantity: parseInt(e.target.value),
+                  });
+                else
+                  setFormData({
+                    ...formData,
+                    quantity: 1,
+                  });
+              }}
+              variant="outlined"
+            />
+          </Grid>
+
           {!isSeries ? (
             <Grid size={2}>
               <TextField
@@ -665,48 +721,10 @@ const EditComicDetail = () => {
             </Grid>
           ) : (
             <>
-              <Grid size={4}>
-                <TextField
-                  fullWidth
-                  error={isSeries && Number(formData.quantity) < 2}
-                  label={
-                    <p className="REM">
-                      Số lượng cuốn trong bộ{" "}
-                      <span className="text-red-600">*</span>
-                    </p>
-                  }
-                  type="number"
-                  name="quantity"
-                  value={formData.quantity || ""}
-                  onChange={(e) => {
-                    if (Number(e.target.value) > 0)
-                      setFormData({
-                        ...formData,
-                        quantity: parseInt(e.target.value),
-                      });
-                    else
-                      setFormData({
-                        ...formData,
-                        quantity: 1,
-                      });
-                  }}
-                  variant="outlined"
-                  helperText={
-                    <p
-                      className={`${
-                        Number(formData.quantity) > 1 && isSeries && "hidden"
-                      } REM text-xs`}
-                    >
-                      Số lượng truyện tối thiểu trong bộ truyện là 2!
-                    </p>
-                  }
-                />
-              </Grid>
-
               <Grid size={8}>
                 <Autocomplete
                   multiple
-                  value={formData.episodesList}
+                  value={formData.episodesList || []}
                   onChange={(event, newValue) => {
                     setFormData({
                       ...formData,
@@ -775,7 +793,7 @@ const EditComicDetail = () => {
               name="description"
               value={formData.description}
               onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value.trim() })
+                setFormData({ ...formData, description: e.target.value })
               }
               variant="outlined"
               helperText={
@@ -802,7 +820,7 @@ const EditComicDetail = () => {
                   genres: currentComics.genres,
                   price: currentComics.price,
                   quantity: currentComics.quantity,
-                  episodesList: currentComics.episodesList,
+                  episodesList: currentComics.episodesList || [],
                   description: currentComics.description,
                   publishedDate:
                     currentComics.publishedDate &&

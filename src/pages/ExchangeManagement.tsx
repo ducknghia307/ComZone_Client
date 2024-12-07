@@ -2,8 +2,10 @@ import React from "react";
 import Exchange from "../components/exchange/Exchange";
 import { Tabs } from "antd";
 import CurrentUserComicExchange from "../components/exchange/CurrentUserComicExchange";
+import { useNavigate } from "react-router-dom";
 
 export default function ExchangeManagement() {
+  const navigate = useNavigate();
   const tabItems = [
     {
       key: "1",
@@ -27,10 +29,8 @@ export default function ExchangeManagement() {
         centered
         items={tabItems}
         onChange={(key) => {
-          if (key === "1")
-            window.history.pushState(null, "", "/exchange/list/all");
-          else if (key === "2")
-            window.history.pushState(null, "", "/exchange/comics-collection");
+          if (key === "1") navigate("/exchange/list/all");
+          else if (key === "2") navigate("/exchange/comics-collection");
         }}
       />
     </div>

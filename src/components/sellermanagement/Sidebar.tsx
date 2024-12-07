@@ -17,8 +17,8 @@ interface SidebarProps {
   handleMenuItemClick: (item: string) => void;
   sellerSubscription?: SellerSubscription | null;
   fetchSellerSubscription?: () => void;
-  loading: boolean;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  loading?: boolean;
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({

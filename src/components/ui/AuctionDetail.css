@@ -227,8 +227,9 @@
   border-radius: 0px;
 }
 .error-message {
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: red;
+  margin-top: 5px;
 }
 .publisher {
   margin-top: 20px;

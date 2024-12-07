@@ -289,22 +289,26 @@ const ComicAuction = () => {
   const handleBidInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setBidAmount(value);
-    if (
-      value &&
-      parseFloat(value) >= auctionData.currentPrice + auctionData.priceStep
+    if (parseFloat(value) < auctionData.maxPrice) {
+      setError("");
+    } else if (
+      parseFloat(value) >=
+      auctionData.currentPrice + auctionData.priceStep
     ) {
       setError("");
     }
   };
 
   const handlePlaceBid = async () => {
-    if (
+    if (parseFloat(bidAmount) >= auctionData.maxPrice) {
+      setError(" Không ra giá lớn hơn hoặc bằng giá mua ngay.");
+      return;
+    } else if (
       parseFloat(bidAmount) <
       auctionData?.currentPrice + auctionData?.priceStep
     ) {
-      // Set error message if the bid is too low
       setError("Yêu cầu ra giá tối thiểu hoặc cao hơn.");
-      return; // Prevent further execution if bid is too low
+      return;
     }
     setError("");
     setBidAmount("");
@@ -514,64 +518,110 @@ const ComicAuction = () => {
 
           <div className="shop-info">
             {auctionData.status === "ONGOING" && hasDeposited && (
-              <p
-                style={{
-                  fontSize: "17px",
-                  paddingTop: "10px",
-                  fontFamily: "REM",
-                  fontWeight: "400",
-                }}
-              >
-                Giá đấu tối thiểu tiếp theo:{" "}
-                {auctionData && (
-                  <span style={{ fontWeight: "bold" }}>
-                    {(
-                      auctionData.currentPrice + auctionData.priceStep
-                    ).toLocaleString("vi-VN")}
-                    đ
-                  </span>
+              <>
+                {/* If the user is the highest bidder, don't display anything */}
+                {isHighest ? null : (
+                  <>
+                    {/* Display the minimum bid if it's still valid */}
+                    {auctionData.currentPrice + auctionData.priceStep <=
+                    auctionData.maxPrice ? (
+                      <p
+                        style={{
+                          fontSize: "17px",
+                          paddingTop: "10px",
+                          fontFamily: "REM",
+                          fontWeight: "400",
+                        }}
+                      >
+                        Giá đấu tối thiểu tiếp theo:{" "}
+                        {auctionData && (
+                          <span style={{ fontWeight: "bold" }}>
+                            {(
+                              auctionData.currentPrice + auctionData.priceStep
+                            ).toLocaleString("vi-VN")}
+                            đ
+                          </span>
+                        )}
+                      </p>
+                    ) : (
+                      /* Display the error if the bid exceeds max price */
+                      <p
+                        style={{
+                          fontSize: "17px",
+                          paddingTop: "10px",
+                          marginBottom: "10px",
+                          fontFamily: "REM",
+                          fontWeight: "400",
+                          color: "red",
+                        }}
+                      >
+                        Chỉ có thể mua ngay với giá{" "}
+                        {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
+                        thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
+                      </p>
+                    )}
+                  </>
                 )}
-              </p>
+              </>
             )}
+
             {auctionData.comics.sellerId.id !== userId && (
               <>
                 {!hasDeposited ? (
-                  <div
-                    style={{
-                      paddingTop: "15px",
-                      paddingBottom: "20px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "20px",
-                    }}
-                  >
-                    <p
+                  <div>
+                    {auctionData.currentPrice + auctionData.priceStep >
+                      auctionData.maxPrice && (
+                      <p
+                        style={{
+                          fontSize: "17px",
+                          paddingTop: "10px",
+                          fontFamily: "REM",
+                          fontWeight: "400",
+                          color: "red",
+                        }}
+                      >
+                        Chỉ có thể mua ngay với giá{" "}
+                        {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
+                        thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
+                      </p>
+                    )}
+                    <div
                       style={{
-                        fontSize: "17px",
-                        fontFamily: "REM",
-                        fontWeight: "400",
+                        paddingTop: "15px",
+                        paddingBottom: "20px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "20px",
                       }}
                     >
-                      Số tiền cần cọc:{" "}
-                      <span style={{ fontWeight: "bold" }}>
-                        {typeof auctionData?.depositAmount === "number" &&
-                          auctionData?.depositAmount.toLocaleString("vi-VN")}
-                        đ
-                      </span>
-                    </p>
-                    {!auctionEnded && auctionData.status !== "UPCOMING" && (
-                      <Chip
-                        label="Đặt cọc tại đây"
-                        onClick={handleOpenDepositModal}
+                      <p
                         style={{
-                          backgroundColor: "#fff",
-                          color: "#000",
+                          fontSize: "17px",
                           fontFamily: "REM",
-                          border: "1px solid black",
-                          boxShadow: "2px 2px",
+                          fontWeight: "400",
                         }}
-                      />
-                    )}
+                      >
+                        Số tiền cần cọc:{" "}
+                        <span style={{ fontWeight: "bold" }}>
+                          {typeof auctionData?.depositAmount === "number" &&
+                            auctionData?.depositAmount.toLocaleString("vi-VN")}
+                          đ
+                        </span>
+                      </p>
+                      {!auctionEnded && auctionData.status !== "UPCOMING" && (
+                        <Chip
+                          label="Đặt cọc tại đây"
+                          onClick={handleOpenDepositModal}
+                          style={{
+                            backgroundColor: "#fff",
+                            color: "#000",
+                            fontFamily: "REM",
+                            border: "1px solid black",
+                            boxShadow: "2px 2px",
+                          }}
+                        />
+                      )}
+                    </div>
                   </div>
                 ) : isHighest ? (
                   <div className="highest-bid-message REM">
@@ -580,12 +630,13 @@ const ComicAuction = () => {
                 ) : (
                   <div className="bid-row">
                     <input
-                      type="text"
+                      type="number"
                       placeholder="đ"
                       className="bid-input"
                       value={bidAmount}
                       onChange={handleBidInputChange}
                       disabled={isBidDisabled}
+                      min={0}
                     />
                     <Popconfirm
                       title={
@@ -650,7 +701,7 @@ const ComicAuction = () => {
               </>
             )}
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="REM error-message">{error}</div>}
             <div className="flex justify-between my-4 ">
               <Chip
                 avatar={

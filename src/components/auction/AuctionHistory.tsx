@@ -29,6 +29,18 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const userId = useAppSelector((state) => state.auth.userId);
   const [highestBid, setHighestBid] = useState<any[]>([]);
+  const buttonStyles = {
+    contained: {
+      backgroundColor: "black",
+      color: "white",
+      fontFamily: "REM",
+      padding: "5px 15px",
+      fontSize: "16px",
+      textTransform: "uppercase",
+      letterSpacing: "1px",
+      boxShadow: "5px 5px 0 white",
+    },
+  };
   console.log("highestbid", highestBid);
 
   console.log("userid", userId);
@@ -512,11 +524,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
             {auction.status === "ONGOING" || auction.status === "SUCCESSFUL" ? (
               <Button
                 variant="contained"
-                style={{
-                  backgroundColor: "#000000",
-                  color: "#FFFFFF",
-                  fontSize: "15px",
-                }}
+                sx={buttonStyles.contained}
                 onClick={() => navigate(`/auctiondetail/${auction.id}`)}
               >
                 TRỞ LẠI CUỘC ĐẤU GIÁ
@@ -525,32 +533,31 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
               <Button
                 onClick={() => handleOpenModal(auction)}
                 variant="contained"
-                style={{
-                  backgroundColor: "#000000",
-                  color: "#FFFFFF",
-                  fontSize: "16px",
-                }}
+                sx={buttonStyles.contained}
               >
                 XEM CHI TIẾT ĐẤU GIÁ
               </Button>
             )}
+
             {auction.status === "SUCCESSFUL" &&
             auction.winner?.id === userId ? (
               <div>
                 <Button
-                  size="large"
-                  variant="contained"
-                  style={{
-                    backgroundColor: "green",
-                    color: "#FFFFFF",
-                    fontSize: "17px",
-
-                    marginLeft: "10px",
-                  }}
                   onClick={() => handleBuy(auction, "currentPrice")}
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "green",
+                    color: "white",
+                    fontFamily: "REM",
+                    padding: "5px 15px",
+                    fontSize: "16px",
+                    letterSpacing: "1px",
+                    boxShadow: "5px 5px 0 white",
+                    marginLeft: "17px",
+                  }}
                 >
                   <ShoppingCartOutlined className="mr-2" />
-                  <Typography>Thanh toán</Typography>
+                  THANH TOÁN
                 </Button>
               </div>
             ) : null}

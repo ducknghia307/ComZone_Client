@@ -155,61 +155,63 @@ const Navbar = () => {
       localStorage.removeItem("registeringSellerPlan");
     }
   }, []);
-
-  const fetchUnreadAnnouncement = async () => {
-    try {
-      const response = await privateAxios.get(
-        "announcements/user/unread-count"
-      );
-      console.log("1", response);
-
-      dispatch(setUnreadAnnounce(response.data));
-    } catch (error) {
-      console.error("Error fetching user info:", error);
-      setLoading(false);
-    }
-  };
-
-  const getUserAnnouncement = async () => {
-    try {
-      const response = await privateAxios.get(`/announcements/user`);
-      const data = response.data || [];
-      console.log("ANNOUNCEMENT", data);
-
-      setAnnouncements(data);
-      dispatch(setUnreadAnnounce(data.filter((item) => !item.isRead).length));
-    } catch (error) {
-      console.error("Error fetching announcements:", error);
-    }
-  };
-
-  const fetchUserInfo = async () => {
-    if (accessToken) {
+  useEffect(() => {
+    const fetchUnreadAnnouncement = async () => {
       try {
-        const response = await privateAxios.get("users/profile");
-
-        console.log(response);
-        setUserInfo(response.data);
+        const response = await privateAxios.get(
+          "announcements/user/unread-count"
+        );
+        console.log("1", response);
+        dispatch(setUnreadAnnounce(response.data));
       } catch (error) {
-        console.error("Error fetching user info:", error);
+        console.error("Error fetching unread announcements:", error);
         setLoading(false);
       }
-    } else {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchUnreadAnnouncement();
+  }, [dispatch]);
+
+  useEffect(() => {
+    const getUserAnnouncement = async () => {
+      try {
+        const response = await privateAxios.get("/announcements/user");
+        const data = response.data || [];
+        console.log("ANNOUNCEMENT", data);
+        setAnnouncements(data);
+        dispatch(setUnreadAnnounce(data.filter((item) => !item.isRead).length));
+      } catch (error) {
+        console.error("Error fetching announcements:", error);
+      }
+    };
+
+    getUserAnnouncement();
+  }, [dispatch]);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (accessToken) {
+        try {
+          const response = await privateAxios.get("users/profile");
+          console.log(response);
+          setUserInfo(response.data);
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, [accessToken]);
 
   const handleLogout = async () => {
     await dispatch(LogoutUser());
     window.location.href = "/";
     // window.location.reload();
   };
-
-  useEffect(() => {
-    fetchUserInfo();
-    fetchUnreadAnnouncement();
-    getUserAnnouncement();
-  }, [accessToken]);
 
   const handleSearch = () => {
     if (searchTerm.trim()) {

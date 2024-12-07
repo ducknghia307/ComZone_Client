@@ -8,14 +8,18 @@ import VNPay from "../../assets/vnpay.png";
 import TickCircle from "../../assets/tick-circle.png";
 
 const PaymentMethod = ({
+  auctionId,
   amount,
   balance,
   onMethodSelect,
 }: {
+  auctionId: string;
   amount: number;
   balance: number;
   onMethodSelect: (method: string) => void;
 }) => {
+  console.log("z", auctionId);
+
   const [selectedMethod, setSelectedMethod] = useState("wallet");
   const [hideBalance, setHideBalance] = useState(true);
   const [selectedWalletMethod, setSelectedWalletMethod] = useState<string>("");
@@ -268,23 +272,25 @@ const PaymentMethod = ({
       </div>
 
       {/* Option 2: Thanh Toán Khi Nhận Hàng */}
-      <div
-        className={`w-full px-10 py-4 rounded-lg border h-28 ${
-          selectedMethod === "cod"
-            ? "border-black border-2"
-            : "border-gray-300 opacity-60 hover:opacity-100 hover:border-black cursor-pointer"
-        } flex items-center duration-200`}
-        onClick={() => setSelectedMethod("cod")}
-      >
-        <div className="flex items-center">
-          <img
-            src="https://images-ext-1.discordapp.net/external/8HO1TdE688wNSIPu1fBpZhwFmNdyGN_T5DHPy_KFu5w/https/cdn-icons-png.flaticon.com/512/5163/5163782.png?format=webp&quality=lossless&width=576&height=576"
-            alt=""
-            className="w-[2em] h-[2em]"
-          />
-          <h4 className="font-bold ml-2">THANH TOÁN KHI NHẬN HÀNG</h4>
+      {!auctionId && (
+        <div
+          className={`w-full px-10 py-4 rounded-lg border h-28 ${
+            selectedMethod === "cod"
+              ? "border-black border-2"
+              : "border-gray-300 opacity-60 hover:opacity-100 hover:border-black cursor-pointer"
+          } flex items-center duration-200`}
+          onClick={() => setSelectedMethod("cod")}
+        >
+          <div className="flex items-center">
+            <img
+              src="https://images-ext-1.discordapp.net/external/8HO1TdE688wNSIPu1fBpZhwFmNdyGN_T5DHPy_KFu5w/https/cdn-icons-png.flaticon.com/512/5163/5163782.png?format=webp&quality=lossless&width=576&height=576"
+              alt=""
+              className="w-[2em] h-[2em]"
+            />
+            <h4 className="font-bold ml-2">THANH TOÁN KHI NHẬN HÀNG</h4>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

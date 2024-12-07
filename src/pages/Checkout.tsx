@@ -121,6 +121,11 @@ const Checkout = () => {
   };
 
   const comics = sessionStorage.getItem("selectedComics");
+  const auctionId =
+    Object.values(groupedSelectedComics)
+      .flatMap((group) => group.comics)
+      .find((comic) => comic.auctionId)?.auctionId || null;
+
   useEffect(() => {
     if (comics) {
       setGroupedSelectedComics(JSON.parse(comics));
@@ -395,6 +400,7 @@ const Checkout = () => {
 
               {/* <DeliveryMethod /> */}
               <PaymentMethod
+                auctionId={auctionId}
                 onMethodSelect={handlePaymentMethodSelect}
                 amount={totalPrice + totalDeliveryPrice}
                 balance={userWalletBalance}

@@ -249,6 +249,7 @@ const Checkout = () => {
 
         const newUserDeliveryInfo = await privateAxios
           .post("delivery-information", {
+            userId: user.id,
             name: selectedAddress?.fullName,
             phone: selectedAddress?.phone,
             provinceId: selectedAddress?.province.id,
@@ -263,6 +264,7 @@ const Checkout = () => {
 
         const newSellerDeliveryInfo = await privateAxios
           .post("delivery-information", {
+            userId: sellerDetails.user.id,
             name: sellerDetails?.user.name,
             phone: sellerDetails?.verifiedPhone,
             provinceId: sellerDetails?.province.id,
@@ -292,20 +294,11 @@ const Checkout = () => {
           ? "AUCTION"
           : "TRADITIONAL";
 
-        console.log({
-          sellerId: sellerId,
-          deliveryId: newDelivery.id,
-          totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
-          paymentMethod: selectedPaymentMethod.toUpperCase(),
-          addressId: selectedAddress?.id,
-          type: orderType,
-          note: notes[sellerId] || null,
-        });
-
         const orderResponse = await privateAxios.post("/orders", {
           sellerId: sellerId,
           deliveryId: newDelivery.id,
-          totalPrice: Number(sellerTotalPrice + sellerDeliveryPrice),
+          //ĐÃ TRỪ PHÍ GIAO HÀNG
+          totalPrice: Number(sellerTotalPrice),
           paymentMethod: selectedPaymentMethod.toUpperCase(),
           addressId: selectedAddress?.id,
           type: orderType,
@@ -327,8 +320,6 @@ const Checkout = () => {
             price,
           };
 
-          console.log("Order Item Payload:", orderItemPayload);
-
           await privateAxios.post("/order-items", orderItemPayload);
           orderedComicIds.push(comic.id);
           if (auctionId) {
@@ -342,7 +333,6 @@ const Checkout = () => {
         }
       }
 
-      console.log("All orders are successfully created!");
       const storedCartData = localStorage.getItem("cart");
       if (storedCartData) {
         const parsedCartData = JSON.parse(storedCartData);
@@ -363,7 +353,7 @@ const Checkout = () => {
       navigate("/order/complete");
     } catch (error: any) {
       if (error.response) {
-        console.error("Server responded with:", error.response.data); // Log detailed server error
+        console.error("Server responded with:", error.response.data);
       } else {
         console.error("Error submitting order:", error);
       }

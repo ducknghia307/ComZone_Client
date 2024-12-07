@@ -25,6 +25,8 @@ import { UserInfo } from "../../common/base.interface";
 import CurrencySplitter from "../../assistants/Spliter";
 import { useAppSelector } from "../../redux/hooks";
 import { Transaction } from "../../common/interfaces/transaction.interface";
+import displayPastTimeFromNow from "../../utils/displayPastTimeFromNow";
+import { Tooltip } from "antd";
 const UserWallet = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
@@ -41,6 +43,7 @@ const UserWallet = () => {
       const response = await privateAxios("/users/profile");
       const data = await response.data;
       setUserInfo(data);
+      console.log(data);
     } catch {
       console.log("...");
     }
@@ -54,9 +57,7 @@ const UserWallet = () => {
       console.log("1", data);
       const formattedTransactions = data.map((transaction: Transaction) => ({
         code: transaction.code,
-        date: new Date(transaction.createdAt ?? new Date()).toLocaleDateString(
-          "vi-VN"
-        ),
+        createdAt: transaction.createdAt,
         type:
           (transaction.type === "ADD" &&
             (transaction.walletDeposit
@@ -136,8 +137,6 @@ const UserWallet = () => {
       case "SUCCESSFUL":
         return {
           color: "#4caf50",
-          borderRadius: "8px",
-          padding: "8px 20px",
           fontWeight: "bold",
           display: "inline-block",
           fontSize: "12px",
@@ -145,20 +144,16 @@ const UserWallet = () => {
       case "PENDING":
         return {
           color: "#ff9800",
-          backgroundColor: "#fff3e0",
-          borderRadius: "8px",
-          padding: "8px 20px",
           fontWeight: "bold",
           display: "inline-block",
+          fontSize: "12px",
         };
       case "FAILED":
         return {
-          color: "#e91e63",
-          backgroundColor: "#fce4ec",
-          borderRadius: "8px",
-          padding: "8px 20px",
+          color: "#ff0000",
           fontWeight: "bold",
           display: "inline-block",
+          fontSize: "12px",
         };
     }
   };
@@ -175,7 +170,8 @@ const UserWallet = () => {
         return status;
     }
   };
-  console.log(transactions);
+
+  if (!userInfo) return;
 
   return (
     <div className="wallet-container">
@@ -314,32 +310,70 @@ const UserWallet = () => {
                   sx={{ color: "#FF8A00", fontFamily: "REM" }}
                 >
                   {isVisible
-                    ? `${CurrencySplitter(userInfo?.balance ?? 0)} đ`
+                    ? `${
+                        userInfo.balance > 0
+                          ? CurrencySplitter(userInfo.balance)
+                          : 0
+                      } đ`
                     : "****** đ"}
                 </Typography>
                 <IconButton onClick={() => setIsVisible(!isVisible)}>
                   <VisibilityOffIcon />
                 </IconButton>
               </div>
-              <div style={{ display: "flex", marginRight: "20px" }}>
-                <Typography variant="h6" mr={2} sx={{ fontFamily: "REM" }}>
-                  Hiện có thể rút:
-                </Typography>
-                <Typography
-                  variant="h6"
-                  sx={{ color: "#FF8A00", fontFamily: "REM" }}
+              {userInfo.role === "SELLER" && (
+                <div
+                  style={{
+                    display: "flex",
+                    marginRight: "20px",
+                    alignItems: "center",
+                  }}
                 >
-                  {isVisible
-                    ? `${CurrencySplitter(
-                        (userInfo?.balance ?? 0) -
-                          (userInfo?.nonWithdrawableAmount ?? 0)
-                      )} đ`
-                    : "****** đ"}
-                </Typography>
-                <IconButton onClick={() => setIsVisible(!isVisible)}>
-                  <VisibilityOffIcon />
-                </IconButton>
-              </div>
+                  <Typography variant="h6" mr={2} sx={{ fontFamily: "REM" }}>
+                    Số dư chưa thể sử dụng:
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{ color: "#FF8A00", fontFamily: "REM" }}
+                  >
+                    {isVisible
+                      ? `${
+                          userInfo.nonWithdrawableAmount > 0
+                            ? CurrencySplitter(userInfo.nonWithdrawableAmount)
+                            : 0
+                        } đ`
+                      : "****** đ"}
+                  </Typography>
+                  <IconButton onClick={() => setIsVisible(!isVisible)}>
+                    <VisibilityOffIcon />
+                  </IconButton>
+
+                  {userInfo.nonWithdrawableAmount > 0 && (
+                    <Tooltip
+                      trigger={"hover"}
+                      title={
+                        <p className="REM text-black">
+                          Bạn đang có đơn hàng chưa xác nhận thành công, hệ
+                          thống sẽ giữ khoản tiền bằng tổng giá trị đơn hàng cho
+                          tới khi đơn hàng được người mua xác nhận.
+                        </p>
+                      }
+                      color="white"
+                      className="ml-4"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"></path>
+                      </svg>
+                    </Tooltip>
+                  )}
+                </div>
+              )}
             </Box>
 
             <Box display="flex" gap={2}>
@@ -437,7 +471,7 @@ const UserWallet = () => {
                         #{transaction.code}
                       </TableCell>
                       <TableCell sx={{ fontFamily: "REM" }} align="center">
-                        {transaction.date}
+                        {displayPastTimeFromNow(transaction.createdAt)}
                       </TableCell>
                       <TableCell sx={{ fontFamily: "REM" }} align="center">
                         {transaction.type}

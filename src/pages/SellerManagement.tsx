@@ -9,6 +9,7 @@ import SellerComicsManagement from "../components/sellermanagement/SellerComicsM
 import OrderManagement from "../components/sellermanagement/OrderManagement";
 import AuctionManagement from "../components/auctions/AuctionManagement";
 import FeedbackManagement from "../components/feedback/FeedbackManagement";
+import Loading from "../components/loading/Loading";
 const SellerManagementPage: React.FC = () => {
   const currentUrl = window.location.pathname;
   console.log("URL", currentUrl);
@@ -21,13 +22,18 @@ const SellerManagementPage: React.FC = () => {
   const [sellerSubscription, setSellerSubscription] =
     useState<SellerSubscription | null>();
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const fetchSellerSubscription = async () => {
+    setLoading(true);
     await privateAxios
       .get("seller-subscriptions/user")
       .then((res) => {
+        console.log(res.data);
         setSellerSubscription(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -41,6 +47,8 @@ const SellerManagementPage: React.FC = () => {
           <SellerComicsManagement
             sellerSubscription={sellerSubscription}
             fetchSellerSubscription={fetchSellerSubscription}
+            loading={loading}
+            setLoading={setLoading}
           />
         );
       case "/sellermanagement/order":
@@ -54,18 +62,19 @@ const SellerManagementPage: React.FC = () => {
 
   return (
     <div className="w-full flex items-stretch justify-center gap-4 md:px-8 py-4 bg-gray-50">
+      {loading && <Loading />}
       <div className="min-w-fit rounded-md">
         <Sidebar
           currentUrl={currentUrl}
           handleMenuItemClick={handleMenuItemClick}
           sellerSubscription={sellerSubscription}
           fetchSellerSubscription={fetchSellerSubscription}
+          loading={loading}
+          setLoading={setLoading}
         />
       </div>
 
-      <div className="grow max-w-[80vw] flex items-stretch">
-        {getTable()}
-      </div>
+      <div className="grow max-w-[80vw] flex items-stretch">{getTable()}</div>
     </div>
   );
 };

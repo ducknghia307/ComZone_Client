@@ -175,9 +175,7 @@ const FeedbackManagement = () => {
                     <TableCell style={{ whiteSpace: "nowrap" }} align="center">
                       {new Date(feedback.createdAt).toLocaleString()}
                     </TableCell>
-                    <TableCell style={{ whiteSpace: "nowrap" }} align="center">
-                      {feedback.comment}
-                    </TableCell>
+                    <TableCell align="center">{feedback.comment}</TableCell>
                     <TableCell align="center">
                       <div className="flex items-center justify-center gap-2">
                         {feedback.rating}{" "}

@@ -18,6 +18,10 @@ import { OrderDetailData } from "../../common/base.interface";
 import { Avatar } from "antd";
 import moment from "moment";
 import EmptyImage from "../../assets/notFound/emptybox.png";
+import {
+  DeliveryStatus,
+  DeliveryStatusGroup,
+} from "../../common/interfaces/delivery.interface";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState<OrderDetailData[]>([]);
@@ -109,8 +113,14 @@ const OrderManagement = () => {
     setSelectedOrderId(null);
   };
 
-  const translateStatus = (status: string, deliveryStatus?: string) => {
-    if (status === "PACKAGING" && deliveryStatus === "ready_to_pick") {
+  const translateStatus = (status: string, deliveryStatus?: DeliveryStatus) => {
+    if (
+      status === "PACKAGING" &&
+      deliveryStatus &&
+      DeliveryStatusGroup.pickingGroup.some(
+        (status) => deliveryStatus === status
+      )
+    ) {
       return "Hoàn tất đóng gói";
     }
     switch (status) {
@@ -121,7 +131,7 @@ const OrderManagement = () => {
       case "PACKAGING":
         return "Đang đóng gói";
       case "DELIVERING":
-        return "Đang giao hàng";
+        return "Đang chờ xác nhận giao hàng";
       case "SUCCESSFUL":
         return "Hoàn tất";
       case "CANCELED":
@@ -135,7 +145,13 @@ const OrderManagement = () => {
     status: string,
     delivery?: { status: string }
   ) => {
-    if (status === "PACKAGING" && delivery?.status === "ready_to_pick") {
+    if (
+      status === "PACKAGING" &&
+      delivery.status &&
+      DeliveryStatusGroup.pickingGroup.some(
+        (status) => delivery.status === status
+      )
+    ) {
       return {
         color: "#7c4af2",
         backgroundColor: "#e0d4fc",
@@ -296,7 +312,10 @@ const OrderManagement = () => {
                         fontFamily: "REM",
                       }}
                     >
-                      {translateStatus(order.status, order.delivery?.status)}
+                      {translateStatus(
+                        order.status,
+                        order.delivery?.status as DeliveryStatus
+                      )}
                     </span>
                   </TableCell>
                   <TableCell align="center">

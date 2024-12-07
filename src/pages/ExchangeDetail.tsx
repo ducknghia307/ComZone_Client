@@ -73,7 +73,7 @@ const ExchangeDetail: React.FC = () => {
     ) {
       if (isFirst) setFirstCurrentStage(5);
       else setSecondCurrentStage(5);
-      return;
+      return 5;
     }
 
     //FETCH STAGE 4
@@ -87,34 +87,35 @@ const ExchangeDetail: React.FC = () => {
         setFirstAddress(firstDelivery.from.fullAddress!);
         setSecondAddress(firstDelivery.to.fullAddress!);
       }
-      return;
+      return 4;
     }
 
     //FETCH STAGE 3
     else if (firstDelivery) {
       if (isFirst) {
         setFirstCurrentStage(3);
-        setFirstAddress(firstDelivery.from.fullAddress!);
-        setSecondAddress(firstDelivery.to.fullAddress!);
-      } else {
-        setSecondCurrentStage(3);
         setFirstAddress(firstDelivery.to.fullAddress!);
         setSecondAddress(firstDelivery.from.fullAddress!);
+      } else {
+        setSecondCurrentStage(3);
+        setFirstAddress(firstDelivery.from.fullAddress!);
+        setSecondAddress(firstDelivery.to.fullAddress!);
       }
-      return;
+      return 3;
     }
 
     //FETCH STAGE 2
     else if (confirmation && confirmation.dealingConfirm) {
       if (isFirst) setFirstCurrentStage(2);
       else setSecondCurrentStage(2);
-      return;
+      return 2;
     }
 
     // FETCH STAGE 1
     else if (exchange.status === "DEALING" && !confirmation) {
       if (isFirst) setFirstCurrentStage(1);
       else setSecondCurrentStage(1);
+      return 1;
     }
   };
 
@@ -199,6 +200,7 @@ const ExchangeDetail: React.FC = () => {
       if (
         (firstUserDelivery !== null &&
           secondUserDelivery !== null &&
+          firstUserDelivery.deliveryTrackingCode &&
           DeliveryStatusGroup.failedGroup
             .concat(DeliveryStatusGroup.returnGroup)
             .includes(firstUserDelivery.status)) ||
@@ -234,22 +236,30 @@ const ExchangeDetail: React.FC = () => {
         return;
       }
 
+      console.log(firstUserDeliveryRes);
+
       //Allocate FIRST stage
-      stageAllocating(
-        true,
-        firstConfirmation,
-        selfTransactionsResponse.data,
-        firstUserDelivery,
-        exchangeDetails.exchange
+      console.log(
+        "first: ",
+        stageAllocating(
+          true,
+          firstConfirmation,
+          selfTransactionsResponse.data,
+          firstUserDelivery,
+          exchangeDetails.exchange
+        )
       );
 
       //Allocate SECOND stage
-      stageAllocating(
-        false,
-        secondConfirmation,
-        otherTransactionsResponse.data,
-        secondUserDelivery,
-        exchangeDetails.exchange
+      console.log(
+        "second: ",
+        stageAllocating(
+          false,
+          secondConfirmation,
+          otherTransactionsResponse.data,
+          secondUserDelivery,
+          exchangeDetails.exchange
+        )
       );
     } catch (error) {
       console.error("Error fetching exchange details:", error);

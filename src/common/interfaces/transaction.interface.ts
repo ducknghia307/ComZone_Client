@@ -15,7 +15,6 @@ export interface Transaction extends BaseInterface {
   status: string;
   user: UserInfo;
   note?: string;
-  date: string;
   auction?: Auction;
   exchange?: Exchange;
   walletDeposit?: WalletDeposit;

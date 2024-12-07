@@ -1,12 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Avatar, Modal, notification, Select } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ExchangePostInterface } from "../../../common/interfaces/exchange.interface";
 import { Comic } from "../../../common/base.interface";
 import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
+import { Socket } from "socket.io-client";
+import socket from "../../../services/socket";
+import { useAppSelector } from "../../../redux/hooks";
 
 export default function SelectOfferComicsModal({
   post,
@@ -25,6 +28,8 @@ export default function SelectOfferComicsModal({
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   fetchExchangeNewsFeed: () => void;
 }) {
+  const { userId } = useAppSelector((state) => state.auth);
+
   const [requestSelectOptionValues, setRequestSelectOptionValues] = useState<
     { label: string; value: string; image: string }[]
   >([]);
@@ -43,6 +48,8 @@ export default function SelectOfferComicsModal({
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
 
   const navigate = useNavigate();
+
+  const socketRef = useRef<Socket>(socket);
 
   const fetchPostUserOfferComics = async () => {
     await publicAxios.get(`comics/exchange/${post.user.id}`).then((res) => {
@@ -117,6 +124,11 @@ export default function SelectOfferComicsModal({
           .then((response) => {
             sessionStorage.setItem("connectedChat", response.data.id);
 
+            if (socketRef.current) {
+              socketRef.current.emit("join-room", { userId: userId });
+              socketRef.current.emit("join-room", { userId: post.user.id });
+            }
+
             setIsChatOpen(true);
             handleModalClose();
           });
@@ -169,7 +181,13 @@ export default function SelectOfferComicsModal({
                       {requestSelectOptionValues.length}
                     </span>
                     <button
-                      onClick={() => navigate("/profile/comicExchange")}
+                      onClick={() => {
+                        sessionStorage.setItem(
+                          "create-exchange-comics",
+                          "true"
+                        );
+                        navigate("/exchange/comics-collection");
+                      }}
                       className="ml-8 px-2 rounded-md duration-200 bg-gray-800 text-white hover:bg-gray-700"
                     >
                       + Thêm truyện

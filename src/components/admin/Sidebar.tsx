@@ -18,7 +18,7 @@ import AirplayOutlinedIcon from '@mui/icons-material/AirplayOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import ViewHeadlineOutlinedIcon from '@mui/icons-material/ViewHeadlineOutlined';
 import { privateAxios } from "../../middleware/axiosInstance";
-import adminImage from '../../assets/settings.png';
+import adminImage from '../../assets/hcn-logo (1).png';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -117,7 +117,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
               flex: 1
             }}
           >
-            ADMIN PANEL
+            ADMIN
           </Typography>
         )}
         <IconButton onClick={onToggleCollapse} sx={{ color: '#fff' }}>
@@ -130,16 +130,14 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       {/* Profile Section */}
       {!isCollapsed && (
         <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Avatar
+          <img
             src={adminImage}
-            sx={{
-              width: 80,
-              height: 80,
+            style={{
+              width: 200,
               margin: '0 auto',
-              border: '3px solid rgba(255, 255, 255, 0.2)',
             }}
           />
-          <Typography
+          {/* <Typography
             variant="h6"
             sx={{
               mt: 2,
@@ -149,7 +147,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
             }}
           >
             {userInfo?.name || 'Admin'}
-          </Typography>
+          </Typography> */}
         </Box>
       )}
 
@@ -224,7 +222,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
           </ListItemIcon>
           {!isCollapsed && (
             <ListItemText
-              primary="Logout"
+              primary="Đăng Xuất"
               sx={{
                 '& .MuiTypography-root': {
                   fontFamily: 'REM',

@@ -9,7 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { Box, FormControl, IconButton, InputAdornment, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Avatar, Box, FormControl, IconButton, InputAdornment, MenuItem, Select, TextField, Typography } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ModalExchangeDetail from '../modal/ModalExchangeDetail';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -71,6 +71,8 @@ const ManageExchanges: React.FC = () => {
         }
 
         setExchanges(exchangesData);
+        console.log("Exchanges", exchangesData);
+        
       } catch (error) {
         console.error("Error fetching exchanges:", error);
       } finally {
@@ -349,8 +351,18 @@ const ManageExchanges: React.FC = () => {
                   <StyledTableRow key={exchange.id}>
                     {/* <StyledTableCell>{exchange.id}</StyledTableCell> */}
                     <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>{exchange.post.postContent.length > 25 ? exchange.post.postContent.substring(0, 25) + '...' : exchange.post.postContent}</StyledTableCell>
-                    <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>{exchange.requestUser.name}</StyledTableCell>
-                    <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>{exchange.post.user.name}</StyledTableCell>
+                    <StyledTableCell align="left">
+                      <Box display="flex" alignItems="center" justifyContent='center'>
+                        <Avatar alt={exchange.requestUser.name} src={exchange.requestUser.avatar} sx={{ width: 24, height: 24, marginRight: 1.5 }} />
+                        <Typography>{exchange.requestUser.name}</Typography>
+                      </Box>
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      <Box display="flex" alignItems="center" justifyContent='center'>
+                        <Avatar alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 24, height: 24, marginRight: 1.5 }} />
+                        <Typography>{exchange.post.user.name}</Typography>
+                      </Box>
+                    </StyledTableCell>
                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                       {formatCurrency(exchange.compensationAmount)}
                     </StyledTableCell>

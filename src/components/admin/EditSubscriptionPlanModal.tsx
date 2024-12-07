@@ -15,8 +15,8 @@ interface SubscriptionPlan {
     id: string;
     price: number;
     duration: number;
-    offeredResource: number;
     auctionTime: number;
+    sellTime: number;
 }
 
 interface EditModalProps {
@@ -45,7 +45,7 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
 
         setEditedPlan((prev) => ({
             ...prev,
-            [name]: ["price", "duration", "offeredResource"].includes(name)
+            [name]: ["price", "duration", "auctionTime", "sellTime"].includes(name)
                 ? Number(value)
                 : value
         }));
@@ -55,13 +55,13 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
         console.log("Edited plan:", editedPlan);
         try {
             const response = await privateAxios.patch(`/seller-subs-plans/${plan.id}`, editedPlan);
-            onUpdatePlan(response.data); 
-            onClose(); 
+            onUpdatePlan(response.data);
+            onClose();
         } catch (error) {
             console.error('Error updating subscription plan:', error);
         }
     };
-    
+
 
     return (
         <Dialog
@@ -94,9 +94,10 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                             letterSpacing: 1,
                             margin: 'auto',
                             borderBottom: '2px solid #c66a7a',
+                            fontFamily: 'REM'
                         }}
                     >
-                        Chỉnh Sửa Gói Subscription
+                        Chỉnh Sửa Gói Đăng Ký
                     </Typography>
                 </Box>
             </DialogTitle>
@@ -117,7 +118,22 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: 2,
-                                backgroundColor: '#f0f0f0'
+                                backgroundColor: '#f0f0f0',
+                                fontFamily: 'REM'
+                            }
+                        }}
+                    />
+                    <TextField
+                        fullWidth
+                        label="Giới Hạn Lượt Bán"
+                        name="sellTime"
+                        type="number"
+                        value={editedPlan.sellTime}
+                        onChange={handleChange}
+                        variant="outlined"
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: 2
                             }
                         }}
                     />
@@ -130,19 +146,23 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                         onChange={handleChange}
                         variant="outlined"
                         sx={{
+                            fontFamily: 'REM',
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: 2
-                            }
+                            },
+
                         }}
                     />
                     <TextField
                         fullWidth
                         label="Thời Hạn (Tháng)"
                         name="duration"
+                        type="number"
                         value={editedPlan.duration}
                         onChange={handleChange}
                         variant="outlined"
                         sx={{
+                            fontFamily: 'REM',
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: 2
                             }
@@ -151,11 +171,13 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                     <TextField
                         fullWidth
                         label="Lượt Bán Đấu Giá"
-                        name="offeredResource"
+                        name="auctionTime"
+                        type="number"
                         value={editedPlan.auctionTime}
                         onChange={handleChange}
                         variant="outlined"
                         sx={{
+                            fontFamily: 'REM',
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: 2
                             }
@@ -173,6 +195,7 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                     variant="contained"
                     color="primary"
                     sx={{
+                        fontFamily: 'REM',
                         borderRadius: 2,
                         textTransform: 'none',
                         background: 'linear-gradient(145deg, #c66a7a, #a3566a)',
@@ -188,6 +211,7 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                     variant="outlined"
                     color="secondary"
                     sx={{
+                        fontFamily: 'REM',
                         borderRadius: 2,
                         textTransform: 'none'
                     }}

@@ -347,7 +347,7 @@ const ManageOrders: React.FC = () => {
                   <StyledTableRow key={order.id}>
                     {/* Delivery Info */}
                     <StyledTableCell rowSpan={1} component="th" scope="row">
-                      {order.delivery.deliveryTrackingCode || "N/A"}
+                      {order.delivery.deliveryTrackingCode || "Chưa có"}
                     </StyledTableCell>
                     <StyledTableCell rowSpan={1} align="left">
                       {order.delivery.to.name || "N/A"}

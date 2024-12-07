@@ -13,8 +13,8 @@ interface SubscriptionPlan {
     id: string;
     price: number;
     duration: number;
-    offeredResource: number;
     auctionTime: number;
+    sellTime: number;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -57,7 +57,7 @@ const SubscriptionPlans: React.FC = () => {
                 const response = await privateAxios.get('/seller-subs-plans');
                 setPlans(response.data);
                 console.log("plans", response.data);
-                
+
             } catch (error) {
                 console.error('Error fetching subscription plans:', error);
             } finally {
@@ -121,7 +121,7 @@ const SubscriptionPlans: React.FC = () => {
             </Box>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#71002b' }}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#71002b', fontFamily: 'REM' }}>
                     Quản lý gói đăng ký
                 </Typography>
 
@@ -147,11 +147,12 @@ const SubscriptionPlans: React.FC = () => {
                 <TableContainer style={{ marginTop: '20px', }}>
                     <Table sx={{ minWidth: 700 }} aria-label="subscription plans table">
                         <TableHead>
-                            <TableRow>
-                                <StyledTableCell>ID</StyledTableCell>
-                                <StyledTableCell align="center">Giá (VND)</StyledTableCell>
-                                <StyledTableCell align="center">Thời Hạn (Tháng)</StyledTableCell>
-                                <StyledTableCell align="center">Bán đấu giá (Lần)</StyledTableCell>
+                            <TableRow >
+                                <StyledTableCell sx={{ fontFamily: 'REM' }}>ID</StyledTableCell>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Giá (VND)</StyledTableCell>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Giới Hạn Lượt Bán</StyledTableCell>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Thời Hạn (Tháng)</StyledTableCell>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Bán đấu giá (Lần)</StyledTableCell>
                                 <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Chỉnh Sửa</StyledTableCell>
                             </TableRow>
                         </TableHead>
@@ -165,11 +166,12 @@ const SubscriptionPlans: React.FC = () => {
                             ) : (
                                 paginatedPlans.map((plan) => (
                                     <StyledTableRow key={plan.id}>
-                                        <StyledTableCell>{plan.id}</StyledTableCell>
-                                        <StyledTableCell align="center">{plan.price.toLocaleString()}</StyledTableCell>
-                                        <StyledTableCell align="center">{plan.duration}</StyledTableCell>
-                                        <StyledTableCell align="center">{plan.auctionTime}</StyledTableCell>
-                                        <StyledTableCell align="right">
+                                        <StyledTableCell sx={{ fontFamily: 'REM' }}>{plan.id}</StyledTableCell>
+                                        <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.price.toLocaleString()}</StyledTableCell>
+                                        <StyledTableCell sx={{ fontFamily: 'REM' }}>{plan.sellTime}</StyledTableCell>
+                                        <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.duration}</StyledTableCell>
+                                        <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.auctionTime}</StyledTableCell>
+                                        <StyledTableCell align="right" >
                                             <IconButton color="error" onClick={() => handleEditClick(plan)}>
                                                 <EditOutlinedIcon />
                                             </IconButton>

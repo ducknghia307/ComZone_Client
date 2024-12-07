@@ -302,39 +302,47 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                     justifyContent='space-between'
                                     paddingX='30px'
                                 >
-                                    <Stack direction="row" alignItems="center" spacing={2}>
-                                        <Avatar
+                                    {/* <Avatar
                                             sx={{
                                                 bgcolor: '#71002b', width: 40, height: 40,
                                             }}
                                         >
                                             <SwapVertIcon />
-                                        </Avatar>
-                                        <Box>
-                                            <Typography variant="caption" color="text.secondary" gutterBottom>
-                                                Người gửi yêu cầu
-                                            </Typography>
-                                            <Typography variant="subtitle1" fontWeight={600}>
-                                                {exchange.requestUser.name}
-                                            </Typography>
+                                        </Avatar> */}
+                                    <Box>
+                                        <Typography sx={{ color: 'grey', fontSize: '13px' }}>
+                                            Người gửi yêu cầu
+                                        </Typography>
+                                        <Box display="flex" alignItems="center" sx={{ paddingTop: '10px' }}>
+                                            <Avatar alt={exchange.requestUser.name} src={exchange.requestUser.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
+                                            <Typography sx={{ fontWeight: 'bold' }}>{exchange.requestUser.name}</Typography>
                                         </Box>
-                                    </Stack>
+                                    </Box>
 
                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                        <Avatar
+                                        {/* <Avatar
                                             sx={{
                                                 bgcolor: '#c66a7a', width: 40, height: 40,
                                             }}
                                         >
                                             <MonetizationOnOutlinedIcon />
-                                        </Avatar>
-                                        <Box>
+                                        </Avatar> */}
+                                        {/* <Box>
                                             <Typography variant="caption" color="text.secondary" gutterBottom>
                                                 Người đăng bài trao đổi
                                             </Typography>
                                             <Typography variant="subtitle1" fontWeight={600}>
                                                 {exchange.post.user.name}
                                             </Typography>
+                                        </Box> */}
+                                        <Box>
+                                            <Typography sx={{ color: 'grey', fontSize: '13px' }}>
+                                                Người đăng bài trao đổi
+                                            </Typography>
+                                            <Box display="flex" alignItems="center" sx={{ paddingTop: '10px' }}>
+                                                <Avatar alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
+                                                <Typography sx={{ fontWeight: 'bold' }}>{exchange.post.user.name}</Typography>
+                                            </Box>
                                         </Box>
                                     </Stack>
                                 </Stack>
@@ -362,8 +370,22 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                             <Typography variant="subtitle1" fontWeight={600} gutterBottom>
                                                 Tiền chênh lệch
                                             </Typography>
-                                            <Typography color="text.secondary">
+                                            <Typography color="text.secondary" sx={{ display: 'inline-flex', alignItems: 'center' }}>
                                                 {formatCurrency(exchange.compensationAmount)}
+                                                {exchange.compensateUser && (
+                                                    <Typography variant="body2" color="text.primary" sx={{ fontWeight: 600, fontSize: '0.95rem', ml: 1, display: 'inline-flex', alignItems: 'center' }}>
+                                                        ({'người bù tiền: '}
+                                                        <Box display="inline-flex" alignItems="center" sx={{ marginRight: 0.5, marginLeft: 1 }}>
+                                                            <Avatar
+                                                                alt={exchange.compensateUser.name}
+                                                                src={exchange.compensateUser.avatar}
+                                                                sx={{ width: 18, height: 18, marginRight: 0.5 }}
+                                                            />
+                                                            {exchange.compensateUser.name}
+                                                        </Box>
+                                                        )
+                                                    </Typography>
+                                                )}
                                             </Typography>
                                         </Box>
                                     </Stack>

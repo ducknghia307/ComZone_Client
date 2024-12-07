@@ -222,7 +222,7 @@ const Genres: React.FC<GenresProps> = ({
                     fontFamily: "REM",
                   }}
                 />
-                <div className="all-genres-cards">
+                <div className={`all-genres-cards ${comics.length > 4 ? 'grid-layout' : 'flex-layout'}`}>
                   {sortedAuctionComics.length > 0 ? (
                     sortedAuctionComics.map((comic) => (
                       <div className="auction-card" key={comic.id}>
@@ -274,7 +274,7 @@ const Genres: React.FC<GenresProps> = ({
                     fontFamily: "REM",
                   }}
                 />
-                <div className="all-genres-cards">
+                <div className={`all-genres-cards ${comics.length > 4 ? 'grid-layout' : 'flex-layout'}`}>
                   {sortedRegularComics.length > 0 ? (
                     sortedRegularComics.map((comic) => (
                       <div className="hot-comic-card" key={comic.id}>

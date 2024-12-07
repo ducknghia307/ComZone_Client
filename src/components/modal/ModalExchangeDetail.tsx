@@ -373,7 +373,7 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                             <Typography color="text.secondary" sx={{ display: 'inline-flex', alignItems: 'center' }}>
                                                 {formatCurrency(exchange.compensationAmount)}
                                                 {exchange.compensateUser && (
-                                                    <Typography variant="body2" color="text.primary" sx={{ fontWeight: 600, fontSize: '0.95rem', ml: 1, display: 'inline-flex', alignItems: 'center' }}>
+                                                    <Typography variant="body2" color="text.primary" sx={{ fontWeight: 600, fontSize: '14px', ml: 1, display: 'inline-flex', alignItems: 'center' }}>
                                                         ({'người bù tiền: '}
                                                         <Box display="inline-flex" alignItems="center" sx={{ marginRight: 0.5, marginLeft: 1 }}>
                                                             <Avatar

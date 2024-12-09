@@ -22,7 +22,7 @@ interface RefundModalProps {
         orderId?: string; // Có thể không có nếu là exchange
         // exchangeId?: string; // Có thể không có nếu là order
         reason: string;
-        images: string[];
+        attachedImages: string[];
         description: string;
         createdAt: string;
         requestId?: string;
@@ -259,8 +259,8 @@ const RefundModal: React.FC<RefundModalProps> = ({
                                 flexWrap: 'wrap',
                                 justifyContent: 'center'
                             }}>
-                                {refundDetails.images?.length > 0 ? (
-                                    refundDetails.images.map((image, index) => (
+                                {refundDetails.attachedImages?.length > 0 ? (
+                                    refundDetails.attachedImages.map((image, index) => (
                                         <Box
                                             key={index}
                                             sx={{
@@ -276,7 +276,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
                                                 alt={`Refund Image ${index + 1}`}
                                                 style={{
                                                     width: '100px',
-                                                    height: '100px',
+                                                    height: '150px',
                                                     objectFit: 'cover',
                                                     borderRadius: '8px',
                                                     border: '2px solid #c66a7a',

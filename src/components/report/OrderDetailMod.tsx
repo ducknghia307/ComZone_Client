@@ -47,6 +47,11 @@ const StatusChip = styled('span')<{ status: string; deliveryStatus?: string }>((
                     color: '#ff9800',
                     backgroundColor: '#fff3e0',
                 };
+            case 'SUCCESSFUL':
+                return {
+                    color: '#fef6c7',
+                    backgroundColor: '#395f18',
+                };
             case 'DELIVERED':
                 return {
                     color: '#32CD32',
@@ -66,6 +71,11 @@ const StatusChip = styled('span')<{ status: string; deliveryStatus?: string }>((
                 return {
                     color: '#e91e63',
                     backgroundColor: '#fce4ec',
+                };
+            case 'FAILED':
+                return {
+                    color: "#f44336",
+                    backgroundColor: "#ffebee",
                 };
             default:
                 return {
@@ -95,7 +105,7 @@ interface OrderDetailProps {
     open: boolean;
     onClose: () => void;
     orderId: string;
-    onStatusUpdate: (orderId: string, newStatus: string, deliveryStatus?: string,  paymentMethod?: string) => void;
+    onStatusUpdate: (orderId: string, newStatus: string, deliveryStatus?: string, paymentMethod?: string) => void;
     order: OrderDetailData | undefined;
     // paymentMethod: string;
 }
@@ -200,6 +210,10 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                 return 'Đang giao hàng';
             case 'CANCELED':
                 return 'Đã hủy';
+            case "SUCCESSFUL":
+                return "Hoàn tất";
+            case "FAILED":
+                return "Thất bại";
             default:
                 return status;
         }

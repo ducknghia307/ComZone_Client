@@ -144,10 +144,10 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
           fontWeight: "bold",
           display: "inline-block",
         };
-      case "PROCESSING":
+      case "UPCOMING":
         return {
-          color: "#ff9800",
-          backgroundColor: "#fff3e0",
+          color: "#6226EF",
+          backgroundColor: "#EDE7F6",
           borderRadius: "8px",
           padding: "8px 20px",
           fontWeight: "bold",
@@ -162,10 +162,10 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
           fontWeight: "bold",
           display: "inline-block",
         };
-      case "UPCOMING":
+      case "PROCESSING":
         return {
-          color: "#6226EF",
-          backgroundColor: "#EDE7F6",
+          color: "#ff9800",
+          backgroundColor: "#fff3e0",
           borderRadius: "8px",
           padding: "8px 20px",
           fontWeight: "bold",
@@ -198,6 +198,16 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
           fontWeight: "bold",
           display: "inline-block",
         };
+      case "CANCELED":
+        return {
+          color: "#757575",
+          backgroundColor: "#eeeeee",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
     }
   };
 
@@ -207,16 +217,18 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
         return "Thành công";
       case "COMPLETED":
         return "Hoàn thành";
-      case "PROCESSING":
-        return "Đang xử lí";
       case "UPCOMING":
         return "Sắp diễn ra";
+      case "PROCESSING":
+        return "Đang xử lí";
       case "ONGOING":
         return "Đang diễn ra";
       case "FAILED":
         return "Thất bại";
       case "REJECTED":
         return "Bị từ chối";
+      case "CANCELED":
+        return "Đã hủy";
       default:
         return status;
     }

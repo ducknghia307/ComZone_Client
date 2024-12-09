@@ -264,14 +264,14 @@ const ManageRefunds: React.FC = () => {
                     <Table sx={{ minWidth: 700 }} aria-label="refunds table">
                         <TableHead>
                             <TableRow>
-                                <StyledTableCell>Tên Người Dùng</StyledTableCell>
+                                <StyledTableCell sx={{ whiteSpace: 'nowrap' }}>Tên Người Dùng</StyledTableCell>
                                 <StyledTableCell>Mã Đơn Hàng</StyledTableCell>
-                                <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Ngày Yêu Cầu</StyledTableCell>
+                                <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Thời Gian</StyledTableCell>
                                 <StyledTableCell align="right">Lý Do</StyledTableCell>
                                 <StyledTableCell align="right">Chi Tiết Lý Do (nếu có)</StyledTableCell>
-                                <StyledTableCell align="right">Hình Ảnh</StyledTableCell>
+                                <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Hình Ảnh</StyledTableCell>
                                 <StyledTableCell align="right">Trạng Thái</StyledTableCell>
-                                <StyledTableCell align="right">Chỉnh Sửa</StyledTableCell>
+                                <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Chỉnh Sửa</StyledTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -282,10 +282,10 @@ const ManageRefunds: React.FC = () => {
                                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>{formatDateTime(refund.createdAt)}</StyledTableCell>
                                     <StyledTableCell align="right">{refund.reason.length > 50 ? `${refund.reason.substring(0, 50)}...` : refund.reason}</StyledTableCell>
                                     <StyledTableCell align="right">{refund.description.length > 50 ? `${refund.description.substring(0, 50)}...` : refund.description}</StyledTableCell>
-                                    <StyledTableCell align="right">
+                                    {/* <StyledTableCell align="right">
                                         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                                            {refund.images?.length > 0 ? (
-                                                refund.images.map((image, index) => (
+                                            {refund.attachedImages?.length > 0 ? (
+                                                refund.attachedImages.map((image, index) => (
                                                     <img
                                                         key={index}
                                                         src={image}
@@ -303,7 +303,17 @@ const ManageRefunds: React.FC = () => {
                                                 <span style={{ fontStyle: 'italic', color: '#999' }}>Không có hình ảnh</span>
                                             )}
                                         </div>
+                                    </StyledTableCell> */}
+                                    <StyledTableCell align="right">
+                                        <div style={{ textAlign: 'center' }}>
+                                            {refund.attachedImages?.length > 0 ? (
+                                                <span>{refund.attachedImages.length} ảnh</span>
+                                            ) : (
+                                                <span style={{ fontStyle: 'italic', color: '#999' }}>Không có hình ảnh</span>
+                                            )}
+                                        </div>
                                     </StyledTableCell>
+
                                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                                         <span style={getStatusChipStyles(refund.status)}>
                                             {translateStatus(refund.status)}
@@ -344,7 +354,7 @@ const ManageRefunds: React.FC = () => {
                             orderId: selectedRefund.order?.id,
                             // exchangeId: selectedRefund.exchange?.id,
                             reason: selectedRefund.reason,
-                            images: selectedRefund.images,
+                            attachedImages: selectedRefund.attachedImages,
                             createdAt: selectedRefund.createdAt,
                             description: selectedRefund.description,
                             requestId: selectedRefund.id || '',

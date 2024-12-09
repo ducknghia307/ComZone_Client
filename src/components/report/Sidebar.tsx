@@ -80,11 +80,11 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, onSelect }: SidebarProps) => {
       path: "/mod/orders",
       icon: <AllInboxOutlinedIcon sx={{ color: "inherit" }} />,
     },
-    {
-      title: "Quản Lý Giao Hàng",
-      path: "/mod/deliveries",
-      icon: <LocalShippingOutlinedIcon sx={{ color: "inherit" }} />,
-    },
+    // {
+    //   title: "Quản Lý Giao Hàng",
+    //   path: "/mod/deliveries",
+    //   icon: <LocalShippingOutlinedIcon sx={{ color: "inherit" }} />,
+    // },
     {
       title: "Quản Lý Đấu Giá",
       path: "/mod/auctions",

@@ -7,6 +7,7 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import { privateAxios } from '../../middleware/axiosInstance';
+import { notification } from 'antd';
 interface Feedback {
     id: string;
     user: { name: string };
@@ -16,14 +17,14 @@ interface Feedback {
     rating: number;
     attachedImages: string[];
     isApprove: boolean;
-  }
+}
 interface ModalFeedbackProps {
     isOpen: boolean;
     feedback: Feedback | null;
     onClose: () => void;
     onUpdateFeedback: (updatedFeedback: Feedback) => void;
-  }
-  const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose, onUpdateFeedback }) => {
+}
+const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose, onUpdateFeedback }) => {
     const handleApprove = async () => {
         if (!feedback?.id) {
             console.error("Feedback ID is missing!");
@@ -36,7 +37,12 @@ interface ModalFeedbackProps {
             console.log("Approving feedback ID:", feedback.id);
             const response = await privateAxios.patch(`/seller-feedback/approve/${feedback.id}`);
             console.log("Approval response:", response.data);
-            alert("Feedback đã được duyệt thành công!");
+            // alert("Feedback đã được duyệt thành công!");
+            notification.success({
+                message: 'Duyệt Đánh Giá Thành Công!',
+                description: 'Đánh giá đã được duyệt thành công.',
+                placement: 'topRight',
+            });
 
             // Cập nhật trạng thái feedback qua callback
             const updatedFeedback = { ...feedback, isApprove: true };
@@ -45,7 +51,12 @@ interface ModalFeedbackProps {
             onClose(); // Đóng modal
         } catch (error) {
             console.error("Error approving feedback:", error);
-            alert("Có lỗi xảy ra khi duyệt đánh giá!");
+            // alert("Có lỗi xảy ra khi duyệt đánh giá!");
+            notification.error({
+                message: 'Lỗi Khi Duyệt Đánh Giá!',
+                description: 'Có lỗi xảy ra khi duyệt đánh giá, vui lòng thử lại sau.',
+                placement: 'topRight',
+            });
         }
     };
 

@@ -211,6 +211,16 @@ const ManageAuctions: React.FC = () => {
           fontWeight: "bold",
           display: "inline-block",
         };
+      case "CANCELED":
+        return {
+          color: "#757575",
+          backgroundColor: "#eeeeee",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
     }
   };
 
@@ -230,6 +240,8 @@ const ManageAuctions: React.FC = () => {
         return "Thất bại";
       case "REJECTED":
         return "Bị từ chối";
+      case "CANCELED":
+        return "Đã hủy";
       default:
         return status;
     }
@@ -287,15 +299,15 @@ const ManageAuctions: React.FC = () => {
               value={selectedStatus}
               onChange={handleStatusFilterChange}
               displayEmpty
-              sx={{fontFamily: 'REM'}}
+              sx={{ fontFamily: 'REM' }}
             >
-              <MenuItem sx={{fontFamily: 'REM'}} value="">Tất Cả</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="UPCOMING">Sắp diễn ra</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="ONGOING">Đang diễn ra</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="SUCCESSFUL">Thành công</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="FAILED">Thất bại</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="CANCELED">Đã hủy</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="COMPLETED">Hoàn thành</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="">Tất Cả</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="UPCOMING">Sắp diễn ra</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="ONGOING">Đang diễn ra</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="SUCCESSFUL">Thành công</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="FAILED">Thất bại</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="CANCELED">Đã hủy</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="COMPLETED">Hoàn thành</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -316,7 +328,7 @@ const ManageAuctions: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell style={{ fontFamily: "REM" }}>
+                <StyledTableCell style={{ fontFamily: "REM", whiteSpace: 'nowrap' }}>
                   Người Bán
                 </StyledTableCell>
                 <StyledTableCell

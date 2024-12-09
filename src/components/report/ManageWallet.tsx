@@ -79,7 +79,8 @@ const ManageWallet: React.FC = () => {
                           : "Thông tin giao dịch không có sẵn"
               : transaction.type === "ADD"
                 ? transaction.order
-                  ? `Nhận tiền đơn hàng (${transaction.note})`
+                  // ? `Nhận tiền đơn hàng (${transaction.note})`
+                  ? `Nhận tiền đơn hàng`
                   : transaction.exchange
                     ? `Thanh toán tiền bù trao đổi`
                     : transaction.deposit?.exchange

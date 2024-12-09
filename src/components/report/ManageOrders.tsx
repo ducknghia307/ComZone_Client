@@ -291,7 +291,7 @@ const ManageOrders: React.FC = () => {
                 <SearchOutlinedIcon sx={{ color: '#fff' }} />
               </InputAdornment>
             ),
-            style: { color: '#fff', fontFamily:'REM' },
+            style: { color: '#fff', fontFamily: 'REM' },
           }}
         />
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -304,16 +304,16 @@ const ManageOrders: React.FC = () => {
               value={statusFilter}
               onChange={handleStatusFilterChange}
               displayEmpty
-              sx={{fontFamily: 'REM'}}
+              sx={{ fontFamily: 'REM' }}
             >
-              <MenuItem sx={{fontFamily: 'REM'}} value="ALL">Tất cả</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="PENDING">Chờ xử lí</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="PACKAGING">Đang đóng gói</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="DELIVERING">Đang giao hàng</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="DELIVERED">Đã giao thành công</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="SUCCESSFUL">Hoàn tất</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="FAILED">Thất bại</MenuItem>
-              <MenuItem sx={{fontFamily: 'REM'}} value="CANCELED">Bị hủy</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="ALL">Tất cả</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="PENDING">Chờ xử lí</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="PACKAGING">Đang đóng gói</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="DELIVERING">Đang giao hàng</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="DELIVERED">Đã giao thành công</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="SUCCESSFUL">Hoàn tất</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="FAILED">Thất bại</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="CANCELED">Bị hủy</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -326,13 +326,13 @@ const ManageOrders: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell style={{ fontFamily: 'REM' }}>Mã Vận Đơn (nếu có)</StyledTableCell>
-                <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>Người Đặt</StyledTableCell>
-                <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>Người Bán</StyledTableCell>
-                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Tổng Tiền</StyledTableCell>
-                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Phương Thức Thanh Toán</StyledTableCell>
-                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Trạng Thái</StyledTableCell>
-                <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Chi Tiết</StyledTableCell>
+                <StyledTableCell style={{ fontFamily: 'REM', whiteSpace: 'nowrap' }}>Mã Vận Đơn (nếu có)</StyledTableCell>
+                <StyledTableCell align="left" style={{ fontFamily: 'REM', whiteSpace: 'nowrap' }}>Người Đặt</StyledTableCell>
+                <StyledTableCell align="left" style={{ fontFamily: 'REM', whiteSpace: 'nowrap' }}>Người Bán</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM', whiteSpace: 'nowrap' }}>Tổng Tiền</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM', whiteSpace: 'nowrap' }}>Phương Thức Thanh Toán</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM', whiteSpace: 'nowrap' }}>Trạng Thái</StyledTableCell>
+                <StyledTableCell align="right" style={{ fontFamily: 'REM', whiteSpace: 'nowrap' }}>Chi Tiết</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>

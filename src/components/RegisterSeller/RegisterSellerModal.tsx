@@ -7,11 +7,13 @@ import ActionConfirm from "../actionConfirm/ActionConfirm";
 interface OpenModal {
   isRegisterSellerModal: boolean;
   setIsRegisterSellerModal: (value: boolean) => void;
+  fetchUserInfo: () => void;
 }
 
 const RegisterSellerModal: React.FC<OpenModal> = ({
   isRegisterSellerModal,
   setIsRegisterSellerModal,
+  fetchUserInfo,
 }) => {
   const [isWelcoming, setIsWelcoming] = useState<boolean>(true);
   const [isConfirmQuitting, setIsConfirmQuitting] = useState<boolean>(false);
@@ -55,7 +57,10 @@ const RegisterSellerModal: React.FC<OpenModal> = ({
             </button>
           </div>
         ) : (
-          <RegisterSeller setIsRegisterSellerModal={setIsRegisterSellerModal} />
+          <RegisterSeller
+            setIsRegisterSellerModal={setIsRegisterSellerModal}
+            fetchUserInfo={fetchUserInfo}
+          />
         )}
       </Modal>
 

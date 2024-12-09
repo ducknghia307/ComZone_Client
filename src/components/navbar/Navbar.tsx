@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Logo from "../../assets/hcn-logo.png";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import type { MenuProps } from "antd";
 import { Badge, Dropdown, notification, Popover } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -25,6 +30,7 @@ import {
   plusUnreadAnnounce,
   setUnreadAnnounce,
 } from "../../redux/features/notification/announcementSlice";
+import CurrencySplitter from "../../assistants/Spliter";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -44,6 +50,8 @@ const Navbar = () => {
 
   const navigate = useNavigate();
   const location1 = useLocation();
+  const [params, setParams] = useSearchParams();
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -140,8 +148,8 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const sessionRedirect = localStorage.getItem("registeringSellerPlan");
-    if (sessionRedirect) {
+    const planSessionRedirect = localStorage.getItem("registeringSellerPlan");
+    if (planSessionRedirect) {
       const params: any = new Proxy(
         new URLSearchParams(window.location.search),
         {
@@ -150,11 +158,42 @@ const Navbar = () => {
       );
       const paymentStatus = params ? params.payment_status : null;
       if (paymentStatus && paymentStatus === "SUCCESSFUL") {
-        handleSubscribePlan(sessionRedirect);
+        handleSubscribePlan(planSessionRedirect);
       }
       localStorage.removeItem("registeringSellerPlan");
     }
+
+    const walletRedirect = localStorage.getItem("wallet-deposit");
+    if (walletRedirect) {
+      const status = params.get("payment_status");
+      if (status) {
+        if (status === "SUCCESSFUL")
+          notification.success({
+            key: "wallet-deposit",
+            message: "Nạp tiền thành công",
+            description: (
+              <p>
+                Bạn đã nạp thành công số tiền{" "}
+                {CurrencySplitter(Number(walletRedirect))}đ vào ví ComZone.
+              </p>
+            ),
+            duration: 5,
+          });
+        else if (status === "FAILED")
+          notification.error({
+            key: "wallet-deposit",
+            message: "Nạp tiền thất bại",
+            duration: 5,
+          });
+
+        params.delete("payment_status");
+        setParams(params);
+
+        localStorage.removeItem("wallet-deposit");
+      }
+    }
   }, []);
+
   useEffect(() => {
     const fetchUnreadAnnouncement = async () => {
       try {
@@ -188,22 +227,22 @@ const Navbar = () => {
     getUserAnnouncement();
   }, [dispatch]);
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (accessToken) {
-        try {
-          const response = await privateAxios.get("users/profile");
-          console.log(response);
-          setUserInfo(response.data);
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-          setLoading(false);
-        }
-      } else {
+  const fetchUserInfo = async () => {
+    if (accessToken) {
+      try {
+        const response = await privateAxios.get("users/profile");
+        console.log(response);
+        setUserInfo(response.data);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
         setLoading(false);
       }
-    };
+    } else {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUserInfo();
   }, [accessToken]);
 
@@ -740,6 +779,7 @@ const Navbar = () => {
         <RegisterSellerModal
           isRegisterSellerModal={isRegisteringSeller}
           setIsRegisterSellerModal={setIsRegisteringSeller}
+          fetchUserInfo={fetchUserInfo}
         />
       )}
     </>

@@ -7,9 +7,8 @@ import { ExchangePostInterface } from "../../../common/interfaces/exchange.inter
 import { Comic } from "../../../common/base.interface";
 import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
-import { Socket } from "socket.io-client";
-import socket from "../../../services/socket";
 import { useAppSelector } from "../../../redux/hooks";
+import socket from "../../../services/socket";
 
 export default function SelectOfferComicsModal({
   post,
@@ -48,8 +47,6 @@ export default function SelectOfferComicsModal({
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
 
   const navigate = useNavigate();
-
-  const socketRef = useRef<Socket>(socket);
 
   const fetchPostUserOfferComics = async () => {
     await publicAxios.get(`comics/exchange/${post.user.id}`).then((res) => {
@@ -124,10 +121,8 @@ export default function SelectOfferComicsModal({
           .then((response) => {
             sessionStorage.setItem("connectedChat", response.data.id);
 
-            if (socketRef.current) {
-              socketRef.current.emit("join-room", { userId: userId });
-              socketRef.current.emit("join-room", { userId: post.user.id });
-            }
+            socket.emit("join-room", { userId: userId });
+            socket.emit("join-room", { userId: post.user.id });
 
             setIsChatOpen(true);
             handleModalClose();

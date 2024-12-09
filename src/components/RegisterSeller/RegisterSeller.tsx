@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { message, notification, Steps } from "antd";
+import { Checkbox, message, notification, Steps } from "antd";
 import SellerInfomation from "./SellerInfomation";
 import DeliveryMethod from "./DeliveryMethod";
 import { privateAxios } from "../../middleware/axiosInstance";
@@ -10,8 +10,10 @@ import SubscriptionRegister from "./SubscriptionRegister";
 
 const RegisterSeller = ({
   setIsRegisterSellerModal,
+  fetchUserInfo,
 }: {
   setIsRegisterSellerModal: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchUserInfo: () => void;
 }) => {
   const [current, setCurrent] = useState(0);
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -28,11 +30,13 @@ const RegisterSeller = ({
   const [ward, setWard] = useState<string | null>(null);
   const [detailedAddress, setDetailedAddress] = useState<string>("");
 
+  const [policyCheck, setPolicyCheck] = useState<boolean>(false);
+
   const validateAddress = (isValid: boolean) => {
     setIsAddressComplete(isValid);
   };
 
-  const fetchUserInfo = async () => {
+  const fetchUserInfoInRegister = async () => {
     try {
       const response = await privateAxios("/users/profile");
       const data = response.data;
@@ -43,11 +47,10 @@ const RegisterSeller = ({
   };
 
   const handleSendOtp = () => {
-    if (phone) {
-      if (phone.length !== 10 || phone.charAt(0) !== "0")
-        message.warning(
-          "Số điện thoại không hợp lệ! Số điện thoại phải có đúng 10 số."
-        );
+    if (phone && phone.length > 0) {
+      if (phone.length < 10 || phone.length > 11 || phone.charAt(0) !== "0")
+        message.warning("Số điện thoại không hợp lệ!");
+
       setOtpSent(true);
     } else {
       message.warning("Bạn cần nhập số điện thoại để gửi mã xác thực OTP!");
@@ -55,19 +58,7 @@ const RegisterSeller = ({
   };
 
   const next = () => {
-    if (current === 0) {
-      if (!otp) {
-        message.error("Vui lòng nhập mã xác thực.");
-      } else {
-        if (otp === "111111") {
-          message.success("Mã OTP hợp lệ");
-          setCurrent(current + 1);
-        } else {
-          message.error("Mã xác thực không hợp lệ. Vui lòng kiểm tra lại.");
-        }
-        setOtp("");
-      }
-    } else if (current === 1) {
+    if (current === 1) {
       if (!isAddressComplete) {
         message.error("Vui lòng điền đầy đủ thông tin địa chỉ.");
       } else {
@@ -116,10 +107,12 @@ const RegisterSeller = ({
           otp={otp}
           setOtp={setOtp}
           otpSent={otpSent}
+          setOtpSent={setOtpSent}
           handleSendOtp={handleSendOtp}
           setName={setName}
           setEmail={setEmail}
           setPhone={setPhone}
+          setCurrent={setCurrent}
         />
       ),
     },
@@ -151,7 +144,7 @@ const RegisterSeller = ({
   ];
 
   useEffect(() => {
-    fetchUserInfo();
+    fetchUserInfoInRegister();
   }, []);
 
   const handleFinish = async () => {
@@ -169,6 +162,7 @@ const RegisterSeller = ({
         "Đăng ký thông tin người bán thành công! Bạn có thể tiếp tục đăng ký gói bán của ComZone.",
         8
       );
+      fetchUserInfo();
       console.log("Response data:", response.data);
     } catch (error) {
       message.error(
@@ -186,6 +180,16 @@ const RegisterSeller = ({
         <Steps current={current} items={items} labelPlacement="vertical" />
       </div>
       <div className="w-full">{steps[current].content}</div>
+
+      {current === 2 && (
+        <div className="flex items-center gap-2 mt-4">
+          <Checkbox
+            checked={policyCheck}
+            onChange={() => setPolicyCheck(!policyCheck)}
+          />
+          <p>Tôi đã đọc và chấp nhận điều khoản sử dụng.</p>
+        </div>
+      )}
 
       <div className="flex w-full items-center justify-center">
         <div className="mt-6 flex flex-row items-center justify-end w-full h-10 gap-4">
@@ -207,10 +211,11 @@ const RegisterSeller = ({
           )}
           {current === steps.length - 2 && (
             <button
-              className="px-16 py-2 rounded-lg bg-green-700 text-white duration-200 hover:opacity-70"
+              disabled={current === 2 && !policyCheck}
+              className="px-16 py-2 rounded-lg bg-green-700 text-white duration-200 hover:opacity-70 disabled:bg-gray-300"
               onClick={handleFinish}
             >
-              Hoàn thành
+              HOÀN TẤT ĐĂNG KÝ
             </button>
           )}
         </div>

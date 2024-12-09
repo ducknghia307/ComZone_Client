@@ -10,6 +10,7 @@ import OrderManagement from "../components/sellermanagement/OrderManagement";
 import AuctionManagement from "../components/auctions/AuctionManagement";
 import FeedbackManagement from "../components/feedback/FeedbackManagement";
 import Loading from "../components/loading/Loading";
+import ShopInfo from "../components/sellermanagement/ShopInfo";
 const SellerManagementPage: React.FC = () => {
   const currentUrl = window.location.pathname;
   console.log("URL", currentUrl);
@@ -42,6 +43,8 @@ const SellerManagementPage: React.FC = () => {
 
   const getTable = () => {
     switch (window.location.pathname) {
+      case "/sellermanagement/shop-info":
+        return <ShopInfo />;
       case "/sellermanagement/comic":
         return (
           <SellerComicsManagement
@@ -61,7 +64,7 @@ const SellerManagementPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex items-stretch justify-center gap-4 md:px-8 py-4 bg-gray-50">
+    <div className="w-full flex flex-col phone:flex-row items-stretch justify-center gap-4 px-1 phone:px-8 py-4 bg-gray-50">
       {loading && <Loading />}
       <div className="min-w-fit rounded-md">
         <Sidebar
@@ -74,7 +77,7 @@ const SellerManagementPage: React.FC = () => {
         />
       </div>
 
-      <div className="grow max-w-[80vw] flex items-stretch">{getTable()}</div>
+      <div className="grow flex items-stretch">{getTable()}</div>
     </div>
   );
 };

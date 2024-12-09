@@ -317,7 +317,7 @@ const Navbar = () => {
             </p>
           )}
           {userInfo?.role === "SELLER" && (
-            <Link to={"/sellermanagement/comic"} className="REM text-base ">
+            <Link to={"/sellermanagement/shop-info"} className="REM text-base">
               Quản lí Shop
             </Link>
           )}
@@ -335,12 +335,9 @@ const Navbar = () => {
     },
     {
       key: "5",
-      label: (
-        <div className="REM text-base " onClick={handleLogout}>
-          Đăng xuất
-        </div>
-      ),
+      label: <div className="REM text-base">Đăng xuất</div>,
       icon: <LogoutOutlined style={{ fontSize: 18 }} />,
+      onClick: handleLogout,
     },
   ];
 

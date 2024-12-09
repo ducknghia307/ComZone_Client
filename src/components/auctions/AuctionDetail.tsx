@@ -632,7 +632,7 @@ const ComicAuction = () => {
                 ) : (
                   <div className="bid-row">
                     <input
-                      type="number"
+                      type="text"
                       placeholder="đ"
                       className="bid-input"
                       value={
@@ -641,16 +641,16 @@ const ComicAuction = () => {
                           : bidAmount
                       }
                       onChange={(event) => {
-                        // Remove non-numeric characters before setting the state
-                        const numericValue = event.target.value.replace(
-                          /\./g,
-                          ""
-                        );
+                        let inputValue = event.target.value;
+                  
+                        // Loại bỏ mọi ký tự không phải là số
+                        inputValue = inputValue.replace(/[^\d]/g, '');
+                
                         handleBidInputChange({
                           ...event,
                           target: {
                             ...event.target,
-                            value: numericValue,
+                            value: inputValue,
                           },
                         });
                       }}

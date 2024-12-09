@@ -39,6 +39,7 @@ const ProfileUser: React.FC = () => {
   const { accessToken } = useAppSelector((state) => state.auth);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [isUploading, setIsUploading] = useState(false);
 
   const [profileData, setProfileData] = useState<ProfileData>({
     email: "",
@@ -90,9 +91,37 @@ const ProfileUser: React.FC = () => {
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleClickUpload = () => {
+    document.getElementById("avatar-upload")?.click();
+  };
+
+  const uploadImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    setIsUploading(true);
+    try {
+      const res = await privateAxios.post("/file/upload/image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setNewAvatar(res.data.imageUrl);
+      return res.data.imageUrl;
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) setNewAvatar(URL.createObjectURL(file));
+    if (file) {
+      const localPreviewUrl = URL.createObjectURL(file);
+      setNewAvatar(localPreviewUrl);
+      await uploadImage(file);
+    }
   };
 
   const handleEditClick = () => setEditing(true);

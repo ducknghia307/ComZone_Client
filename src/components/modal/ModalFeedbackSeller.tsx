@@ -24,6 +24,7 @@ interface ModalFeedbackSellerProps {
   userId: string;
   orderId: string; // Thêm orderId để cập nhật trạng thái
   onStatusUpdate: (orderId: string, newStatus: string) => void; // Callback để cập nhật trạng thái
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
@@ -34,6 +35,7 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
   userId,
   orderId,
   onStatusUpdate,
+  setIsLoading,
 }) => {
   const [ratingValue, setRatingValue] = useState<number | null>(null);
   const [images, setImages] = useState<File[]>([]);
@@ -100,6 +102,9 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
       return;
     }
 
+    setIsLoading(true);
+    onClose();
+
     // UPLOAD IMAGES ONLY WHEN SUBMITTING FEEDBACK
     const formData = new FormData();
     images.forEach((file) => {
@@ -154,8 +159,15 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
 
       // alert("Đánh giá đã được gửi thành công!");
       notification.success({
-        message: "Thành công",
-        description: "Đánh giá đã được gửi thành công!",
+        message: <p className="REM uppercase">Hoàn tất đơn hàng thành công</p>,
+        description: (
+          <p className="REM">
+            Cảm ơn bạn đã mua truyện ở ComZone và để lại đánh giá cho người bán.
+            Đánh giá của bạn sẽ được phê duyệt bởi hệ thống trước khi xuất hiện
+            trên trang.
+          </p>
+        ),
+        duration: 7,
       });
       console.log(payload);
 
@@ -167,6 +179,8 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
         message: "Lỗi",
         description: "Có lỗi xảy ra khi gửi đánh giá.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 

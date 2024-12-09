@@ -98,7 +98,10 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       )}
 
-      {(!fullActive || !isUnlimited) && (
+      {(!sellerSubscription?.canSell ||
+        !sellerSubscription?.canAuction ||
+        !sellerSubscription?.isActive ||
+        sellerSubscription?.plan.price === 0) && (
         <>
           <button
             onClick={() => setIsBuyingPlan(true)}
@@ -131,6 +134,29 @@ const Sidebar: React.FC<SidebarProps> = ({
         </>
       )}
       <ul className="REM p-4 rounded-md drop-shadow-xl bg-white">
+        <li
+          className={`menu-item ${
+            currentUrl === "/sellermanagement/shop-info"
+              ? "active"
+              : "duration-200 opacity-60"
+          } flex items-center`}
+          onClick={() => {
+            handleMenuItemClick("comic");
+            navigate("/sellermanagement/shop-info");
+          }}
+          style={{ whiteSpace: "nowrap" }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="currentColor"
+          >
+            <path d="M21 13V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V13H2V11L3 6H21L22 11V13H21ZM5 13V19H19V13H5ZM4.03961 11H19.9604L19.3604 8H4.63961L4.03961 11ZM6 14H14V17H6V14ZM3 3H21V5H3V3Z"></path>
+          </svg>
+          Quản Lý Shop
+        </li>
         <li
           className={`menu-item ${
             currentUrl === "/sellermanagement/comic"

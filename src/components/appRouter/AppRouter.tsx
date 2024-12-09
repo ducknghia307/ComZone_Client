@@ -83,6 +83,10 @@ const AppRouter = () => {
         <Route path="/sellermanagement" element={<SellerManagement />} />
         <Route path="/sellermanagement/createcomic" element={<CreateComic />} />
         <Route
+          path="/sellermanagement/shop-info"
+          element={<SellerManagementPage />}
+        />
+        <Route
           path="/sellermanagement/comic"
           element={<SellerManagementPage />}
         />

@@ -224,14 +224,24 @@ const SellerComicsManagement = ({
     if (!sellerSubscription) {
       notification.warning({
         key: "subs",
-        message: <p>Yêu cầu đăng ký gói bán ComZone.</p>,
+        message: (
+          <p className="REM">
+            Bạn không có lượt bán hay đấu giá. Vui lòng đăng ký gói bán để thêm
+            truyện!
+          </p>
+        ),
         duration: 5,
       });
       setIsRegisteringPlan(true);
     } else if (!sellerSubscription.isActive) {
       notification.warning({
         key: "subs",
-        message: <p>Gói đăng ký bán ComZone của bạn đã hết hiệu lực.</p>,
+        message: (
+          <p className="REM">
+            Gói đăng ký bán ComZone của bạn đã hết hiệu lực. Vui lòng đăng ký
+            thêm!
+          </p>
+        ),
         duration: 5,
       });
       setIsRegisteringPlan(true);
@@ -554,7 +564,6 @@ const SellerComicsManagement = ({
             comic={selectedComic}
             onCancel={handleModalCancel}
             onSuccess={handleModalSuccess}
-            fetchSellerComics={fetchSellerComics}
           />
         </div>
       );

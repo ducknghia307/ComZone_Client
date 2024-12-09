@@ -27,7 +27,7 @@ export default function BuyPlan({
   setIsOpen: React.Dispatch<React.SetStateAction<string>>;
   setIsRegisterSellerModal?: React.Dispatch<React.SetStateAction<boolean>>;
   callback?: () => void;
-  setEntirelyOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setEntirelyOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   setUsedTrial: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [isHidingBalance, setIsHidingBalance] = useState<boolean>(true);
@@ -108,7 +108,7 @@ export default function BuyPlan({
           duration: 5,
         });
         if (callback) callback();
-        setEntirelyOpen(false);
+        if (setEntirelyOpen) setEntirelyOpen(false);
       })
       .catch((err) => {
         console.log(err);

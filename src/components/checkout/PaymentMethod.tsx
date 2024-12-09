@@ -50,6 +50,8 @@ const PaymentMethod = ({
     }
 
     try {
+      localStorage.setItem("wallet-deposit", selectedAmount.toString());
+
       if (selectedWalletMethod === "ZaloPay") {
         const resWalletDes = await privateAxios.post("/wallet-deposits", {
           amount: selectedAmount,
@@ -145,11 +147,11 @@ const PaymentMethod = ({
             "hidden"
           }`}
         >
-          <p className="text-red-500 font-light text-xs">
+          <p className="text-red-500 font-light">
             Số dư hiện không đủ.
           </p>
           <button
-            className="text-sky-800 text-sm duration-200 hover:text-sky-600"
+            className="text-sky-800 duration-200 hover:text-sky-600"
             onClick={showModal}
           >
             Nạp thêm

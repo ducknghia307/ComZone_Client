@@ -12,8 +12,10 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
 import ModalRequestRefund from "../modal/ModalRequestRefund";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import CurrencySplitter from "../../assistants/Spliter";
 import { Link } from "react-router-dom";
+import Loading from "../loading/Loading";
+import EmptyOrderIcon from "../../assets/notFound/emptybox.png";
+
 interface Order {
   id: string;
   delivery?: Delivery;
@@ -59,6 +61,8 @@ const OrderHistory = () => {
   console.log("Order ID selected for refund modal:", selectedOrderId);
 
   const [isRefundModalOpen, setRefundModalOpen] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchOrdersWithItems = async () => {
@@ -296,7 +300,8 @@ const OrderHistory = () => {
 
   return (
     <div>
-      <div className="status-tabs">
+      {isLoading && <Loading />}
+      <div className="w-full bg-white flex items-center mb-1 overflow-x-auto overflow-y-hidden pb-2">
         {[
           "all",
           "PENDING",
@@ -309,312 +314,312 @@ const OrderHistory = () => {
         ].map((status) => (
           <span
             key={status}
-            className={`status-tab REM ${
+            className={`status-tab grow REM whitespace-nowrap ${
               selectedStatus === status ? "active" : ""
             }`}
             onClick={() => setSelectedStatus(status)}
-            style={{ whiteSpace: "nowrap" }}
           >
             {getStatusText(status)}
           </span>
         ))}
       </div>
 
-      <div className="searchbar">
-        <SearchOutlinedIcon sx={{ color: "#8d8d8d", fontSize: "24px" }} />
-        <TextField
-          variant="outlined"
-          fullWidth
-          size="small"
-          placeholder="Tìm kiếm theo tên Shop, ID đơn hàng hoặc Tên Sản phẩm"
-          InputProps={{
-            disableUnderline: true,
-            sx: { "& fieldset": { border: "none", fontFamily: "REM" } },
-          }}
-        />
-      </div>
-
       <div className="purchase-history-content">
-        {filteredOrders.map((order) => (
-          <div key={order.id} className="status-detail" style={orderCardStyle}>
-            {order.type === "AUCTION" && (
-              <div style={cornerRibbonStyle}>
-                <div style={ribbonContentStyle}>
-                  <GavelIcon sx={{ fontSize: 16, marginRight: "4px" }} />
-                  Đấu giá
+        {filteredOrders.length > 0 ? (
+          filteredOrders.map((order) => (
+            <div
+              key={order.id}
+              className="status-detail"
+              style={orderCardStyle}
+            >
+              {order.type === "AUCTION" && (
+                <div style={cornerRibbonStyle}>
+                  <div style={ribbonContentStyle}>
+                    <GavelIcon sx={{ fontSize: 16, marginRight: "4px" }} />
+                    Đấu giá
+                  </div>
                 </div>
-              </div>
-            )}
-            <div className="status-content" style={{ padding: "10px 30px" }}>
-              <div className="status-content-detail">
-                <StoreOutlinedIcon style={{ fontSize: 28 }} />
-                <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
-                  {order.items[0]?.comics.sellerId.name || "N/A"}
-                </Typography>
+              )}
+              <div className="status-content" style={{ padding: "10px 30px" }}>
+                <div className="status-content-detail">
+                  <StoreOutlinedIcon style={{ fontSize: 28 }} />
+                  <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
+                    {order.items[0]?.comics.sellerId.name || "N/A"}
+                  </Typography>
 
-                <Link
-                  to={`/seller/shop/all/${order.items[0]?.comics.sellerId.id}`}
-                  style={{ marginLeft: "10px" }}
-                  className="shop-button duration-200 hover:bg-gray-100"
+                  <Link
+                    to={`/seller/shop/all/${order.items[0]?.comics.sellerId.id}`}
+                    style={{ marginLeft: "10px" }}
+                    className="shop-button duration-200 hover:bg-gray-100"
+                  >
+                    <StoreOutlinedIcon />
+                    <Typography sx={{ fontFamily: "REM" }}>Xem Shop</Typography>
+                  </Link>
+                </div>
+                <Typography
+                  sx={{
+                    margin: "auto 0",
+                    paddingRight: "20px",
+                    color: getStatusColor(order.status),
+                    fontSize: "16px",
+                  }}
                 >
-                  <StoreOutlinedIcon />
-                  <Typography sx={{ fontFamily: "REM" }}>Xem Shop</Typography>
-                </Link>
+                  {getStatusText(order.status)}
+                </Typography>
               </div>
-              <Typography
-                sx={{
-                  margin: "auto 0",
-                  paddingRight: "20px",
-                  color: getStatusColor(order.status),
-                  fontSize: "16px",
+
+              <div
+                className="status-content1"
+                style={{
+                  padding: "20px 50px",
+                  display: "flex",
+                  gap: "20px",
+                  flexDirection: "column",
                 }}
               >
-                {getStatusText(order.status)}
-              </Typography>
-            </div>
-
-            <div
-              className="status-content1"
-              style={{
-                padding: "20px 50px",
-                display: "flex",
-                gap: "20px",
-                flexDirection: "column",
-              }}
-            >
-              {order.items.map((item: any) => (
-                <div
-                  key={item.id}
-                  style={{ display: "flex", gap: "20px", marginBottom: "10px" }}
-                >
-                  {/* Hình ảnh sản phẩm */}
-                  <img
-                    src={
-                      item.comics.coverImage ||
-                      "https://via.placeholder.com/150"
-                    }
-                    alt={item.name}
+                {order.items.map((item: any) => (
+                  <div
+                    key={item.id}
                     style={{
-                      width: "100px",
-                      height: "140px",
-                      objectFit: "cover",
+                      display: "flex",
+                      gap: "20px",
+                      marginBottom: "10px",
                     }}
-                  />
+                  >
+                    {/* Hình ảnh sản phẩm */}
+                    <img
+                      src={
+                        item.comics.coverImage ||
+                        "https://via.placeholder.com/150"
+                      }
+                      alt={item.name}
+                      style={{
+                        width: "100px",
+                        height: "140px",
+                        objectFit: "cover",
+                      }}
+                    />
 
-                  {/* Tên và giá sản phẩm */}
-                  <div>
-                    <Typography
+                    {/* Tên và giá sản phẩm */}
+                    <div>
+                      <Typography
+                        sx={{
+                          fontSize: "20px",
+                          fontWeight: "500",
+                          fontFamily: "REM",
+                        }}
+                      >
+                        {item.comics.title}
+                      </Typography>
+                      <Typography>{item.type}</Typography>
+                      <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
+                        x1
+                      </Typography>
+                    </div>
+
+                    <div
+                      style={{
+                        marginLeft: "auto",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
+                        {order.type === "AUCTION"
+                          ? Number(order.totalPrice).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })
+                          : Number(item.comics.price).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                      </Typography>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "20px",
+                  // backgroundColor: "#fafafa",
+                  borderTop: "1px solid #eee",
+                }}
+              >
+                {order.status === "FAILED" && (
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
+                      <ErrorOutlineIcon className="text-red-500 mr-2" />
+                      <div className="flex flex-col">
+                        <span className="text-red-600 font-semibold font-['REM']">
+                          Lý do từ chối hoàn tiền
+                        </span>
+                        <span className="text-red-500 font-['REM']">
+                          {order.refundRequest?.rejectedReason ||
+                            "Không có lý do cụ thể"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col items-end gap-1 ml-auto">
+                  {order.delivery?.deliveryFee && (
+                    <p className="REM font-light italic">
+                      Phí vận chuyển:&emsp;
+                      {Number(order.delivery.deliveryFee).toLocaleString(
+                        "vi-VN",
+                        {
+                          style: "currency",
+                          currency: "VND",
+                        }
+                      )}
+                    </p>
+                  )}
+
+                  <div className="flex items-center gap-3">
+                    <span className="font-['REM'] text-lg">Tổng tiền:</span>
+                    <span className="font-['REM'] text-2xl font-medium text-[#f77157]">
+                      {Number(
+                        order.totalPrice + order.delivery?.deliveryFee || 0
+                      ).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  flex: "1 1 auto",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "10px",
+                  paddingBottom: "20px",
+                  paddingRight: "20px",
+                }}
+              >
+                {order.status === "COMPLETED" ? (
+                  <>
+                    <Button
                       sx={{
-                        fontSize: "20px",
-                        fontWeight: "500",
+                        color: "#000",
+                        backgroundColor: "#fff",
+                        border: "1px solid black",
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        padding: "5px 20px",
+                        fontFamily: "REM",
+                      }}
+                      onClick={() => openOrderDetailsModal(order)}
+                    >
+                      Xem Chi Tiết
+                    </Button>
+                    <Button
+                      sx={{
+                        color: "#fff",
+                        backgroundColor: "#00BFA6",
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        padding: "5px 20px",
+                        fontFamily: "REM",
+                      }}
+                      onClick={() => alert("Liên hệ người bán!")}
+                    >
+                      Liên hệ người bán
+                    </Button>
+                  </>
+                ) : order.status === "DELIVERED" ? (
+                  <>
+                    <Button
+                      sx={{
+                        color: "#000",
+                        backgroundColor: "#fff",
+                        border: "1px solid black",
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        padding: "5px 20px",
+                        fontFamily: "REM",
+                      }}
+                      onClick={() => openOrderDetailsModal(order)}
+                    >
+                      Xem Chi Tiết
+                    </Button>
+                    <Button
+                      sx={{
+                        color: "#fff",
+                        backgroundColor: "#00BFA6",
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        padding: "5px 20px",
+                        fontFamily: "REM",
+                      }}
+                      onClick={() =>
+                        handleOpenModal(
+                          order.items[0].comics.sellerId.name || "N/A",
+                          order.items[0].comics.sellerId.id,
+                          order.user?.id || "",
+                          order.id.toString()
+                        )
+                      }
+                    >
+                      Đã Nhận Được Hàng
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setRefundModalOpen(true);
+                        setSelectedOrderId(order.id.toString());
+                      }}
+                      sx={{
+                        color: "#fff",
+                        backgroundColor: "#FFB74D",
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        padding: "5px 20px",
                         fontFamily: "REM",
                       }}
                     >
-                      {item.comics.title}
-                    </Typography>
-                    <Typography>{item.type}</Typography>
-                    <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
-                      x1
-                    </Typography>
-                  </div>
-
-                  <div
-                    style={{
-                      marginLeft: "auto",
-                      display: "flex",
-                      alignItems: "center",
+                      Gặp vấn đề khi nhận hàng
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    sx={{
+                      color: "#000",
+                      backgroundColor: "#fff",
+                      border: "1px solid black",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "5px 20px",
+                      fontFamily: "REM",
                     }}
+                    onClick={() => openOrderDetailsModal(order)}
                   >
-                    <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
-                      {order.type === "AUCTION"
-                        ? Number(order.totalPrice).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })
-                        : Number(item.comics.price).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })}
-                    </Typography>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "20px",
-                // backgroundColor: "#fafafa",
-                borderTop: "1px solid #eee",
-              }}
-            >
-              {order.status === "FAILED" && (
-                <div className="flex items-center space-x-2">
-                  <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
-                    <ErrorOutlineIcon className="text-red-500 mr-2" />
-                    <div className="flex flex-col">
-                      <span className="text-red-600 font-semibold font-['REM']">
-                        Lý do từ chối hoàn tiền
-                      </span>
-                      <span className="text-red-500 font-['REM']">
-                        {order.refundRequest?.rejectedReason ||
-                          "Không có lý do cụ thể"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-col items-end gap-1 ml-auto">
-                {order.delivery?.deliveryFee && (
-                  <p className="REM font-light italic">
-                    Phí vận chuyển:&emsp;
-                    {Number(order.delivery.deliveryFee).toLocaleString(
-                      "vi-VN",
-                      {
-                        style: "currency",
-                        currency: "VND",
-                      }
-                    )}
-                  </p>
+                    Xem Chi Tiết
+                  </Button>
                 )}
-
-                <div className="flex items-center gap-3">
-                  <span className="font-['REM'] text-lg">Tổng tiền:</span>
-                  <span className="font-['REM'] text-2xl font-medium text-[#f77157]">
-                    {Number(
-                      order.totalPrice + order.delivery?.deliveryFee || 0
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </span>
-                </div>
               </div>
-            </div>
 
-            <div
-              style={{
-                flex: "1 1 auto",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "10px",
-                paddingBottom: "20px",
-                paddingRight: "20px",
-              }}
-            >
-              {order.status === "COMPLETED" ? (
-                <>
-                  <Button
-                    sx={{
-                      color: "#000",
-                      backgroundColor: "#fff",
-                      border: "1px solid black",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      padding: "5px 20px",
-                      fontFamily: "REM",
-                    }}
-                    onClick={() => openOrderDetailsModal(order)}
-                  >
-                    Xem Chi Tiết
-                  </Button>
-                  <Button
-                    sx={{
-                      color: "#fff",
-                      backgroundColor: "#00BFA6",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      padding: "5px 20px",
-                      fontFamily: "REM",
-                    }}
-                    onClick={() => alert("Liên hệ người bán!")}
-                  >
-                    Liên hệ người bán
-                  </Button>
-                </>
-              ) : order.status === "DELIVERED" ? (
-                <>
-                  <Button
-                    sx={{
-                      color: "#000",
-                      backgroundColor: "#fff",
-                      border: "1px solid black",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      padding: "5px 20px",
-                      fontFamily: "REM",
-                    }}
-                    onClick={() => openOrderDetailsModal(order)}
-                  >
-                    Xem Chi Tiết
-                  </Button>
-                  <Button
-                    sx={{
-                      color: "#fff",
-                      backgroundColor: "#00BFA6",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      padding: "5px 20px",
-                      fontFamily: "REM",
-                    }}
-                    onClick={() =>
-                      handleOpenModal(
-                        order.items[0].comics.sellerId.name || "N/A",
-                        order.items[0].comics.sellerId.id,
-                        order.user?.id || "",
-                        order.id.toString()
-                      )
-                    }
-                  >
-                    Đã Nhận Được Hàng
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setRefundModalOpen(true);
-                      setSelectedOrderId(order.id.toString());
-                    }}
-                    sx={{
-                      color: "#fff",
-                      backgroundColor: "#FFB74D",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      padding: "5px 20px",
-                      fontFamily: "REM",
-                    }}
-                  >
-                    Gặp vấn đề khi nhận hàng
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  sx={{
-                    color: "#000",
-                    backgroundColor: "#fff",
-                    border: "1px solid black",
-                    fontWeight: "bold",
-                    fontSize: "16px",
-                    padding: "5px 20px",
-                    fontFamily: "REM",
-                  }}
-                  onClick={() => openOrderDetailsModal(order)}
-                >
-                  Xem Chi Tiết
-                </Button>
-              )}
+              {/* Modal xem chi tiết*/}
+              <OrderDetailsModal
+                open={isOrderDetailsOpen}
+                onClose={closeOrderDetailsModal}
+                order={selectedOrder}
+              />
             </div>
-
-            {/* Modal xem chi tiết*/}
-            <OrderDetailsModal
-              open={isOrderDetailsOpen}
-              onClose={closeOrderDetailsModal}
-              order={selectedOrder}
-            />
+          ))
+        ) : (
+          <div className="w-full flex flex-col items-center justify-center gap-4 py-[10vh] rounded-md bg-white REM font-light text-lg opacity-40">
+            <img src={EmptyOrderIcon} alt="" className="w-[10em]" />
+            Không có đơn hàng nào
           </div>
-        ))}
+        )}
         {/* Modal đã nhận được hàng*/}
         <ModalFeedbackSeller
           open={openModal}
@@ -624,6 +629,7 @@ const OrderHistory = () => {
           userId={selectedUserId || ""}
           orderId={selectedOrderId || ""} // Truyền orderId
           onStatusUpdate={handleStatusUpdate} // Truyền callback
+          setIsLoading={setIsLoading}
         />
 
         <ModalRequestRefund

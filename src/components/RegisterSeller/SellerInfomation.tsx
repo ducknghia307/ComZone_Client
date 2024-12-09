@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { UserInfo } from "../../common/base.interface";
-import { Input } from "antd";
+import { Input, message } from "antd";
+import OTPVerification from "../wallet/OTPVerification";
 
 interface SellerInformationProps {
   userInfo?: UserInfo;
   otp: string;
   setOtp: (otp: string) => void;
   otpSent: boolean;
+  setOtpSent: React.Dispatch<React.SetStateAction<boolean>>;
   handleSendOtp: () => void;
   setName: (name: string) => void;
   setEmail: (email: string) => void;
   setPhone: (phone: string) => void;
+  setCurrent: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const SellerInfomation: React.FC<SellerInformationProps> = ({
@@ -18,10 +21,12 @@ const SellerInfomation: React.FC<SellerInformationProps> = ({
   otp,
   setOtp,
   otpSent,
+  setOtpSent,
   handleSendOtp,
   setName,
   setEmail,
   setPhone,
+  setCurrent,
 }) => {
   const [name, setLocalName] = useState<string>(userInfo?.name || "");
   const [email, setLocalEmail] = useState<string>(userInfo?.email || "");
@@ -109,10 +114,17 @@ const SellerInfomation: React.FC<SellerInformationProps> = ({
               </div>
             </div>
             {otpSent && (
-              <div className="w-2/3 flex flex-col mt-4">
-                <h2>OTP</h2>
-                <Input.OTP length={6} onChange={(e) => setOtp(e)} value={otp} />
-              </div>
+              <OTPVerification
+                isOpen={otpSent}
+                setIsOpen={setOtpSent}
+                handleCallback={() => {
+                  message.success("Xác thực OTP thành công.", 5);
+                  setOtpSent(false);
+                  setCurrent((prev) => prev + 1);
+                }}
+                user={userInfo}
+                phoneNumber={phone}
+              />
             )}
           </div>
         </div>

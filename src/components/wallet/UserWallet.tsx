@@ -26,11 +26,13 @@ import CurrencySplitter from "../../assistants/Spliter";
 import { useAppSelector } from "../../redux/hooks";
 import { Transaction } from "../../common/interfaces/transaction.interface";
 import displayPastTimeFromNow from "../../utils/displayPastTimeFromNow";
-import { Tooltip } from "antd";
+import { notification, Tooltip } from "antd";
+import WithdrawalForm from "./WithdrawalForm";
 const UserWallet = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
+  const [showSOFs, setShowSOFs] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -65,7 +67,7 @@ const UserWallet = () => {
               : transaction.order
               ? "Nhận tiền"
               : "")) ||
-          (transaction.walletDeposit &&
+          (transaction.withdrawal &&
             transaction.type === "SUBTRACT" &&
             "Rút tiền") ||
           "Thanh toán",
@@ -90,7 +92,7 @@ const UserWallet = () => {
               : "Thông tin giao dịch không có sẵn"
             : transaction.type === "ADD"
             ? transaction.order
-              ? `Nhận tiền đơn hàng (${transaction.note})`
+              ? `Nhận tiền đơn hàng`
               : transaction.exchange
               ? `Thanh toán tiền bù trao đổi`
               : transaction.deposit?.exchange
@@ -177,110 +179,22 @@ const UserWallet = () => {
     <div className="wallet-container">
       {showDepositForm && userInfo ? (
         <DepositForm
-          onBack={() => setShowDepositForm(false)}
+          onBack={() => {
+            fetchUserInfo();
+            fetchUserTransactions();
+            setShowDepositForm(false);
+          }}
           userInfo={userInfo}
         />
       ) : showWithdrawForm ? (
-        <Box>
-          <IconButton onClick={() => setShowWithdrawForm(false)}>
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography
-            variant="h4"
-            gutterBottom
-            textAlign="center"
-            fontWeight="bold"
-          >
-            RÚT TIỀN RA KHỎI VÍ
-          </Typography>
-          <div style={{ width: "600px", margin: "auto", paddingTop: "40px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="h6">Số dư hiện tại:</Typography>
-              <Box display="flex" alignItems="center">
-                <Typography variant="h6" sx={{ color: "#FF8A00" }}>
-                  {isVisible ? "1.000.000 đ" : "******** đ"}
-                </Typography>
-                <IconButton onClick={() => setIsVisible(!isVisible)}>
-                  {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                </IconButton>
-              </Box>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="h6">Số dư có thể rút:</Typography>
-              <Box display="flex" alignItems="center">
-                <Typography variant="h6" sx={{ color: "#FF8A00" }}>
-                  {isVisible ? "900.000 đ" : "****** đ"}
-                </Typography>
-                <IconButton onClick={() => setIsVisible(!isVisible)}>
-                  {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                </IconButton>
-              </Box>
-            </div>
-            <Typography sx={{ color: "#FF8A00", textAlign: "center" }}>
-              (Một phần số dư của bạn đang bị giữ lại do khoản cọc trong giao
-              dịch.)
-            </Typography>
-
-            <div style={{ paddingTop: "20px" }}>
-              <Typography sx={{ paddingBottom: "10px", fontWeight: "bold" }}>
-                Nhập số tiền muốn rút:
-              </Typography>
-              <TextField
-                variant="outlined"
-                fullWidth
-                InputProps={{
-                  startAdornment: <Typography>đ</Typography>,
-                }}
-              />
-            </div>
-            <Typography
-              sx={{
-                paddingBottom: "10px",
-                fontWeight: "bold",
-                paddingTop: "20px",
-              }}
-            >
-              Chọn phương thức rút tiền:
-            </Typography>
-            <Box display="flex" gap={3} sx={{ paddingLeft: "20px" }}>
-              <img
-                style={{
-                  border: "1px solid black",
-                  borderRadius: "10px",
-                  width: "70px",
-                  height: "70px",
-                }}
-                src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png"
-                alt="ZaloPay"
-              />
-              <img
-                style={{
-                  border: "1px solid black",
-                  borderRadius: "10px",
-                  width: "70px",
-                  height: "70px",
-                }}
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLeYoMVenMbgWL1FxDJPKuQvJD6R0KdnXE7A&s"
-                alt="VNPay"
-                width={100}
-              />
-            </Box>
-            <Button
-              sx={{
-                marginTop: 3,
-                display: "block",
-                marginLeft: "auto",
-                marginRight: "auto",
-                color: "#fff",
-                backgroundColor: "#000",
-                padding: "5px 20px",
-                fontSize: "16px",
-              }}
-            >
-              TIẾN HÀNH RÚT TIỀN
-            </Button>
-          </div>
-        </Box>
+        <WithdrawalForm
+          onBack={() => {
+            fetchUserInfo();
+            fetchUserTransactions();
+            setShowWithdrawForm(false);
+          }}
+          user={userInfo}
+        />
       ) : (
         <>
           <Typography
@@ -300,28 +214,8 @@ const UserWallet = () => {
             alignItems="center"
             mb={3}
           >
-            <Box>
-              <div style={{ display: "flex", marginRight: "20px" }}>
-                <Typography variant="h6" mr={2} sx={{ fontFamily: "REM" }}>
-                  Số dư hiện tại:
-                </Typography>
-                <Typography
-                  variant="h6"
-                  sx={{ color: "#FF8A00", fontFamily: "REM" }}
-                >
-                  {isVisible
-                    ? `${
-                        userInfo.balance > 0
-                          ? CurrencySplitter(userInfo.balance)
-                          : 0
-                      } đ`
-                    : "****** đ"}
-                </Typography>
-                <IconButton onClick={() => setIsVisible(!isVisible)}>
-                  <VisibilityOffIcon />
-                </IconButton>
-              </div>
-              {userInfo.role === "SELLER" && (
+            {/* <Box> */}
+            {/* {userInfo.role === "SELLER" && (
                 <div
                   style={{
                     display: "flex",
@@ -373,144 +267,158 @@ const UserWallet = () => {
                     </Tooltip>
                   )}
                 </div>
-              )}
-            </Box>
+              )} */}
+            {/* </Box> */}
 
-            <Box display="flex" gap={2}>
-              <Button
-                sx={{
-                  backgroundColor: "#fff",
-                  color: "#000",
-                  border: "1px solid black",
-                  padding: "5px 20px",
-                  fontFamily: "REM",
-                }}
-                onClick={() => setShowWithdrawForm(true)}
+            <div className="REM flex flex-row-reverse items-stretch gap-1 py-2">
+              <button
+                onClick={() => setIsVisible(!isVisible)}
+                className="px-4 border border-gray-500 rounded-md duration-200 hover:bg-gray-100"
               >
-                Rút Tiền
-              </Button>
-              <Button
-                sx={{
-                  backgroundColor: "#000",
-                  color: "#fff",
-                  padding: "5px 20px",
-                  fontFamily: "REM",
+                {isVisible
+                  ? `SỐ DƯ KHẢ DỤNG: ${
+                      userInfo.balance > 0
+                        ? CurrencySplitter(userInfo.balance)
+                        : 0
+                    }đ`
+                  : "XEM SỐ DƯ KHẢ DỤNG"}
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowWithdrawForm(true);
                 }}
+                className="px-4 border border-gray-500 rounded-md duration-200 hover:bg-gray-100"
+              >
+                RÚT TIỀN
+              </button>
+
+              <button
                 onClick={() => setShowDepositForm(true)}
+                className="px-4 bg-black text-white uppercase py-2 rounded-md duration-200 hover:bg-gray-800"
               >
                 Nạp Tiền Vào Ví
-              </Button>
-            </Box>
+              </button>
+            </div>
           </Box>
 
-          <TableContainer component={Paper} className="wallet-table-container">
-            <Table>
-              <TableHead>
-                <TableRow style={{ backgroundColor: "black" }}>
-                  <TableCell
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontFamily: "REM",
-                    }}
-                  >
-                    Mã giao dịch
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontFamily: "REM",
-                    }}
-                  >
-                    Ngày giao dịch
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontFamily: "REM",
-                    }}
-                  >
-                    Loại giao dịch
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontFamily: "REM",
-                    }}
-                  >
-                    Số Tiền (đ)
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontFamily: "REM",
-                    }}
-                  >
-                    Trạng Thái
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontFamily: "REM",
-                    }}
-                  >
-                    Ghi Chú
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedTransactions.map(
-                  (transaction: Transaction, index) => (
-                    <TableRow key={index}>
-                      <TableCell sx={{ fontFamily: "REM" }} align="center">
-                        #{transaction.code}
-                      </TableCell>
-                      <TableCell sx={{ fontFamily: "REM" }} align="center">
-                        {displayPastTimeFromNow(transaction.createdAt)}
-                      </TableCell>
-                      <TableCell sx={{ fontFamily: "REM" }} align="center">
-                        {transaction.type}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontFamily: "REM",
-                          color: transaction.amount.toString().startsWith("+")
-                            ? "green"
-                            : "red",
-                        }}
-                        align="center"
-                      >
-                        {transaction.amount}
-                      </TableCell>
+          {transactions.length > 0 ? (
+            <TableContainer
+              component={Paper}
+              className="wallet-table-container"
+            >
+              <Table>
+                <TableHead>
+                  <TableRow style={{ backgroundColor: "black" }}>
+                    <TableCell
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontFamily: "REM",
+                      }}
+                    >
+                      Mã giao dịch
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontFamily: "REM",
+                      }}
+                    >
+                      Ngày giao dịch
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontFamily: "REM",
+                      }}
+                    >
+                      Loại giao dịch
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontFamily: "REM",
+                      }}
+                    >
+                      Số Tiền (đ)
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontFamily: "REM",
+                      }}
+                    >
+                      Trạng Thái
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontFamily: "REM",
+                      }}
+                    >
+                      Ghi Chú
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedTransactions.map(
+                    (transaction: Transaction, index) => (
+                      <TableRow key={index}>
+                        <TableCell sx={{ fontFamily: "REM" }} align="center">
+                          #{transaction.code}
+                        </TableCell>
+                        <TableCell sx={{ fontFamily: "REM" }} align="center">
+                          {displayPastTimeFromNow(transaction.createdAt)}
+                        </TableCell>
+                        <TableCell sx={{ fontFamily: "REM" }} align="center">
+                          {transaction.type}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontFamily: "REM",
+                            color: transaction.amount.toString().startsWith("+")
+                              ? "green"
+                              : "red",
+                          }}
+                          align="center"
+                        >
+                          {transaction.amount}
+                        </TableCell>
 
-                      <TableCell sx={{ fontFamily: "REM" }} align="center">
-                        <span style={getStatusChipStyles(transaction.status)}>
-                          {translateStatus(transaction.status).toUpperCase()}
-                        </span>
-                      </TableCell>
-                      <TableCell sx={{ fontFamily: "REM" }} align="center">
-                        {transaction.note}
-                      </TableCell>
-                    </TableRow>
-                  )
-                )}
-              </TableBody>
-            </Table>
-            <TablePagination
-              rowsPerPageOptions={[20, 50]}
-              component="div"
-              count={transactions.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableContainer>
+                        <TableCell sx={{ fontFamily: "REM" }} align="center">
+                          <span style={getStatusChipStyles(transaction.status)}>
+                            {translateStatus(transaction.status).toUpperCase()}
+                          </span>
+                        </TableCell>
+                        <TableCell sx={{ fontFamily: "REM" }} align="center">
+                          {transaction.note}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  )}
+                </TableBody>
+              </Table>
+              <TablePagination
+                rowsPerPageOptions={[20, 50]}
+                component="div"
+                count={transactions.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableContainer>
+          ) : (
+            <p className="w-full text-center REM uppercase text-xl font-light opacity-50 py-[10vh]">
+              Chưa có giao dịch nào
+            </p>
+          )}
         </>
       )}
     </div>

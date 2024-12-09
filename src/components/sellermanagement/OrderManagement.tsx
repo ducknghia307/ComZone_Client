@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Chip,
   IconButton,
   Paper,
   Table,
@@ -44,8 +43,8 @@ const OrderManagement = () => {
 
         if (Array.isArray(data)) {
           const sortedOrders = data.sort((a, b) => {
-            const dateA = new Date(a.createdAt);
-            const dateB = new Date(b.createdAt);
+            const dateA = new Date(a.updatedAt);
+            const dateB = new Date(b.updatedAt);
             return dateB.getTime() - dateA.getTime();
           });
 

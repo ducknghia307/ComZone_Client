@@ -88,7 +88,7 @@ const Sidebar = () => {
           >
             <PersonOutlinedIcon /> Hồ Sơ Của Tôi
           </li>
-          <li
+          {/* <li
             className={`menu-item ${
               currentUrl.includes("/accountmanagement/announcement")
                 ? "active"
@@ -139,7 +139,7 @@ const Sidebar = () => {
                 Trao Đổi
               </li>
             </ul>
-          )}
+          )} */}
           <li
             className={`menu-item ${
               currentUrl === "/accountmanagement/auction" ? "active" : ""

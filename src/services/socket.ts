@@ -5,7 +5,7 @@ import { makeStore } from "../redux/store";
 const { store } = makeStore();
 
 const socket = io(import.meta.env.VITE_SERVER_BASE_URL, {
-  autoConnect: false,
+  autoConnect: true,
   query: {},
 });
 

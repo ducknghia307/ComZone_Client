@@ -58,13 +58,34 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
   const navigateToAll = () => {
     navigate("/accountmanagement/announcement/orders");
   };
+  const markAllAsRead = async () => {
+    try {
+      await privateAxios.patch(`/announcements/mark-all-read`);
+
+      setAnnouncements((prev) =>
+        prev.map((announcement) => ({ ...announcement, isRead: true }))
+      );
+
+      console.log("All announcements marked as read.");
+    } catch (error) {
+      console.error("Error marking all announcements as read:", error);
+    }
+  };
 
   const navigateTo = async (item) => {
     if (item.order) {
       if (item.recipientType === "SELLER") navigate("/sellermanagement/order");
       else navigate("/accountmanagement/purchase");
     }
+    console.log("item", item);
 
+    if (item.auction) {
+      if (item.recipientType === "SELLER") {
+        navigate("sellermanagement/auction");
+      } else {
+        navigate(`/auctiondetail/${item.auction.id}`);
+      }
+    }
     if (item.exchange)
       navigate(`/exchange/detail/${item.exchange.id || item.exchange}`);
     console.log(item);
@@ -144,12 +165,16 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
   };
 
   return (
-    <div className="relative max-h-96 w-96 overflow-y-auto">
+    <div className="relative max-h-96 w-96 ">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white">
-        <div className="mb-2 pb-2 border-b">
-          <h4 className="font-bold text-gray-800 text-center">
-            Thông Báo Mới Nhận
+        <div className="mb-2 pb-2 border-b flex justify-between px-3">
+          <h4 className="font-bold text-gray-800 ">Thông Báo Mới Nhận</h4>
+          <h4
+            className="font-bold text-gray-800 cursor-pointer hover:underline"
+            onClick={markAllAsRead}
+          >
+            Đánh dấu đã đọc tất cả
           </h4>
         </div>
 
@@ -181,7 +206,7 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       </div>
 
       {/* Notifications */}
-      <div className="mb-2">
+      <div className="headerNoti mb-2 overflow-y-auto h-80 w-96 p-1">
         {filteredAnnouncements.length > 0 ? (
           filteredAnnouncements.map((item, index) => {
             return (
@@ -237,14 +262,16 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       </div>
 
       {/* Footer */}
-      <div className="border-t p-1 text-center sticky bottom-0 bg-white z-10">
-        <button
-          className="text-blue-500 text-sm font-semibold hover:underline"
-          onClick={navigateToAll}
-        >
-          Xem tất cả
-        </button>
-      </div>
+      {announcements.length > 0 && (
+        <div className="border-t p-1 text-center sticky bottom-0 bg-white z-10">
+          {/* <button
+            className="text-blue-500 text-sm font-semibold hover:underline"
+            onClick={navigateToAll}
+          >
+            Xem thêm
+          </button> */}
+        </div>
+      )}
     </div>
   );
 };

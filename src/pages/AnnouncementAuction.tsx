@@ -10,6 +10,26 @@ const AnnouncementAuction = () => {
   const [unreadAnnounce, setUnreadAnnounce] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  const markAllAsRead = async () => {
+    try {
+      await privateAxios.patch(`/announcements/mark-all-read`, {
+        params: { type: "AUCTION" },
+      });
+
+      setAnnouncements((prevAnnouncements) =>
+        prevAnnouncements.map((announcement) => ({
+          ...announcement,
+          isRead: true,
+        }))
+      );
+      setUnreadAnnounce(0);
+
+      console.log("All auction announcements marked as read.");
+    } catch (error) {
+      console.error("Error marking all auction announcements as read:", error);
+    }
+  };
+
   // Function to mark an announcement as read
   const markAsRead = async (announcementId: string) => {
     try {
@@ -62,13 +82,23 @@ const AnnouncementAuction = () => {
         <Grid size={2} className="account-menu">
           <Sidebar />
         </Grid>
+
         <Grid size={9} className="announcement-content">
-          <div className="p-6 bg-white shadow-lg rounded-lg">
+          <div className="px-10 bg-white shadow-lg rounded-t border-b flex justify-between align-middle ">
+            <p className="REM font-semibold text-lg my-2">Thông báo đấu giá</p>
+            <button
+              className="text-blue-500 font-semibold hover:underline my-2 "
+              onClick={markAllAsRead}
+            >
+              Đánh dấu đã đọc tất cả
+            </button>
+          </div>
+          <div className="p-4 bg-white shadow-lg rounded-b">
             {announcements.length > 0 ? (
               announcements.map((announcement) => (
                 <div
                   key={announcement.id}
-                  className={`border-b rounded-lg p-4 cursor-pointer transition-colors duration-300 flex ${
+                  className={`border-b rounded-lg p-3 cursor-pointer transition-colors duration-300 flex ${
                     announcement.isRead ? "bg-white" : "bg-gray-100"
                   } hover:bg-custom-blue`}
                   onClick={() =>

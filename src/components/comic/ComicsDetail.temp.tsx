@@ -22,6 +22,7 @@ import {
   SellerFeedbackResponse,
 } from "../../common/interfaces/seller-feedback.interface";
 import Loading from "../loading/Loading";
+import socket from "../../services/socket";
 
 export default function ComicsDetailTemp() {
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
@@ -181,12 +182,14 @@ export default function ComicsDetailTemp() {
     } else {
       setIsLoading(true);
       await privateAxios
-        .post("chat-rooms", {
+        .post("chat-rooms/comics", {
           secondUser: comics.sellerId.id,
           comics: comics.id,
         })
         .then((res) => {
           sessionStorage.setItem("connectedChat", res.data.id);
+          socket.emit("join-room", { userId: comics.sellerId.id });
+          socket.emit("join-room", { userId: userInfo.id });
           setIsChatOpen(true);
         })
         .catch((err) => console.log(err))

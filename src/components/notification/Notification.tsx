@@ -74,8 +74,10 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
 
   const navigateTo = async (item) => {
     if (item.order) {
-      if (item.recipientType === "SELLER") navigate("/sellermanagement/order");
-      else navigate("/accountmanagement/purchase");
+      if (item.recipientType === "SELLER")
+        navigate(`/sellermanagement/order?search=${item.order.code}`);
+      else
+        navigate(`/accountmanagement/purchase?search=${item.order.code || ""}`);
     }
     console.log("item", item);
 
@@ -130,6 +132,7 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       case AnnouncementType.DELIVERY_FINISHED_RECEIVE:
         return ApproveIcon;
 
+      case AnnouncementType.ORDER_FAILED:
       case AnnouncementType.EXCHANGE_REJECTED:
       case AnnouncementType.EXCHANGE_FAILED:
       case AnnouncementType.DELIVERY_FAILED_RECEIVE:

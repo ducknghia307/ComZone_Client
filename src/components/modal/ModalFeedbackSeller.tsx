@@ -14,7 +14,7 @@ import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { OrderDetailData } from "../../common/base.interface";
-import { notification } from "antd";
+import { Checkbox, message, notification } from "antd";
 
 interface ModalFeedbackSellerProps {
   open: boolean;
@@ -43,7 +43,8 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [commentText, setCommentText] = useState<string>("");
 
-  console.log("orderId", orderId);
+  const [withoutFeedbackCheck, setWithoutFeedbackCheck] =
+    useState<boolean>(false);
 
   useEffect(() => {
     const fetchOrdersWithItems = async () => {
@@ -91,13 +92,18 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
     setImages(updatedImages);
   };
 
-  const handleSubmitFeedback = async () => {
-    if (!ratingValue || !commentText.trim() || images.length === 0) {
-      // alert("Vui lòng nhập đầy đủ thông tin đánh giá và tải lên ít nhất một hình ảnh.");
-      notification.warning({
-        message: "Thiếu thông tin",
-        description:
-          "Vui lòng nhập đầy đủ thông tin đánh giá và tải lên ít nhất một hình ảnh.",
+  const handleSubmitFeedback = async (isFeedback: boolean) => {
+    if (
+      isFeedback &&
+      (!ratingValue || !commentText.trim() || images.length === 0)
+    ) {
+      message.warning({
+        content: (
+          <p className="REM">
+            Vui lòng nhập đầy đủ thông tin đánh giá và tải lên ít nhất một hình
+            ảnh!
+          </p>
+        ),
       });
       return;
     }
@@ -106,41 +112,43 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
     onClose();
 
     // UPLOAD IMAGES ONLY WHEN SUBMITTING FEEDBACK
-    const formData = new FormData();
-    images.forEach((file) => {
-      formData.append("images", file);
-    });
 
     try {
-      const imageUploadResponse = await privateAxios.post(
-        "/file/upload/multiple-images",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      if (isFeedback) {
+        const formData = new FormData();
+        images.forEach((file) => {
+          formData.append("images", file);
+        });
 
-      const imageUrls = imageUploadResponse.data.imageUrls;
-      setUploadedImageUrls(imageUrls); // Update state with uploaded image URLs
+        const imageUploadResponse = await privateAxios.post(
+          "/file/upload/multiple-images",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
-      // Prepare the feedback payload
-      const payload = {
-        user: userId,
-        seller: sellerId,
-        rating: ratingValue,
-        comment: commentText,
-        attachedImages: imageUrls, // Include uploaded image URLs in the payload
-        order: orderId,
-        isFeedback: true,
-      };
+        const imageUrls = imageUploadResponse.data.imageUrls;
+        setUploadedImageUrls(imageUrls);
 
-      await privateAxios.post("/seller-feedback", payload);
+        const payload = {
+          user: userId,
+          seller: sellerId,
+          rating: ratingValue,
+          comment: commentText,
+          attachedImages: imageUrls,
+          order: orderId,
+          isFeedback: true,
+        };
+
+        await privateAxios.post("/seller-feedback", payload);
+      }
 
       const statusPayload = {
         order: orderId,
-        isFeedback: true,
+        isFeedback,
       };
 
       console.log("Updating orderId:", orderId);
@@ -162,22 +170,21 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
         message: <p className="REM uppercase">Hoàn tất đơn hàng thành công</p>,
         description: (
           <p className="REM">
-            Cảm ơn bạn đã mua truyện ở ComZone và để lại đánh giá cho người bán.
-            Đánh giá của bạn sẽ được phê duyệt bởi hệ thống trước khi xuất hiện
-            trên trang.
+            Cảm ơn bạn đã mua truyện ở ComZone
+            {isFeedback
+              ? " và để lại đánh giá cho người bán. Đánh giá của bạn sẽ được phê duyệt bởi hệ thống trước khi xuất hiện trên trang."
+              : "."}
           </p>
         ),
         duration: 7,
       });
-      console.log(payload);
 
       onClose();
     } catch (error) {
       console.error("Error submitting feedback:", error);
-      // alert("Có lỗi xảy ra khi gửi đánh giá.");
       notification.error({
         message: "Lỗi",
-        description: "Có lỗi xảy ra khi gửi đánh giá.",
+        description: "Có lỗi xảy ra khi xác nhận đơn hàng.",
       });
     } finally {
       setIsLoading(false);
@@ -372,21 +379,29 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
           }}
         />
 
-        <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#000",
-              color: "#fff",
-              fontWeight: "bold",
-              padding: "10px 30px",
-              fontSize: "16px",
-              fontFamily: "REM",
-            }}
-            onClick={handleSubmitFeedback}
+        <div className="REM flex items-center gap-2 pb-4">
+          <Checkbox
+            checked={withoutFeedbackCheck}
+            onChange={() => setWithoutFeedbackCheck(!withoutFeedbackCheck)}
+          />
+          <p>Xác nhận hoàn tất đơn hàng mà không đánh giá</p>
+        </div>
+
+        <div className="w-full flex items-stretch justify-center gap-1 REM">
+          <button
+            disabled={!withoutFeedbackCheck}
+            onClick={() => handleSubmitFeedback(false)}
+            className="basis-1/3 border border-gray-400 rounded-md duration-200 hover:bg-gray-100 disabled:opacity-40"
           >
-            GỬI ĐÁNH GIÁ
-          </Button>
+            Hoàn tất
+          </button>
+
+          <button
+            onClick={() => handleSubmitFeedback(true)}
+            className="grow py-2 font-semibold bg-gray-900 text-white rounded-md duration-200 hover:bg-gray-700"
+          >
+            Gửi Đánh Giá
+          </button>
         </div>
       </DialogContent>
     </Dialog>

@@ -22,8 +22,8 @@ export default function ComicsSeller({
   return (
     <div className="w-full">
       <div
-        className={`flex gap-2 items-center  pb-4 ${
-          currentId !== seller?.id && "border-b"
+        className={`flex gap-2 items-center ${
+          currentId !== seller?.id && ""
         }`}
       >
         <img

@@ -244,6 +244,7 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchUserInfo();
+    getMessageUnreadList();
   }, [accessToken]);
 
   const handleLogout = async () => {
@@ -341,13 +342,15 @@ const Navbar = () => {
     },
   ];
 
-  const getMessageUnreadList = (value: number) => {
-    setChatUnreadCount(value);
+  const getMessageUnreadList = async () => {
+    console.log("NEW MESSAGE TRIGGERED: ", userInfo?.name);
+    await privateAxios
+      .get("chat-messages/unread")
+      .then((res) => {
+        setChatUnreadCount(res.data.length);
+      })
+      .catch((err) => console.log(err));
   };
-
-  // if (userInfo?.role === "ADMIN" || userInfo?.role === "MODERATOR") {
-  //   return null;
-  // }
 
   const adminAndModPaths = [
     "/admin/dashboard",
@@ -764,13 +767,12 @@ const Navbar = () => {
           )}
         </div>
       </nav>
-      {isChatOpen && (
-        <ChatModal
-          isChatOpen={isChatOpen}
-          setIsChatOpen={setIsChatOpen}
-          getMessageUnreadList={getMessageUnreadList}
-        />
-      )}
+
+      <ChatModal
+        isChatOpen={isChatOpen}
+        setIsChatOpen={setIsChatOpen}
+        getMessageUnreadList={getMessageUnreadList}
+      />
 
       {isRegisteringSeller && (
         <RegisterSellerModal

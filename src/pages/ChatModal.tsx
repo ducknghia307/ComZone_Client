@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import { Socket } from "socket.io-client";
 import { Modal, notification } from "antd";
 import ChatRoomList from "../components/chat/ChatRoomList";
 import { SetStateAction, useEffect, useRef, useState } from "react";
@@ -20,7 +19,7 @@ export default function ChatModal({
 }: {
   isChatOpen: boolean;
   setIsChatOpen: React.Dispatch<SetStateAction<boolean>>;
-  getMessageUnreadList?: Function;
+  getMessageUnreadList?: () => void;
 }) {
   const { isLoggedIn, userId, accessToken } = useAppSelector(
     (state) => state.auth
@@ -40,22 +39,20 @@ export default function ChatModal({
 
   const currentRoomIdRef = useRef(currentRoomId);
 
-  const socketRef = useRef<Socket>(socket);
-
   useEffect(() => {
-    if (socketRef.current) {
-      socketRef.current.on("new-message", (newMessage: Message) => {
-        socketRef.current?.emit("update-room-list", {
+    if (socket) {
+      socket.on("new-message", (newMessage: Message) => {
+        socket.emit("update-room-list", {
           userId,
           chatRoomId: newMessage.chatRoom.id,
         });
 
-        socketRef.current?.emit("get-unread-list", { userId });
+        socket?.emit("get-unread-list", { userId });
 
         if (currentRoomIdRef.current.length === 0) return;
 
         if (newMessage.chatRoom.id == currentRoomIdRef.current) {
-          socketRef.current?.emit("update-message-list", {
+          socket?.emit("update-message-list", {
             userId,
             chatRoomId: currentRoomIdRef.current,
           });
@@ -63,19 +60,17 @@ export default function ChatModal({
       });
     }
 
-    socketRef.current.on("new-room-list", (newRoomList: ChatRoom[]) => {
+    socket.on("new-room-list", (newRoomList: ChatRoom[]) => {
       setChatRoomList(newRoomList);
     });
 
-    socketRef.current.on(
-      "new-message-list",
-      (newMessageList: MessageGroup[]) => {
-        setCurrentMessList(newMessageList);
-      }
-    );
+    socket.on("new-message-list", (newMessageList: MessageGroup[]) => {
+      setCurrentMessList(newMessageList);
+    });
 
-    socketRef.current.on("new-unread-list", (unreadList: ChatRoom[]) => {
-      if (getMessageUnreadList) getMessageUnreadList(unreadList.length);
+    socket.on("new-unread-list", (list: ChatRoom[]) => {
+      console.log("UNREAD FROM CHAT MODAL: ", list);
+      if (getMessageUnreadList) getMessageUnreadList();
     });
   }, [currentRoomId]);
 
@@ -87,8 +82,7 @@ export default function ChatModal({
           const list: ChatRoom[] = res.data;
           setChatRoomList(list);
 
-          if (socketRef.current)
-            socketRef.current.emit("join-room", { userId });
+          if (socket) socket.emit("join-room", { userId });
 
           if (currentRoomId.length > 0) return;
           if (list.length > 0) {
@@ -139,10 +133,10 @@ export default function ChatModal({
         duration: 5,
       });
     } else {
-      if (!socketRef.current) return;
+      if (!socket) return;
 
       if (currentRoomId.length > 0 && messageInput && messageInput.length > 0) {
-        socketRef.current.emit("send-new-message", {
+        socket.emit("send-new-message", {
           userId,
           chatRoom: currentRoomIdRef.current,
           content: messageInput,
@@ -163,8 +157,8 @@ export default function ChatModal({
         duration: 5,
       });
     } else {
-      if (socketRef && socketRef.current) {
-        socketRef.current.emit("send-new-message", {
+      if (socket) {
+        socket.emit("send-new-message", {
           userId,
           chatRoom: currentRoomIdRef.current,
           content: "",
@@ -201,7 +195,7 @@ export default function ChatModal({
         })
         .then((res) => {
           console.log("Uploaded: ", res.data);
-          socketRef?.current?.emit("send-new-message", {
+          socket.emit("send-new-message", {
             userId,
             chatRoom: currentRoomIdRef.current,
             content: res.data.imageUrl,
@@ -247,12 +241,12 @@ export default function ChatModal({
     await privateAxios
       .patch(`chat-messages/chat-room/is-read/${currentRoom.id}`)
       .then(() => {
-        socketRef.current!.emit("update-room-list", {
+        socket!.emit("update-room-list", {
           userId,
           chatRoomId: currentRoom.id,
         });
 
-        socketRef.current?.emit("get-unread-list", { userId });
+        socket?.emit("get-unread-list", { userId });
       })
       .catch((err) => console.log(err));
   };

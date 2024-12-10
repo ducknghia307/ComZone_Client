@@ -1,6 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import {
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -10,7 +10,6 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { privateAxios } from "../../middleware/axiosInstance";
 import OrderDetailSeller from "./OrderDetailSeller";
 import { OrderDetailData } from "../../common/base.interface";
@@ -21,14 +20,21 @@ import {
   DeliveryStatus,
   DeliveryStatusGroup,
 } from "../../common/interfaces/delivery.interface";
+import { useSearchParams } from "react-router-dom";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState<OrderDetailData[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<OrderDetailData[]>([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchInput, setSearchInput] = useState<string>(
+    searchParams.get("search") || ""
+  );
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -42,6 +48,14 @@ const OrderManagement = () => {
         console.log("orders seller", data);
 
         setOrders(data);
+
+        if (
+          searchParams.get("search") &&
+          searchParams.get("search").length > 0
+        ) {
+          searchOrders(searchParams.get("search"));
+          setSearchInput(searchParams.get("search"));
+        } else setFilteredOrders(data);
       } catch (error) {
         console.error("Error fetching orders:", error);
       } finally {
@@ -50,6 +64,22 @@ const OrderManagement = () => {
     };
     fetchOrders();
   }, []);
+
+  const searchOrders = async (key?: string) => {
+    if (!key && searchInput.length === 0) return;
+
+    await privateAxios
+      .get(`orders/search/seller?search=${key || searchInput}`)
+      .then((res) => {
+        setFilteredOrders(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    setSearchInput(searchParams.get("search"));
+    searchOrders(searchParams.get("search"));
+  }, [searchParams.get("search")]);
 
   const reload = async () => {
     try {
@@ -74,7 +104,7 @@ const OrderManagement = () => {
     setPage(0);
   };
 
-  const paginatedOrders = orders.slice(
+  const paginatedOrders = filteredOrders.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -83,14 +113,9 @@ const OrderManagement = () => {
     setSelectedOrderId(orderId);
   };
 
-  // const closeOrderDetail = () => {
-  //   setSelectedOrderId(null);
-  // };
-
   const closeOrderDetail = () => {
     const selectedOrder = orders.find((order) => order.id === selectedOrderId);
 
-    // Kiểm tra nếu thỏa mãn điều kiện
     if (
       selectedOrder &&
       selectedOrder.status === "PACKAGING" &&
@@ -110,17 +135,17 @@ const OrderManagement = () => {
         (status) => deliveryStatus === status
       )
     ) {
-      return "Hoàn tất đóng gói";
+      return "Chờ bàn giao hàng";
     }
     switch (status) {
       case "PENDING":
         return "Đang chờ xác nhận";
-      case "DELIVERED":
-        return "Đã giao hàng";
       case "PACKAGING":
         return "Đang đóng gói";
       case "DELIVERING":
-        return "Đang chờ xác nhận giao hàng";
+        return "Đang giao hàng";
+      case "DELIVERED":
+        return "Đã giao hàng";
       case "SUCCESSFUL":
         return "Hoàn tất";
       case "CANCELED":
@@ -238,10 +263,46 @@ const OrderManagement = () => {
   return (
     <div className="REM w-full bg-white p-4 rounded-lg drop-shadow-lg flex flex-col gap-4">
       <p className="text-2xl font-bold uppercase">Quản Lý Đơn Hàng</p>
+
+      <div className="relative">
+        <input
+          type="text"
+          disabled={orders.length === 0}
+          placeholder="Tìm kiếm theo tên truyện, tên người bán, mã đơn hàng, mã vận đơn..."
+          className="w-full border border-gray-300 rounded-md p-2 pl-12 font-light"
+          value={searchInput}
+          onChange={(e) => {
+            setSearchInput(e.target.value);
+
+            if (e.target.value.length === 0) {
+              searchParams.delete("search");
+              setSearchParams(searchParams);
+              setFilteredOrders(orders);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && searchInput.length > 0) {
+              setSearchParams({ search: searchInput });
+              searchOrders();
+            }
+          }}
+        />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="currentColor"
+          className="absolute top-1/2 -translate-y-1/2 left-4"
+        >
+          <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"></path>
+        </svg>
+      </div>
+
       {!isLoading && orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-16">
           <img src={EmptyImage} alt="" className="w-32 bg-white" />
-          <p>Chưa có đơn hàng nào!</p>
+          <p>Không có đơn hàng!</p>
         </div>
       ) : (
         <TableContainer
@@ -252,6 +313,9 @@ const OrderManagement = () => {
           <Table>
             <TableHead>
               <TableRow style={{ backgroundColor: "black" }}>
+                <TableCell style={{ color: "white", textAlign: "center" }}>
+                  Mã đơn hàng
+                </TableCell>
                 <TableCell style={{ color: "white", textAlign: "center" }}>
                   Người dùng
                 </TableCell>
@@ -281,6 +345,7 @@ const OrderManagement = () => {
             <TableBody>
               {paginatedOrders.map((order) => (
                 <TableRow key={order.id}>
+                  <TableCell align="left">#{order.code}</TableCell>
                   <TableCell align="left">
                     <Avatar src={order.user.avatar} /> {order.user.name}
                   </TableCell>
@@ -340,9 +405,9 @@ const OrderManagement = () => {
             </TableBody>
           </Table>
           <TablePagination
-            rowsPerPageOptions={[5, 10, 15]}
+            rowsPerPageOptions={[10, 15]}
             component="div"
-            count={orders.length}
+            count={filteredOrders.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

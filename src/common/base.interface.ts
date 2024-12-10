@@ -142,6 +142,7 @@ export interface OrderDetailData {
   id: string;
   createdAt: string;
   updatedAt: string;
+  code: string;
   deliveryTrackingCode: string | null;
   totalPrice: number;
   paymentMethod: string;
@@ -188,6 +189,7 @@ export interface Delivery {
     name: string;
     phone: string;
     address: string;
+    fullAddress?: string;
   };
   to: {
     user: any;
@@ -198,6 +200,7 @@ export interface Delivery {
     name: string;
     phone: string;
     address: string;
+    fullAddress?: string;
   };
 }
 

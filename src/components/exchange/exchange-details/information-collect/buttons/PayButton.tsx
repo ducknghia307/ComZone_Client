@@ -27,7 +27,9 @@ export default function PayButton({
     await privateAxios
       .get("users/profile")
       .then((res) => {
-        setUserBalance(res.data.balance);
+        const balance = res.data.balance;
+        setUserBalance(balance);
+        if (balance < total) setAmount(total - balance);
       })
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
@@ -115,7 +117,10 @@ export default function PayButton({
   return (
     <>
       <button
-        onClick={() => setIsConfirming(true)}
+        onClick={() => {
+          if (userBalance < total) setAmount(total - userBalance);
+          setIsConfirming(true);
+        }}
         className="bg-sky-700 py-2 text-white text-xs font-semibold rounded-md duration-200 hover:bg-sky-900"
       >
         THANH TOÁN BẰNG VÍ COMZONE
@@ -125,6 +130,8 @@ export default function PayButton({
         onCancel={(e) => {
           e.stopPropagation();
           setChecked(false);
+          setAmount(0);
+          setPaymentGateway(undefined);
           setIsConfirming(false);
         }}
         centered
@@ -182,7 +189,8 @@ export default function PayButton({
             <button
               disabled={
                 !checked ||
-                (userBalance < total && amount < total && !paymentGateway)
+                (userBalance < total && amount < total) ||
+                !paymentGateway
               }
               className="basis-2/3 py-2 bg-sky-700 text-white font-semibold rounded-md duration-200 hover:bg-sky-800 disabled:bg-gray-300"
               onClick={() => {

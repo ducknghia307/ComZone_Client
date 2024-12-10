@@ -267,6 +267,10 @@ const ManageAuctions: React.FC = () => {
       auction.comics.sellerId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       auction.comics.title.toLowerCase().includes(searchTerm.toLowerCase());
     return statusMatch && searchMatch;
+  })
+  .sort((a, b) => {
+    // Sort by createdAt in descending order (most recent first)
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   return (

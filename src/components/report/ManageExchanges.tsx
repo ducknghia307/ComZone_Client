@@ -72,7 +72,7 @@ const ManageExchanges: React.FC = () => {
 
         setExchanges(exchangesData);
         console.log("Exchanges", exchangesData);
-        
+
       } catch (error) {
         console.error("Error fetching exchanges:", error);
       } finally {
@@ -248,7 +248,10 @@ const ManageExchanges: React.FC = () => {
 
     // Return exchange only if all filters match
     return exchangeStatusMatch && postStatusMatch && searchMatch;
-  });
+  })
+    .sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   return (
     <div style={{ paddingBottom: '40px' }}>

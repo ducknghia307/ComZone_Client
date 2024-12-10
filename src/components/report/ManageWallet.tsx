@@ -47,6 +47,7 @@ const ManageWallet: React.FC = () => {
         const response = await privateAxios.get("/transactions/all");
         const formattedTransactions = response.data.map((transaction: Transaction) => ({
           date: new Date(transaction.createdAt).toLocaleDateString("vi-VN"),
+          originalCreatedAt: transaction.createdAt,
           userName: transaction.user?.name || "N/A",
           type:
             (transaction.type === "ADD" &&
@@ -194,13 +195,15 @@ const ManageWallet: React.FC = () => {
   const filteredWallet = transactions.filter((transaction) =>
     (transaction.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       transaction.type.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (transactionType === 'ALL' || transaction.type === transactionType)
-  );
-
-  // const filteredWallet = transactions.filter((transaction) =>
-  //   transaction.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   transaction.type.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
+    (transactionType === 'ALL' ||
+      (transactionType === 'Nạp Tiền' && transaction.type === "Nạp tiền") ||
+      (transactionType === 'Nhận Tiền' && transaction.type === "Nhận tiền") ||
+      (transactionType === 'Rút Tiền' && transaction.type === "Rút tiền") ||
+      (transactionType === 'Thanh Toán' && transaction.type === "Thanh toán"))
+  )
+    .sort((a, b) => {
+      return new Date(b.originalCreatedAt).getTime() - new Date(a.originalCreatedAt).getTime();
+    });
 
   return (
     <div style={{ paddingBottom: '40px' }}>
@@ -235,6 +238,8 @@ const ManageWallet: React.FC = () => {
             >
               <MenuItem sx={{ fontFamily: 'REM' }} value="ALL">Tất cả</MenuItem>
               <MenuItem sx={{ fontFamily: 'REM' }} value="Nạp Tiền">Nạp Tiền</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="Nhận Tiền">Nhận Tiền</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="Rút Tiền">Rút Tiền</MenuItem>
               <MenuItem sx={{ fontFamily: 'REM' }} value="Thanh Toán">Thanh Toán</MenuItem>
             </Select>
           </FormControl>

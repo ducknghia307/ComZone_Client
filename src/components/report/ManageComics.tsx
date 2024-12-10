@@ -60,7 +60,16 @@ const ManageComics: React.FC = () => {
     const fetchComics = async () => {
       try {
         const response = await privateAxios.get("/comics");
-        setComics(response.data);
+        
+        const sortedComics = response.data.sort((a: Comic, b: Comic) => {
+          // Ensure createdAt exists and is a valid date
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          
+          return dateB - dateA;
+        });
+
+        setComics(sortedComics);
         console.log(response.data);
       } catch (error) {
         console.error("Error fetching comics data:", error);

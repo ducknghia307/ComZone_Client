@@ -103,6 +103,7 @@ export interface Auction {
     createdAt: string;
   };
   currentCondition?: string;
+  createdAt: Date;
 }
 
 //comic

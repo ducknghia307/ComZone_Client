@@ -15,6 +15,7 @@ import OrderDetailMod from './OrderDetailMod';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { OrderDetailData } from '../../common/base.interface';
 import { SelectChangeEvent } from '@mui/material/Select';
+import { fontFamily } from '@mui/system';
 interface Delivery {
   deliveryTrackingCode: string;
   from: { name: string };
@@ -47,9 +48,11 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: '#c66a7a',
     color: theme.palette.common.white,
+    fontFamily: 'REM'
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    fontFamily: 'REM'
   },
 }));
 
@@ -105,7 +108,11 @@ const ManageOrders: React.FC = () => {
           })
         );
 
-        setOrders(ordersWithItems);
+        const sortedOrders = ordersWithItems.sort((a, b) => {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
+        setOrders(sortedOrders);
         console.log("Orders with items:", ordersWithItems);
       } catch (error) {
         console.error("Error fetching orders:", error);

@@ -24,7 +24,6 @@ import AuctionModalEdit from "../comic/sellerManagement/AuctionModalEdit";
 import { Auction } from "../../common/base.interface";
 import { notification, Popconfirm } from "antd";
 import { EyeOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import AuctionDetailModal from "../modal/AuctionDetailModal";
 import AuctionDetailModalSeller from "../modal/AuctionDetailModalSeller";
 import EmptyImage from "../../assets/notFound/emptybox.png";
 
@@ -278,7 +277,6 @@ const AuctionManagement = () => {
                     style={{
                       color: "white",
                       textAlign: "center",
-                      whiteSpace: "nowrap",
                     }}
                   >
                     Thời Gian Bắt Đầu
@@ -287,7 +285,6 @@ const AuctionManagement = () => {
                     style={{
                       color: "white",
                       textAlign: "center",
-                      whiteSpace: "nowrap",
                     }}
                   >
                     Thời Gian Kết Thúc
@@ -356,10 +353,10 @@ const AuctionManagement = () => {
                     >
                       {truncateText(auction.comics.title, 20)}
                     </TableCell>
-                    <TableCell style={{ whiteSpace: "nowrap" }} align="center">
+                    <TableCell align="center">
                       {new Date(auction.startTime).toLocaleString()}
                     </TableCell>
-                    <TableCell style={{ whiteSpace: "nowrap" }} align="center">
+                    <TableCell align="center">
                       {new Date(auction.endTime).toLocaleString()}
                     </TableCell>
                     <TableCell align="center">

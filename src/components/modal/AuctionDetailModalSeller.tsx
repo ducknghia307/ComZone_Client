@@ -93,6 +93,8 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
         return "Hoàn thành";
       case "ONGOING":
         return "Đang diễn ra";
+      case "UPCOMING":
+        return "Sắp diễn ra";
       case "FAILED":
         return "Thất bại";
       case "CANCELED":

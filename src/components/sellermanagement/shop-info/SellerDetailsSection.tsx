@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { SellerDetails, UserInfo } from "../../../common/base.interface";
-import { Avatar } from "antd";
+import { Avatar, Modal, notification } from "antd";
 import { SellerComicsData, SellerOrdersData } from "../ShopInfo";
+import { privateAxios } from "../../../middleware/axiosInstance";
+import CurrencySplitter from "../../../assistants/Spliter";
+import ShopBalanceModal from "./ShopBalanceModal";
 
 export default function SellerDetailsSection({
   user,
@@ -10,6 +13,8 @@ export default function SellerDetailsSection({
   sellerOrdersData,
   totalFeedback,
   averageRating,
+  setIsLoading,
+  fetchUserInfo,
 }: {
   user: UserInfo;
   sellerDetails: SellerDetails;
@@ -17,6 +22,8 @@ export default function SellerDetailsSection({
   sellerOrdersData: SellerOrdersData;
   totalFeedback: number;
   averageRating: number;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchUserInfo: () => void;
 }) {
   const [newUserInfo, setNewUserInfo] = useState<UserInfo>();
   const [newSellerDetails, setNewSellerDetails] = useState<SellerDetails>();
@@ -29,6 +36,8 @@ export default function SellerDetailsSection({
     "COMICS" | "ORDERS"
   >();
 
+  const [isShowingBalance, setIsShowingBalance] = useState<boolean>(false);
+
   const uploadInputRef = useRef<HTMLInputElement>();
 
   useEffect(() => {
@@ -36,10 +45,57 @@ export default function SellerDetailsSection({
     setNewSellerDetails(sellerDetails);
   }, [user, sellerDetails]);
 
+  const handleUpdateSellerInfo = async () => {
+    if (newUserInfo === user) return;
+
+    setIsLoading(true);
+
+    let newAvatar: string;
+    if (uploadedAvatarFile) {
+      await privateAxios
+        .post(
+          "file/upload/image",
+          {
+            image: uploadedAvatarFile,
+          },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
+        .then((res) => {
+          newAvatar = res.data.imageUrl;
+        })
+        .catch((err) => console.log(err));
+    }
+
+    await privateAxios
+      .patch(`users/profile`, {
+        name: newUserInfo.name,
+        avatar: newAvatar || null,
+      })
+      .then(() => {
+        notification.success({
+          key: "profile-update",
+          message: <p className="REM">Cập nhật thông tin thành công</p>,
+          duration: 5,
+        });
+
+        setIsEditing(false);
+        fetchUserInfo();
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        setUploadedAvatarFile(undefined);
+        setIsLoading(false);
+      });
+  };
+
   if (!newUserInfo || !newSellerDetails) return;
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col items-stretch gap-4">
       <p className="text-2xl font-semibold">THÔNG TIN SHOP</p>
 
       <div className="flex items-stretch gap-2">
@@ -105,6 +161,7 @@ export default function SellerDetailsSection({
                 if (isEditing) {
                   setNewUserInfo(user);
                   setNewSellerDetails(sellerDetails);
+                  setUploadedAvatarFile(undefined);
                 }
               }}
               className="font-light text-sm underline hover:font-semibold"
@@ -113,8 +170,9 @@ export default function SellerDetailsSection({
             </button>
             {isEditing && (
               <button
-                onClick={() => {}}
-                className="text-sm underline text-sky-800 hover:font-semibold"
+                disabled={newUserInfo === user}
+                onClick={() => handleUpdateSellerInfo()}
+                className="text-sm underline text-sky-800 hover:font-semibold disabled:text-gray-400 disabled:hover:font-medium"
               >
                 Lưu
               </button>
@@ -186,7 +244,7 @@ export default function SellerDetailsSection({
               )}
             </button>
 
-            <p className="font-semibold">{sellerComicsData.total || 0}</p>
+            <p className="font-semibold">{sellerComicsData?.total || 0}</p>
           </span>
         </div>
 
@@ -196,7 +254,7 @@ export default function SellerDetailsSection({
               Tổng số truyện đang bán hoặc đấu giá:
             </p>
             <p className="font-semibold">
-              {sellerComicsData.totalAvailable || 0}
+              {sellerComicsData?.totalAvailable || 0}
             </p>
           </div>
         )}
@@ -246,7 +304,7 @@ export default function SellerDetailsSection({
               )}
             </button>
 
-            <p className="font-semibold">{sellerOrdersData.total || 0}</p>
+            <p className="font-semibold">{sellerOrdersData?.total || 0}</p>
           </span>
         </div>
 
@@ -257,7 +315,7 @@ export default function SellerDetailsSection({
                 Tổng số đơn hàng đang thực hiện:
               </p>
               <p className="font-semibold">
-                {sellerOrdersData.totalOngoing || 0}
+                {sellerOrdersData?.ongoingOrders?.length || 0}
               </p>
             </div>
 
@@ -266,7 +324,7 @@ export default function SellerDetailsSection({
                 Tổng số đơn hàng đã hoàn tất:
               </p>
               <p className="font-semibold">
-                {sellerOrdersData.totalSuccessful || 0}
+                {sellerOrdersData?.totalSuccessful || 0}
               </p>
             </div>
           </div>
@@ -285,7 +343,7 @@ export default function SellerDetailsSection({
             </svg>
             Số đánh giá:
           </div>
-          <p className="font-semibold">{totalFeedback}</p>
+          <p className="font-semibold">{totalFeedback || 0}</p>
         </div>
 
         {totalFeedback > 0 && (
@@ -301,10 +359,28 @@ export default function SellerDetailsSection({
               >
                 <path d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"></path>
               </svg>
-              {averageRating}
+              {averageRating || 0}
             </p>
           </div>
         )}
+      </div>
+
+      <div className="flex justify-center items-stretch mt-4">
+        <button
+          onClick={() => {
+            setIsShowingBalance(true);
+          }}
+          className="basis-1/2 bg-gray-900 text-white rounded-md p-1 duration-200 hover:bg-gray-600"
+        >
+          Xem Số Dư Shop
+        </button>
+
+        <ShopBalanceModal
+          user={user}
+          sellerOrdersData={sellerOrdersData}
+          isOpen={isShowingBalance}
+          setIsOpen={setIsShowingBalance}
+        />
       </div>
     </div>
   );

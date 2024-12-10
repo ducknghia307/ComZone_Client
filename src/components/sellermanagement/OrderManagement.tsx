@@ -41,17 +41,7 @@ const OrderManagement = () => {
           : response.data.orders;
         console.log("orders seller", data);
 
-        if (Array.isArray(data)) {
-          const sortedOrders = data.sort((a, b) => {
-            const dateA = new Date(a.updatedAt);
-            const dateB = new Date(b.updatedAt);
-            return dateB.getTime() - dateA.getTime();
-          });
-
-          setOrders(sortedOrders);
-        } else {
-          console.error("API did not return an array of orders.");
-        }
+        setOrders(data);
       } catch (error) {
         console.error("Error fetching orders:", error);
       } finally {
@@ -218,6 +208,13 @@ const OrderManagement = () => {
     }
   };
 
+  const actionRequired = (order) => {
+    return (
+      order.status === "PENDING" ||
+      (order.status === "PACKAGING" && !order.delivery.deliveryTrackingCode)
+    );
+  };
+
   const handleStatusUpdate = (
     orderId: string,
     newStatus: string,
@@ -318,12 +315,25 @@ const OrderManagement = () => {
                     </span>
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton
-                      color="primary"
+                    <button
                       onClick={() => openOrderDetail(order.id)}
+                      className="REM relative flex items-center gap-1 border px-2 py-1 border-gray-300 rounded-md duration-200 hover:bg-gray-100"
                     >
-                      <EditOutlinedIcon />
-                    </IconButton>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                        fill="currentColor"
+                      >
+                        <path d="M15.5 5C13.567 5 12 6.567 12 8.5C12 10.433 13.567 12 15.5 12C17.433 12 19 10.433 19 8.5C19 6.567 17.433 5 15.5 5ZM10 8.5C10 5.46243 12.4624 3 15.5 3C18.5376 3 21 5.46243 21 8.5C21 9.6575 20.6424 10.7315 20.0317 11.6175L22.7071 14.2929L21.2929 15.7071L18.6175 13.0317C17.7315 13.6424 16.6575 14 15.5 14C12.4624 14 10 11.5376 10 8.5ZM3 4H8V6H3V4ZM3 11H8V13H3V11ZM21 18V20H3V18H21Z"></path>
+                      </svg>
+                      <p>Xem</p>
+
+                      {actionRequired(order) && (
+                        <span className="absolute w-2 h-2 bg-red-600 top-0 right-0 rounded-full translate-x-1 -translate-y-1"></span>
+                      )}
+                    </button>
                   </TableCell>
                 </TableRow>
               ))}

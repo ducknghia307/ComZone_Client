@@ -23,7 +23,6 @@ const RegisterSeller = ({
   const navigate = useNavigate();
   // New state variables to store seller information
   const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [district, setDistrict] = useState<number | null>(null);
   const [province, setProvince] = useState<number | null>(null);
@@ -110,7 +109,6 @@ const RegisterSeller = ({
           setOtpSent={setOtpSent}
           handleSendOtp={handleSendOtp}
           setName={setName}
-          setEmail={setEmail}
           setPhone={setPhone}
           setCurrent={setCurrent}
         />

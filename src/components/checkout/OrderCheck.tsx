@@ -107,27 +107,11 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                 </svg>
                 <h3 className="font-medium ml-2">{seller.sellerName}</h3>
               </div>
-              <button className="flex items-center gap-2 text-xs font-light border px-3 py-2 rounded-md duration-200 hover:border-black">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                >
-                  <path d="M6.45455 19L2 22.5V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V18C22 18.5523 21.5523 19 21 19H6.45455ZM5.76282 17H20V5H4V18.3851L5.76282 17ZM11 10H13V12H11V10ZM7 10H9V12H7V10ZM15 10H17V12H15V10Z"></path>
-                </svg>
-                <p>
-                  Chat với{" "}
-                  <span className="font-medium">{seller.sellerName}</span>
-                </p>
-              </button>
             </div>
             <table className="w-full table-fixed">
               <thead>
-                <tr className="text-xs">
+                <tr className="text-sm">
                   <th className="text-start">Sản phẩm</th>
-                  <th className="text-end">Giá</th>
                   <th className="text-end">Số lượng</th>
                   <th className="text-end">Thành tiền</th>
                 </tr>
@@ -139,17 +123,16 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                       <img
                         src={comic?.coverImage}
                         alt={comic?.title}
-                        className="h-32 w-auto"
+                        className="h-32 w-auto rounded-md"
                       />
                       <h4 className="font-medium">{comic?.title}</h4>
                     </td>
                     <td className="max-w-[12rem] ">
                       <h4 className="text-end font-light">
-                        {CurrencySplitter(currentPrice || comic?.price)}đ
+                        {comic?.quantity === 1
+                          ? "Truyện lẻ"
+                          : `Bộ ${comic?.quantity} cuốn`}
                       </h4>
-                    </td>
-                    <td className="max-w-[12rem] ">
-                      <h4 className="text-end font-light">x1</h4>
                     </td>
                     <td className="max-w-[12rem] ">
                       <h4 className="text-end font-light">

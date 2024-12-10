@@ -325,7 +325,11 @@ const Checkout = () => {
             price,
           };
 
-          await privateAxios.post("/order-items", orderItemPayload);
+          const items = await privateAxios.post(
+            "/order-items",
+            orderItemPayload
+          );
+
           orderedComicIds.push(comic.id);
           if (auctionId) {
             socket.emit("updateAuctionStatus", {

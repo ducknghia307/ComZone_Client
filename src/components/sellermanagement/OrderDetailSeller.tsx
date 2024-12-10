@@ -433,15 +433,31 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
             </Typography>
 
             {orderDetail.delivery.deliveryTrackingCode && (
-              <Typography
-                variant="body2"
-                sx={{
-                  color: theme.palette.text.secondary,
-                  fontWeight: 500,
-                }}
-              >
-                Mã đơn hàng: {orderDetail.delivery.deliveryTrackingCode}
-              </Typography>
+              <span className="REM flex items-center gap-4">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    fontWeight: 500,
+                  }}
+                >
+                  Mã đơn hàng: {orderDetail.delivery.deliveryTrackingCode}
+                </Typography>
+
+                <button
+                  onClick={() =>
+                    window
+                      .open(
+                        `https://tracking.ghn.dev/?order_code=${order.delivery.deliveryTrackingCode}`,
+                        "_blank"
+                      )
+                      ?.focus()
+                  }
+                  className="italic text-gray-600 text-sm font-light underline duration-200 hover:text-black"
+                >
+                  Tra cứu vận chuyển
+                </button>
+              </span>
             )}
           </div>
           <div
@@ -505,7 +521,13 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                 justifyContent="space-between"
                 padding={"10px 20px"}
               >
-                <Box display="flex" flexDirection="column" flex={1} gap={1}>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  flex={1}
+                  gap={1}
+                  textAlign="end"
+                >
                   <Chip
                     label="Thông tin người nhận"
                     sx={{
@@ -526,10 +548,12 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                     label="Số điện thoại"
                     value={orderDetail.delivery?.to?.phone}
                   />
-                  <InfoRow
-                    label="Địa chỉ"
-                    value={orderDetail.delivery?.to?.address}
-                  />
+                  {orderDetail.delivery?.to?.fullAddress && (
+                    <InfoRow
+                      label="Địa chỉ"
+                      value={orderDetail.delivery?.to?.fullAddress}
+                    />
+                  )}
                 </Box>
 
                 <Divider orientation="vertical" flexItem />

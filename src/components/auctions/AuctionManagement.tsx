@@ -448,6 +448,7 @@ const AuctionManagement = () => {
             startTime: selectedAuction.startTime,
             endTime: selectedAuction.endTime,
             comics: selectedAuction.comics,
+            createdAt: selectedAuction.createdAt
           }}
           onSuccess={handleModalSuccess}
         />

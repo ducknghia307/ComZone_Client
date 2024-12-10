@@ -450,13 +450,16 @@ const SellerComicsManagement = ({
       headerClassName: "custom-header",
       headerAlign: "center",
       align: "center",
-      renderCell: (params) => (
-        <RenderCell
-          params={params}
-          handleStopSelling={handleStopSelling}
-          handleDeleteComics={handleDeleteComics}
-        />
-      ),
+      renderCell: (params) =>
+        ["UNAVAILABLE", "AVAILABLE"].some(
+          (status) => params.row.status === status
+        ) && (
+          <RenderCell
+            params={params}
+            handleStopSelling={handleStopSelling}
+            handleDeleteComics={handleDeleteComics}
+          />
+        ),
     },
   ];
 

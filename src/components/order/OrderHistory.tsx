@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
 import { Button, TextField, Typography } from "@mui/material";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
-import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import "../ui/OrderHistory.css";
 // import ModalOrder from "../modal/ModalOrder";
 import { privateAxios } from "../../middleware/axiosInstance";
@@ -12,13 +10,15 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import ModalFeedbackSeller from "../modal/ModalFeedbackSeller";
 import ModalRequestRefund from "../modal/ModalRequestRefund";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Loading from "../loading/Loading";
 import EmptyOrderIcon from "../../assets/notFound/emptybox.png";
+import { Avatar } from "antd";
 
 interface Order {
   id: string;
   delivery?: Delivery;
+  code: string;
   status: string;
   shopName: string;
   productName: string;
@@ -47,6 +47,7 @@ interface Item {
 const OrderHistory = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [openModal, setOpenModal] = useState(false);
+  const [baseOrderData, setBaseOrderData] = useState<Order[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedSellerName, setSelectedSellerName] = useState<string | null>(
     null
@@ -55,30 +56,26 @@ const OrderHistory = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const [isOrderDetailsOpen, setOrderDetailsOpen] = useState(false);
-  //   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  console.log("Order ID selected for refund modal:", selectedOrderId);
 
   const [isRefundModalOpen, setRefundModalOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchInput, setSearchInput] = useState<string>(
+    searchParams.get("search") || ""
+  );
+
   useEffect(() => {
     const fetchOrdersWithItems = async () => {
+      setIsLoading(true);
       try {
         const response = await privateAxios.get("/orders/user");
         const ordersData = response.data;
         // Fetch items for each order
         const ordersWithItems = await Promise.all(
-          // ordersData.map(async (order: any) => {
-          //   const itemsResponse = await privateAxios.get(
-          //     `/order-items/order/${order.id}`
-          //   );
-          //   const itemsData = itemsResponse.data;
-
-          //   return { ...order, items: itemsData }; // order với order items
-          // })
           ordersData.map(async (order: any) => {
             const itemsResponse = await privateAxios.get(
               `/order-items/order/${order.id}`
@@ -96,14 +93,24 @@ const OrderHistory = () => {
               items: itemsData,
               refundRequest: refundData,
               rejectReason: refundData?.rejectedReason,
-            }; // order với order items
+            };
           })
         );
-
+        setBaseOrderData(ordersWithItems);
         setOrders(ordersWithItems);
-        console.log("Orders with items and refund requests:", ordersWithItems);
+        console.log("ordersWithItems: ", ordersWithItems);
+        //Handle searching params
+        if (
+          searchParams.get("search") &&
+          searchParams.get("search").length > 0
+        ) {
+          searchOrders(searchParams.get("search"));
+          setSearchInput(searchParams.get("search"));
+        }
       } catch (error) {
         console.error("Error fetching orders:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -189,16 +196,6 @@ const OrderHistory = () => {
           display: "inline-block",
           fontFamily: "REM",
         };
-      // case "COMPLETED":
-      //   return {
-      //     color: "#395f18",
-      //     backgroundColor: "#fef6c7",
-      //     borderRadius: "8px",
-      //     padding: "8px 20px",
-      //     fontWeight: "bold",
-      //     display: "inline-block",
-      //     fontFamily: "REM",
-      //   };
       case "CANCELED":
         return {
           color: "#e91e63",
@@ -288,7 +285,6 @@ const OrderHistory = () => {
     selectedStatus === "all"
       ? orders
       : orders.filter((order) => order.status === selectedStatus);
-  console.log(filteredOrders);
 
   const handleStatusUpdate = (orderId: string, newStatus: string) => {
     setOrders((prevOrders) =>
@@ -298,8 +294,25 @@ const OrderHistory = () => {
     );
   };
 
+  const searchOrders = async (key?: string) => {
+    if (!key && searchInput.length === 0) return;
+
+    await privateAxios
+      .get(`orders/search/user?search=${key || searchInput}`)
+      .then((res) => {
+        console.log(res.data);
+        setOrders(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    setSearchInput(searchParams.get("search"));
+    searchOrders(searchParams.get("search"));
+  }, [searchParams.get("search")]);
+
   return (
-    <div>
+    <div className="REM">
       {isLoading && <Loading />}
       <div className="w-full bg-white flex items-center mb-1 overflow-x-auto overflow-y-hidden pb-2">
         {[
@@ -314,7 +327,7 @@ const OrderHistory = () => {
         ].map((status) => (
           <span
             key={status}
-            className={`status-tab grow REM whitespace-nowrap ${
+            className={`status-tab grow whitespace-nowrap ${
               selectedStatus === status ? "active" : ""
             }`}
             onClick={() => setSelectedStatus(status)}
@@ -322,6 +335,41 @@ const OrderHistory = () => {
             {getStatusText(status)}
           </span>
         ))}
+      </div>
+
+      <div className="grow relative py-2">
+        <input
+          type="text"
+          disabled={baseOrderData.length === 0}
+          placeholder="Tìm kiếm theo tên truyện, tên người bán, mã đơn hàng, mã vận đơn..."
+          className="w-full border border-gray-300 rounded-md p-2 pl-12 font-light"
+          value={searchInput}
+          onChange={(e) => {
+            setSearchInput(e.target.value);
+
+            if (e.target.value.length === 0) {
+              searchParams.delete("search");
+              setSearchParams(searchParams);
+              setOrders(baseOrderData);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && searchInput.length > 0) {
+              setSearchParams({ search: searchInput });
+              searchOrders();
+            }
+          }}
+        />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="currentColor"
+          className="absolute top-1/2 -translate-y-1/2 left-4"
+        >
+          <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"></path>
+        </svg>
       </div>
 
       <div className="purchase-history-content">
@@ -340,22 +388,20 @@ const OrderHistory = () => {
                   </div>
                 </div>
               )}
+
               <div className="status-content" style={{ padding: "10px 30px" }}>
-                <div className="status-content-detail">
-                  <StoreOutlinedIcon style={{ fontSize: 28 }} />
-                  <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
-                    {order.items[0]?.comics.sellerId.name || "N/A"}
-                  </Typography>
+                <div className="flex items-center sm:gap-8 gap-2">
+                  <p className="font-semibold text-xl">#{order.code}</p>
 
                   <Link
                     to={`/seller/shop/all/${order.items[0]?.comics.sellerId.id}`}
-                    style={{ marginLeft: "10px" }}
-                    className="shop-button duration-200 hover:bg-gray-100"
+                    className="px-2 py-1 flex items-center gap-2 border border-gray-400 rounded-md duration-200 hover:bg-gray-100"
                   >
-                    <StoreOutlinedIcon />
-                    <Typography sx={{ fontFamily: "REM" }}>Xem Shop</Typography>
+                    <Avatar src={order.items[0]?.comics.sellerId.avatar} />
+                    <p>{order.items[0]?.comics.sellerId.name}</p>
                   </Link>
                 </div>
+
                 <Typography
                   sx={{
                     margin: "auto 0",
@@ -368,23 +414,11 @@ const OrderHistory = () => {
                 </Typography>
               </div>
 
-              <div
-                className="status-content1"
-                style={{
-                  padding: "20px 50px",
-                  display: "flex",
-                  gap: "20px",
-                  flexDirection: "column",
-                }}
-              >
+              <div className="flex flex-col items-stretch">
                 {order.items.map((item: any) => (
                   <div
                     key={item.id}
-                    style={{
-                      display: "flex",
-                      gap: "20px",
-                      marginBottom: "10px",
-                    }}
+                    className="flex items-stretch gap-2 sm:gap-4 p-2 phone:pr-8"
                   >
                     {/* Hình ảnh sản phẩm */}
                     <img
@@ -393,28 +427,19 @@ const OrderHistory = () => {
                         "https://via.placeholder.com/150"
                       }
                       alt={item.name}
-                      style={{
-                        width: "100px",
-                        height: "140px",
-                        objectFit: "cover",
-                      }}
+                      className="w-[7em] h-[10em] object-cover rounded-md"
                     />
 
                     {/* Tên và giá sản phẩm */}
-                    <div>
-                      <Typography
-                        sx={{
-                          fontSize: "20px",
-                          fontWeight: "500",
-                          fontFamily: "REM",
-                        }}
-                      >
+                    <div className="flex flex-col justify-center">
+                      <p className="text-lg font-semibold uppercase lg:max-w-[40em]">
                         {item.comics.title}
-                      </Typography>
-                      <Typography>{item.type}</Typography>
-                      <Typography sx={{ fontSize: "18px", fontFamily: "REM" }}>
-                        x1
-                      </Typography>
+                      </p>
+                      <p className="text-sm">
+                        {item.comics.quantity
+                          ? "Truyện lẻ"
+                          : `Bộ ${item.comics.quantity} cuốn`}
+                      </p>
                     </div>
 
                     <div
@@ -455,10 +480,10 @@ const OrderHistory = () => {
                     <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
                       <ErrorOutlineIcon className="text-red-500 mr-2" />
                       <div className="flex flex-col">
-                        <span className="text-red-600 font-semibold font-['REM']">
+                        <span className="text-red-600 font-semibold">
                           Lý do từ chối hoàn tiền
                         </span>
-                        <span className="text-red-500 font-['REM']">
+                        <span className="text-red-500">
                           {order.refundRequest?.rejectedReason ||
                             "Không có lý do cụ thể"}
                         </span>
@@ -469,7 +494,7 @@ const OrderHistory = () => {
 
                 <div className="flex flex-col items-end gap-1 ml-auto">
                   {order.delivery?.deliveryFee && (
-                    <p className="REM font-light italic">
+                    <p className="font-light italic">
                       Phí vận chuyển:&emsp;
                       {Number(order.delivery.deliveryFee).toLocaleString(
                         "vi-VN",
@@ -482,8 +507,8 @@ const OrderHistory = () => {
                   )}
 
                   <div className="flex items-center gap-3">
-                    <span className="font-['REM'] text-lg">Tổng tiền:</span>
-                    <span className="font-['REM'] text-2xl font-medium text-[#f77157]">
+                    <span className="text-lg">Tổng tiền:</span>
+                    <span className="text-2xl font-medium text-[#f77157]">
                       {Number(
                         order.totalPrice + order.delivery?.deliveryFee || 0
                       ).toLocaleString("vi-VN", {

@@ -8,54 +8,16 @@ import TvOutlinedIcon from "@mui/icons-material/TvOutlined";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import MultipleStopOutlinedIcon from "@mui/icons-material/MultipleStopOutlined";
 import UserWallet from "../wallet/UserWallet";
-import ExchangeHistory from "../exchangeNewsFeed/ExchangeHistory";
 import OrderHistory from "../order/OrderHistory";
 import AuctionHistory from "../auction/AuctionHistory";
 import ProfileUser from "../../pages/ProfileUser";
-import { Auction } from "../../common/base.interface";
 
 const AccountUser: React.FC = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState("purchase");
 
-  const [editing, setEditing] = useState(false);
-  const [newAvatar, setNewAvatar] = useState<string | null>(null);
-
   const handleMenuItemClick = (item: string) => {
     setSelectedMenuItem(item);
   };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setNewAvatar(URL.createObjectURL(file));
-    }
-  };
-
-  const handleEditClick = () => {
-    setEditing(true);
-  };
-
-  const handleCancelClick = () => {
-    setEditing(false);
-    setNewAvatar(null);
-  };
-
-  const handleConfirmClick = () => {
-    if (newAvatar) {
-      setProfileData({ ...profileData, avatar: newAvatar });
-    }
-    setEditing(false);
-  };
-
-  const [profileData, setProfileData] = useState({
-    email: "maicttsel73328@fpt.edu.vn",
-    username: "thanhmai27092003",
-    phoneNumber: "0947758903",
-    gender: "Female",
-    address: "LA",
-    dateOfBirth: "09/27/2003",
-    avatar: "https://cdn-icons-png.flaticon.com/512/147/147144.png",
-  });
 
   const renderContent = () => {
     switch (selectedMenuItem) {
@@ -67,8 +29,6 @@ const AccountUser: React.FC = () => {
         return <AuctionHistory />;
       case "wallet":
         return <UserWallet />;
-      case "exchange":
-        return <ExchangeHistory />;
       default:
         return <div>Chọn một mục để xem chi tiết...</div>;
     }

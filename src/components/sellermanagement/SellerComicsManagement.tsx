@@ -89,10 +89,15 @@ const SellerComicsManagement = ({
               quantity: 1,
             });
 
-            notification.success({
+            notification.info({
               key: "success",
-              message: "Thành công",
-              description: "Truyện đã được dừng bán thành công!",
+              message: <p className="REM">Đã dừng bán truyện</p>,
+              description: (
+                <p className="REM">
+                  Truyện "{comic.title}" đã được dừng bán khỏi các trang tìm
+                  kiếm.
+                </p>
+              ),
               duration: 5,
             });
             fetchSellerComics();
@@ -288,6 +293,15 @@ const SellerComicsManagement = ({
 
   const columns: GridColDef[] = [
     {
+      field: "index",
+      headerName: "Số TT",
+      flex: 0.75,
+      headerClassName: "custom-header",
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => <p className="my-auto">{params.value}</p>,
+    },
+    {
       field: "coverImage",
       headerName: "Ảnh truyện",
       flex: 0.75,
@@ -372,40 +386,46 @@ const SellerComicsManagement = ({
       renderCell: (params) => {
         const statusMap: Record<string, string> = {
           AVAILABLE: params.row.type === "SELL" ? "Đang bán" : "Đang đấu giá",
-          UNAVAILABLE: "Không khả dụng",
+          UNAVAILABLE: "Chưa bán",
+          PRE_ORDER: "Đang được mua",
           SOLD: "Đã bán",
         };
 
         const status = statusMap[params.value] || "N/A";
 
-        if (status === "Không khả dụng") {
+        if (status === "Chưa bán") {
           return (
-            <div className="my-auto">
-              <div>
-                <IconButton
-                  aria-label="edit"
-                  color="success"
-                  onClick={() => handleAuction(params.row)}
-                >
-                  <GavelIcon
-                    sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
-                  />
-                </IconButton>
-                <IconButton
-                  aria-label="edit"
-                  color="success"
-                  onClick={() => handleSell(params.row)}
-                >
-                  <AddBusinessIcon
-                    sx={{ border: "1px solid #D5D5D5", borderRadius: "5px" }}
-                  />
-                </IconButton>
-              </div>
+            <div className="my-auto flex flex-col gap-1 items-stretch">
+              <button
+                onClick={() => handleSell(params.row)}
+                className="flex items-center justify-center gap-1 text-green-700 phone:whitespace-nowrap p-1 border border-green-700 rounded-md duration-200 hover:bg-green-700 hover:text-white"
+              >
+                <AddBusinessIcon />
+                <p>Bán</p>
+              </button>
+
+              <button
+                onClick={() => handleAuction(params.row)}
+                className="flex items-center justify-center gap-1 text-red-600 phone:whitespace-nowrap p-1 border border-red-600 rounded-md duration-200 hover:bg-red-600 hover:text-white"
+              >
+                <GavelIcon />
+                <p>Đấu giá</p>
+              </button>
             </div>
           );
         }
 
-        return <span className="my-auto">{status}</span>;
+        return (
+          <span
+            className={`my-auto phone:whitespace-nowrap ${
+              params.value === "AVAILABLE" && "text-sky-600"
+            } ${params.value === "PRE_ORDER" && "text-green-700"} ${
+              params.value === "SOLD" && "text-red-600"
+            }`}
+          >
+            {status}
+          </span>
+        );
       },
     },
     {
@@ -445,7 +465,11 @@ const SellerComicsManagement = ({
   const renderContent = () => {
     if (!loading && (!comics || (comics && comics.length === 0))) {
       return (
-        <div className="REM w-full min-h-[30vh] h-full flex flex-col items-center justify-center gap-8 bg-gray-900 rounded-lg p-4">
+        <div
+          className={`${
+            loading && "hidden"
+          } REM w-full min-h-[30vh] h-full flex flex-col items-center justify-center gap-8 bg-gray-900 rounded-lg p-4`}
+        >
           <p className="text-[2em] uppercase text-center lg:whitespace-nowrap bg-clip-text text-transparent font-bold bg-gradient-to-r from-green-500 via-red-400 to-sky-400">
             Bắt đầu đăng bán truyện tranh ngay
           </p>
@@ -515,7 +539,9 @@ const SellerComicsManagement = ({
 
           <div style={{ height: "auto", width: "100%" }}>
             <DataGrid
-              rows={filteredComics}
+              rows={filteredComics.map((comics, index) => {
+                return { ...comics, index: index + 1 };
+              })}
               columns={columns}
               initialState={{ pagination: { paginationModel } }}
               pageSizeOptions={[20, 30]}
@@ -571,7 +597,7 @@ const SellerComicsManagement = ({
 
   return (
     <div className="w-full bg-white p-4 rounded-lg drop-shadow-lg">
-      {renderContent()}
+      {!loading && renderContent()}
       {(!sellerSubscription || !sellerSubscription.isActive) && (
         <SellerSubsModal
           isOpen={isRegisteringPlan}

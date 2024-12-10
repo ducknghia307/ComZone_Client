@@ -17,9 +17,10 @@ export interface SellerComicsData {
 
 export interface SellerOrdersData {
   orders: any[];
+  ongoingOrders: any[];
   total: number;
-  totalOngoing: number;
   totalSuccessful: number;
+  totalPendingAmount: number;
 }
 
 export interface SellerTransactionsData {
@@ -82,6 +83,7 @@ export default function ShopInfo() {
     await privateAxios
       .get("orders/seller/data")
       .then((res) => {
+        console.log("ORDER: ", res.data);
         setSellerOrdersData(res.data);
       })
       .catch((err) => console.log(err));
@@ -131,6 +133,8 @@ export default function ShopInfo() {
           sellerOrdersData={sellerOrdersData}
           totalFeedback={totalFeedback}
           averageRating={averageRating}
+          setIsLoading={setIsLoading}
+          fetchUserInfo={fetchUserInfo}
         />
       </div>
 

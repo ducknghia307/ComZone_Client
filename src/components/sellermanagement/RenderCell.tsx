@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import { EyeOutlined } from "@ant-design/icons";
 import { DeleteOutline } from "@mui/icons-material";
+import { privateAxios } from "../../middleware/axiosInstance";
+import { message } from "antd";
 
 export const RenderCell = ({
   params,
@@ -20,6 +22,19 @@ export const RenderCell = ({
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const previewAuction = async (comicsId: string) => {
+    await privateAxios
+      .get(`auction/comics/${comicsId}`)
+      .then((res) => {
+        if (res.data) navigate(`/auctiondetail/${res.data.id}`);
+        else message.warning("Không tìm thấy cuộc đấu giá!", 5);
+      })
+      .catch((err) => {
+        message.warning("Không tìm thấy cuộc đấu giá!", 5);
+        console.log(err);
+      });
   };
 
   return (
@@ -59,6 +74,18 @@ export const RenderCell = ({
           <MenuItem
             onClick={() => {
               navigate(`/detail/${params.row.id}`);
+            }}
+            sx={{ borderBottom: "1px solid #D5D5D5" }}
+          >
+            <EyeOutlined style={{ fontSize: "20px", marginRight: "6px" }} />
+            <p className="REM">Xem trước</p>
+          </MenuItem>
+        )}
+
+        {params.row.type === "AUCTION" && (
+          <MenuItem
+            onClick={() => {
+              previewAuction(params.row.id);
             }}
             sx={{ borderBottom: "1px solid #D5D5D5" }}
           >

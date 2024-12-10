@@ -57,7 +57,7 @@ export const RenderCell = ({
           </MenuItem>
         )}
 
-        {params.row.type === "SELL" && (
+        {params.row.type === "SELL" && params.row.status === "AVAILABLE" && (
           <MenuItem
             onClick={() => {
               handleStopSelling(params.row);

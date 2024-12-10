@@ -131,7 +131,10 @@ const ManageRefunds: React.FC = () => {
         const fetchRefundRequests = async () => {
             try {
                 const response = await privateAxios.get('/refund-requests/all');
-                setRefundRequests(response.data);
+                const sortedRefunds = response.data.sort((a: RefundRequest, b: RefundRequest) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+                setRefundRequests(sortedRefunds);
                 console.log("refunds", response)
             } catch (err) {
                 console.error('Error fetching refund requests:', err);

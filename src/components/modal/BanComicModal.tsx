@@ -46,7 +46,7 @@ const BanComicModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =
         <Modal open={open} onClose={onClose}>
             <Box sx={modalStyle}>
                 <Box sx={{ position: 'relative', mb: 2 }}>
-                    <Typography variant="h6" component="h2" sx={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold', color: '#71002b' }}>
+                    <Typography variant="h6" component="h2" sx={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold', color: '#71002b', fontFamily: 'REM' }}>
                         Lý Do Cấm Bán Truyện
                     </Typography>
                     <IconButton onClick={onClose} sx={{ position: 'absolute', top: 0, right: 0 }}>
@@ -55,11 +55,11 @@ const BanComicModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =
                 </Box>
                 <FormControl component="fieldset" fullWidth>
                     <RadioGroup value={selectedReason} onChange={handleReasonChange}>
-                        <FormControlLabel value="Thông tin sai lệch" control={<Radio />} label="Thông tin sai lệch" />
-                        <FormControlLabel value="Nội dung không phù hợp" control={<Radio />} label="Nội dung không phù hợp" />
-                        <FormControlLabel value="Vi phạm bản quyền" control={<Radio />} label="Vi phạm bản quyền" />
-                        <FormControlLabel value="Sách lậu, sách giả" control={<Radio />} label="Sách lậu, sách giả" />
-                        <FormControlLabel value="Khác" control={<Radio />} label="Khác" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Thông tin sai lệch" control={<Radio />} label="Thông tin sai lệch" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Nội dung không phù hợp" control={<Radio />} label="Nội dung không phù hợp" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Vi phạm bản quyền" control={<Radio />} label="Vi phạm bản quyền" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Sách lậu, sách giả" control={<Radio />} label="Sách lậu, sách giả" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Khác" control={<Radio />} label="Khác" />
                     </RadioGroup>
                     {selectedReason === 'Khác' && (
                         <TextField
@@ -83,6 +83,7 @@ const BanComicModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =
                             padding: '10px 20px',
                             borderRadius: '4px',
                             fontWeight: 'bold',
+                            fontFamily: 'REM'
                         }}
                         disabled={loading}
                     >

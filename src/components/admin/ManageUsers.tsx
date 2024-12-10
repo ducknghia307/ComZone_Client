@@ -216,7 +216,7 @@ const ManageUsers: React.FC = () => {
               }}
             >
               <MenuItem sx={{ fontFamily: 'REM' }} value="ALL">Tất cả</MenuItem>
-              <MenuItem sx={{ fontFamily: 'REM' }} value="MEMBER">Người Mua</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="MEMBER">Thành Viên</MenuItem>
               <MenuItem sx={{ fontFamily: 'REM' }} value="SELLER">Người Bán</MenuItem>
             </Select>
           </FormControl>

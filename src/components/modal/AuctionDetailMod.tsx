@@ -112,19 +112,21 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
             fontWeight: "bold",
             color: "#000",
             fontSize: "16px",
+            fontFamily: 'REM'
           }}
         >
           {label}
         </Typography>
         <Typography
           variant="body1"
-          fontWeight={500}
+          fontWeight={400}
           sx={{
             paddingLeft: 2,
             color:
               isPaid !== undefined ? (isPaid ? "#32CD32" : "#ff9800") : "#000",
-            whiteSpace: "normal",
+            whiteSpace: "nowrap",
             wordWrap: "break-word",
+            fontFamily: 'REM'
           }}
         >
           {value}
@@ -262,6 +264,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
               fontSize: "1.5rem",
               color: theme.palette.text.primary,
               textTransform: "uppercase",
+              fontFamily: 'REM'
             }}
           >
             Chi tiết đơn hàng
@@ -285,21 +288,23 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
             variant="body2"
             sx={{
               color: theme.palette.text.secondary,
-              fontWeight: 500,
+              fontWeight: 400,
               mb: "10px",
+              fontFamily: 'REM'
             }}
           >
             Thời gian bắt đầu:{" "}
-            {new Date(auctionData.startTime).toLocaleString()}
+            {new Date(auctionData.startTime).toLocaleString('vi-VN')}
           </Typography>
           <Typography
             variant="body2"
             sx={{
               color: theme.palette.text.secondary,
-              fontWeight: 500,
+              fontWeight: 400,
+              fontFamily: 'REM'
             }}
           >
-            Thời gian kết thúc: {new Date(auctionData.endTime).toLocaleString()}
+            Thời gian kết thúc: {new Date(auctionData.endTime).toLocaleString('vi-VN')}
           </Typography>
         </Box>
       </DialogTitle>
@@ -395,17 +400,17 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                 <Table>
                   <TableHead>
                     <TableRow sx={{ backgroundColor: "rgba(0,0,0,0.05)" }}>
-                      <TableCell sx={{ color: "black", fontSize: "16px" }}>
+                      <TableCell sx={{ color: "black", fontSize: "16px", fontFamily: 'REM' }}>
                         Ảnh Chính
                       </TableCell>
-                      <TableCell sx={{ color: "black", fontSize: "16px" }}>
+                      <TableCell sx={{ color: "black", fontSize: "16px", fontFamily: 'REM' }}>
                         Tên Truyện
                       </TableCell>
-                      <TableCell sx={{ color: "black", fontSize: "16px" }}>
+                      <TableCell sx={{ color: "black", fontSize: "16px", fontFamily: 'REM' }}>
                         Tác giả
                       </TableCell>
                       {/* <TableCell sx={{ color: 'black', fontSize: '16px' }}>Giá (đ)</TableCell> */}
-                      <TableCell sx={{ color: "black", fontSize: "16px" }}>
+                      <TableCell sx={{ color: "black", fontSize: "16px", fontFamily: 'REM' }}>
                         Tập/Bộ
                       </TableCell>
                     </TableRow>
@@ -420,10 +425,10 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                           style={{ width: 50, height: "auto", margin: "auto" }}
                         />
                       </TableCell>
-                      <TableCell>{comic.title || "N/A"}</TableCell>
-                      <TableCell>{comic.author || "N/A"}</TableCell>
+                      <TableCell sx={{ fontFamily: 'REM' }}>{comic.title || "N/A"}</TableCell>
+                      <TableCell sx={{ fontFamily: 'REM' }}>{comic.author || "N/A"}</TableCell>
                       {/* <TableCell>{comic.price?.toLocaleString() || 'N/A'} đ</TableCell> */}
-                      <TableCell>
+                      <TableCell sx={{ fontFamily: 'REM' }}>
                         {comic.quantity > 1 ? "Bộ truyện" : "Tập Truyện"}
                       </TableCell>
                     </TableRow>

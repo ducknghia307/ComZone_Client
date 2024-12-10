@@ -22,6 +22,7 @@ interface User {
   status: string;
   avatar?: string;
   role: string;
+  createdAt: Date;
 }
 
 // Styled Components for Moderator
@@ -66,7 +67,14 @@ const ManageUsers: React.FC = () => {
     const fetchUsers = async () => {
       try {
         const response = await privateAxios.get('/users');
-        const filteredUsers = response.data.filter((user: User) => user.role !== 'ADMIN' && user.role !== 'MODERATOR');
+        // const filteredUsers = response.data.filter((user: User) => user.role !== 'ADMIN' && user.role !== 'MODERATOR');
+        const filteredUsers = response.data
+        .filter((user: User) => user.role !== 'ADMIN' && user.role !== 'MODERATOR')
+        .sort((a: User, b: User) => {
+          const dateA = new Date(a.createdAt).getTime();
+          const dateB = new Date(b.createdAt).getTime();
+          return dateB - dateA;
+        });
         setUsers(filteredUsers);
         // setUsers(response.data);
       } catch (error) {
@@ -167,7 +175,7 @@ const ManageUsers: React.FC = () => {
       case "SELLER":
         return "Người Bán";
       case "MEMBER":
-        return "Người Mua";
+        return "Thành Viên";
       default:
         return role;
     }
@@ -233,7 +241,7 @@ const ManageUsers: React.FC = () => {
               }}
             >
               <MenuItem sx={{ fontFamily: 'REM' }} value="ALL">Tất cả</MenuItem>
-              <MenuItem sx={{ fontFamily: 'REM' }} value="MEMBER">Người Mua</MenuItem>
+              <MenuItem sx={{ fontFamily: 'REM' }} value="MEMBER">Thành Viên</MenuItem>
               <MenuItem sx={{ fontFamily: 'REM' }} value="SELLER">Người Bán</MenuItem>
             </Select>
           </FormControl>

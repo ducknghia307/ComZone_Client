@@ -133,19 +133,20 @@ const InfoRow = ({ label, value, paymentMethod }: { label: string; value: string
                 color="text.secondary"
                 variant="body2"
                 sx={{
-                    whiteSpace: 'nowrap', fontWeight: 'bold', color: '#000', fontSize: '16px'
+                    whiteSpace: 'nowrap', fontWeight: 'bold', color: '#000', fontSize: '16px', fontFamily: 'REM'
                 }}
             >
                 {label}
             </Typography>
             <Typography
                 variant="body1"
-                fontWeight={500}
+                fontWeight={400}
                 sx={{
                     paddingLeft: 2,
                     color: paymentMethod ? paymentStatusColor : "#000",
-                    whiteSpace: 'normal',
+                    whiteSpace: 'nowrap',
                     wordWrap: 'break-word',
+                    fontFamily: 'REM'
                 }}
 
             >
@@ -315,7 +316,8 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                             fontSize: '1.5rem',
                             color: theme.palette.text.primary,
                             textTransform: 'uppercase',
-                            marginRight: '100px'
+                            marginRight: '100px',
+                            fontFamily: 'REM'
                         }}
                     >
                         Chi tiết đơn hàng
@@ -340,19 +342,21 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                             variant="body2"
                             sx={{
                                 color: theme.palette.text.secondary,
-                                fontWeight: 500
+                                fontWeight: 400,
+                                fontFamily: 'REM'
                             }}
                         >
-                            Ngày tạo đơn hàng: {new Date(orderDetail.createdAt).toLocaleString()}
+                            Ngày tạo đơn hàng: {new Date(orderDetail.createdAt).toLocaleString('vi-VN')}
                         </Typography>
                         <Typography
                             variant="body2"
                             sx={{
                                 color: theme.palette.text.secondary,
-                                fontWeight: 500
+                                fontWeight: 500,
+                                fontFamily: 'REM'
                             }}
                         >
-                            Mã đơn hàng: {orderDetail.delivery.deliveryTrackingCode}
+                            Mã đơn hàng: <span style={{ color: '#000', fontWeight: 'bold' }}>{orderDetail.delivery.deliveryTrackingCode}</span>
                         </Typography>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px', alignItems: 'center' }}>
@@ -465,11 +469,11 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                 <Table>
                                     <TableHead>
                                         <TableRow sx={{ backgroundColor: 'rgba(0,0,0,0.05)' }}>
-                                            <TableCell sx={{ color: 'black', fontSize: '16px' }}>Ảnh truyện</TableCell>
-                                            <TableCell sx={{ color: 'black', fontSize: '16px' }}>Tên truyện</TableCell>
-                                            <TableCell sx={{ color: 'black', fontSize: '16px' }}>Tác giả</TableCell>
-                                            <TableCell sx={{ color: 'black', fontSize: '16px' }}>Giá (đ)</TableCell>
-                                            <TableCell sx={{ color: 'black', fontSize: '16px' }}>Tập/Bộ</TableCell>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: 'REM' }}>Ảnh truyện</TableCell>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: 'REM' }}>Tên truyện</TableCell>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: 'REM' }}>Tác giả</TableCell>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: 'REM' }}>Giá (đ)</TableCell>
+                                            <TableCell sx={{ color: 'black', fontSize: '16px', fontFamily: 'REM' }}>Tập/Bộ</TableCell>
                                         </TableRow>
                                     </TableHead>
 
@@ -484,10 +488,10 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                                             style={{ width: 50, height: 'auto', margin: 'auto' }}
                                                         />
                                                     </TableCell>
-                                                    <TableCell>{item.comics.title}</TableCell>
-                                                    <TableCell>{item.comics.author || 'N/A'}</TableCell>
-                                                    <TableCell>{item.comics.price.toLocaleString()} đ</TableCell>
-                                                    <TableCell>{item.comics.quantity > 1 ? "Bộ truyện" : "Tập truyện"}</TableCell>
+                                                    <TableCell sx={{ fontFamily: 'REM' }}>{item.comics.title}</TableCell>
+                                                    <TableCell sx={{ fontFamily: 'REM' }}>{item.comics.author || 'N/A'}</TableCell>
+                                                    <TableCell sx={{ fontFamily: 'REM' }}>{item.comics.price.toLocaleString()} đ</TableCell>
+                                                    <TableCell sx={{ fontFamily: 'REM' }}>{item.comics.quantity > 1 ? "Bộ truyện" : "Tập truyện"}</TableCell>
                                                 </TableRow>
                                             ))
                                         ) : (
@@ -506,12 +510,12 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                             <StyledPaper sx={{ padding: '16px', backgroundColor: 'rgba(0, 0, 0, 0.05)', borderRadius: '8px' }}>
                                 <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
                                     <EditOutlinedIcon sx={{ fontSize: '16px' }} />
-                                    <Typography fontSize='16px' fontWeight="bold" >
+                                    <Typography fontSize='16px' fontWeight="bold" sx={{ fontFamily: 'REM' }}>
                                         Ghi chú từ người mua:
                                     </Typography>
                                 </div>
 
-                                <Typography variant="body1" marginTop={'5px'}>
+                                <Typography variant="body1" marginTop={'5px'} sx={{ fontFamily: 'REM' }}>
                                     {orderDetail.note}
                                 </Typography>
                             </StyledPaper>

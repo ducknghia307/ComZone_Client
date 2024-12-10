@@ -78,7 +78,10 @@ const ManageFeedbacks: React.FC = () => {
     const fetchFeedbacks = async () => {
       try {
         const response = await privateAxios.get('/seller-feedback');
-        setFeedbacks(response.data);
+        const sortedFeedbacks = response.data.sort((a: Feedback, b: Feedback) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setFeedbacks(sortedFeedbacks);
         console.log("feedbacks", response.data);
       } catch (error) {
         console.error('Error fetching feedbacks:', error);

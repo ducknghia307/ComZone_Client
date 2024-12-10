@@ -192,7 +192,8 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                 bgcolor: 'rgba(113, 0, 43, 0.05)',
                                 px: 2,
                                 py: 1,
-                                borderRadius: '12px'
+                                borderRadius: '12px',
+                                gap: 1
                             }}
                         >
                             <AccessTimeIcon sx={{ color: '#71002b', fontSize: 20 }} />
@@ -201,10 +202,11 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                 color="text.secondary"
                                 sx={{
                                     fontWeight: 600,
-                                    color: '#71002b'
+                                    color: '#71002b',
+                                    fontFamily: 'REM',
                                 }}
                             >
-                                {new Date(exchange?.createdAt).toLocaleString()}
+                                {new Date(exchange?.createdAt).toLocaleString('vi-VN')}
                             </Typography>
                         </Stack>
                     </Box>
@@ -219,7 +221,8 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                             textFillColor: 'transparent',
                             textAlign: 'center',
                             flex: 1,
-                            marginRight: '120px'
+                            marginRight: '120px',
+                            fontFamily: 'REM',
                         }}
                     >
                         Chi Tiết Trao Đổi
@@ -274,14 +277,14 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                 }}
                             >
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'REM', }}>
                                         Trạng thái trao đổi:
                                     </Typography>
                                     <span style={getStatusColor(exchange.status)}>{getStatusText(exchange.status)}</span>
                                 </Box>
 
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'REM', }}>
                                         Trạng thái bài post:
                                     </Typography>
                                     <span style={getStatusColor(exchange.post.status)}>{getStatusText(exchange.post.status)}</span>
@@ -310,12 +313,12 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                             <SwapVertIcon />
                                         </Avatar> */}
                                     <Box>
-                                        <Typography sx={{ color: 'grey', fontSize: '13px' }}>
+                                        <Typography sx={{ color: 'grey', fontSize: '13px', fontFamily: 'REM', }}>
                                             Người gửi yêu cầu
                                         </Typography>
                                         <Box display="flex" alignItems="center" sx={{ paddingTop: '10px' }}>
                                             <Avatar alt={exchange.requestUser.name} src={exchange.requestUser.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
-                                            <Typography sx={{ fontWeight: 'bold' }}>{exchange.requestUser.name}</Typography>
+                                            <Typography sx={{ fontWeight: 'bold', fontFamily: 'REM', }}>{exchange.requestUser.name}</Typography>
                                         </Box>
                                     </Box>
 
@@ -336,12 +339,12 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                             </Typography>
                                         </Box> */}
                                         <Box>
-                                            <Typography sx={{ color: 'grey', fontSize: '13px' }}>
+                                            <Typography sx={{ color: 'grey', fontSize: '13px', fontFamily: 'REM', }}>
                                                 Người đăng bài trao đổi
                                             </Typography>
                                             <Box display="flex" alignItems="center" sx={{ paddingTop: '10px' }}>
                                                 <Avatar alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
-                                                <Typography sx={{ fontWeight: 'bold' }}>{exchange.post.user.name}</Typography>
+                                                <Typography sx={{ fontWeight: 'bold', fontFamily: 'REM', }}>{exchange.post.user.name}</Typography>
                                             </Box>
                                         </Box>
                                     </Stack>
@@ -358,22 +361,22 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                             >
                                 <Stack spacing={2.5}>
                                     <Box>
-                                        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                                        <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontFamily: 'REM' }}>
                                             Nội dung yêu cầu
                                         </Typography>
-                                        <Typography color="text.secondary">
+                                        <Typography color="text.secondary" sx={{ fontFamily: 'REM' }}>
                                             {exchange.post.postContent}
                                         </Typography>
                                     </Box>
                                     <Stack direction="row" spacing={2}>
                                         <Box flex={1}>
-                                            <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                                            <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontFamily: 'REM' }}>
                                                 Tiền chênh lệch
                                             </Typography>
-                                            <Typography color="text.secondary" sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                                            <Typography color="text.secondary" sx={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'REM', }}>
                                                 {formatCurrency(exchange.compensationAmount)}
                                                 {exchange.compensateUser && (
-                                                    <Typography variant="body2" color="text.primary" sx={{ fontWeight: 600, fontSize: '14px', ml: 1, display: 'inline-flex', alignItems: 'center' }}>
+                                                    <Typography variant="body2" color="text.primary" sx={{ fontWeight: 600, fontSize: '14px', ml: 1, display: 'inline-flex', alignItems: 'center', fontFamily: 'REM', }}>
                                                         ({'người bù tiền: '}
                                                         <Box display="inline-flex" alignItems="center" sx={{ marginRight: 0.5, marginLeft: 1 }}>
                                                             <Avatar
@@ -393,7 +396,7 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                             </Paper>
                             {exchange.post.images && exchange.post.images.length > 0 && (
                                 <Paper elevation={0} sx={{ p: 2.5, bgcolor: 'rgba(113, 0, 43, 0.04)', borderRadius: '16px' }}>
-                                    <Typography variant="h6" fontWeight={600} gutterBottom>
+                                    <Typography variant="h6" fontWeight={600} gutterBottom sx={{ fontFamily: 'REM' }}>
                                         Hình ảnh
                                     </Typography>
                                     <Stack direction="row" spacing={2} flexWrap="wrap">
@@ -439,7 +442,8 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                             '&:hover': {
                                 bgcolor: '#c66a7a',
                                 // transform: 'scale(1.05)'
-                            }
+                            },
+                            fontFamily: 'REM',
                         }}
                     >
                         Đóng

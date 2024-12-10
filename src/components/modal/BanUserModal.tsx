@@ -124,7 +124,7 @@ const BanUserModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =>
         <Modal open={open} onClose={onClose}>
             <Box sx={modalStyle}>
                 <Box sx={{ position: 'relative', mb: 2 }}>
-                    <Typography variant="h6" component="h2" sx={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold', color: '#71002b' }}>
+                    <Typography variant="h6" component="h2" sx={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold', color: '#71002b', fontFamily: 'REM' }}>
                         Lý Do Cấm Người Dùng
                     </Typography>
                     <IconButton onClick={onClose} sx={{ position: 'absolute', top: 0, right: 0 }}>
@@ -133,12 +133,12 @@ const BanUserModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =>
                 </Box>
                 <FormControl component="fieldset" fullWidth>
                     <RadioGroup value={selectedReason} onChange={handleReasonChange}>
-                        <FormControlLabel value="Cung cấp thông tin sai lệch" control={<Radio />} label="Cung cấp thông tin sai lệch" />
-                        <FormControlLabel value="Hành vi xúc phạm và lạm dụng" control={<Radio />} label="Hành vi xúc phạm và lạm dụng" />
-                        <FormControlLabel value="Gian lận" control={<Radio />} label="Gian lận" />
-                        <FormControlLabel value="Tạo nhiều tài khoản ảo" control={<Radio />} label="Tạo nhiều tài khoản ảo" />
-                        <FormControlLabel value="Trả lại hàng không đúng quy định" control={<Radio />} label="Trả lại hàng không đúng quy định" />
-                        <FormControlLabel value="Khác" control={<Radio />} label="Khác" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Cung cấp thông tin sai lệch" control={<Radio />} label="Cung cấp thông tin sai lệch" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Hành vi xúc phạm và lạm dụng" control={<Radio />} label="Hành vi xúc phạm và lạm dụng" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Gian lận" control={<Radio />} label="Gian lận" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Tạo nhiều tài khoản ảo" control={<Radio />} label="Tạo nhiều tài khoản ảo" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Trả lại hàng không đúng quy định" control={<Radio />} label="Trả lại hàng không đúng quy định" />
+                        <FormControlLabel sx={{ '& .MuiFormControlLabel-label': { fontFamily: 'REM', fontWeight: 400 } }} value="Khác" control={<Radio />} label="Khác" />
                     </RadioGroup>
                     {selectedReason === 'Khác' && (
                         <TextField
@@ -162,6 +162,7 @@ const BanUserModal: React.FC<BanComicModalProps> = ({ open, onClose, onBan }) =>
                             padding: '10px 20px',
                             borderRadius: '4px',
                             fontWeight: 'bold',
+                            fontFamily:'REM'
                         }}
                     >
                         Cấm Người Dùng

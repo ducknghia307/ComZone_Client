@@ -105,6 +105,7 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                             backgroundClip: 'text',
                             textFillColor: 'transparent',
                             textAlign: 'center',
+                            fontFamily: 'REM'
                         }}
                     >
                         Chi Tiết Đánh Giá
@@ -157,7 +158,7 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                             >
                                 <Stack direction="row" alignItems="center" spacing={1}>
                                     <AccessTimeIcon sx={{ color: '#71002b', fontSize: 20 }} />
-                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 400, fontFamily: 'REM' }}>
                                         {new Date(feedback.createdAt).toLocaleString()}
                                     </Typography>
                                 </Stack>
@@ -175,7 +176,7 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                                         label={`${feedback.rating}/5`}
                                         size="small"
                                         sx={{
-                                            bgcolor: '#c66a7a', color: 'white', fontWeight: 600, fontSize: '0.875rem', height: 24,
+                                            bgcolor: '#c66a7a', color: 'white', fontWeight: 400, fontSize: '0.875rem', height: 24, fontFamily: 'REM',
                                         }}
                                     />
                                 </Stack>
@@ -198,10 +199,10 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                                             <PersonOutlineIcon />
                                         </Avatar>
                                         <Box>
-                                            <Typography variant="caption" color="text.secondary" gutterBottom>
+                                            <Typography variant="caption" color="text.secondary" gutterBottom sx={{ fontFamily: 'REM' }}>
                                                 Người mua
                                             </Typography>
-                                            <Typography variant="subtitle1" fontWeight={600}>
+                                            <Typography variant="subtitle1" fontWeight={600} sx={{ fontFamily: 'REM' }}>
                                                 {feedback.user?.name || 'Không xác định'}
                                             </Typography>
                                         </Box>
@@ -216,10 +217,10 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                                             <StorefrontOutlinedIcon />
                                         </Avatar>
                                         <Box>
-                                            <Typography variant="caption" color="text.secondary" gutterBottom>
+                                            <Typography variant="caption" color="text.secondary" gutterBottom sx={{ fontFamily: 'REM' }}>
                                                 Người bán
                                             </Typography>
-                                            <Typography variant="subtitle1" fontWeight={600}>
+                                            <Typography variant="subtitle1" fontWeight={600} sx={{ fontFamily: 'REM' }}>
                                                 {feedback.seller?.name || 'Không xác định'}
                                             </Typography>
                                         </Box>
@@ -237,7 +238,7 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                                 <Stack spacing={2} >
                                     <Stack direction="row" alignItems="center" spacing={1}>
                                         <ChatOutlinedIcon sx={{ color: '#71002b', fontSize: 20 }} />
-                                        <Typography variant="subtitle1" fontWeight={600}>
+                                        <Typography variant="subtitle1" fontWeight={600} sx={{ fontFamily: 'REM' }}>
                                             Nội dung đánh giá
                                         </Typography>
                                     </Stack>
@@ -245,6 +246,7 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                                         sx={{
                                             color: 'text.secondary',
                                             lineHeight: 1.6,
+                                            fontFamily: 'REM',
                                         }}
                                     >
                                         {feedback.comment}
@@ -263,7 +265,7 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                                     <Stack spacing={2.5}>
                                         <Stack direction="row" alignItems="center" spacing={1}>
                                             <ImageOutlinedIcon sx={{ color: '#71002b', fontSize: 20 }} />
-                                            <Typography variant="subtitle1" fontWeight={600}>
+                                            <Typography variant="subtitle1" fontWeight={600} sx={{ fontFamily: 'REM' }}>
                                                 Ảnh đánh giá
                                             </Typography>
                                         </Stack>
@@ -338,6 +340,7 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                                     boxShadow: '0 12px 20px rgba(113, 0, 43, 0.4)',
                                     transform: 'translateY(-1px)',
                                 },
+                                fontFamily: 'REM',
                             }}
                         >
                             Duyệt Đánh Giá
@@ -356,6 +359,7 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                             textTransform: 'none',
                             fontWeight: 600,
                             fontSize: '0.95rem',
+                            fontFamily: 'REM',
                         }}
                     >
                         Đóng

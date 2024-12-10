@@ -206,9 +206,9 @@ export default function WithdrawalForm({
               }}
               className="w-full border border-gray-400 p-2 rounded-md"
             />
-            {(user.balance < 50000 || amount < 50000) && (
+            {amount < 50000 && (
               <p className="text-red-600 font-light italic">
-                Sô tiền rút tối thiểu là 50,000đ
+                Số tiền rút tối thiểu là 50,000đ
               </p>
             )}
             {user.balance < amount && (

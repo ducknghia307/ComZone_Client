@@ -267,16 +267,7 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       </div>
 
       {/* Footer */}
-      {announcements.length > 0 && (
-        <div className="border-t p-1 text-center sticky bottom-0 bg-white z-10">
-          {/* <button
-            className="text-blue-500 text-sm font-semibold hover:underline"
-            onClick={navigateToAll}
-          >
-            Xem thêm
-          </button> */}
-        </div>
-      )}
+
     </div>
   );
 };

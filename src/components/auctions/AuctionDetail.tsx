@@ -630,92 +630,94 @@ const ComicAuction = () => {
                     Bạn là người có giá cao nhất!
                   </div>
                 ) : (
-                  <div className="bid-row">
-                    <input
-                      type="text"
-                      placeholder="đ"
-                      className="bid-input"
-                      value={
-                        bidAmount
-                          ? parseFloat(bidAmount).toLocaleString("vi-VN")
-                          : bidAmount
-                      }
-                      onChange={(event) => {
-                        let inputValue = event.target.value;
-                  
-                        // Loại bỏ mọi ký tự không phải là số
-                        inputValue = inputValue.replace(/[^\d]/g, '');
-                
-                        handleBidInputChange({
-                          ...event,
-                          target: {
-                            ...event.target,
-                            value: inputValue,
-                          },
-                        });
-                      }}
-                      disabled={isBidDisabled}
-                      min={0}
-                    />
-                    <Popconfirm
-                      title={
-                        <Typography
-                          style={{ fontSize: "18px", fontWeight: "500" }}
-                        >
-                          Bạn có chắc chắn muốn ra giá{" "}
-                          <span style={{ fontWeight: "bold" }}>
-                            {parseFloat(bidAmount).toLocaleString("vi-VN")}₫
-                          </span>{" "}
-                          không?
-                        </Typography>
-                      }
-                      onConfirm={handlePlaceBid}
-                      onCancel={() => console.log("Bid canceled")}
-                      okText="Xác nhận"
-                      cancelText="Hủy"
-                      overlayStyle={{
-                        width: "450px",
-                        borderRadius: "12px",
-                        padding: "20px",
-                      }}
-                      okButtonProps={{
-                        style: {
-                          backgroundColor: "#000",
-                          color: "#fff",
-                          fontSize: "18px",
-                          fontWeight: "bold",
-                          padding: "15px 30px",
-                          borderRadius: "10px",
-                          marginRight: "15px",
-                        },
-                      }}
-                      cancelButtonProps={{
-                        style: {
-                          backgroundColor: "#fff",
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "bold",
-                          padding: "15px 30px",
-                          border: "2px solid #000",
-                          borderRadius: "10px",
-                        },
-                      }}
-                    >
-                      <Button
-                        variant="contained"
-                        className="bid-button"
-                        sx={{
-                          width: "250px",
-                          height: "60px",
-                          fontSize: "20px",
-                          fontWeight: "bold",
+                  !auctionEnded && (
+                    <div className="bid-row">
+                      <input
+                        type="text"
+                        placeholder="đ"
+                        className="bid-input"
+                        value={
+                          bidAmount
+                            ? parseFloat(bidAmount).toLocaleString("vi-VN")
+                            : bidAmount
+                        }
+                        onChange={(event) => {
+                          let inputValue = event.target.value;
+
+                          // Loại bỏ mọi ký tự không phải là số
+                          inputValue = inputValue.replace(/[^\d]/g, "");
+
+                          handleBidInputChange({
+                            ...event,
+                            target: {
+                              ...event.target,
+                              value: inputValue,
+                            },
+                          });
                         }}
-                        disabled={isBidDisabled || !bidAmount || error !== ""}
+                        disabled={isBidDisabled}
+                        min={0}
+                      />
+                      <Popconfirm
+                        title={
+                          <Typography
+                            style={{ fontSize: "18px", fontWeight: "500" }}
+                          >
+                            Bạn có chắc chắn muốn ra giá{" "}
+                            <span style={{ fontWeight: "bold" }}>
+                              {parseFloat(bidAmount).toLocaleString("vi-VN")}₫
+                            </span>{" "}
+                            không?
+                          </Typography>
+                        }
+                        onConfirm={handlePlaceBid}
+                        onCancel={() => console.log("Bid canceled")}
+                        okText="Xác nhận"
+                        cancelText="Hủy"
+                        overlayStyle={{
+                          width: "450px",
+                          borderRadius: "12px",
+                          padding: "20px",
+                        }}
+                        okButtonProps={{
+                          style: {
+                            backgroundColor: "#000",
+                            color: "#fff",
+                            fontSize: "18px",
+                            fontWeight: "bold",
+                            padding: "15px 30px",
+                            borderRadius: "10px",
+                            marginRight: "15px",
+                          },
+                        }}
+                        cancelButtonProps={{
+                          style: {
+                            backgroundColor: "#fff",
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "bold",
+                            padding: "15px 30px",
+                            border: "2px solid #000",
+                            borderRadius: "10px",
+                          },
+                        }}
                       >
-                        RA GIÁ
-                      </Button>
-                    </Popconfirm>
-                  </div>
+                        <Button
+                          variant="contained"
+                          className="bid-button"
+                          sx={{
+                            width: "250px",
+                            height: "60px",
+                            fontSize: "20px",
+                            fontWeight: "bold",
+                          }}
+                          disabled={isBidDisabled || !bidAmount || error !== ""}
+                        >
+                          RA GIÁ
+                        </Button>
+                      </Popconfirm>
+                    </div>
+                  )
                 )}
               </>
             )}

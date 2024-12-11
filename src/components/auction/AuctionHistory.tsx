@@ -117,18 +117,6 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
     fetchAuctionsAndBids();
   }, [userId]);
 
-  // useEffect(() => {
-  //   const fetchUserDepositAuction = async () => {
-  //     try {
-  //       const reponse = await privateAxios.get("deposits/user/auction");
-  //       console.log("deposit", reponse);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   fetchUserDepositAuction();
-  // }, [userId]);
-
   const getStatusChipStyles = (status: string) => {
     switch (status) {
       case "SUCCESSFUL":
@@ -289,7 +277,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
       // Cập nhật logic cho borderColor
       const borderColor =
         auction.status === "COMPLETED" && auction.winner?.id !== userId
-          ? getStatusChipStyles("FAILED") // Dùng màu của trạng thái "FAILED"
+          ? getStatusChipStyles("FAILED")
           : auction.status === "COMPLETED"
           ? "transparent"
           : auction.status === "ONGOING"
@@ -515,21 +503,24 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end",
+              justifyContent: "space-between", // Align "TRỞ LẠI CUỘC ĐẤU GIÁ" to the left and other buttons to the right
               marginTop: "12px",
               padding: "15px 30px",
               borderTop: "1px solid #dbdbdb",
+              gap: 8,
             }}
           >
-            {auction.status === "ONGOING" || auction.status === "SUCCESSFUL" ? (
-              <Button
-                variant="contained"
-                sx={buttonStyles.contained}
-                onClick={() => navigate(`/auctiondetail/${auction.id}`)}
-              >
-                TRỞ LẠI CUỘC ĐẤU GIÁ
-              </Button>
-            ) : (
+            {/* Left-aligned button */}
+            <Button
+              variant="contained"
+              sx={buttonStyles.contained}
+              onClick={() => navigate(`/auctiondetail/${auction.id}`)}
+            >
+              TRỞ LẠI CUỘC ĐẤU GIÁ
+            </Button>
+
+            {/* Right-aligned buttons */}
+            <div style={{ display: "flex", gap: 8 }}>
               <Button
                 onClick={() => handleOpenModal(auction)}
                 variant="contained"
@@ -537,11 +528,9 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
               >
                 XEM CHI TIẾT ĐẤU GIÁ
               </Button>
-            )}
 
-            {auction.status === "SUCCESSFUL" &&
-            auction.winner?.id === userId ? (
-              <div>
+              {auction.status === "SUCCESSFUL" &&
+              auction.winner?.id === userId ? (
                 <Button
                   onClick={() => handleBuy(auction, "currentPrice")}
                   variant="contained"
@@ -553,14 +542,13 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
                     fontSize: "16px",
                     letterSpacing: "1px",
                     boxShadow: "5px 5px 0 white",
-                    marginLeft: "17px",
                   }}
                 >
                   <ShoppingCartOutlined className="mr-2" />
                   THANH TOÁN
                 </Button>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
         </div>
       );

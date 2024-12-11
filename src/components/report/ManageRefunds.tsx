@@ -241,7 +241,7 @@ const ManageRefunds: React.FC = () => {
                 {/* Search Box */}
                 <TextField
                     variant="outlined"
-                    placeholder="Tìm kiếm..."
+                    placeholder="Tìm kiếm theo tên người dùng..."
                     value={searchTerm}
                     onChange={handleSearch}
                     size="small"
@@ -268,12 +268,12 @@ const ManageRefunds: React.FC = () => {
                         <TableHead>
                             <TableRow>
                                 <StyledTableCell sx={{ whiteSpace: 'nowrap' }}>Tên Người Dùng</StyledTableCell>
-                                <StyledTableCell>Mã Đơn Hàng</StyledTableCell>
+                                <StyledTableCell sx={{ whiteSpace: 'nowrap' }}>Mã Đơn Hàng</StyledTableCell>
                                 <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Thời Gian</StyledTableCell>
-                                <StyledTableCell align="right">Lý Do</StyledTableCell>
-                                <StyledTableCell align="right">Chi Tiết Lý Do (nếu có)</StyledTableCell>
+                                <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Lý Do</StyledTableCell>
+                                <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Chi Tiết Lý Do</StyledTableCell>
                                 <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Hình Ảnh</StyledTableCell>
-                                <StyledTableCell align="right">Trạng Thái</StyledTableCell>
+                                <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Trạng Thái</StyledTableCell>
                                 <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>Chỉnh Sửa</StyledTableCell>
                             </TableRow>
                         </TableHead>

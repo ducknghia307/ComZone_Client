@@ -69,12 +69,12 @@ const ManageUsers: React.FC = () => {
         const response = await privateAxios.get('/users');
         // const filteredUsers = response.data.filter((user: User) => user.role !== 'ADMIN' && user.role !== 'MODERATOR');
         const filteredUsers = response.data
-        .filter((user: User) => user.role !== 'ADMIN' && user.role !== 'MODERATOR')
-        .sort((a: User, b: User) => {
-          const dateA = new Date(a.createdAt).getTime();
-          const dateB = new Date(b.createdAt).getTime();
-          return dateB - dateA;
-        });
+          .filter((user: User) => user.role !== 'ADMIN' && user.role !== 'MODERATOR')
+          .sort((a: User, b: User) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateB - dateA;
+          });
         setUsers(filteredUsers);
         // setUsers(response.data);
       } catch (error) {
@@ -196,7 +196,8 @@ const ManageUsers: React.FC = () => {
   // );
 
   const filteredUsers = users.filter((user) => {
-    const matchesSearchTerm = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearchTerm =
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.role.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -211,11 +212,11 @@ const ManageUsers: React.FC = () => {
         {/* Search Box */}
         <TextField
           variant="outlined"
-          placeholder="Tìm kiếm..."
+          placeholder="Tìm kiếm theo tên hoặc email..."
           value={searchTerm}
           onChange={handleSearch}
           size="small"
-          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '320px' }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

@@ -266,7 +266,7 @@ const ManageExchanges: React.FC = () => {
         {/* Search Box */}
         <TextField
           variant="outlined"
-          placeholder="Tìm kiếm..."
+          placeholder="Tìm kiếm theo tên..."
           value={searchTerm}
           onChange={handleSearch}
           size="small"
@@ -274,7 +274,7 @@ const ManageExchanges: React.FC = () => {
             backgroundColor: "#c66a7a",
             borderRadius: "4px",
             color: "#fff",
-            width: "300px",
+            width: "220px",
           }}
           InputProps={{
             startAdornment: (

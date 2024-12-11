@@ -394,10 +394,12 @@ const Checkout = () => {
 
               {/* <DeliveryMethod /> */}
               <PaymentMethod
+                user={user}
                 auctionId={auctionId}
                 onMethodSelect={handlePaymentMethodSelect}
                 amount={totalPrice + totalDeliveryPrice}
                 balance={userWalletBalance}
+                fetchUserInfo={fetchUserInfo}
               />
             </div>
             <div className="grow min-w-[20em] max-w-[25em] top-4 sticky">

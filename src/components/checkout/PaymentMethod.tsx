@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 // import { BaseInterface } from "../../common/base.interface";
 import { privateAxios } from "../../middleware/axiosInstance";
@@ -6,26 +7,32 @@ import { Modal } from "antd";
 import ZaloPay from "../../assets/zalopay.png";
 import VNPay from "../../assets/vnpay.png";
 import TickCircle from "../../assets/tick-circle.png";
+import { UserInfo } from "../../common/base.interface";
+import PhoneVerification from "../wallet/PhoneVerification";
 
 const PaymentMethod = ({
+  user,
   auctionId,
   amount,
   balance,
   onMethodSelect,
+  fetchUserInfo,
 }: {
+  user: UserInfo;
   auctionId: string;
   amount: number;
   balance: number;
   onMethodSelect: (method: string) => void;
+  fetchUserInfo: () => void;
 }) => {
-  console.log("z", auctionId);
-
   const [selectedMethod, setSelectedMethod] = useState("wallet");
   const [hideBalance, setHideBalance] = useState(true);
   const [selectedWalletMethod, setSelectedWalletMethod] = useState<string>("");
+
   const [selectedAmount, setSelectedAmount] = useState<number>(0);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log(amount);
+  const [isVerifyingPhone, setIsVerifyingPhone] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -44,6 +51,7 @@ const PaymentMethod = ({
   useEffect(() => {
     onMethodSelect(selectedMethod);
   }, [selectedMethod]);
+
   const handlePayment = async () => {
     if (!selectedAmount) {
       return;
@@ -147,15 +155,27 @@ const PaymentMethod = ({
             "hidden"
           }`}
         >
-          <p className="text-red-500 font-light">
-            Số dư hiện không đủ.
-          </p>
+          <p className="text-red-500 font-light">Số dư hiện không đủ.</p>
           <button
             className="text-sky-800 duration-200 hover:text-sky-600"
-            onClick={showModal}
+            onClick={() => {
+              if (!user.phone || user.phone.length === 0) {
+                setIsVerifyingPhone(true);
+              } else showModal();
+            }}
           >
             Nạp thêm
           </button>
+          {isVerifyingPhone && (
+            <PhoneVerification
+              user={user}
+              isOpen={isVerifyingPhone}
+              setIsOpen={setIsVerifyingPhone}
+              confirmCallback={showModal}
+              cancelCallback={() => setIsVerifyingPhone(false)}
+            />
+          )}
+
           <Modal
             className="REM "
             open={isModalOpen}
@@ -176,7 +196,9 @@ const PaymentMethod = ({
               </div>
 
               <div className="mb-4">
-                <h3 className="font-bold mb-2 text-base">Nhập số tiền nạp:</h3>
+                <h3 className="font-bold mb-2 text-base">
+                  Nhập số tiền nạp (VND):
+                </h3>
                 <input
                   type="text"
                   placeholder="Nhập số tiền nạp"
@@ -188,39 +210,47 @@ const PaymentMethod = ({
                     );
                   }}
                 />
-                <p className="text-red-500 text-xs italic">
+                <p
+                  className={`text-red-500 text-xs italic ${
+                    selectedAmount + balance >= amount && "invisible"
+                  }`}
+                >
                   Cần phải nạp thêm: {CurrencySplitter(amount - balance)} đ
                 </p>
               </div>
 
-              <div className="flex flex-wrap justify-start gap-2 mb-4 w-full max-w-lg mx-auto">
+              <div className="grid grid-cols-4 gap-2 mb-4 w-full max-w-lg mx-auto">
                 {[
                   20000, 50000, 100000, 200000, 500000, 1000000, 1500000,
                   2000000,
-                ]
-                  .filter((value) => value >= Math.max(0, amount - balance))
-                  .map((value) => (
-                    <button
-                      key={value}
-                      className=" px-2 bg-white border border-gray-500 hover:bg-gray-200 duration-200 rounded text-black"
-                      onClick={() => setSelectedAmount(value)}
-                    >
-                      {CurrencySplitter(value)}
-                    </button>
-                  ))}
+                ].map((value) => (
+                  <button
+                    key={value}
+                    className={`${
+                      value === selectedAmount
+                        ? "bg-black text-white font-semibold"
+                        : "border border-gray-500 hover:bg-gray-200"
+                    } px-2 duration-200 rounded`}
+                    onClick={() => {
+                      setSelectedAmount(value);
+                    }}
+                  >
+                    {CurrencySplitter(value)}
+                  </button>
+                ))}
               </div>
 
               <h3 className="font-bold mb-2 mt-8">Chọn hình thức nạp:</h3>
               <div className="flex justify-center gap-4 mb-4">
                 <button
-                  className={`relative p-2 rounded-lg border-2 ${
+                  className={`relative p-2 rounded-lg border-2 duration-200 ${
                     selectedWalletMethod === "ZaloPay"
                       ? "border-black"
-                      : "border-gray-300"
+                      : "border-gray-300 opacity-30"
                   }`}
                   onClick={() => setSelectedWalletMethod("ZaloPay")}
                 >
-                  <div className="flex items-center ">
+                  <div className="flex items-center">
                     {selectedWalletMethod === "ZaloPay" && (
                       <img
                         src={TickCircle}
@@ -237,14 +267,14 @@ const PaymentMethod = ({
                 </button>
 
                 <button
-                  className={`relative p-2 rounded-lg border-2 ${
-                    selectedMethod === "VNPay"
+                  className={`relative p-2 rounded-lg border-2 duration-200 ${
+                    selectedWalletMethod === "VNPay"
                       ? "border-black"
-                      : "border-gray-300"
+                      : "border-gray-300 opacity-30"
                   }`}
                   onClick={() => setSelectedWalletMethod("VNPay")}
                 >
-                  <div className="flex items-center ">
+                  <div className="flex items-center">
                     {selectedWalletMethod === "VNPay" && (
                       <img
                         src={TickCircle}
@@ -262,7 +292,8 @@ const PaymentMethod = ({
               </div>
               <div className="w-full flex items-center justify-center mt-8">
                 <button
-                  className="bg-black text-white py-2 px-8 rounded-lg font-bold hover:opacity-90"
+                  disabled={selectedAmount < amount || !selectedWalletMethod}
+                  className="bg-black text-white py-2 px-8 rounded-lg font-bold hover:opacity-90 disabled:bg-gray-300"
                   onClick={handlePayment}
                 >
                   TIẾN HÀNH THANH TOÁN

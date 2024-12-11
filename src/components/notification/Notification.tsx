@@ -130,6 +130,7 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       case AnnouncementType.EXCHANGE_SUCCESSFUL:
       case AnnouncementType.DELIVERY_FINISHED_SEND:
       case AnnouncementType.DELIVERY_FINISHED_RECEIVE:
+      case AnnouncementType.REFUND_APPROVE:
         return ApproveIcon;
 
       case AnnouncementType.ORDER_FAILED:
@@ -137,6 +138,7 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       case AnnouncementType.EXCHANGE_FAILED:
       case AnnouncementType.DELIVERY_FAILED_RECEIVE:
       case AnnouncementType.DELIVERY_FAILED_SEND:
+      case AnnouncementType.REFUND_REJECT:
         return RejectIcon;
 
       case AnnouncementType.EXCHANGE_NEW_DEAL:

@@ -1,12 +1,13 @@
 import { Button, IconButton, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { UserInfo } from "../../common/base.interface";
 import CurrencySplitter from "../../assistants/Spliter";
 import { privateAxios } from "../../middleware/axiosInstance";
+import PhoneVerification from "./PhoneVerification";
 // interface Wallet extends BaseInterface {
 //   balance: number;
 //   nonWithdrawableAmount: number;
@@ -15,12 +16,19 @@ import { privateAxios } from "../../middleware/axiosInstance";
 interface DepositFormProps {
   onBack: () => void;
   userInfo: UserInfo;
+  fetchUserInfo: () => void;
 }
 
-const DepositForm: React.FC<DepositFormProps> = ({ onBack, userInfo }) => {
+const DepositForm: React.FC<DepositFormProps> = ({
+  onBack,
+  userInfo,
+  fetchUserInfo,
+}) => {
   const [isVisible, setIsVisible] = useState(false);
   const [amount, setAmount] = useState(0);
   const [paymentGateway, setPaymentGateway] = useState<"zalopay" | "vnpay">();
+
+  const [isVerifyingPhone, setIsVerifyingPhone] = useState(false);
 
   const redirectToPay = async () => {
     try {
@@ -52,6 +60,11 @@ const DepositForm: React.FC<DepositFormProps> = ({ onBack, userInfo }) => {
       console.error("Payment error:", error);
     }
   };
+
+  useEffect(() => {
+    if (!userInfo.phone || userInfo.phone.length === 0)
+      setIsVerifyingPhone(true);
+  }, [userInfo]);
 
   return (
     <div className="w-full REM">
@@ -179,6 +192,16 @@ const DepositForm: React.FC<DepositFormProps> = ({ onBack, userInfo }) => {
           </button>
         </div>
       </Box>
+
+      <PhoneVerification
+        user={userInfo}
+        isOpen={isVerifyingPhone}
+        setIsOpen={setIsVerifyingPhone}
+        confirmCallback={() => {
+          fetchUserInfo();
+        }}
+        cancelCallback={onBack}
+      />
     </div>
   );
 };

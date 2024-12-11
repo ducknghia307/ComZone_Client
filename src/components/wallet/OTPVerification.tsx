@@ -90,6 +90,7 @@ export default function OTPVerification({
         setOtpInput("");
         setIsOpen(false);
       }}
+      maskClosable={false}
       footer={null}
       centered
     >

@@ -3,6 +3,7 @@ import backgr from "../assets/bookshelf.jpg";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { LoginUser } from "../redux/features/auth/authActionCreators";
+import { CircularProgress } from "@mui/material";
 
 const SignIn = () => {
   const dispatch = useAppDispatch();
@@ -42,7 +43,7 @@ const SignIn = () => {
         window.location.href = "/admin/dashboard";
       } else {
         // Handle login failure (this case may depend on how you handle responses)
-        setErrorMessage("Invalid email or password. Please try again.");
+        setErrorMessage("Email hoặc mật khẩu không đúng. Vui lòng thử lại!");
       }
     } catch (error) {
       console.error("Error logging in:", error);
@@ -58,22 +59,19 @@ const SignIn = () => {
 
   return (
     <div
-      className="bg-cover bg-center flex items-center justify-center w-full"
+      className="REM bg-cover bg-center flex items-center justify-center w-full"
       style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url(${backgr})`,
       }}
     >
       <div className="py-12 w-full flex justify-center">
         <div className="bg-white p-8 rounded-md shadow-md w-full max-w-md">
-          <h2 className="text-3xl font-bold text-center mb-6">Đăng Nhập</h2>
+          <h2 className="text-3xl font-semibold text-center mb-6">Đăng Nhập</h2>
 
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label
-                className="block text-sm font-semibold mb-2"
-                htmlFor="email"
-              >
-                Email/Số Điện Thoại
+              <label className="block text-sm mb-2" htmlFor="email">
+                Địa chỉ Email
               </label>
               <input
                 type="email"
@@ -81,16 +79,13 @@ const SignIn = () => {
                 value={emailRegister ? emailRegister : email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                placeholder="Email/Số Điện Thoại"
+                placeholder="Email"
                 required
               />
             </div>
 
             <div className="mb-4">
-              <label
-                className="block text-sm font-semibold mb-2"
-                htmlFor="password"
-              >
+              <label className="block text-sm mb-2" htmlFor="password">
                 Mật Khẩu
               </label>
               <div className="relative">
@@ -106,22 +101,28 @@ const SignIn = () => {
               </div>
             </div>
 
-            <div className="flex justify-end items-center mb-3">
-              <Link to={"/forgot"} className="text-sm">
-                Quên Mật Khẩu?
-              </Link>
-            </div>
             {errorMessage && (
-              <p className="text-red-500 text-sm text-center mb-1">
-                {errorMessage}
+              <p className="text-red-500 text-sm mb-1">
+                {errorMessage} <br />
+                <Link
+                  to={"/forgot"}
+                  className="text-xs text-gray-600 underline"
+                >
+                  Bạn quên mật khẩu?
+                </Link>
               </p>
             )}
+
             <button
               type="submit"
-              className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition duration-300"
+              className="w-full bg-black text-white py-2 mt-4 rounded-md hover:bg-gray-800 transition duration-300"
               disabled={isLoading}
             >
-              {isLoading ? "Đang Đăng Nhập..." : "Đăng Nhập"}
+              {isLoading ? (
+                <CircularProgress color="inherit" size={"1em"} />
+              ) : (
+                "Đăng Nhập"
+              )}
             </button>
             <h4 className="font-thin text-sm italic text-center mt-2">hoặc</h4>
           </form>
@@ -175,7 +176,7 @@ const SignIn = () => {
 
           <p className="mt-4 text-center text-sm">
             Chưa có tài khoản?{" "}
-            <Link to={"/signup"} className="font-semibold">
+            <Link to={"/signup"} className="font-semibold underline">
               Đăng Ký
             </Link>
           </p>

@@ -93,6 +93,29 @@ export default function ComicsDetailedInfo({
           <p className="w-1/2">{currentComics?.quantity}</p>
         </div>
       )}
+
+      {currentComics?.quantity > 1 && currentComics.episodesList && (
+        <div
+          className={`${
+            !currentComics?.publishedDate && "hidden"
+          } flex items-center text-xs py-2 border-b`}
+        >
+          <p className="w-1/2 text-gray-600">Tên tập, số tập:</p>
+          <div className="w-1/2 flex items-center justify-start gap-2 flex-wrap">
+            {currentComics.episodesList.map((eps, index) => (
+              <>
+                <span
+                  key={index}
+                  className="px-2 py-1 rounded-md border border-gray-300"
+                >
+                  {/^[0-9]*$/.test(eps) && "Tập "}
+                  {eps}
+                </span>
+              </>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

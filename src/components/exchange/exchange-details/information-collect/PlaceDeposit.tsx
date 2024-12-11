@@ -24,7 +24,7 @@ export default function PlaceDeposit({
   secondAddress: string;
   firstUser: UserInfo;
   secondUser: UserInfo;
-  fetchExchangeDetails: Function;
+  fetchExchangeDetails: () => void;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [deliveryDetails, setDeliveryDetails] = useState<{
@@ -234,6 +234,7 @@ export default function PlaceDeposit({
         </div>
 
         <PayButton
+          user={firstUser}
           total={total}
           exchangeId={exchangeDetails.exchange.id}
           fetchExchangeDetails={fetchExchangeDetails}

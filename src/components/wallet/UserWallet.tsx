@@ -26,19 +26,17 @@ import CurrencySplitter from "../../assistants/Spliter";
 import { useAppSelector } from "../../redux/hooks";
 import { Transaction } from "../../common/interfaces/transaction.interface";
 import displayPastTimeFromNow from "../../utils/displayPastTimeFromNow";
-import { notification, Tooltip } from "antd";
 import WithdrawalForm from "./WithdrawalForm";
+
 const UserWallet = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
-  const [showSOFs, setShowSOFs] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [transactions, setTransactions] = useState([]);
   const userId = useAppSelector((state) => state.auth.userId);
-  console.log("userid", userId);
 
   const fetchUserInfo = async () => {
     try {
@@ -78,7 +76,7 @@ const UserWallet = () => {
         note:
           transaction.type === "SUBTRACT"
             ? transaction.order
-              ? `Thanh toán đơn hàng`
+              ? `Thanh toán đơn hàng #${transaction.order.code}`
               : transaction.exchange
               ? `Thanh toán trao đổi`
               : transaction.deposit?.exchange
@@ -92,7 +90,7 @@ const UserWallet = () => {
               : "Thông tin giao dịch không có sẵn"
             : transaction.type === "ADD"
             ? transaction.order
-              ? `Nhận tiền đơn hàng`
+              ? `Nhận tiền đơn hàng #${transaction.order.code}`
               : transaction.exchange
               ? `Thanh toán tiền bù trao đổi`
               : transaction.deposit?.exchange
@@ -105,6 +103,10 @@ const UserWallet = () => {
               ? `Hoàn trả cọc đấu giá do người dùng không thanh toán`
               : transaction.walletDeposit
               ? "Nạp tiền vào ví"
+              : transaction.refundRequest
+              ? transaction.refundRequest.order
+                ? `Hoàn tiền đơn hàng #${transaction.refundRequest.order.code}`
+                : "Nhận tiền đền bù trao đổi"
               : "Thông tin giao dịch không có sẵn"
             : "Thông tin giao dịch không có sẵn",
       }));
@@ -185,6 +187,7 @@ const UserWallet = () => {
             setShowDepositForm(false);
           }}
           userInfo={userInfo}
+          fetchUserInfo={fetchUserInfo}
         />
       ) : showWithdrawForm ? (
         <WithdrawalForm

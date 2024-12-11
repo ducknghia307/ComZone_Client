@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BaseInterface,
   Comic,
@@ -54,6 +54,8 @@ export default function SellerShopPage() {
   const [currentTab, setCurrentTab] = useState<SellerShopTabs>();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   useMemo(async () => {
     setIsLoading(true);
@@ -146,7 +148,9 @@ export default function SellerShopPage() {
 
   useEffect(() => {
     const rewriteUrl = (path: string) => {
-      window.history.pushState(null, "", `/seller/shop/${path}/${id}`);
+      console.log("first:", firstLoad);
+      if (firstLoad) setFirstLoad(false);
+      else window.history.pushState(null, "", `/seller/shop/${path}/${id}`);
     };
 
     switch (currentTab) {

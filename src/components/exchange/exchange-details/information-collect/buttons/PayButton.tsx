@@ -203,7 +203,7 @@ export default function PayButton({
               </button>
               <button
                 disabled={
-                  !checked || amount + userBalance < total || !paymentGateway
+                  !checked || (amount + userBalance < total && !paymentGateway)
                 }
                 className="basis-2/3 py-2 bg-sky-700 text-white font-semibold rounded-md duration-200 hover:bg-sky-800 disabled:bg-gray-300"
                 onClick={() => {

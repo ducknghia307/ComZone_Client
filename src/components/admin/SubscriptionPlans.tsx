@@ -104,7 +104,7 @@ const SubscriptionPlans: React.FC = () => {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                 <TextField
                     variant="outlined"
-                    placeholder="Tìm kiếm..."
+                    placeholder="Tìm kiếm theo ID hoặc giá..."
                     size="small"
                     sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
                     InputProps={{

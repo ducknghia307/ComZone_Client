@@ -411,6 +411,11 @@ const Genres: React.FC<GenresProps> = ({
                                 border: "1px solid #000",
                                 boxShadow: "2px 2px #ccc",
                               }}
+                              onClick={() => {
+                                if (sellerObj.comics.length > 0) {
+                                  navigate(`/seller/shop/all/${sellerObj.seller.id}`);
+                                }
+                              }}
                             />
                             {sellerObj.comics.length > 0 && (
                               <button
@@ -422,23 +427,33 @@ const Genres: React.FC<GenresProps> = ({
                             )}
                           </div>
 
-                          {/* Comics Grid */}
+                          {/* Comics seller */}
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                             {sellerObj.comics && sellerObj.comics.length > 0 ? (
                               sellerObj.comics.slice(0, 5).map((comic) => (
-                                <div
+                                <Link
+                                  to={`/detail/${comic.id}`}
                                   key={comic.id}
-                                  className="bg-gray-100 rounded-lg overflow-hidden shadow hover:shadow-lg transition duration-300"
+                                  className="rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200"
                                 >
-                                  <img
-                                    src={comic.coverImage || "/default-cover.jpg"}
-                                    alt={comic.title}
-                                    className="w-full h-40 object-cover"
-                                  />
-                                  <p className="text-sm text-center font-medium text-gray-700 mt-2 px-2 line-clamp-2">
-                                    {comic.title}
-                                  </p>
-                                </div>
+                                  <div>
+                                    <img
+                                      src={comic.coverImage || "/default-cover.jpg"}
+                                      alt={comic.title}
+                                      className="w-full h-40 object-cover rounded-t-lg"
+                                    />
+                                    <div className="p-4 flex flex-col items-center">
+                                      <div className="h-12">
+                                        <p className="font-medium text-gray-800 text-center line-clamp-2 REM">
+                                          {comic.title}
+                                        </p>
+                                      </div>
+                                      <p className="font-bold text-[#ef4444] text-center mt-2 REM">
+                                        {comic.price.toLocaleString()} đ
+                                      </p>
+                                    </div>
+                                  </div>
+                                </Link>
                               ))
                             ) : (
                               <p className="text-sm text-gray-500 col-span-full text-center">
@@ -453,8 +468,6 @@ const Genres: React.FC<GenresProps> = ({
                   )}
                 </div>
               </div>
-
-
             </>
           ) : (
             <InfiniteScroll

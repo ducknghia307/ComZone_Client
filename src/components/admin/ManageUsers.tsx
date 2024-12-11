@@ -186,7 +186,7 @@ const ManageUsers: React.FC = () => {
         {/* Search Box */}
         <TextField
           variant="outlined"
-          placeholder="Tìm kiếm..."
+          placeholder="Tìm kiếm theo tên hoặc email..."
           value={searchTerm}
           onChange={handleSearch}
           size="small"

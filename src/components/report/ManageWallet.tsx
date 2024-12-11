@@ -211,11 +211,11 @@ const ManageWallet: React.FC = () => {
         {/* Search Box */}
         <TextField
           variant="outlined"
-          placeholder="Tìm kiếm..."
+          placeholder="Tìm kiếm theo tên người dùng hoặc loại giao dịch..."
           value={searchTerm}
           onChange={handleSearch}
           size="small"
-          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '455px' }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

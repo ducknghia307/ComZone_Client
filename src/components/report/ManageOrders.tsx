@@ -287,11 +287,11 @@ const ManageOrders: React.FC = () => {
         {/* Search Box */}
         <TextField
           variant="outlined"
-          placeholder="Tìm kiếm..."
+          placeholder="Tìm kiếm theo tên người đặt hoặc tên người bán..."
           value={searchTerm}
           onChange={handleSearch}
           size="small"
-          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '300px' }}
+          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '420px' }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

@@ -251,7 +251,7 @@ const ManageComics: React.FC = () => {
         {/* Search Box */}
         <TextField
           variant="outlined"
-          placeholder="Tìm kiếm..."
+          placeholder="Tìm kiếm theo tên hoặc tác giả..."
           value={searchTerm}
           onChange={handleSearch}
           size="small"
@@ -259,7 +259,7 @@ const ManageComics: React.FC = () => {
             backgroundColor: "#c66a7a",
             borderRadius: "4px",
             color: "#fff",
-            width: "300px",
+            width: "320px",
           }}
           InputProps={{
             startAdornment: (

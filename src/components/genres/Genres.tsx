@@ -12,6 +12,7 @@ import moment from "moment/min/moment-with-locales";
 import LazyLoad from "react-lazyload";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
+import { Tooltip } from "antd";
 
 interface GenresProps {
   filteredGenres: string[];
@@ -381,42 +382,93 @@ const Genres: React.FC<GenresProps> = ({
                           className="author-card bg-white shadow-lg rounded-lg p-6 mx-4 border border-gray-200"
                         >
                           <div className="flex justify-between items-center mb-6">
-                            <Chip
-                              avatar={
-                                <img
-                                  src={sellerObj.seller.avatar || "/default-avatar.jpg"}
-                                  alt={`${sellerObj.seller.name}'s avatar`}
-                                  className="w-8 h-8 rounded-full"
-                                />
-                              }
-                              label={
-                                <div className="flex items-center gap-2">
-                                  <span className="text-base font-medium text-black">
-                                    {sellerObj.seller.name}
-                                  </span>
-                                  <StoreOutlinedIcon
-                                    className="text-black"
-                                    style={{ fontSize: "20px" }}
+                            {/* Wrap the Chip with Tooltip if comics length is 0 */}
+                            {sellerObj.comics.length > 0 ? (
+                              <Chip
+                                avatar={
+                                  <img
+                                    src={sellerObj.seller.avatar || "/default-avatar.jpg"}
+                                    alt={`${sellerObj.seller.name}'s avatar`}
+                                    className="w-8 h-8 rounded-full"
                                   />
-                                </div>
-                              }
-                              sx={{
-                                fontFamily: "REM",
-                                fontWeight: "500",
-                                fontSize: "16px",
-                                padding: "8px 12px",
-                                borderRadius: "8px",
-                                backgroundColor: "#fff",
-                                color: "#000",
-                                border: "1px solid #000",
-                                boxShadow: "2px 2px #ccc",
-                              }}
-                              onClick={() => {
-                                if (sellerObj.comics.length > 0) {
-                                  navigate(`/seller/shop/all/${sellerObj.seller.id}`);
                                 }
-                              }}
-                            />
+                                label={
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-base font-medium text-black">
+                                      {sellerObj.seller.name}
+                                    </span>
+                                    <StoreOutlinedIcon
+                                      className={`transition-colors duration-200 ${sellerObj.comics.length > 0
+                                        ? "text-black"
+                                        : "group-hover:text-red-500 text-black"
+                                        }`}
+                                      style={{ fontSize: "20px" }}
+                                    />
+                                  </div>
+                                }
+                                sx={{
+                                  fontFamily: "REM",
+                                  fontWeight: "500",
+                                  fontSize: "16px",
+                                  padding: "8px 12px",
+                                  borderRadius: "8px",
+                                  backgroundColor: "#fff",
+                                  color: "#000",
+                                  border: "1px solid #000",
+                                  boxShadow: "2px 2px #ccc",
+                                  transition: "all 0.3s ease-in-out",
+                                  cursor: sellerObj.comics.length > 0 ? "pointer" : "not-allowed",
+                                }}
+                                onClick={() => {
+                                  if (sellerObj.comics.length > 0) {
+                                    navigate(`/seller/shop/all/${sellerObj.seller.id}`);
+                                  }
+                                }}
+                              />
+                            ) : (
+                              <Tooltip
+                                title={<span style={{ whiteSpace: 'nowrap' }}>Người bán này chưa bán truyện nào</span>}
+                                placement="top"
+                              >
+                                <Chip
+                                  avatar={
+                                    <img
+                                      src={sellerObj.seller.avatar || "/default-avatar.jpg"}
+                                      alt={`${sellerObj.seller.name}'s avatar`}
+                                      className="w-8 h-8 rounded-full"
+                                    />
+                                  }
+                                  label={
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-base font-medium text-black">
+                                        {sellerObj.seller.name}
+                                      </span>
+                                      <StoreOutlinedIcon
+                                        className={`transition-colors duration-200 ${sellerObj.comics.length > 0
+                                          ? "text-black"
+                                          : "group-hover:text-red-500 text-black"
+                                          }`}
+                                        style={{ fontSize: "20px" }}
+                                      />
+                                    </div>
+                                  }
+                                  sx={{
+                                    fontFamily: "REM",
+                                    fontWeight: "500",
+                                    fontSize: "16px",
+                                    padding: "8px 12px",
+                                    borderRadius: "8px",
+                                    backgroundColor: "#fff",
+                                    color: "#000",
+                                    border: "1px solid #000",
+                                    boxShadow: "2px 2px #ccc",
+                                    transition: "all 0.3s ease-in-out",
+                                    cursor: "not-allowed",
+                                  }}
+                                />
+                              </Tooltip>
+                            )}
+
                             {sellerObj.comics.length > 0 && (
                               <button
                                 className="text-blue-500 text-sm hover:underline"

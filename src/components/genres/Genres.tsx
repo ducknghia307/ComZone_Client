@@ -4,13 +4,14 @@ import "../ui/GenreSidebar.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Countdown from "react-countdown";
 import { Button, Chip, CircularProgress } from "@mui/material";
-import { Comic } from "../../common/base.interface";
+import { Comic, UserInfo } from "../../common/base.interface";
 import { publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import Loading from "../loading/Loading";
 import moment from "moment/min/moment-with-locales";
 import LazyLoad from "react-lazyload";
 import InfiniteScroll from "react-infinite-scroll-component";
+import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 
 interface GenresProps {
   filteredGenres: string[];
@@ -18,12 +19,23 @@ interface GenresProps {
   filteredConditions: string[];
 }
 
+interface Seller {
+  seller: {
+    id: string;
+    name: string;
+    [key: string]: any;
+  };
+  comics: Comic[];
+}
+
+
 const Genres: React.FC<GenresProps> = ({
   filteredGenres,
   filteredAuthors,
   filteredConditions,
 }) => {
   const [comics, setComics] = useState<Comic[]>([]);
+  const [sellers, setSellers] = useState<Seller[]>([]);
   const [totalComicsQuantity, setTotalComicsQuantity] = useState<number>(0);
   const [auctionComics, setAuctionComics] = useState<Comic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -61,17 +73,54 @@ const Genres: React.FC<GenresProps> = ({
     );
   };
 
+  // const fetchComics = async (comicsCount?: number) => {
+  //   try {
+  //     const response = await publicAxios.get(
+  //       `/comics/count/status/available?load=${comicsCount || comicsEachLoad}`
+  //     );
+  //     setComics(response.data[0]);
+  //     setTotalComicsQuantity(response.data[1]);
+
+  //     const auctionComics = await publicAxios.get<Comic[]>("/auction");
+  //     setAuctionComics(auctionComics.data);
+  //     console.log("auction comics", auctionComics.data);
+  //   } catch (error) {
+  //     console.error("Error fetching comics:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchComics = async (comicsCount?: number) => {
     try {
-      const response = await publicAxios.get(
-        `/comics/count/status/available?load=${comicsCount || comicsEachLoad}`
-      );
-      setComics(response.data[0]);
-      setTotalComicsQuantity(response.data[1]);
+      if (searchQuery) {
+        // Fetch from the new search API
+        const response = await publicAxios.get(`/comics/search/home`, {
+          params: { key: searchQuery },
+        });
+        console.log("Search API Response:", response.data);
 
-      const auctionComics = await publicAxios.get<Comic[]>("/auction");
-      setAuctionComics(auctionComics.data);
-      console.log("auction comics", auctionComics.data);
+        // Destructure the response
+        const { comics: regularComics = [], auctions: auctionComicsData = [], sellers: sellersData = [] } = response.data;
+
+        // Update state variables
+        setComics(regularComics);
+        setAuctionComics(auctionComicsData);
+        setSellers(sellersData);
+        console.log("Sellers Data:", sellers);
+
+      } else {
+        // Existing logic for fetching comics without a search query
+        const response = await publicAxios.get(
+          `/comics/count/status/available?load=${comicsCount || comicsEachLoad}`
+        );
+
+        const fetchedComics = Array.isArray(response.data[0]) ? response.data[0] : [];
+        setComics(fetchedComics);
+
+        const auctionComics = await publicAxios.get<Comic[]>("/auction");
+        setAuctionComics(Array.isArray(auctionComics.data) ? auctionComics.data : []);
+      }
     } catch (error) {
       console.error("Error fetching comics:", error);
     } finally {
@@ -87,8 +136,8 @@ const Genres: React.FC<GenresProps> = ({
     const genreMatch =
       filteredGenres.length > 0
         ? filteredGenres.every((genre) =>
-            comic.genres.some((comicGenre) => comicGenre.name === genre)
-          )
+          comic.genres.some((comicGenre) => comicGenre.name === genre)
+        )
         : true;
 
     const authorMatch =
@@ -112,9 +161,9 @@ const Genres: React.FC<GenresProps> = ({
     const genreMatch =
       filteredGenres.length > 0
         ? comic.comics.genres &&
-          comic.comics.genres.some((genre) =>
-            filteredGenres.includes(genre.name)
-          )
+        comic.comics.genres.some((genre) =>
+          filteredGenres.includes(genre.name)
+        )
         : true;
     const authorMatch =
       filteredAuthors.length > 0
@@ -222,7 +271,8 @@ const Genres: React.FC<GenresProps> = ({
                     fontFamily: "REM",
                   }}
                 />
-                <div className={`all-genres-cards ${comics.length > 4 ? 'grid-layout' : 'flex-layout'}`}>
+                <div className={`all-genres-cards ${sortedAuctionComics.length < 4 ? 'align-left' : 'grid-layout'}`}>
+
                   {sortedAuctionComics.length > 0 ? (
                     sortedAuctionComics.map((comic) => (
                       <div className="auction-card" key={comic.id}>
@@ -297,6 +347,114 @@ const Genres: React.FC<GenresProps> = ({
                   )}
                 </div>
               </div>
+
+              <div className="author-section mt-8">
+                <Chip
+                  label="Người Bán"
+                  variant="outlined"
+                  sx={{
+                    fontSize: "20px",
+                    padding: "20px 16px",
+                    marginBottom: 2,
+                    borderRadius: "20px",
+                    marginLeft: "20px",
+                    fontFamily: "REM",
+                    borderColor: "#000",
+                  }}
+                />
+
+                <div className="space-y-4">
+                  {sellers.length > 0 ? (
+                    sellers
+                      .filter((sellerObj) =>
+                        sellerObj.seller &&
+                        sellerObj.seller.name &&
+                        (searchQuery
+                          ? sellerObj.seller.name
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase())
+                          : true)
+                      )
+                      .map((sellerObj) => (
+                        <div
+                          key={sellerObj.seller.id}
+                          className="author-card bg-white shadow-lg rounded-lg p-6 mx-4 border border-gray-200"
+                        >
+                          <div className="flex justify-between items-center mb-6">
+                            <Chip
+                              avatar={
+                                <img
+                                  src={sellerObj.seller.avatar || "/default-avatar.jpg"}
+                                  alt={`${sellerObj.seller.name}'s avatar`}
+                                  className="w-8 h-8 rounded-full"
+                                />
+                              }
+                              label={
+                                <div className="flex items-center gap-2">
+                                  <span className="text-base font-medium text-black">
+                                    {sellerObj.seller.name}
+                                  </span>
+                                  <StoreOutlinedIcon
+                                    className="text-black"
+                                    style={{ fontSize: "20px" }}
+                                  />
+                                </div>
+                              }
+                              sx={{
+                                fontFamily: "REM",
+                                fontWeight: "500",
+                                fontSize: "16px",
+                                padding: "8px 12px",
+                                borderRadius: "8px",
+                                backgroundColor: "#fff",
+                                color: "#000",
+                                border: "1px solid #000",
+                                boxShadow: "2px 2px #ccc",
+                              }}
+                            />
+                            {sellerObj.comics.length > 0 && (
+                              <button
+                                className="text-blue-500 text-sm hover:underline"
+                                onClick={() => navigate(`/seller/shop/all/${sellerObj.seller.id}`)}
+                              >
+                                Xem tất cả
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Comics Grid */}
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                            {sellerObj.comics && sellerObj.comics.length > 0 ? (
+                              sellerObj.comics.slice(0, 5).map((comic) => (
+                                <div
+                                  key={comic.id}
+                                  className="bg-gray-100 rounded-lg overflow-hidden shadow hover:shadow-lg transition duration-300"
+                                >
+                                  <img
+                                    src={comic.coverImage || "/default-cover.jpg"}
+                                    alt={comic.title}
+                                    className="w-full h-40 object-cover"
+                                  />
+                                  <p className="text-sm text-center font-medium text-gray-700 mt-2 px-2 line-clamp-2">
+                                    {comic.title}
+                                  </p>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-sm text-gray-500 col-span-full text-center">
+                                Người bán này chưa bán truyện nào
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                  ) : (
+                    <p className="text-sm text-gray-500">Không tìm thấy người bán nào</p>
+                  )}
+                </div>
+              </div>
+
+
             </>
           ) : (
             <InfiniteScroll
@@ -347,11 +505,10 @@ const Genres: React.FC<GenresProps> = ({
                               )}
                               {comic?.edition !== "REGULAR" && (
                                 <span
-                                  className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${
-                                    comic?.edition === "SPECIAL"
-                                      ? "bg-yellow-600"
-                                      : "bg-red-800"
-                                  } text-white text-[0.5em] font-light text-nowrap justify-center`}
+                                  className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${comic?.edition === "SPECIAL"
+                                    ? "bg-yellow-600"
+                                    : "bg-red-800"
+                                    } text-white text-[0.5em] font-light text-nowrap justify-center`}
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -403,8 +560,9 @@ const Genres: React.FC<GenresProps> = ({
             </InfiniteScroll>
           )}
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 

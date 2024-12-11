@@ -99,3 +99,22 @@
     /* 1 card per row for mobile devices */
   }
 }
+
+.align-left {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Align items to the left */
+  gap: 1rem; /* Space between items */
+}
+
+/* For 4 or more items, use a grid layout */
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14em, 1fr));
+  gap: 1rem;
+}
+
+.auction-card {
+  width: 14em;
+  margin: 0; /* Ensure no auto-centering */
+}

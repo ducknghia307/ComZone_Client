@@ -5,6 +5,7 @@ import {
   UserInfo,
 } from "../base.interface";
 import { Exchange } from "./exchange.interface";
+import { Order } from "./order.interface";
 import { ExchangeRefundRequest } from "./refund-request.interface";
 import { SellerSubscription } from "./seller-subscription.interface";
 
@@ -18,7 +19,7 @@ export interface Transaction extends BaseInterface {
   auction?: Auction;
   exchange?: Exchange;
   walletDeposit?: WalletDeposit;
-  order?: BaseInterface;
+  order?: Order;
   deposit?: DepositDetails;
   sellerSubscription: SellerSubscription;
   refundRequest: ExchangeRefundRequest;

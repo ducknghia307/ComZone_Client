@@ -170,7 +170,7 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
   };
 
   return (
-    <div className="relative max-h-96 w-96 ">
+    <div className="relative max-h-[400px] w-96 ">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white">
         <div className="mb-2 pb-2 border-b flex justify-between px-3">
@@ -211,7 +211,7 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       </div>
 
       {/* Notifications */}
-      <div className="headerNoti mb-2 overflow-y-auto h-80 w-96 p-1">
+      <div className="headerNoti mb-2 overflow-y-auto h-[300px] w-96 p-1">
         {filteredAnnouncements.length > 0 ? (
           filteredAnnouncements.map((item, index) => {
             return (
@@ -267,7 +267,16 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       </div>
 
       {/* Footer */}
-
+      {announcements.length > 0 && (
+        <div className="border-t p-1 text-center sticky bottom-0 bg-white z-10">
+          {/* <button
+            className="text-blue-500 text-sm font-semibold hover:underline"
+            onClick={navigateToAll}
+          >
+            Xem thêm
+          </button> */}
+        </div>
+      )}
     </div>
   );
 };

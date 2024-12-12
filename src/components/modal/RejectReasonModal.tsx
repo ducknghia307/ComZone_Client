@@ -53,7 +53,11 @@ const RejectReasonModal: React.FC<RejectReasonModalProps> = ({ open, onClose, or
 
     const handleConfirm = async () => {
         if (!reason.trim()) {
-            alert('Vui lòng nhập lý do từ chối.');
+            notification.warning({
+                message: 'Chú ý',
+                description: 'Vui lòng nhập lý do từ chối.',
+                placement: 'topRight',
+            });
             return;
         }
 

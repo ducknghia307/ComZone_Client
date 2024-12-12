@@ -327,9 +327,8 @@ const OrderHistory = () => {
         ].map((status) => (
           <span
             key={status}
-            className={`status-tab grow whitespace-nowrap ${
-              selectedStatus === status ? "active" : ""
-            }`}
+            className={`status-tab grow whitespace-nowrap ${selectedStatus === status ? "active" : ""
+              }`}
             onClick={() => setSelectedStatus(status)}
           >
             {getStatusText(status)}
@@ -452,13 +451,13 @@ const OrderHistory = () => {
                       <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
                         {order.type === "AUCTION"
                           ? Number(order.totalPrice).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })
+                            style: "currency",
+                            currency: "VND",
+                          })
                           : Number(item.comics.price).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
+                            style: "currency",
+                            currency: "VND",
+                          })}
                       </Typography>
                     </div>
                   </div>
@@ -475,7 +474,7 @@ const OrderHistory = () => {
                   borderTop: "1px solid #eee",
                 }}
               >
-                {order.status === "FAILED" && (
+                {/* {order.status === "FAILED" && (
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
                       <ErrorOutlineIcon className="text-red-500 mr-2" />
@@ -487,6 +486,19 @@ const OrderHistory = () => {
                           {order.refundRequest?.rejectedReason ||
                             "Không có lý do cụ thể"}
                         </span>
+                      </div>
+                    </div>
+                  </div>
+                )} */}
+                {order.status === "FAILED" && order.refundRequest?.rejectedReason && (
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
+                      <ErrorOutlineIcon className="text-red-500 mr-2" />
+                      <div className="flex flex-col">
+                        <span className="text-red-600 font-semibold">
+                          Lý do từ chối hoàn tiền
+                        </span>
+                        <span className="text-red-500">{order.refundRequest.rejectedReason}</span>
                       </div>
                     </div>
                   </div>

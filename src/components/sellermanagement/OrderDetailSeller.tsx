@@ -69,6 +69,7 @@ const StatusChip = styled("span")<{ status: string; deliveryStatus?: string }>(
         case "SUCCESSFUL":
           return { color: "#4caf50", backgroundColor: "#e8f5e9" };
         case "FAILED":
+          return { color: "#f44336", backgroundColor: "#ffebee" };
         case "CANCELED":
           return { color: "#ff0000", backgroundColor: "#ffe1e1" };
         default:
@@ -125,8 +126,8 @@ const InfoRow = ({
     paymentMethod === "WALLET"
       ? "#32CD32"
       : paymentMethod === "COD"
-      ? "#ff9800"
-      : "#000";
+        ? "#ff9800"
+        : "#000";
 
   return (
     <Box
@@ -222,7 +223,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
 
   const translateStatus = (status: string, deliveryStatus?: string) => {
     if (status === "PACKAGING" && deliveryStatus === "ready_to_pick") {
-      return "Hoàn tất đóng gói";
+      return "Chờ bàn giao hàng";
     }
     switch (status) {
       case "PENDING":
@@ -237,6 +238,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
         return "Hoàn tất";
       case "CANCELED":
         return "Đã hủy";
+      case "FAILED":
+        return "Thất bại";
       default:
         return status;
     }
@@ -382,6 +385,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
           <StatusChip
             status={orderDetail.status}
             deliveryStatus={orderDetail.delivery?.status}
+            sx={{ textTransform: "none", fontFamily: 'REM', fontWeight: 'bold' }}
           >
             {translateStatus(orderDetail.status, orderDetail.delivery?.status)}
           </StatusChip>
@@ -391,7 +395,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
             sx={{
               fontSize: "1.5rem",
               color: theme.palette.text.primary,
-              textTransform: "uppercase",
+              textTransform: "none",
               marginRight: "100px",
               fontFamily: "REM",
             }}
@@ -634,8 +638,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
 
                   <TableBody>
                     {orders.length > 0 &&
-                    orders[0].items &&
-                    orders[0].items.length > 0 ? (
+                      orders[0].items &&
+                      orders[0].items.length > 0 ? (
                       orders[0].items.map((item: any, index: number) => (
                         <TableRow key={index}>
                           <TableCell>

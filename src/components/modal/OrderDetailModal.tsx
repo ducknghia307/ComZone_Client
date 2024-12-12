@@ -242,7 +242,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
           width: 1000,
           maxHeight: "90vh",
           bgcolor: "background.paper",
-          boxShadow: "none",
+          boxShadow: 24,
           p: 4,
           borderRadius: "8px",
           display: "flex",
@@ -324,7 +324,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
               </Typography>
             )}
           </div>
-          {order.status === "FAILED" && (
+          {order.status === "FAILED" && order.rejectReason && (
             <div
               style={{
                 display: "flex",
@@ -346,7 +346,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                 variant="body2"
                 sx={{ color: "#d32f2f", fontFamily: "REM" }}
               >
-                {order.rejectReason || "Không có lý do cụ thể"}
+                {order.rejectReason}
               </Typography>
             </div>
           )}

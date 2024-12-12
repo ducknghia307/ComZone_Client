@@ -150,6 +150,8 @@ const OrderManagement = () => {
         return "Hoàn tất";
       case "CANCELED":
         return "Đã hủy";
+      case "FAILED":
+        return "Thất bại";
       default:
         return status;
     }
@@ -230,6 +232,15 @@ const OrderManagement = () => {
           fontWeight: "bold",
           display: "inline-block",
         };
+      case "FAILED":
+        return {
+          color: "#f44336",
+          backgroundColor: "#ffebee",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
     }
   };
 
@@ -249,12 +260,12 @@ const OrderManagement = () => {
       prevOrders.map((order) =>
         order.id === orderId
           ? {
-              ...order,
-              status: newStatus,
-              delivery: delivery
-                ? { ...order.delivery, status: delivery.status }
-                : order.delivery,
-            }
+            ...order,
+            status: newStatus,
+            delivery: delivery
+              ? { ...order.delivery, status: delivery.status }
+              : order.delivery,
+          }
           : order
       )
     );

@@ -9,7 +9,7 @@ import DeliveryProcessInfo from "./DeliveryProcessInfo";
 import SuccessfulExchange from "./SuccessfulExchange";
 import { Address } from "../../../../common/base.interface";
 import DealsInformation from "./DealsInformation";
-import { ExchangeRefundRequest } from "../../../../common/interfaces/refund-request.interface";
+import { RefundRequest } from "../../../../common/interfaces/refund-request.interface";
 import { useEffect, useState } from "react";
 import { privateAxios } from "../../../../middleware/axiosInstance";
 import ViewRefundButton from "./buttons/ViewRefundButton";
@@ -41,11 +41,10 @@ export default function InformationCollectSection({
   secondAddress: string;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [refundRequestsList, setRefundRequestsList] = useState<
-    ExchangeRefundRequest[]
-  >([]);
-  const [userRefundRequest, setUserRefundRequest] =
-    useState<ExchangeRefundRequest>();
+  const [refundRequestsList, setRefundRequestsList] = useState<RefundRequest[]>(
+    []
+  );
+  const [userRefundRequest, setUserRefundRequest] = useState<RefundRequest>();
 
   const self = exchangeDetails.isRequestUser
     ? exchangeDetails.exchange.requestUser
@@ -78,9 +77,7 @@ export default function InformationCollectSection({
       .get(`refund-requests/user/exchange/${exchangeDetails.exchange.id}`)
       .then((res) => {
         setRefundRequestsList(res.data);
-        setUserRefundRequest(
-          res.data.find((req: ExchangeRefundRequest) => req.mine)
-        );
+        setUserRefundRequest(res.data.find((req: RefundRequest) => req.mine));
       })
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));

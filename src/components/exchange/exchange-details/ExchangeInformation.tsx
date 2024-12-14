@@ -82,25 +82,25 @@ export default function ExchangeInformation({
           </div>
         )}
 
-        {exchangeDetails.exchange.compensationAmount &&
-          exchangeDetails.exchange.compensationAmount > 0 && (
-            <div className="flex items-center justify-between text-sm font-light">
-              <p>Giá trị tiền bù:</p>
-              <p
-                className={`${
-                  exchangeDetails.exchange.compensateUser?.id === firstUser?.id
-                    ? "text-red-600"
-                    : "text-green-600"
-                } font-semibold`}
-              >
-                {exchangeDetails.exchange.compensateUser?.id === firstUser?.id
-                  ? "- "
-                  : "+ "}
-                {CurrencySplitter(exchangeDetails.exchange.compensationAmount)}{" "}
-                đ
-              </p>
-            </div>
-          )}
+        <div className="flex items-center justify-between text-sm font-light">
+          <p>Giá trị tiền bù:</p>
+          <p
+            className={`${
+              !exchangeDetails.exchange.compensateUser
+                ? "text-gray-500"
+                : exchangeDetails.exchange.compensateUser?.id === firstUser?.id
+                ? "text-red-600 font-semibold"
+                : "text-green-600 font-semibold"
+            }`}
+          >
+            {!exchangeDetails.exchange.compensateUser
+              ? ""
+              : exchangeDetails.exchange.compensateUser?.id === firstUser?.id
+              ? "- "
+              : "+ "}
+            {CurrencySplitter(exchangeDetails.exchange.compensationAmount)} đ
+          </p>
+        </div>
       </div>
 
       {firstCurrentStage > 0 && (

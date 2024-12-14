@@ -1,5 +1,5 @@
 import { BaseInterface, Delivery, UserInfo } from "../base.interface";
-import { ExchangeRefundRequest } from "./refund-request.interface";
+import { RefundRequest } from "./refund-request.interface";
 
 export enum OrderStatusEnum {
   PENDING = "PENDING",
@@ -26,5 +26,5 @@ export interface Order extends BaseInterface {
   cancelReason?: string;
   note?: string;
   isFeedback?: boolean;
-  refundRequest?: ExchangeRefundRequest;
+  refundRequest?: RefundRequest;
 }

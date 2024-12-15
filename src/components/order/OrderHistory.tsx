@@ -424,7 +424,7 @@ const OrderHistory = () => {
                 {order.items.map((item: any) => (
                   <div
                     key={item.id}
-                    className="flex items-stretch gap-2 sm:gap-4 p-2 phone:pr-8"
+                    className="flex items-stretch gap-2 sm:gap-4 p-2 phone:pr-8 phone:pl-8"
                   >
                     {/* Hình ảnh sản phẩm */}
                     <img

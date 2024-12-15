@@ -10,8 +10,8 @@ import { privateAxios } from '../../middleware/axiosInstance';
 import { notification } from 'antd';
 interface Feedback {
     id: string;
-    user: { name: string };
-    seller: { name: string };
+    user: { name: string; avatar: string; };
+    seller: { name: string; avatar: string; };
     createdAt: string;
     comment: string;
     rating: number;
@@ -191,38 +191,44 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                             >
                                 <Stack spacing={2.5} direction="row" justifyContent='space-between' paddingX='30px'>
                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                        <Avatar
+                                        {/* <Avatar
                                             sx={{
                                                 bgcolor: '#71002b', width: 40, height: 40,
                                             }}
                                         >
                                             <PersonOutlineIcon />
-                                        </Avatar>
+                                        </Avatar> */}
                                         <Box>
-                                            <Typography variant="caption" color="text.secondary" gutterBottom sx={{ fontFamily: 'REM' }}>
+                                            <Typography sx={{ color: 'grey', fontSize: '13px', fontFamily: 'REM', }}>
                                                 Người mua
                                             </Typography>
-                                            <Typography variant="subtitle1" fontWeight={600} sx={{ fontFamily: 'REM' }}>
-                                                {feedback.user?.name || 'Không xác định'}
-                                            </Typography>
+                                            <Box display="flex" alignItems="center" sx={{ paddingTop: '10px' }}>
+                                                <Avatar alt={feedback.user?.name} src={feedback.user?.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
+                                                <Typography variant="subtitle1" fontWeight={600} sx={{ fontFamily: 'REM' }}>
+                                                    {feedback.user?.name || 'Không xác định'}
+                                                </Typography>
+                                            </Box>
                                         </Box>
                                     </Stack>
 
                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                        <Avatar
+                                        {/* <Avatar
                                             sx={{
                                                 bgcolor: '#c66a7a', width: 40, height: 40,
                                             }}
                                         >
                                             <StorefrontOutlinedIcon />
-                                        </Avatar>
+                                        </Avatar> */}
                                         <Box>
-                                            <Typography variant="caption" color="text.secondary" gutterBottom sx={{ fontFamily: 'REM' }}>
+                                            <Typography sx={{ color: 'grey', fontSize: '13px', fontFamily: 'REM', }}>
                                                 Người bán
                                             </Typography>
-                                            <Typography variant="subtitle1" fontWeight={600} sx={{ fontFamily: 'REM' }}>
-                                                {feedback.seller?.name || 'Không xác định'}
-                                            </Typography>
+                                            <Box display="flex" alignItems="center" sx={{ paddingTop: '10px' }}>
+                                                <Avatar alt={feedback.seller?.name} src={feedback.seller?.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
+                                                <Typography variant="subtitle1" fontWeight={600} sx={{ fontFamily: 'REM' }}>
+                                                    {feedback.seller?.name || 'Không xác định'}
+                                                </Typography>
+                                            </Box>
                                         </Box>
                                     </Stack>
                                 </Stack>

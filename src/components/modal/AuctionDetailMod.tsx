@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import {
   Typography,
   Box,
@@ -85,7 +85,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
     isPaid,
   }: {
     label: string;
-    value: string | number;
+    value: ReactNode;
     isPaid?: boolean;
   }) => {
     const theme = useTheme();
@@ -121,7 +121,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
           variant="body1"
           fontWeight={400}
           sx={{
-            paddingLeft: 2,
+            paddingLeft: 3,
             color:
               isPaid !== undefined ? (isPaid ? "#32CD32" : "#ff9800") : "#000",
             whiteSpace: "nowrap",
@@ -375,7 +375,21 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                       border: "2px solid black",
                     }}
                   />
-                  <InfoRow label="Họ tên" value={sellerInfo.name} />
+                  <InfoRow label="Họ tên" value={
+                    <Box display="flex" alignItems="center" gap="10px">
+                      <img
+                        src={sellerInfo.avatar || "/placeholder.png"}
+                        alt={sellerInfo.avatar}
+                        style={{
+                          width: "32px",
+                          height: "32px",
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      {sellerInfo.name}
+                    </Box>
+                  } />
                   <InfoRow label="Số điện thoại" value={sellerInfo.phone} />
                   <InfoRow label="Địa chỉ" value={sellerInfo.address} />
                 </Box>

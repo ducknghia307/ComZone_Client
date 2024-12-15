@@ -13,14 +13,25 @@ import { Box, FormControl, IconButton, InputAdornment, Menu, MenuItem, Select, S
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import BanUserModal from '../modal/BanUserModal';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import ModalUserInfo from '../modal/ModalUserInfo';
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  status: string;
-  role: string;
   avatar: string;
+  role: string | null;
+  createdAt: string;
+  phone: string;
+  refresh_token: string;
+  updatedAt: string;
+  balance: number;
+  nonWithdrawableAmount: number;
+  last_active?: Date | null;
+  isActive?: boolean;
+  follower_count?: number;
+  address: string;
+  status: string;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -57,9 +68,11 @@ const ManageUsers: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openBanModal, setOpenBanModal] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [openUserModal, setOpenUserModal] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -88,7 +101,7 @@ const ManageUsers: React.FC = () => {
     setPage(0);
   };
 
-  const handleOpenBanModal = (userId: number) => {
+  const handleOpenBanModal = (userId: string) => {
     setSelectedUserId(userId);
     setOpenBanModal(true);
   };
@@ -180,6 +193,11 @@ const ManageUsers: React.FC = () => {
     return matchesSearchTerm && matchesRoleFilter;
   });
 
+  const handleUserClick = (user: User) => {
+    setSelectedUser(user);
+    setOpenUserModal(true);
+  };
+
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -249,10 +267,10 @@ const ManageUsers: React.FC = () => {
               ) : (
                 filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
                   <StyledTableRow key={user.id}>
-                    <StyledTableCell align="center" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <img style={{ width: '50px', height: '50px', borderRadius: '50%' }} src={user.avatar || '/placeholder.png'} alt={user.name} />
+                    <StyledTableCell align="center" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+                      <img onClick={() => handleUserClick(user)} style={{ width: '50px', height: '50px', borderRadius: '50%' }} src={user.avatar || '/placeholder.png'} alt={user.name} />
                     </StyledTableCell>
-                    <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM' }}>
+                    <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM', cursor: 'pointer' }} onClick={() => handleUserClick(user)}>
                       {user.name}
                     </StyledTableCell>
                     <StyledTableCell component="th" scope="row" style={{ fontFamily: 'REM' }}>
@@ -298,6 +316,11 @@ const ManageUsers: React.FC = () => {
         open={openBanModal}
         onClose={() => setOpenBanModal(false)}
         onBan={handleBanUser}
+      />
+      <ModalUserInfo
+        open={openUserModal}
+        onClose={() => setOpenUserModal(false)}
+        user={selectedUser}
       />
     </div>
   );

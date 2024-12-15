@@ -9,17 +9,17 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { Box, FormControl, IconButton, InputAdornment, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Avatar, Box, FormControl, IconButton, InputAdornment, MenuItem, Select, TextField, Typography } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import OrderDetailMod from './OrderDetailMod';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { OrderDetailData } from '../../common/base.interface';
+import { OrderDetailData, UserInfo } from '../../common/base.interface';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { fontFamily } from '@mui/system';
 interface Delivery {
   deliveryTrackingCode: string;
-  from: { name: string };
-  to: { name: string };
+  from: UserInfo;
+  to: UserInfo;
   deliveryStatus?: string;
 }
 
@@ -48,7 +48,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: '#c66a7a',
     color: theme.palette.common.white,
-    fontFamily: 'REM'
+    fontFamily: 'REM',
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -357,10 +357,25 @@ const ManageOrders: React.FC = () => {
                       {order.delivery.deliveryTrackingCode || "Chưa có"}
                     </StyledTableCell>
                     <StyledTableCell rowSpan={1} align="left">
-                      {order.delivery.to.name || "N/A"}
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                        <img
+                          alt={order.delivery.to.name}
+                          src={order.delivery.to.user.avatar || ""}
+                          style={{ width: 32, height: 32, borderRadius: '50%' }}
+                        />
+                        {order.delivery.to.name || "N/A"}
+                      </Box>
                     </StyledTableCell>
                     <StyledTableCell align="left" style={{ fontFamily: 'REM' }}>
-                      {order.delivery.from?.name || "N/A"}
+                      {/* {order.delivery.from?.name || "N/A"} */}
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                        <img
+                          alt={order.delivery.from.name}
+                          src={order.delivery.from.user.avatar || ""}
+                          style={{ width: 32, height: 32, borderRadius: '50%' }}
+                        />
+                        {order.delivery.from.name || "N/A"}
+                      </Box>
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       {order.totalPrice} đ {/* Show total price, not item price */}

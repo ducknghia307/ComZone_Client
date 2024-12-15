@@ -15,6 +15,7 @@ import { Box, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Sel
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import BanComicModal from '../modal/BanComicModal';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import ModalComicInfo from '../modal/ModalComicInfo';
 
 // Styled Components for Moderator
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -54,18 +55,19 @@ const ManageComics: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [typeFilter, setTypeFilter] = useState<string>('ALL');
-
+  const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
+  const [openComicModal, setOpenComicModal] = useState(false);
 
   useEffect(() => {
     const fetchComics = async () => {
       try {
         const response = await privateAxios.get("/comics");
-        
+
         const sortedComics = response.data.sort((a: Comic, b: Comic) => {
           // Ensure createdAt exists and is a valid date
           const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
           const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          
+
           return dateB - dateA;
         });
 
@@ -238,6 +240,16 @@ const ManageComics: React.FC = () => {
     return statusMatch && typeMatch && searchMatch;
   });
 
+  const handleOpenComicModal = (comic: Comic) => {
+    setSelectedComic(comic);
+    setOpenComicModal(true);
+  };
+
+  const handleCloseComicModal = () => {
+    setSelectedComic(null);
+    setOpenComicModal(false);
+  };
+
   return (
     <div style={{ paddingBottom: "40px" }}>
       <Box
@@ -248,7 +260,6 @@ const ManageComics: React.FC = () => {
           marginBottom: "30px",
         }}
       >
-        {/* Search Box */}
         <TextField
           variant="outlined"
           placeholder="Tìm kiếm theo tên hoặc tác giả..."
@@ -356,9 +367,9 @@ const ManageComics: React.FC = () => {
                 filteredComics.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((comic) => (
                   <StyledTableRow key={comic.id}>
                     <StyledTableCell>
-                      <img style={{ width: '80px', height: '120px' }} src={comic.coverImage} alt={comic.title} />
+                      <img style={{ width: '80px', height: '120px', cursor: 'pointer' }} onClick={() => handleOpenComicModal(comic)} src={comic.coverImage} alt={comic.title} />
                     </StyledTableCell>
-                    <StyledTableCell>{comic.title}</StyledTableCell>
+                    <StyledTableCell style={{ cursor: 'pointer' }} onClick={() => handleOpenComicModal(comic)}>{comic.title}</StyledTableCell>
                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>{comic.author}</StyledTableCell>
                     <StyledTableCell align="right">
                       <span style={getStatusColor(comic.status)}>
@@ -398,6 +409,11 @@ const ManageComics: React.FC = () => {
         open={openBanModal}
         onClose={() => setOpenBanModal(false)}
         onBan={handleBanComic}
+      />
+      <ModalComicInfo
+        open={openComicModal}
+        onClose={handleCloseComicModal}
+        comic={selectedComic}
       />
     </div>
   );

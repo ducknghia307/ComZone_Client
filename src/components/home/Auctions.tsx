@@ -137,7 +137,7 @@ const Auctions: React.FC = () => {
         </div>
         {ongoingComics.length === 0 ? (
           <div className="no-auctions">
-            <p style={{ color: "#fff", textAlign: "center" }}>Hiện tại không có sản phẩm đấu giá.</p>
+            <p style={{ color: "#000", textAlign: "center", fontFamily: 'REM' }}>Hiện tại không có sản phẩm đấu giá.</p>
           </div>
         ) : (
           <Carousel

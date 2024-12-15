@@ -268,10 +268,10 @@ const ManageAuctions: React.FC = () => {
       auction.comics.title.toLowerCase().includes(searchTerm.toLowerCase());
     return statusMatch && searchMatch;
   })
-  .sort((a, b) => {
-    // Sort by createdAt in descending order (most recent first)
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
+    .sort((a, b) => {
+      // Sort by createdAt in descending order (most recent first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   return (
     <div style={{ paddingBottom: "40px" }}>
@@ -389,7 +389,14 @@ const ManageAuctions: React.FC = () => {
                     <React.Fragment key={auction.id}>
                       <StyledTableRow>
                         <StyledTableCell style={{ fontFamily: "REM" }}>
-                          {auction.comics.sellerId.name}
+                          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                            <img
+                              alt={auction.comics.sellerId.avatar}
+                              src={auction.comics.sellerId.avatar || ""}
+                              style={{ width: 32, height: 32, borderRadius: '50%' }}
+                            />
+                            {auction.comics.sellerId.name}
+                          </Box>
                         </StyledTableCell>
                         <StyledTableCell
                           align="left"

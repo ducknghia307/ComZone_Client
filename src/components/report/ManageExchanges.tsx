@@ -409,10 +409,16 @@ const ManageExchanges: React.FC = () => {
                       {formatCurrency(exchange.compensationAmount)}
                     </StyledTableCell>
                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                      <span style={getStatusColor(exchange.status)}>{getStatusText(exchange.status)}</span>
+                      {/* <span style={getStatusColor(exchange.status)}>{getStatusText(exchange.status)}</span> */}
+                      <span style={getStatusColor(exchange.status)}>
+                        {exchange.status ? getStatusText(exchange.status) : 'Unknown Status'}
+                      </span>
                     </StyledTableCell>
                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                      <span style={getStatusColor(exchange.post.status)}>{getStatusText(exchange.post.status)}</span>
+                      {/* <span style={getStatusColor(exchange.post.status)}>{getStatusText(exchange.post.status)}</span> */}
+                      <span style={getStatusColor(exchange.post?.status)}>
+                        {exchange.post?.status ? getStatusText(exchange.post.status) : 'Unknown Post Status'}
+                      </span>
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       <IconButton color="default" onClick={() => openExchangeDetail(exchange.id)}>

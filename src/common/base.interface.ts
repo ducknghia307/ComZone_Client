@@ -174,6 +174,7 @@ export interface OrderDetailData {
     };
   }>;
   delivery: Delivery;
+  packageImages?: string[];
 }
 
 export interface Delivery {

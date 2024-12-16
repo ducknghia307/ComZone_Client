@@ -62,8 +62,8 @@ const RefundModal: React.FC<RefundModalProps> = ({
       const apiUrl = refundRequest.order
         ? `/refund-requests/approve/order/${refundRequest.order.id}`
         : refundRequest.exchange
-        ? `/refund-requests/approve/exchange/${refundRequest.id}`
-        : "";
+          ? `/refund-requests/approve/exchange/${refundRequest.id}`
+          : "";
 
       await privateAxios.patch(apiUrl);
 
@@ -167,257 +167,323 @@ const RefundModal: React.FC<RefundModalProps> = ({
             },
           }}
         >
-          {refundRequest ? (
-            <>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  mb: 3,
-                }}
-              >
+          <Box
+            sx={{
+              maxHeight: "80vh",
+              overflowY: "scroll",
+              borderRadius: "inherit",
+              "&::-webkit-scrollbar": {
+                display: "none", 
+              },
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            {refundRequest ? (
+              <>
                 <Box
                   sx={{
-                    flex: 1,
                     display: "flex",
-                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 3,
                   }}
                 >
-                  <span style={getStatusChipStyles(refundRequest.status)}>
-                    {translateStatus(refundRequest.status)}
-                  </span>
-                </Box>
-                <Typography
-                  id="refund-modal-title"
-                  variant="h5"
-                  component="h2"
-                  sx={{
-                    color: "#71002b",
-                    fontFamily: "REM",
-                    fontWeight: "bold",
-                    flex: 2,
-                    textAlign: "center",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Chi tiết yêu cầu hoàn tiền
-                </Typography>
-                <Box
-                  sx={{
-                    flex: 1,
-                    display: "flex",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <IconButton
-                    onClick={onClose}
+                  <Box
                     sx={{
-                      color: "#c66a7a",
-                      "&:hover": {
-                        color: "#71002b",
-                        bgcolor: "transparent",
-                      },
+                      flex: 1,
+                      display: "flex",
+                      justifyContent: "flex-start",
                     }}
                   >
-                    <CloseIcon />
-                  </IconButton>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  backgroundColor: "#ffe3d842",
-                  p: 2,
-                  borderRadius: "8px",
-                  mb: 2,
-                }}
-              >
-                <Typography variant="body1" sx={{ mb: 1, fontFamily: "REM" }}>
-                  <strong style={{ color: "#c66a7a" }}>Tên Người Dùng:</strong>{" "}
-                  {refundRequest.user.name}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1, fontFamily: "REM" }}>
-                  <strong style={{ color: "#c66a7a" }}>Thời gian:</strong>{" "}
-                  {formatDateTime(refundRequest.createdAt.toString())}
-                </Typography>
-                <Typography variant="body1" sx={{ fontFamily: "REM" }}>
-                  <strong style={{ color: "#c66a7a" }}>Lý do:</strong>{" "}
-                  {refundRequest.reason}
-                </Typography>
-              </Box>
-
-              <Typography
-                variant="h6"
-                sx={{
-                  mb: 2,
-                  color: "#71002b",
-                  fontFamily: "REM",
-                  fontSize: "1rem",
-                }}
-              >
-                Hình ảnh đính kèm
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  mb: 3,
-                  flexWrap: "wrap",
-                  justifyContent: "center",
-                }}
-              >
-                {refundRequest.attachedImages?.length > 0 ? (
-                  refundRequest.attachedImages.map((image, index) => (
-                    <Box
-                      key={index}
+                    <span style={getStatusChipStyles(refundRequest.status)}>
+                      {translateStatus(refundRequest.status)}
+                    </span>
+                  </Box>
+                  <Typography
+                    id="refund-modal-title"
+                    variant="h5"
+                    component="h2"
+                    sx={{
+                      color: "#71002b",
+                      fontFamily: "REM",
+                      fontWeight: "bold",
+                      flex: 2,
+                      textAlign: "center",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Chi tiết yêu cầu hoàn tiền
+                  </Typography>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <IconButton
+                      onClick={onClose}
                       sx={{
-                        position: "relative",
+                        color: "#c66a7a",
                         "&:hover": {
-                          transform: "scale(1.05)",
-                          transition: "transform 0.2s",
+                          color: "#71002b",
+                          bgcolor: "transparent",
                         },
                       }}
                     >
-                      <img
-                        src={image}
-                        alt={`Refund Image ${index + 1}`}
-                        style={{
-                          width: "100px",
-                          height: "150px",
-                          objectFit: "cover",
-                          borderRadius: "8px",
-                          border: "2px solid #c66a7a",
-                          cursor: "pointer",
-                        }}
-                      />
-                    </Box>
-                  ))
-                ) : (
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontStyle: "italic",
-                      color: "#999",
-                      fontFamily: "REM",
-                    }}
-                  >
-                    Không có hình ảnh
-                  </Typography>
-                )}
-              </Box>
-              <Divider
-                sx={{
-                  my: 3,
-                  borderColor: "#c66a7a",
-                  opacity: 0.3,
-                }}
-              />
-              <Box>
-                <TextField
-                  label="Chi tiết mô tả yêu cầu hoàn tiền"
-                  fullWidth
-                  multiline
-                  rows={3}
-                  value={refundRequest?.description || ""}
-                  disabled
+                      <CloseIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+                <Box
                   sx={{
-                    mb: 3,
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "#c66a7a",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "#71002b",
-                      },
-                      "&.Mui-disabled": {
-                        backgroundColor: "#ffe3d842",
-                        color: "#c66a7a",
-                      },
-                    },
-                    "& .MuiInputBase-input.Mui-disabled": {
-                      WebkitTextFillColor: "#c66a7a",
-                    },
-                    "& .MuiInputLabel-root": {
-                      color: "#c66a7a",
-                      fontFamily: "REM",
-                    },
+                    backgroundColor: "#ffe3d842",
+                    p: 2,
+                    borderRadius: "8px",
+                    mb: 2,
                   }}
-                />
+                >
+                  <Typography variant="body1" sx={{ mb: 1, fontFamily: "REM" }}>
+                    <strong style={{ color: "#c66a7a" }}>Tên Người Dùng:</strong>{" "}
+                    {refundRequest.user.name}
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 1, fontFamily: "REM" }}>
+                    <strong style={{ color: "#c66a7a" }}>Thời gian:</strong>{" "}
+                    {formatDateTime(refundRequest.createdAt.toString())}
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontFamily: "REM" }}>
+                    <strong style={{ color: "#c66a7a" }}>Lý do:</strong>{" "}
+                    {refundRequest.reason}
+                  </Typography>
+                </Box>
+
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mb: 2,
+                    color: "#71002b",
+                    fontFamily: "REM",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Hình ảnh từ người mua
+                </Typography>
                 <Box
                   sx={{
                     display: "flex",
-                    justifyContent: "space-between",
                     gap: 2,
-                    padding: "0 70px",
+                    mb: 3,
+                    flexWrap: "wrap",
+                    justifyContent: "center",
                   }}
                 >
-                  {refundRequest?.status !== "APPROVED" &&
-                    refundRequest?.status !== "REJECTED" && (
-                      <>
-                        <Button
-                          variant="contained"
-                          onClick={handleApprove}
-                          disabled={loading}
-                          sx={{
-                            flex: 1,
-                            bgcolor: "#c66a7a",
-                            color: "#fff",
-                            fontFamily: "REM",
-                            "&:hover": {
-                              bgcolor: "#71002b",
-                            },
-                            "&.Mui-disabled": {
-                              bgcolor: "#c66a7a80",
-                            },
+                  {refundRequest.attachedImages?.length > 0 ? (
+                    refundRequest.attachedImages.map((image, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          position: "relative",
+                          "&:hover": {
+                            transform: "scale(1.05)",
+                            transition: "transform 0.2s",
+                          },
+                        }}
+                      >
+                        <img
+                          src={image}
+                          alt={`Refund Image ${index + 1}`}
+                          style={{
+                            width: "150px",
+                            height: "150px",
+                            objectFit: "cover",
+                            borderRadius: "8px",
+                            border: "2px solid #c66a7a",
+                            cursor: "pointer",
                           }}
-                        >
-                          {loading ? "Đang xử lý..." : "Chấp thuận"}
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          onClick={handleRejectOpen}
-                          disabled={loading}
-                          sx={{
-                            flex: 1,
-                            borderColor: "#c66a7a",
-                            color: "#c66a7a",
-                            fontFamily: "REM",
-                            "&:hover": {
-                              borderColor: "#71002b",
-                              color: "#71002b",
-                              bgcolor: "transparent",
-                            },
-                          }}
-                        >
-                          Từ chối
-                        </Button>
-                      </>
-                    )}
+                        />
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontStyle: "italic",
+                        color: "#999",
+                        fontFamily: "REM",
+                      }}
+                    >
+                      Không có hình ảnh
+                    </Typography>
+                  )}
                 </Box>
-              </Box>
-            </>
-          ) : (
-            <Typography
-              variant="body1"
-              sx={{
-                color: "#71002b",
-                fontFamily: "REM",
-              }}
-            >
-              Không có thông tin hoàn tiền.
-            </Typography>
-          )}
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mb: 2,
+                    color: "#71002b",
+                    fontFamily: "REM",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Hình ảnh đóng gói từ người bán
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    mb: 3,
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                  }}
+                >
+                  {refundRequest.order?.packageImages?.length > 0 ? (
+                    refundRequest.order.packageImages.map((image, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          position: "relative",
+                          "&:hover": {
+                            transform: "scale(1.05)",
+                            transition: "transform 0.2s",
+                          },
+                        }}
+                      >
+                        <img
+                          src={image}
+                          alt={`Package Image ${index + 1}`}
+                          style={{
+                            width: "150px",
+                            height: "150px",
+                            objectFit: "cover",
+                            borderRadius: "8px",
+                            border: "2px solid #71002b",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontStyle: "italic",
+                        color: "#999",
+                        fontFamily: "REM",
+                      }}
+                    >
+                      Không có hình ảnh đóng gói từ người bán.
+                    </Typography>
+                  )}
+                </Box>
+
+                <Divider
+                  sx={{
+                    my: 3,
+                    borderColor: "#c66a7a",
+                    opacity: 0.3,
+                  }}
+                />
+                <Box>
+                  <TextField
+                    label="Chi tiết mô tả yêu cầu hoàn tiền"
+                    fullWidth
+                    multiline
+                    rows={3}
+                    value={refundRequest?.description || ""}
+                    disabled
+                    sx={{
+                      mb: 3,
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#c66a7a",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#71002b",
+                        },
+                        "&.Mui-disabled": {
+                          backgroundColor: "#ffe3d842",
+                          color: "#c66a7a",
+                        },
+                      },
+                      "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor: "#c66a7a",
+                      },
+                      "& .MuiInputLabel-root": {
+                        color: "#c66a7a",
+                        fontFamily: "REM",
+                      },
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 2,
+                      padding: "0 70px",
+                    }}
+                  >
+                    {refundRequest?.status !== "APPROVED" &&
+                      refundRequest?.status !== "REJECTED" && (
+                        <>
+                          <Button
+                            variant="contained"
+                            onClick={handleApprove}
+                            disabled={loading}
+                            sx={{
+                              flex: 1,
+                              bgcolor: "#c66a7a",
+                              color: "#fff",
+                              fontFamily: "REM",
+                              "&:hover": {
+                                bgcolor: "#71002b",
+                              },
+                              "&.Mui-disabled": {
+                                bgcolor: "#c66a7a80",
+                              },
+                              marginBottom: '10px'
+                            }}
+                          >
+                            {loading ? "Đang xử lý..." : "Chấp thuận"}
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={handleRejectOpen}
+                            disabled={loading}
+                            sx={{
+                              flex: 1,
+                              borderColor: "#c66a7a",
+                              color: "#c66a7a",
+                              fontFamily: "REM",
+                              "&:hover": {
+                                borderColor: "#71002b",
+                                color: "#71002b",
+                                bgcolor: "transparent",
+                              },
+                              marginBottom: '10px'
+                            }}
+                          >
+                            Từ chối
+                          </Button>
+                        </>
+                      )}
+                  </Box>
+                </Box>
+              </>
+            ) : (
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "#71002b",
+                  fontFamily: "REM",
+                }}
+              >
+                Không có thông tin hoàn tiền.
+              </Typography>
+            )}
+          </Box>
         </Box>
       </Modal>
-      {/* <RejectReasonModal
-                open={isRejectModalOpen}
-                onClose={() => setIsRejectModalOpen(false)}
-                orderId={refundRequest?.orderId || ''}
-                onReject={() => {
-                    onReject('');
-                    onClose();
-                }}
-            /> */}
       <RejectReasonModal
         open={isRejectModalOpen}
         onClose={handleRejectClose}

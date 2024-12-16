@@ -349,8 +349,22 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                                 Người đăng bài trao đổi
                                             </Typography>
                                             <Box display="flex" alignItems="center" sx={{ paddingTop: '10px' }}>
-                                                <Avatar alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
-                                                <Typography sx={{ fontWeight: 'bold', fontFamily: 'REM', }}>{exchange.post.user.name}</Typography>
+                                                {/* <Avatar alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
+                                                <Typography sx={{ fontWeight: 'bold', fontFamily: 'REM', }}>{exchange.post.user.name}</Typography> */}
+                                                {exchange.post?.user ? (
+                                                    <>
+                                                        <Avatar
+                                                            alt={exchange.post.user.avatar || 'User Avatar'}
+                                                            src={exchange.post.user.avatar}
+                                                            sx={{ width: 34, height: 34, marginRight: 1.5 }}
+                                                        />
+                                                        <Typography sx={{ fontWeight: 'bold', fontFamily: 'REM' }}>
+                                                            {exchange.post.user.name || 'Unknown User'}
+                                                        </Typography>
+                                                    </>
+                                                ) : (
+                                                    <Typography>No User Info</Typography>
+                                                )}
                                             </Box>
                                         </Box>
                                     </Stack>

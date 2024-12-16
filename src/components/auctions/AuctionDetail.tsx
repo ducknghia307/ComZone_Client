@@ -8,6 +8,7 @@ import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ComicsDescription from "../comic/comicDetails/ComicsDescription";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import socket, { connectSocket } from "../../services/socket";
+import ErrorOutlineSharpIcon from "@mui/icons-material/ErrorOutlineSharp";
 import {
   setAuctionData,
   setHighestBid,
@@ -525,7 +526,7 @@ const ComicAuction = () => {
                 {isHighest ? null : (
                   <>
                     {/* Display the minimum bid if it's still valid */}
-                    {auctionData.currentPrice + auctionData.priceStep <=
+                    {auctionData.currentPrice + auctionData.priceStep >
                     auctionData.maxPrice ? (
                       <p
                         style={{
@@ -557,6 +558,7 @@ const ComicAuction = () => {
                           color: "red",
                         }}
                       >
+                        <ErrorOutlineSharpIcon className="mr-2" />
                         Chỉ có thể mua ngay với giá{" "}
                         {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
                         thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
@@ -582,6 +584,7 @@ const ComicAuction = () => {
                           color: "red",
                         }}
                       >
+                        <ErrorOutlineSharpIcon className="mr-2" />
                         Chỉ có thể mua ngay với giá{" "}
                         {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
                         thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
@@ -630,7 +633,9 @@ const ComicAuction = () => {
                     Bạn là người có giá cao nhất!
                   </div>
                 ) : (
-                  !auctionEnded && (
+                  !auctionEnded &&
+                  auctionData.currentPrice + auctionData.priceStep <
+                    auctionData.maxPrice && (
                     <div className="bid-row">
                       <input
                         type="text"

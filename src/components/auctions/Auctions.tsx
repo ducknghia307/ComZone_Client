@@ -7,6 +7,7 @@ import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import Loading from "../loading/Loading";
 import EmptyIcon from "../../assets/notFound/empty.png";
+import SellIcon from "@mui/icons-material/Sell";
 
 const renderer = ({ days, hours, minutes, seconds }: any) => {
   return (
@@ -134,23 +135,54 @@ const AllAuctions = ({
 
       {filteredComics(activeTab === "ONGOING" ? ongoingComics : upcomingComics)
         .length > 0 ? (
-        <div className="auction-cards mt-4">
+        <div
+          className={`mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4`}
+        >
           {filteredComics(
             activeTab === "ONGOING" ? ongoingComics : upcomingComics
           ).map((comic) => (
-            <div className="auction-card" key={comic.id}>
+            <div
+              className="bg-white rounded-lg w-[14em] overflow-hidden border drop-shadow-md cursor-pointer"
+              key={comic.id}
+              onClick={() => handleDetailClick(comic.id)}
+            >
               <img
                 src={comic.comics.coverImage}
                 alt={comic.comics.title}
-                className="object-cover mx-auto rounded-t"
+                className="object-cover w-full h-80"
               />
-              <div className="p-2">
-                <p className="title">{comic.comics.title}</p>
-                <Chip
-                  label={comic.comics.condition}
-                  icon={<ChangeCircleOutlinedIcon />}
-                  size="medium"
-                />
+              <div className="px-3 py-2">
+                <div
+                  className={`flex flex-row justify-between w-full gap-2 pb-2 min-h-[2em] mt-2`}
+                >
+                  {comic.comics.condition === "SEALED" && (
+                    <span className="flex items-center gap-1 basis-1/2 px-2 rounded-2xl bg-sky-800 text-white text-[0.5em] font-light text-nowrap justify-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="10"
+                        height="10"
+                        fill="currentColor"
+                      >
+                        <path d="M12 1L20.2169 2.82598C20.6745 2.92766 21 3.33347 21 3.80217V13.7889C21 15.795 19.9974 17.6684 18.3282 18.7812L12 23L5.6718 18.7812C4.00261 17.6684 3 15.795 3 13.7889V3.80217C3 3.33347 3.32553 2.92766 3.78307 2.82598L12 1ZM12 3.04879L5 4.60434V13.7889C5 15.1263 5.6684 16.3752 6.7812 17.1171L12 20.5963L17.2188 17.1171C18.3316 16.3752 19 15.1263 19 13.7889V4.60434L12 3.04879ZM16.4524 8.22183L17.8666 9.63604L11.5026 16L7.25999 11.7574L8.67421 10.3431L11.5019 13.1709L16.4524 8.22183Z"></path>
+                      </svg>
+                      NGUYÊN SEAL
+                    </span>
+                  )}
+                </div>
+                <p className="font-semibold line-clamp-2 h-[3rem]">
+                  {comic.comics.title}
+                </p>
+                <p className="font-semibold my-4 flex items-center justify-center">
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full shadow-sm flex items-center gap-1 text-sm flex-nowrap whitespace-nowrap max-w-full">
+                    <SellIcon sx={{ fontSize: 12 }} />
+                    Giá hiện tại:{" "}
+                    <span className="font-bold">
+                      {comic.currentPrice.toLocaleString("vi-VN")}đ
+                    </span>
+                  </span>
+                </p>
+
                 {activeTab === "ONGOING" ? (
                   <>
                     <p className="endtime">KẾT THÚC TRONG</p>
@@ -164,13 +196,6 @@ const AllAuctions = ({
                     SẮP DIỄN RA
                   </p>
                 )}
-                <Button
-                  className="detail-button"
-                  onClick={() => handleDetailClick(comic.id)}
-                  variant="contained"
-                >
-                  Xem Chi Tiết
-                </Button>
               </div>
             </div>
           ))}

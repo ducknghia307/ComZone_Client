@@ -214,9 +214,10 @@ const CurrentUserComicExchange = () => {
               hideOnSinglePage
               onChange={(page) => {
                 setCurrentPage(page - 1);
+
                 if (topListPosition.current) {
                   topListPosition.current.scrollIntoView({
-                    behavior: "smooth",
+                    behavior: "instant",
                   });
                 }
               }}

@@ -36,8 +36,6 @@ const ExchangeTab: React.FC = () => {
     { label: "Yêu cầu nhận được", path: "/exchange/list/pending-request" },
     { label: "Yêu cầu đã gửi đi", path: "/exchange/list/sent-request" },
     { label: "Đang trao đổi", path: "/exchange/list/in-progress" },
-    { label: "Đang vận chuyển", path: "/exchange/list/in-delivery" },
-    { label: "Đã giao hàng", path: "/exchange/list/finished-delivery" },
     { label: "Thành công", path: "/exchange/list/successful" },
     { label: "Thất bại", path: "/exchange/list/failed" },
     { label: "Bị từ chối", path: "/exchange/list/rejected" },

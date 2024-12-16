@@ -3,7 +3,7 @@ import "../ui/AuctionSidebar.css";
 import Countdown from "react-countdown";
 import { Button, Chip, Badge } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
+import { publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import Loading from "../loading/Loading";
 import EmptyIcon from "../../assets/notFound/empty.png";
@@ -40,14 +40,24 @@ const AllAuctions = ({
   const navigate = useNavigate();
   const [ongoingComics, setOngoingComics] = useState<any[]>([]);
   const [upcomingComics, setUpcomingComics] = useState<any[]>([]);
-
+  const [sortOrder, setSortOrder] = useState("asc");
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("ONGOING");
 
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOrder(
+      e.target.value === "Giá cao đến thấp"
+        ? "desc"
+        : e.target.value === "Lượt đấu giá nhiều"
+        ? "bids"
+        : "asc"
+    );
+  };
   useEffect(() => {
     const fetchComics = async () => {
       try {
-        const response = await publicAxios.get("/auction");
+        // Fetch the auctions and get the one with the most bids
+        const response = await publicAxios.get("/auction/most-bids");
         const data = response.data;
         console.log("Available Comics:", data);
 
@@ -59,7 +69,6 @@ const AllAuctions = ({
         const upcomingComics = data.filter(
           (auction: any) => auction.status === "UPCOMING"
         );
-
         setUpcomingComics(upcomingComics);
       } catch (error) {
         console.error("Error fetching comics:", error);
@@ -75,9 +84,22 @@ const AllAuctions = ({
     navigate(`/auctiondetail/${comicId}`);
   };
 
-  const filteredComics = (comics: any[]) => {
-    return comics.filter((comic) => {
-      // Genre Match (AND Logic)
+  const getSortedComics = (comics: any[]) => {
+    // Sort the comics by currentPrice or number of bids if needed
+    const sortedComics = comics.sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a.currentPrice - b.currentPrice;
+      } else if (sortOrder === "desc") {
+        return b.currentPrice - a.currentPrice;
+      } else if (sortOrder === "bids") {
+        return b.bids.length - a.bids.length;
+      } else {
+        return 0;
+      }
+    });
+
+    // Now apply the filtering logic
+    return sortedComics.filter((comic) => {
       const genreMatch =
         filteredGenres.length === 0 ||
         filteredGenres.every((genre) =>
@@ -86,12 +108,10 @@ const AllAuctions = ({
           )
         );
 
-      // Author Match (AND Logic)
       const authorMatch =
         filteredAuthors.length === 0 ||
         filteredAuthors.every((author) => comic.comics.author.includes(author));
 
-      // Condition Match
       const conditionMatch =
         filteredConditions.length === 0 ||
         filteredConditions.includes(comic.comics.condition);
@@ -106,6 +126,14 @@ const AllAuctions = ({
     <div className="mb-10 REM">
       <div className="auction-section flex justify-between items-center">
         <h2 className="text-2xl font-bold">Các Cuộc Đấu Giá Ở ComZone</h2>
+        <div className="flex items-center">
+          <span className="mr-2">Sắp xếp: </span>
+          <select className="border rounded p-1" onChange={handleSortChange}>
+            <option>Giá thấp đến cao</option>
+            <option>Giá cao đến thấp</option>
+            <option>Lượt đấu giá nhiều</option>
+          </select>
+        </div>
       </div>
 
       <div className="flex justify-around border-b mb-3">
@@ -132,13 +160,10 @@ const AllAuctions = ({
       </div>
 
       {/* Ongoing or Upcoming Auctions Section */}
-
-      {filteredComics(activeTab === "ONGOING" ? ongoingComics : upcomingComics)
+      {getSortedComics(activeTab === "ONGOING" ? ongoingComics : upcomingComics)
         .length > 0 ? (
-        <div
-          className={`mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4`}
-        >
-          {filteredComics(
+        <div className="mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4">
+          {getSortedComics(
             activeTab === "ONGOING" ? ongoingComics : upcomingComics
           ).map((comic) => (
             <div
@@ -152,9 +177,7 @@ const AllAuctions = ({
                 className="object-cover w-full h-80"
               />
               <div className="px-3 py-2">
-                <div
-                  className={`flex flex-row justify-between w-full gap-2 pb-2 min-h-[2em] mt-2`}
-                >
+                <div className="flex flex-row justify-between w-full gap-2 pb-2 min-h-[2em] mt-2">
                   {comic.comics.condition === "SEALED" && (
                     <span className="flex items-center gap-1 basis-1/2 px-2 rounded-2xl bg-sky-800 text-white text-[0.5em] font-light text-nowrap justify-center">
                       <svg
@@ -170,10 +193,10 @@ const AllAuctions = ({
                     </span>
                   )}
                 </div>
-                <p className="font-semibold line-clamp-2 h-[3rem]">
+                <p className="font-bold line-clamp-6 h-[4.5rem]">
                   {comic.comics.title}
                 </p>
-                <p className="font-semibold my-4 flex items-center justify-center">
+                <p className="font-semibold mt-2 mb-2 flex items-center justify-center">
                   <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full shadow-sm flex items-center gap-1 text-sm flex-nowrap whitespace-nowrap max-w-full">
                     <SellIcon sx={{ fontSize: 12 }} />
                     Giá hiện tại:{" "}
@@ -185,7 +208,7 @@ const AllAuctions = ({
 
                 {activeTab === "ONGOING" ? (
                   <>
-                    <p className="endtime">KẾT THÚC TRONG</p>
+                    <p className="font-medium">KẾT THÚC TRONG</p>
                     <Countdown
                       date={new Date(comic.endTime)}
                       renderer={renderer}

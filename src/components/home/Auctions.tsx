@@ -5,10 +5,9 @@ import "../ui/Auctions.css";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Countdown from "react-countdown";
-import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { publicAxios } from "../../middleware/axiosInstance";
-import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
+import SellIcon from "@mui/icons-material/Sell";
 
 const responsive = {
   superLargeDesktop: {
@@ -137,7 +136,11 @@ const Auctions: React.FC = () => {
         </div>
         {ongoingComics.length === 0 ? (
           <div className="no-auctions">
-            <p style={{ color: "#000", textAlign: "center", fontFamily: 'REM' }}>Hiện tại không có sản phẩm đấu giá.</p>
+            <p
+              style={{ color: "#000", textAlign: "center", fontFamily: "REM" }}
+            >
+              Hiện tại không có sản phẩm đấu giá.
+            </p>
           </div>
         ) : (
           <Carousel
@@ -155,28 +158,40 @@ const Auctions: React.FC = () => {
             }
             renderButtonGroupOutside={true}
           >
-            {ongoingComics.map((comic, index) => (
-              <div className="auction-card" key={index}>
+            {ongoingComics.map((comic) => (
+              <div
+                className="bg-white rounded-lg w-[14em] overflow-hidden border drop-shadow-md cursor-pointer m-auto"
+                key={comic.id}
+                onClick={() => handleDetailClick(comic.id)}
+              >
                 <img
                   src={comic.comics.coverImage}
-                  // alt={comic.title}
-                  className=" object-fill mx-auto"
+                  alt={comic.comics.title}
+                  className="object-cover w-full h-80"
                 />
-                <p className="title">{comic.title}</p>
-                <Chip
-                  label={comic.comics.condition}
-                  icon={<ChangeCircleOutlinedIcon />}
-                  size="medium"
-                />
-                <p className="endtime">KẾT THÚC TRONG</p>
-                <Countdown date={new Date(comic.endTime)} renderer={renderer} />
-                <Button
-                  className="detail-button"
-                  onClick={() => handleDetailClick(comic.id)}
-                  variant="contained"
-                >
-                  Xem Chi Tiết
-                </Button>
+
+                <div className="px-3 py-2">
+                  {/* Comic Title */}
+                  <p className="font-bold line-clamp-6 h-[4.5rem]">
+                    {comic.comics.title}
+                  </p>
+                  {/* Current Price */}
+                  <p className="font-semibold mt-2 mb-2 flex items-center justify-center">
+                    <span className="bg-green-100 text-green-800 px-4 py-1 rounded-full shadow-sm flex items-center gap-1 text-sm flex-nowrap whitespace-nowrap max-w-full">
+                      <SellIcon sx={{ fontSize: 12 }} />
+                      Giá hiện tại:{" "}
+                      <span className="font-bold">
+                        {comic.currentPrice.toLocaleString("vi-VN")}đ
+                      </span>
+                    </span>
+                  </p>
+                  {/* Countdown Timer */}
+                  <p className="font-semibold">KẾT THÚC TRONG</p>
+                  <Countdown
+                    date={new Date(comic.endTime)}
+                    renderer={renderer}
+                  />
+                </div>
               </div>
             ))}
           </Carousel>

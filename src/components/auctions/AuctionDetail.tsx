@@ -526,7 +526,7 @@ const ComicAuction = () => {
                 {isHighest ? null : (
                   <>
                     {/* Display the minimum bid if it's still valid */}
-                    {auctionData.currentPrice + auctionData.priceStep >
+                    {auctionData.currentPrice + auctionData.priceStep <
                     auctionData.maxPrice ? (
                       <p
                         style={{
@@ -558,7 +558,7 @@ const ComicAuction = () => {
                           color: "red",
                         }}
                       >
-                        <ErrorOutlineSharpIcon className="mr-2" />
+                        <ErrorOutlineSharpIcon className="mr-1" />
                         Chỉ có thể mua ngay với giá{" "}
                         {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
                         thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
@@ -573,7 +573,7 @@ const ComicAuction = () => {
               <>
                 {!hasDeposited ? (
                   <div>
-                    {auctionData.currentPrice + auctionData.priceStep >
+                    {auctionData.currentPrice + auctionData.priceStep >=
                       auctionData.maxPrice && (
                       <p
                         style={{
@@ -584,7 +584,7 @@ const ComicAuction = () => {
                           color: "red",
                         }}
                       >
-                        <ErrorOutlineSharpIcon className="mr-2" />
+                        <ErrorOutlineSharpIcon className="mr-1" />
                         Chỉ có thể mua ngay với giá{" "}
                         {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
                         thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.

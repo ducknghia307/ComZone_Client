@@ -27,4 +27,5 @@ export interface Order extends BaseInterface {
   note?: string;
   isFeedback?: boolean;
   refundRequest?: RefundRequest;
+  packageImages: string[];
 }

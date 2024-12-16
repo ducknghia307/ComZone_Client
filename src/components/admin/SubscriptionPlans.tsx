@@ -148,7 +148,7 @@ const SubscriptionPlans: React.FC = () => {
                     <Table sx={{ minWidth: 700 }} aria-label="subscription plans table">
                         <TableHead>
                             <TableRow >
-                                <StyledTableCell sx={{ fontFamily: 'REM' }}>ID</StyledTableCell>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Tên Gói</StyledTableCell>
                                 <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Giá (VND)</StyledTableCell>
                                 <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Giới Hạn Lượt Bán</StyledTableCell>
                                 <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Thời Hạn (Tháng)</StyledTableCell>
@@ -164,20 +164,33 @@ const SubscriptionPlans: React.FC = () => {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                paginatedPlans.map((plan) => (
-                                    <StyledTableRow key={plan.id}>
-                                        <StyledTableCell sx={{ fontFamily: 'REM' }}>{plan.id}</StyledTableCell>
-                                        <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.price.toLocaleString()}</StyledTableCell>
-                                        <StyledTableCell sx={{ fontFamily: 'REM' }}>{plan.sellTime}</StyledTableCell>
-                                        <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.duration}</StyledTableCell>
-                                        <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.auctionTime}</StyledTableCell>
-                                        <StyledTableCell align="right" >
-                                            <IconButton color="error" onClick={() => handleEditClick(plan)}>
-                                                <EditOutlinedIcon />
-                                            </IconButton>
-                                        </StyledTableCell>
-                                    </StyledTableRow>
-                                ))
+                                paginatedPlans.map((plan) => {
+                                    let planName = "Gói Dùng Thử"; // Mặc định
+                                    if (plan.price === 0) {
+                                        planName = "Gói Dùng Thử";
+                                    } else if (plan.price > 300000 && plan.price < 1000000) {
+                                        planName = "Gói Nâng Cấp";
+                                    } else if (plan.price >= 1000000) {
+                                        planName = "Gói Không Giới Hạn";
+                                    }
+                                    return (
+                                        <StyledTableRow key={plan.id}>
+                                            {/* <StyledTableCell sx={{ fontFamily: 'REM' }}>{plan.id}</StyledTableCell> */}
+                                            <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>
+                                                {planName}
+                                            </StyledTableCell>
+                                            <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.price.toLocaleString()}</StyledTableCell>
+                                            <StyledTableCell sx={{ fontFamily: 'REM' }}>{plan.sellTime}</StyledTableCell>
+                                            <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.duration}</StyledTableCell>
+                                            <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.auctionTime}</StyledTableCell>
+                                            <StyledTableCell align="right" >
+                                                <IconButton color="error" onClick={() => handleEditClick(plan)}>
+                                                    <EditOutlinedIcon />
+                                                </IconButton>
+                                            </StyledTableCell>
+                                        </StyledTableRow>
+                                    )
+                                })
                             )}
                         </TableBody>
                     </Table>

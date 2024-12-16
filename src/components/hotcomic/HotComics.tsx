@@ -72,8 +72,8 @@ const HotComics: React.FC<GenresProps> = ({
     const genreMatch =
       filteredGenres.length > 0
         ? filteredGenres.every((genre) =>
-            comic.genres.some((comicGenre) => comicGenre.name === genre)
-          )
+          comic.genres.some((comicGenre) => comicGenre.name === genre)
+        )
         : true;
 
     const authorMatch =
@@ -210,19 +210,21 @@ const HotComics: React.FC<GenresProps> = ({
               </div>
             </>
           ) : (
-            <div className="all-genres-cards mt-4">
+            <div className="mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4">
               {sortedComics.length > 0 ? (
                 sortedComics.map((comic) => (
-                  <div className="hot-comic-card" key={comic.id}>
+                  <div className="bg-white rounded-lg w-[14em] overflow-hidden border drop-shadow-md" key={comic.id}>
                     <Link to={`/detail/${comic.id}`}>
                       <img
                         src={comic.coverImage}
                         alt={comic.title}
-                        className="object-cover mx-auto"
+                        className="object-cover w-full h-80"
                       />
-                      <p className="price">{formatPrice(comic.price)}</p>
-                      <p className="author">{comic.author.toUpperCase()}</p>
-                      <p className="title">{comic.title}</p>
+                      <div className="px-3 py-2">
+                        <p className=" font-bold text-xl text-red-500">{formatPrice(comic.price)}</p>
+                        <p className="font-light text-sm">{comic.author.toUpperCase()}</p>
+                        <p className="font-semibold line-clamp-3 h-[4.5em]">{comic.title}</p>
+                      </div>
                     </Link>
                   </div>
                 ))

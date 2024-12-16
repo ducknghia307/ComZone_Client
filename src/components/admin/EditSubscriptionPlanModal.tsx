@@ -10,6 +10,7 @@ import {
     Typography
 } from '@mui/material';
 import { privateAxios } from '../../middleware/axiosInstance';
+import { Switch } from 'antd';
 
 interface SubscriptionPlan {
     id: string;
@@ -32,23 +33,61 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
     plan,
     onUpdatePlan
 }) => {
-    // Use the passed plan directly to ensure correct data
     const [editedPlan, setEditedPlan] = useState<SubscriptionPlan>(plan);
+    const [isUnlimited, setIsUnlimited] = useState<boolean>(plan.sellTime === 0 && plan.auctionTime === 0);
+    const [originalValues, setOriginalValues] = useState<{ sellTime: number, auctionTime: number }>({ sellTime: plan.sellTime, auctionTime: plan.auctionTime });
 
-    // Reset editedPlan when the plan prop changes
     useEffect(() => {
         setEditedPlan(plan);
+        setIsUnlimited(plan.sellTime === 0 && plan.auctionTime === 0);
+        setOriginalValues({ sellTime: plan.sellTime, auctionTime: plan.auctionTime });
     }, [plan]);
+
+    useEffect(() => {
+        if (!open) {
+            setEditedPlan(plan);
+        }
+    }, [open, plan]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
+        // setEditedPlan((prev) => ({
+        //     ...prev,
+        //     [name]: ["price", "duration", "auctionTime", "sellTime"].includes(name)
+        //         ? Number(value)
+        //         : value
+        // }));
+        const numericValue = Number(value);
+
         setEditedPlan((prev) => ({
             ...prev,
             [name]: ["price", "duration", "auctionTime", "sellTime"].includes(name)
-                ? Number(value)
+                ? numericValue < 0
+                    ? 0 // = 0 nếu nhập số âm
+                    : numericValue
                 : value
         }));
+    };
+
+    const handleToggleChange = () => {
+        if (isUnlimited) {
+            // toggle off, original values
+            setEditedPlan((prev) => ({
+                ...prev,
+                sellTime: originalValues.sellTime,
+                auctionTime: originalValues.auctionTime
+            }));
+        } else {
+            //toggle on, sellTime and auctionTime (unlimited)
+            setEditedPlan((prev) => ({
+                ...prev,
+                sellTime: 0,
+                auctionTime: 0
+            }));
+        }
+
+        setIsUnlimited(!isUnlimited);
     };
 
     const handleSave = async () => {
@@ -61,7 +100,6 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
             console.error('Error updating subscription plan:', error);
         }
     };
-
 
     return (
         <Dialog
@@ -110,16 +148,24 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                 }}>
                     <TextField
                         fullWidth
-                        label="ID"
-                        name="id"
-                        value={editedPlan.id}
+                        label="Tên Gói"
+                        name="name"
+                        value={
+                            editedPlan.price === 0
+                                ? "Gói Dùng Thử"
+                                : editedPlan.price > 300000 && editedPlan.price < 1000000
+                                    ? "Gói Nâng Cấp"
+                                    : editedPlan.price >= 1000000
+                                        ? "Gói Không Giới Hạn"
+                                        : "Gói Dùng Thử"
+                        }
                         disabled
                         variant="outlined"
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: 2,
                                 backgroundColor: '#f0f0f0',
-                                fontFamily: 'REM'
+                                fontFamily: 'REM',
                             }
                         }}
                     />
@@ -136,6 +182,7 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                                 borderRadius: 2
                             }
                         }}
+                        disabled={isUnlimited}
                     />
                     <TextField
                         fullWidth
@@ -182,7 +229,14 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
                                 borderRadius: 2
                             }
                         }}
+                        disabled={isUnlimited}
                     />
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                    <Typography variant="body2" sx={{ mr: 2 }}>
+                        Không Giới Hạn Lượt Bán và Đấu Giá:
+                    </Typography>
+                    <Switch checked={isUnlimited} onChange={handleToggleChange} />
                 </Box>
             </DialogContent>
             <DialogActions sx={{

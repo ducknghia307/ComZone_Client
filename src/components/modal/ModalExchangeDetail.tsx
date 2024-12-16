@@ -280,14 +280,20 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                     <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'REM', }}>
                                         Trạng thái trao đổi:
                                     </Typography>
-                                    <span style={getStatusColor(exchange.status)}>{getStatusText(exchange.status)}</span>
+                                    {/* <span style={getStatusColor(exchange.status)}>{getStatusText(exchange.status)}</span> */}
+                                    <span style={getStatusColor(exchange.status)}>
+                                        {exchange.status ? getStatusText(exchange.status) : 'Unknown Status'}
+                                    </span>
                                 </Box>
 
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'REM', }}>
                                         Trạng thái bài post:
                                     </Typography>
-                                    <span style={getStatusColor(exchange.post.status)}>{getStatusText(exchange.post.status)}</span>
+                                    {/* <span style={getStatusColor(exchange.post.status)}>{getStatusText(exchange.post.status)}</span> */}
+                                    <span style={getStatusColor(exchange.post?.status)}>
+                                        {exchange.post?.status ? getStatusText(exchange.post.status) : 'Unknown Post Status'}
+                                    </span>
                                 </Box>
                             </Box>
 

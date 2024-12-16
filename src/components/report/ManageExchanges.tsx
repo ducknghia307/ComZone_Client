@@ -13,6 +13,8 @@ import { Avatar, Box, FormControl, IconButton, InputAdornment, MenuItem, Select,
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ModalExchangeDetail from '../modal/ModalExchangeDetail';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import { UserInfo } from '../../common/base.interface';
+import ModalExchangeUser from '../modal/ModalExchangeUser';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -40,6 +42,7 @@ const ManageExchanges: React.FC = () => {
   const [filterPoster, setFilterPoster] = useState('ALL');
   const [filterExchangeStatus, setFilterExchangeStatus] = useState('ALL');
   const [filterPostStatus, setFilterPostStatus] = useState('ALL');
+  const [selectedUser, setSelectedUser] = useState<UserInfo | null>(null);
 
   const openExchangeDetail = async (exchangeId: string) => {
     try {
@@ -253,6 +256,14 @@ const ManageExchanges: React.FC = () => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
+  const openUserDetail = (user: UserInfo) => {
+    setSelectedUser(user);
+  };
+
+  const closeUserDetail = () => {
+    setSelectedUser(null);
+  };
+
   return (
     <div style={{ paddingBottom: '40px' }}>
       <Box
@@ -353,27 +364,63 @@ const ManageExchanges: React.FC = () => {
                 filteredExchanges.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((exchange) => (
                   <StyledTableRow key={exchange.id}>
                     {/* <StyledTableCell>{exchange.id}</StyledTableCell> */}
-                    <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>{exchange.post.postContent.length > 25 ? exchange.post.postContent.substring(0, 25) + '...' : exchange.post.postContent}</StyledTableCell>
+                    {/* <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>{exchange.post.postContent.length > 25 ? exchange.post.postContent.substring(0, 25) + '...' : exchange.post.postContent}</StyledTableCell> */}
+                    <StyledTableCell align="left">
+                      {exchange.post?.postContent
+                        ? exchange.post.postContent.length > 25
+                          ? exchange.post.postContent.substring(0, 25) + '...'
+                          : exchange.post.postContent
+                        : 'No Content'}
+                    </StyledTableCell>
+
+
                     <StyledTableCell align="left">
                       <Box display="flex" alignItems="center" justifyContent='center'>
-                        <Avatar alt={exchange.requestUser.name} src={exchange.requestUser.avatar} sx={{ width: 24, height: 24, marginRight: 1.5 }} />
-                        <Typography>{exchange.requestUser.name}</Typography>
+                        <Avatar onClick={() => openUserDetail(exchange.requestUser)} alt={exchange.requestUser.name} src={exchange.requestUser.avatar} sx={{ width: 24, height: 24, marginRight: 1.5 }} />
+                        <Typography onClick={() => openUserDetail(exchange.requestUser)}>{exchange.requestUser.name}</Typography>
                       </Box>
                     </StyledTableCell>
-                    <StyledTableCell align="left">
+                    {/* <StyledTableCell align="left">
                       <Box display="flex" alignItems="center" justifyContent='center'>
-                        <Avatar alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 24, height: 24, marginRight: 1.5 }} />
-                        <Typography>{exchange.post.user.name}</Typography>
+                        <Avatar onClick={() => openUserDetail(exchange.post.user)} alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 24, height: 24, marginRight: 1.5 }} />
+                        <Typography onClick={() => openUserDetail(exchange.post.user)}>{exchange.post.user.name}</Typography>
+                      </Box>
+                    </StyledTableCell> */}
+                    <StyledTableCell align="left">
+                      <Box display="flex" alignItems="center" justifyContent="center">
+                        {exchange.post?.user ? (
+                          <>
+                            <Avatar
+                              onClick={() => openUserDetail(exchange.post.user)}
+                              alt={exchange.post.user.avatar || 'User Avatar'}
+                              src={exchange.post.user.avatar}
+                              sx={{ width: 24, height: 24, marginRight: 1.5 }}
+                            />
+                            <Typography onClick={() => openUserDetail(exchange.post.user)}>
+                              {exchange.post.user.name || 'Unknown User'}
+                            </Typography>
+                          </>
+                        ) : (
+                          <Typography>No User Info</Typography>
+                        )}
                       </Box>
                     </StyledTableCell>
+
+
                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                       {formatCurrency(exchange.compensationAmount)}
                     </StyledTableCell>
                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                      <span style={getStatusColor(exchange.status)}>{getStatusText(exchange.status)}</span>
+                      {/* <span style={getStatusColor(exchange.status)}>{getStatusText(exchange.status)}</span> */}
+                      <span style={getStatusColor(exchange.status)}>
+                        {exchange.status ? getStatusText(exchange.status) : 'Unknown Status'}
+                      </span>
                     </StyledTableCell>
                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                      <span style={getStatusColor(exchange.post.status)}>{getStatusText(exchange.post.status)}</span>
+                      {/* <span style={getStatusColor(exchange.post.status)}>{getStatusText(exchange.post.status)}</span> */}
+                      <span style={getStatusColor(exchange.post?.status)}>
+                        {exchange.post?.status ? getStatusText(exchange.post.status) : 'Unknown Post Status'}
+                      </span>
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       <IconButton color="default" onClick={() => openExchangeDetail(exchange.id)}>
@@ -401,6 +448,12 @@ const ManageExchanges: React.FC = () => {
         isOpen={!!selectedExchangeId}
         exchange={selectedExchange}
         onClose={closeExchangeDetail}
+      />
+
+      <ModalExchangeUser
+        open={!!selectedUser}
+        onClose={closeUserDetail}
+        user={selectedUser}
       />
     </div>
   );

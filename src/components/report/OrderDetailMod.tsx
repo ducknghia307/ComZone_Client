@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import {
     Dialog, DialogTitle, DialogContent, Typography, IconButton, Box, Paper, Stack, Divider, useTheme, alpha, styled,
     Chip,
@@ -109,7 +109,7 @@ interface OrderDetailProps {
     order: OrderDetailData | undefined;
     // paymentMethod: string;
 }
-const InfoRow = ({ label, value, paymentMethod }: { label: string; value: string | number; paymentMethod?: string; }) => {
+const InfoRow = ({ label, value, paymentMethod }: { label: string; value: ReactNode; paymentMethod?: string; }) => {
     const theme = useTheme();
 
     const paymentStatusColor =
@@ -403,9 +403,28 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                             border: '2px solid black',
                                         }}
                                     />
-                                    <InfoRow label="Họ tên" value={orderDetail.delivery.to.name} />
+                                    <InfoRow
+                                        label="Họ tên"
+                                        value={
+                                            <Box display="flex" alignItems="center" gap="10px">
+                                                <img
+                                                    src={orderDetail.delivery.to.user.avatar || "/placeholder.png"}
+                                                    alt={orderDetail.delivery.to.user.name}
+                                                    style={{
+                                                        width: "32px",
+                                                        height: "32px",
+                                                        borderRadius: "50%",
+                                                        objectFit: "cover",
+                                                    }}
+                                                />
+                                                {orderDetail.delivery.to.name}
+                                            </Box>
+                                        }
+                                    />
+
                                     <InfoRow label="Số điện thoại" value={orderDetail.delivery.to.phone} />
                                     <InfoRow label="Địa chỉ" value={orderDetail.delivery.to.address} />
+                                    <InfoRow label="Email" value={orderDetail.delivery.to.user.email} />
                                 </Box>
 
                                 <Divider orientation="vertical" flexItem />
@@ -423,9 +442,24 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                             border: '2px solid black',
                                         }}
                                     />
-                                    <InfoRow label="Họ tên" value={orderDetail.delivery.from.name} />
+                                    <InfoRow label="Họ tên" value={
+                                        <Box display="flex" alignItems="center" gap="10px">
+                                            <img
+                                                src={orderDetail.delivery.from.user.avatar || "/placeholder.png"}
+                                                alt={orderDetail.delivery.from.user.name}
+                                                style={{
+                                                    width: "32px",
+                                                    height: "32px",
+                                                    borderRadius: "50%",
+                                                    objectFit: "cover",
+                                                }}
+                                            />
+                                            {orderDetail.delivery.from.name}
+                                        </Box>
+                                    } />
                                     <InfoRow label="Số điện thoại" value={orderDetail.delivery.from.phone} />
                                     <InfoRow label="Địa chỉ" value={orderDetail.delivery.from.address} />
+                                    <InfoRow label="Email" value={orderDetail.delivery.from.user.email} />
                                 </Box>
 
                                 <Divider orientation="vertical" flexItem />

@@ -27,7 +27,7 @@ export default function ComicsSeller({
         <img
           src={
             seller?.avatar ||
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxfSUXtB9oG6_7ZgV3gFLrqGdkv61wqYkVVw&s"
+            "https://cdn-icons-png.flaticon.com/512/346/346514.png"
           }
           alt=""
           onClick={() => {

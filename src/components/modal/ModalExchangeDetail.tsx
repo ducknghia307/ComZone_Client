@@ -280,14 +280,20 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                     <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'REM', }}>
                                         Trạng thái trao đổi:
                                     </Typography>
-                                    <span style={getStatusColor(exchange.status)}>{getStatusText(exchange.status)}</span>
+                                    {/* <span style={getStatusColor(exchange.status)}>{getStatusText(exchange.status)}</span> */}
+                                    <span style={getStatusColor(exchange.status)}>
+                                        {exchange.status ? getStatusText(exchange.status) : 'Unknown Status'}
+                                    </span>
                                 </Box>
 
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'REM', }}>
                                         Trạng thái bài post:
                                     </Typography>
-                                    <span style={getStatusColor(exchange.post.status)}>{getStatusText(exchange.post.status)}</span>
+                                    {/* <span style={getStatusColor(exchange.post.status)}>{getStatusText(exchange.post.status)}</span> */}
+                                    <span style={getStatusColor(exchange.post?.status)}>
+                                        {exchange.post?.status ? getStatusText(exchange.post.status) : 'Unknown Post Status'}
+                                    </span>
                                 </Box>
                             </Box>
 
@@ -343,8 +349,22 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                                 Người đăng bài trao đổi
                                             </Typography>
                                             <Box display="flex" alignItems="center" sx={{ paddingTop: '10px' }}>
-                                                <Avatar alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
-                                                <Typography sx={{ fontWeight: 'bold', fontFamily: 'REM', }}>{exchange.post.user.name}</Typography>
+                                                {/* <Avatar alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 34, height: 34, marginRight: 1.5 }} />
+                                                <Typography sx={{ fontWeight: 'bold', fontFamily: 'REM', }}>{exchange.post.user.name}</Typography> */}
+                                                {exchange.post?.user ? (
+                                                    <>
+                                                        <Avatar
+                                                            alt={exchange.post.user.avatar || 'User Avatar'}
+                                                            src={exchange.post.user.avatar}
+                                                            sx={{ width: 34, height: 34, marginRight: 1.5 }}
+                                                        />
+                                                        <Typography sx={{ fontWeight: 'bold', fontFamily: 'REM' }}>
+                                                            {exchange.post.user.name || 'Unknown User'}
+                                                        </Typography>
+                                                    </>
+                                                ) : (
+                                                    <Typography>No User Info</Typography>
+                                                )}
                                             </Box>
                                         </Box>
                                     </Stack>
@@ -365,7 +385,8 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                             Nội dung yêu cầu
                                         </Typography>
                                         <Typography color="text.secondary" sx={{ fontFamily: 'REM' }}>
-                                            {exchange.post.postContent}
+                                            {/* {exchange.post.postContent} */}
+                                            {exchange.post?.postContent ? exchange.post.postContent : 'No post content available'}
                                         </Typography>
                                     </Box>
                                     <Stack direction="row" spacing={2}>
@@ -394,7 +415,7 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                     </Stack>
                                 </Stack>
                             </Paper>
-                            {exchange.post.images && exchange.post.images.length > 0 && (
+                            {exchange.post?.images && exchange.post?.images?.length > 0 ? (
                                 <Paper elevation={0} sx={{ p: 2.5, bgcolor: 'rgba(113, 0, 43, 0.04)', borderRadius: '16px' }}>
                                     <Typography variant="h6" fontWeight={600} gutterBottom sx={{ fontFamily: 'REM' }}>
                                         Hình ảnh
@@ -411,6 +432,10 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                         ))}
                                     </Stack>
                                 </Paper>
+                            ) : (
+                            <Typography sx={{ fontStyle: 'italic', color: 'gray', textAlign: 'center' }}>
+                                No images available
+                            </Typography>
                             )}
                         </Stack>
                     )}

@@ -71,60 +71,58 @@ export default function ChargeMoney({
           <div className="flex flex-col gap-1">
             <p className="uppercase text-lg font-semibold">Nạp tiền vào ví</p>
 
+            <div className="flex justify-start items-center gap-4">
+              <h3 className="text-sm">Số dư hiện tại:</h3>
+              <div className="font-semibold">
+                {isHidingBalance
+                  ? "*********"
+                  : `${CurrencySplitter(userBalance)} đ`}
+              </div>
+
+              <button onClick={() => setIsHidingBalance(!isHidingBalance)}>
+                {isHidingBalance ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                    <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                    <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                    <path d="m2 2 20 20" />
+                  </svg>
+                )}
+              </button>
+            </div>
+
             <p
               className={`${
-                amount + userBalance >= total && "invisible"
+                userBalance >= total && "invisible"
               } text-red-500 italic`}
             >
               Số dư hiện tại không đủ.
             </p>
-
-            {userBalance > 0 && (
-              <div className="flex justify-start items-center gap-4">
-                <h3 className="text-sm">Số dư hiện tại:</h3>
-                <div className="font-semibold">
-                  {isHidingBalance
-                    ? "*********"
-                    : `${CurrencySplitter(userBalance)} đ`}
-                </div>
-
-                <button onClick={() => setIsHidingBalance(!isHidingBalance)}>
-                  {isHidingBalance ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
-                      <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
-                      <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
-                      <path d="m2 2 20 20" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            )}
 
             <div className="mb-4">
               <h3 className="font-light text-sm mb-2">Nhập số tiền nạp:</h3>
@@ -150,7 +148,6 @@ export default function ChargeMoney({
                 Cần phải nạp thêm: {CurrencySplitter(total - userBalance)} đ
               </p>
             </div>
-
             <div className="grid grid-cols-4 justify-start gap-2 mb-4 w-full max-w-lg mx-auto">
               {[
                 20000, 50000, 100000, 200000, 500000, 1000000, 1500000, 2000000,
@@ -171,7 +168,6 @@ export default function ChargeMoney({
                 </button>
               ))}
             </div>
-
             <p>Chọn cổng thanh toán:</p>
             <div className="flex items-stretch gap-2 mt-2">
               <button

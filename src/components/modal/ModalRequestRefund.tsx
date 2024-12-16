@@ -21,12 +21,14 @@ interface ModalRequestRefundProps {
   open: boolean;
   onClose: () => void;
   orderId: string;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ModalRequestRefund: React.FC<ModalRequestRefundProps> = ({
   open,
   onClose,
   orderId,
+  setIsLoading,
 }) => {
   const [images, setImages] = useState<File[]>([]);
   const [reason, setReason] = useState<string>("");
@@ -66,22 +68,37 @@ const ModalRequestRefund: React.FC<ModalRequestRefundProps> = ({
 
   const handleSubmitRefundRequest = async () => {
     if (!reason.trim()) {
-      api.error({
+      api.warning({
+        key: "warning",
         message: "Thiếu thông tin",
         description: "Vui lòng chọn một lý do.",
-        placement: "topRight",
+        duration: 5,
       });
       return;
     }
 
     if (!description.trim()) {
-      api.error({
+      api.warning({
+        key: "warning",
         message: "Thiếu thông tin",
         description: "Vui lòng nhập mô tả chi tiết.",
-        placement: "topRight",
+        duration: 5,
       });
       return;
     }
+
+    if (images.length === 0) {
+      api.warning({
+        key: "warning",
+        message: "Thiếu thông tin",
+        description: "Vui lòng đính kèm ít nhất 1 hình ảnh.",
+        duration: 5,
+      });
+      return;
+    }
+
+    onClose();
+    setIsLoading(true);
 
     const formData = new FormData();
     images.forEach((file) => formData.append("images", file));
@@ -113,7 +130,6 @@ const ModalRequestRefund: React.FC<ModalRequestRefundProps> = ({
         description: "Yêu cầu hoàn tiền đã được gửi!",
         placement: "topRight",
       });
-      onClose();
     } catch (error) {
       console.error("Error submitting refund request:", error);
       api.error({
@@ -121,6 +137,8 @@ const ModalRequestRefund: React.FC<ModalRequestRefundProps> = ({
         description: "Có lỗi xảy ra khi gửi yêu cầu hoàn tiền.",
         placement: "topRight",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -175,7 +193,7 @@ const ModalRequestRefund: React.FC<ModalRequestRefundProps> = ({
                 fontFamily: "REM",
               }}
             >
-              Lý do yêu cầu hoàn tiền:
+              Lý do yêu cầu hoàn tiền: <span className="text-red-600">*</span>
             </Typography>
             <RadioGroup
               value={reason}
@@ -186,7 +204,7 @@ const ModalRequestRefund: React.FC<ModalRequestRefundProps> = ({
                   key={index}
                   value={reasonText}
                   control={<Radio />}
-                  label={reasonText}
+                  label={<p className="REM">{reasonText}</p>}
                 />
               ))}
             </RadioGroup>
@@ -200,7 +218,7 @@ const ModalRequestRefund: React.FC<ModalRequestRefundProps> = ({
                 fontFamily: "REM",
               }}
             >
-              Mô tả chi tiết lý do:
+              Mô tả chi tiết lý do: <span className="text-red-600">*</span>
             </Typography>
             <TextField
               fullWidth
@@ -229,7 +247,7 @@ const ModalRequestRefund: React.FC<ModalRequestRefundProps> = ({
                   m: 0,
                 }}
               >
-                Hình ảnh minh chứng (không bắt buộc, tối đa 4):
+                Ảnh đính kèm (tối đa 4): <span className="text-red-600">*</span>
               </Typography>
               <input
                 accept="image/*"
@@ -316,6 +334,9 @@ const ModalRequestRefund: React.FC<ModalRequestRefundProps> = ({
           </div>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
+              disabled={
+                reason.trim().length === 0 || description.trim().length === 0
+              }
               variant="contained"
               sx={{
                 backgroundColor: "#000",

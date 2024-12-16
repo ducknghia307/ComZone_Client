@@ -147,8 +147,8 @@ export default function RefundRequest({
             placeholder={
               <p className="text-sm italic">Chọn một loại vấn đề...</p>
             }
-            optionRender={(props) => <p className="text-wrap">{props.label}</p>}
-            labelRender={(props) => <p className="text-wrap">{props.label}</p>}
+            optionRender={(props) => <p className="text-wrap leading-normal">{props.label}</p>}
+            labelRender={(props) => <p className="text-wrap leading-normal">{props.label}</p>}
           />
         </div>
 

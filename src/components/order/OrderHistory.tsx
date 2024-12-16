@@ -14,6 +14,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import Loading from "../loading/Loading";
 import EmptyOrderIcon from "../../assets/notFound/emptybox.png";
 import { Avatar } from "antd";
+import { DeliveryStatus } from "../../common/interfaces/delivery.interface";
 
 interface Order {
   id: string;
@@ -231,11 +232,13 @@ const OrderHistory = () => {
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: string, deliveryStatus?: DeliveryStatus) => {
     switch (status) {
       case "PENDING":
         return "Chờ xử lí";
       case "PACKAGING":
+        if (deliveryStatus && deliveryStatus === DeliveryStatus.READY_TO_PICK)
+          return "Đang chờ bàn giao";
         return "Đang đóng gói";
       case "DELIVERING":
         return "Đang giao hàng";
@@ -327,8 +330,9 @@ const OrderHistory = () => {
         ].map((status) => (
           <span
             key={status}
-            className={`status-tab grow whitespace-nowrap ${selectedStatus === status ? "active" : ""
-              }`}
+            className={`status-tab grow whitespace-nowrap ${
+              selectedStatus === status ? "active" : ""
+            }`}
             onClick={() => setSelectedStatus(status)}
           >
             {getStatusText(status)}
@@ -409,7 +413,10 @@ const OrderHistory = () => {
                     fontSize: "16px",
                   }}
                 >
-                  {getStatusText(order.status)}
+                  {getStatusText(
+                    order.status,
+                    (order.delivery.status as DeliveryStatus) || null
+                  )}
                 </Typography>
               </div>
 
@@ -417,7 +424,7 @@ const OrderHistory = () => {
                 {order.items.map((item: any) => (
                   <div
                     key={item.id}
-                    className="flex items-stretch gap-2 sm:gap-4 p-2 phone:pr-8"
+                    className="flex items-stretch gap-2 sm:gap-4 p-2 phone:pr-8 phone:pl-8"
                   >
                     {/* Hình ảnh sản phẩm */}
                     <img
@@ -451,13 +458,13 @@ const OrderHistory = () => {
                       <Typography sx={{ fontSize: "20px", fontFamily: "REM" }}>
                         {order.type === "AUCTION"
                           ? Number(order.totalPrice).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })
+                              style: "currency",
+                              currency: "VND",
+                            })
                           : Number(item.comics.price).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })}
+                              style: "currency",
+                              currency: "VND",
+                            })}
                       </Typography>
                     </div>
                   </div>
@@ -490,19 +497,22 @@ const OrderHistory = () => {
                     </div>
                   </div>
                 )} */}
-                {order.status === "FAILED" && order.refundRequest?.rejectedReason && (
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
-                      <ErrorOutlineIcon className="text-red-500 mr-2" />
-                      <div className="flex flex-col">
-                        <span className="text-red-600 font-semibold">
-                          Lý do từ chối hoàn tiền
-                        </span>
-                        <span className="text-red-500">{order.refundRequest.rejectedReason}</span>
+                {order.status === "FAILED" &&
+                  order.refundRequest?.rejectedReason && (
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center px-4 py-3 bg-red-50 rounded-lg max-w-3xl">
+                        <ErrorOutlineIcon className="text-red-500 mr-2" />
+                        <div className="flex flex-col">
+                          <span className="text-red-600 font-semibold">
+                            Lý do từ chối hoàn tiền
+                          </span>
+                          <span className="text-red-500">
+                            {order.refundRequest.rejectedReason}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 <div className="flex flex-col items-end gap-1 ml-auto">
                   {order.delivery?.deliveryFee && (
@@ -673,6 +683,7 @@ const OrderHistory = () => {
           open={isRefundModalOpen}
           onClose={() => setRefundModalOpen(false)}
           orderId={selectedOrderId || ""}
+          setIsLoading={setIsLoading}
         />
       </div>
     </div>

@@ -23,6 +23,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import Grid from "@mui/material/Grid2";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { DeliveryStatus } from "../../common/interfaces/delivery.interface";
 
 interface OrderDetailsModalProps {
   open: boolean;
@@ -130,22 +131,22 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: string, deliveryStatus?: DeliveryStatus) => {
     switch (status) {
       case "PENDING":
         return "Chờ xử lí";
       case "PACKAGING":
+        if (deliveryStatus && deliveryStatus === DeliveryStatus.READY_TO_PICK)
+          return "Đang chờ bàn giao";
         return "Đang đóng gói";
       case "DELIVERING":
         return "Đang giao hàng";
       case "DELIVERED":
         return "Đã giao thành công";
-      case "COMPLETED":
+      case "SUCCESSFUL":
         return "Hoàn tất";
       case "CANCELED":
         return "Bị hủy";
-      case "SUCCESSFUL":
-        return "Hoàn tất";
       case "FAILED":
         return "Thất bại";
       default:
@@ -258,7 +259,10 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
           }}
         >
           <Typography sx={getStatusChipStyle(order.status)}>
-            {getStatusText(order.status)}
+            {getStatusText(
+              order.status,
+              (order.delivery.status as DeliveryStatus) || null
+            )}
           </Typography>
           <Typography
             gutterBottom

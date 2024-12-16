@@ -12,7 +12,7 @@ import {
 import SuccessfulOrFailedButton from "./buttons/SuccessfulOrFailedButton";
 import { UserInfo } from "../../../../common/base.interface";
 import FailedDeliveryButton from "./buttons/FailedDeliveryButton";
-import { ExchangeRefundRequest } from "../../../../common/interfaces/refund-request.interface";
+import { RefundRequest } from "../../../../common/interfaces/refund-request.interface";
 import ViewRefundButton from "./buttons/ViewRefundButton";
 import { notification } from "antd";
 moment.locale("vi");
@@ -38,11 +38,10 @@ export default function DeliveryProcessInfo({
     useState(true);
   const [receiveDelivery, setReceiveDelivery] = useState<Delivery>();
   const [sendDelivery, setSendDelivery] = useState<Delivery>();
-  const [refundRequestsList, setRefundRequestsList] = useState<
-    ExchangeRefundRequest[]
-  >([]);
-  const [userRefundRequest, setUserRefundRequest] =
-    useState<ExchangeRefundRequest>();
+  const [refundRequestsList, setRefundRequestsList] = useState<RefundRequest[]>(
+    []
+  );
+  const [userRefundRequest, setUserRefundRequest] = useState<RefundRequest>();
 
   const exchange = exchangeDetails.exchange;
 
@@ -99,9 +98,7 @@ export default function DeliveryProcessInfo({
       .get(`refund-requests/user/exchange/${exchange.id}`)
       .then((res) => {
         setRefundRequestsList(res.data);
-        setUserRefundRequest(
-          res.data.find((req: ExchangeRefundRequest) => req.mine)
-        );
+        setUserRefundRequest(res.data.find((req: RefundRequest) => req.mine));
       })
       .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));

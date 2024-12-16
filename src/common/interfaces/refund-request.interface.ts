@@ -2,7 +2,7 @@ import { BaseInterface, UserInfo } from "../base.interface";
 import { Exchange } from "./exchange.interface";
 import { Order } from "./order.interface";
 
-export interface ExchangeRefundRequest extends BaseInterface {
+export interface RefundRequest extends BaseInterface {
   user: UserInfo;
   reason: string;
   description: string;
@@ -11,5 +11,5 @@ export interface ExchangeRefundRequest extends BaseInterface {
   order?: Order;
   status: "PENDING" | "APPROVED" | "REJECTED";
   rejectedReason?: string;
-  mine: boolean;
+  mine?: boolean;
 }

@@ -13,6 +13,7 @@ import LazyLoad from "react-lazyload";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import { Tooltip } from "antd";
+import EmptyIcon from "../../assets/notFound/empty.png";
 
 interface GenresProps {
   filteredGenres: string[];
@@ -317,15 +318,24 @@ const Genres: React.FC<GenresProps> = ({
                       </div>
                     ))
                   ) : (
-                    <p className="no-auction-comics">
-                      Không có truyện đấu giá nào phù hợp
-                    </p>
+                    <div className="flex justify-center items-center w-full h-full">
+                      <div className="text-center text-gray-500">
+                        <img
+                          className="h-40 w-full object-contain"
+                          src={EmptyIcon}
+                          alt="No Announcements"
+                        />
+                        <p>
+                          Không có truyện đấu giá nào phù hợp
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
 
               {/* Non-Auction Comics Section */}
-              <div className="regular-comics-section mt-2">
+              <div className="regular-comics-section mt-8">
                 <Chip
                   label="Truyện thông thường"
                   color="secondary"
@@ -360,9 +370,18 @@ const Genres: React.FC<GenresProps> = ({
                       </div>
                     ))
                   ) : (
-                    <p className="no-regular-comics">
-                      Không có truyện nào phù hợp
-                    </p>
+                    <div className="flex justify-center items-center w-full h-full">
+                      <div className="text-center text-gray-500">
+                        <img
+                          className="h-40 w-full object-contain"
+                          src={EmptyIcon}
+                          alt="No Announcements"
+                        />
+                        <p>
+                          Không có truyện nào phù hợp
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -558,9 +577,14 @@ const Genres: React.FC<GenresProps> = ({
                         </div>
                       ))
                   ) : (
-                    <p className="text-sm text-gray-500">
-                      Không tìm thấy người bán nào
-                    </p>
+                    <div className="text-center text-gray-500">
+                      <img
+                        className="h-40 w-full object-contain"
+                        src={EmptyIcon}
+                        alt="No Announcements"
+                      />
+                      <p>Không tìm thấy người bán nào</p>
+                    </div>
                   )}
                 </div>
               </div>

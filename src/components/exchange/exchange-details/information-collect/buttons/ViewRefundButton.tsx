@@ -1,6 +1,6 @@
 import { Avatar, Modal } from "antd";
 import { useState } from "react";
-import { ExchangeRefundRequest } from "../../../../../common/interfaces/refund-request.interface";
+import { RefundRequest } from "../../../../../common/interfaces/refund-request.interface";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../../../../redux/hooks";
 
@@ -8,8 +8,8 @@ export default function ViewRefundButton({
   refundRequest,
   requestsList,
 }: {
-  refundRequest: ExchangeRefundRequest | undefined;
-  requestsList: ExchangeRefundRequest[];
+  refundRequest: RefundRequest | undefined;
+  requestsList: RefundRequest[];
 }) {
   const { userId } = useAppSelector((state) => state.auth);
 

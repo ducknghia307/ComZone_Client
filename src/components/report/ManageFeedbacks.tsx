@@ -26,8 +26,8 @@ import ModalFeedback from './ModalFeedback';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 interface Feedback {
   id: string;
-  user: { name: string };
-  seller: { name: string };
+  user: { name: string; avatar: string; };
+  seller: { name: string; avatar: string; };
   createdAt: string;
   comment: string;
   rating: number;
@@ -252,8 +252,25 @@ const ManageFeedbacks: React.FC = () => {
                     <StyledTableCell>
                       {new Date(feedback.createdAt).toLocaleString()}
                     </StyledTableCell>
-                    <StyledTableCell align="center">{feedback.user?.name || 'Unknown'}</StyledTableCell>
-                    <StyledTableCell align="center">{feedback.seller?.name || 'Unknown'}</StyledTableCell>
+                    <StyledTableCell align="center">
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', whiteSpace: 'nowrap', gap: '8px' }}>
+                        <img
+                          style={{ width: '24px', height: '24px', borderRadius: '50%', cursor: 'pointer' }}
+                          src={feedback.user.avatar}
+                          alt={feedback.user.avatar}
+                        />
+                        {feedback.user?.name || 'Unknown'}
+                      </Box>
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', whiteSpace: 'nowrap', gap: '8px' }}>
+                        <img
+                          style={{ width: '24px', height: '24px', borderRadius: '50%', cursor: 'pointer' }}
+                          src={feedback.seller.avatar}
+                          alt={feedback.seller.avatar}
+                        />{feedback.seller?.name || 'Unknown'}
+                      </Box>
+                    </StyledTableCell>
                     <StyledTableCell align="center">
                       {feedback.comment.length > 50 ? feedback.comment.substring(0, 50) + '...' : feedback.comment}
                     </StyledTableCell>

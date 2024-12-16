@@ -223,18 +223,6 @@ const HotComics: React.FC<GenresProps> = ({
                       <p className="price">{formatPrice(comic.price)}</p>
                       <p className="author">{comic.author.toUpperCase()}</p>
                       <p className="title">{comic.title}</p>
-                      <div className="rating-sold-comic">
-                        <p className="rating">
-                          {[...Array(5)].map((_, index) => (
-                            <StarIcon
-                              key={index}
-                              style={{ width: "20px", color: "#ffc107" }}
-                            />
-                          ))}
-                        </p>
-                        <div className="divider"></div>
-                        <p className="sold-info">Đã bán 123</p>
-                      </div>
                     </Link>
                   </div>
                 ))

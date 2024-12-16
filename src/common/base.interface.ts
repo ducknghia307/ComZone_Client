@@ -183,6 +183,7 @@ export interface Delivery {
   estimatedDeliveryTime: string | null;
   status: string;
   from: {
+    user: UserInfo;
     id: string;
     createdAt: string;
     note: string | null;
@@ -193,7 +194,7 @@ export interface Delivery {
     fullAddress?: string;
   };
   to: {
-    user: any;
+    user: UserInfo;
     id: string;
     createdAt: string;
     note: string | null;

@@ -68,7 +68,6 @@ const AppRouter = () => {
           path="/accountmanagement/announcement/orders"
           element={<AnnouncementOrder />}
         />
-        \
         <Route
           path="/accountmanagement/announcement/auctions"
           element={<AnnouncementAuction />}

@@ -9,5 +9,5 @@ export default function displayPastTimeFromNow(
 
   return checkDisplayDateTime
     ? moment(time).calendar()
-    : moment(time).format(customFormat || "HH:mm DD-MM-YYYY");
+    : moment(time).format(customFormat || "DD-MM-YYYY HH:mm");
 }

@@ -35,9 +35,7 @@ import CurrencySplitter from "../../assistants/Spliter";
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
-    borderRadius: theme.spacing(2),
-    maxHeight: "90vh",
-    boxShadow: theme.shadows[10],
+    borderRadius: theme.spacing(2), maxHeight: "90vh", boxShadow: theme.shadows[10],
   },
 }));
 
@@ -58,25 +56,14 @@ const StatusChip = styled("span")<{ status: string; deliveryStatus?: string }>(
         return { color: "#7c4af2", backgroundColor: "#e0d4fc" };
       }
       switch (status) {
-        case "PENDING":
-          return { color: "#ff9800", backgroundColor: "#fff3e0" };
-        case "DELIVERED":
-          return { color: "#32CD32", backgroundColor: "#ccfccc" };
-        case "PACKAGING":
-          return { color: "#ff6b1c", backgroundColor: "#ffe8db" };
-        case "DELIVERING":
-          return { color: "#2196f3", backgroundColor: "#e3f2fd" };
-        case "SUCCESSFUL":
-          return { color: "#4caf50", backgroundColor: "#e8f5e9" };
-        case "FAILED":
-          return { color: "#f44336", backgroundColor: "#ffebee" };
-        case "CANCELED":
-          return { color: "#ff0000", backgroundColor: "#ffe1e1" };
-        default:
-          return {
-            color: theme.palette.info.main,
-            bgColor: alpha(theme.palette.info.light, 0.2),
-          };
+        case "PENDING": return { color: "#ff9800", backgroundColor: "#fff3e0" };
+        case "DELIVERED": return { color: "#32CD32", backgroundColor: "#ccfccc" };
+        case "PACKAGING": return { color: "#ff6b1c", backgroundColor: "#ffe8db" };
+        case "DELIVERING": return { color: "#2196f3", backgroundColor: "#e3f2fd" };
+        case "SUCCESSFUL": return { color: "#4caf50", backgroundColor: "#e8f5e9" };
+        case "FAILED": return { color: "#f44336", backgroundColor: "#ffebee" };
+        case "CANCELED": return { color: "#ff0000", backgroundColor: "#ffe1e1" };
+        default: return { color: theme.palette.info.main, bgColor: alpha(theme.palette.info.light, 0.2), };
       }
     };
 
@@ -102,24 +89,12 @@ interface OrderDetailProps {
   setSelectedOrderId: React.Dispatch<React.SetStateAction<string>>;
   onClose: () => void;
   orderId: string;
-  onStatusUpdate: (
-    orderId: string,
-    newStatus: string,
-    delivery?: { status: string }
-  ) => void;
+  onStatusUpdate: (orderId: string, newStatus: string, delivery?: { status: string }) => void;
   order: OrderDetailData | undefined;
   reload: () => void;
 }
 
-const InfoRow = ({
-  label,
-  value,
-  paymentMethod,
-}: {
-  label: string;
-  value: string | number;
-  paymentMethod?: string;
-}) => {
+const InfoRow = ({ label, value, paymentMethod, }: { label: string; value: string | number; paymentMethod?: string; }) => {
   const theme = useTheme();
 
   const paymentStatusColor =
@@ -138,8 +113,7 @@ const InfoRow = ({
       px={3}
       sx={{
         "&:hover": {
-          backgroundColor: alpha(theme.palette.primary.light, 0.05),
-          borderRadius: 1,
+          backgroundColor: alpha(theme.palette.primary.light, 0.05), borderRadius: 1,
         },
       }}
     >
@@ -147,10 +121,7 @@ const InfoRow = ({
         color="text.secondary"
         variant="body2"
         sx={{
-          whiteSpace: "nowrap",
-          fontWeight: "bold",
-          color: "#000",
-          fontSize: "16px",
+          whiteSpace: "nowrap", fontWeight: "bold", color: "#000", fontSize: "16px",
         }}
       >
         {label}
@@ -159,10 +130,7 @@ const InfoRow = ({
         variant="body1"
         fontWeight={500}
         sx={{
-          paddingLeft: 2,
-          color: paymentMethod ? paymentStatusColor : "#000",
-          whiteSpace: "normal",
-          wordWrap: "break-word",
+          paddingLeft: 2, color: paymentMethod ? paymentStatusColor : "#000", whiteSpace: "normal", wordWrap: "break-word",
         }}
       >
         {value}
@@ -183,6 +151,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
   const [orderDetail, setOrderDetail] = useState<OrderDetailData | null>(null);
   const theme = useTheme();
   const [orders, setOrders] = useState<OrderDetailData[]>([]);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [imageUploadLoading, setImageUploadLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchOrderDetail = async () => {
@@ -226,22 +196,149 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
       return "Chờ bàn giao hàng";
     }
     switch (status) {
-      case "PENDING":
-        return "Đang chờ xử lý";
-      case "DELIVERED":
-        return "Đã giao hàng";
-      case "PACKAGING":
-        return "Đang đóng gói";
-      case "DELIVERING":
-        return "Đang giao hàng";
-      case "SUCCESSFUL":
-        return "Hoàn tất";
-      case "CANCELED":
-        return "Đã hủy";
-      case "FAILED":
-        return "Thất bại";
-      default:
-        return status;
+      case "PENDING": return "Đang chờ xử lý";
+      case "DELIVERED": return "Đã giao hàng";
+      case "PACKAGING": return "Đang đóng gói";
+      case "DELIVERING": return "Đang giao hàng";
+      case "SUCCESSFUL": return "Hoàn tất";
+      case "CANCELED": return "Đã hủy";
+      case "FAILED": return "Thất bại";
+      default: return status;
+    }
+  };
+
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const formData = new FormData();
+      Array.from(files).forEach(file => formData.append('images', file));
+
+      try {
+        setImageUploadLoading(true);
+        const response = await privateAxios.post('/file/upload/multiple-images', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        setSelectedImages(prev => [...prev, ...response.data.imageUrls]);
+      } catch (error) {
+        console.error('Error uploading images:', error);
+      } finally {
+        setImageUploadLoading(false);
+      }
+    }
+  };
+
+  const handleRemoveImage = (imageUrl: string) => {
+    setSelectedImages(prev => prev.filter(image => image !== imageUrl));
+  };
+
+  const handleStartPackaging = async () => {
+    try {
+      const endpoint = `/orders/status/start-packaging/${orderId}`;
+      const response = await privateAxios.post(endpoint);
+
+      const updatedDetail = { ...orderDetail, status: "PACKAGING" };
+      setOrderDetail(updatedDetail);
+      onStatusUpdate(orderId, "PACKAGING");
+
+      notification.success({
+        message: "Thành công",
+        description: "Đã xác nhận đơn hàng thành công",
+        duration: 3,
+      });
+
+      setSelectedOrderId(null);
+    } catch (error: any) {
+      notification.error({
+        message: "Lỗi",
+        description: "Có lỗi xảy ra khi cập nhật trạng thái đơn hàng",
+        duration: 3,
+      });
+    }
+  };
+
+  const handleFinishPackaging = async () => {
+    if (selectedImages.length === 0) {
+      notification.warning({
+        message: "Lưu ý",
+        description: "Vui lòng chọn ít nhất một ảnh!",
+        duration: 3,
+      });
+      return;
+    }
+    try {
+      const endpoint = `/orders/status/finish-packaging/${orderId}`;
+      console.log("Body:", { packageImages: selectedImages });
+      const response = await privateAxios.post(endpoint, { packageImages: selectedImages });
+
+
+      console.log("API Response:", response.data);
+
+      const updatedDeliveryStatus = "ready_to_pick";
+      const updatedDetail = {
+        ...orderDetail,
+        status: "PACKAGING",
+        delivery: {
+          ...orderDetail?.delivery,
+          status: updatedDeliveryStatus,
+        },
+      };
+
+      setOrderDetail(updatedDetail);
+      onStatusUpdate(orderId, "PACKAGING", {
+        status: updatedDeliveryStatus,
+      });
+
+      reload();
+
+      notification.success({
+        message: "Thành công",
+        description: "Trạng thái đơn hàng đã được cập nhật thành công",
+        duration: 3,
+      });
+
+      setSelectedOrderId(null);
+    } catch (error: any) {
+      if (error.response?.status === 400) {
+        Modal.confirm({
+          title: "Lỗi đơn hàng",
+          icon: <ExclamationCircleOutlined />,
+          content: "Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.",
+          okText: "Hủy đơn hàng",
+          cancelText: "Đóng",
+          onOk: async () => {
+            try {
+              await privateAxios.patch("/orders/cancel", {
+                orderId: orderId,
+                cancelReason: "Lỗi tạo đơn vận chuyển giao hàng.",
+              });
+
+              const updatedDetail = { ...orderDetail, status: "CANCELED" };
+              setOrderDetail(updatedDetail);
+              onStatusUpdate(orderId, "CANCELED");
+
+              notification.success({
+                message: "Thành công",
+                description: "Đơn hàng đã được hủy thành công",
+                duration: 3,
+              });
+
+              reload();
+            } catch (cancelError) {
+              notification.error({
+                message: "Lỗi",
+                description: "Có lỗi xảy ra khi hủy đơn hàng",
+                duration: 3,
+              });
+            }
+          },
+        });
+      } else {
+        notification.error({
+          message: "Lỗi",
+          description: "Có lỗi xảy ra khi cập nhật trạng thái đơn hàng",
+          duration: 3,
+        });
+      }
     }
   };
 
@@ -250,15 +347,16 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
       start: {
         title: "Xác nhận đơn hàng",
         content: "Bạn có chắc chắn muốn bắt đầu đóng gói đơn hàng này không?",
+        onConfirm: handleStartPackaging,
       },
       finish: {
         title: "Hoàn tất đóng gói",
-        content:
-          "Bạn có chắc chắn muốn hoàn tất đóng gói để shipper có thể đến lấy hàng không?",
+        content: "Bạn có chắc chắn muốn hoàn tất đóng gói để shipper có thể đến lấy hàng không?",
+        onConfirm: handleFinishPackaging,
       },
     };
 
-    const { title, content } =
+    const { title, content, onConfirm } =
       confirmConfig[actionType as keyof typeof confirmConfig];
 
     Modal.confirm({
@@ -273,95 +371,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
       cancelText: "Hủy",
       centered: true,
       className: "styled-modal-confirm",
-      onOk: async () => {
-        try {
-          const endpoint =
-            actionType === "start"
-              ? `/orders/status/start-packaging/${orderId}`
-              : `/orders/status/finish-packaging/${orderId}`;
-
-          const response = await privateAxios.post(endpoint);
-
-          if (actionType === "start") {
-            const updatedDetail = { ...orderDetail, status: "PACKAGING" };
-            setOrderDetail(updatedDetail);
-            onStatusUpdate(orderId, "PACKAGING");
-
-            notification.success({
-              message: "Thành công",
-              description: "Đã xác nhận đơn hàng thành công",
-              duration: 3,
-            });
-          } else if (actionType === "finish") {
-            const updatedDeliveryStatus = "ready_to_pick";
-            const updatedDetail = {
-              ...orderDetail,
-              status: "PACKAGING",
-              delivery: {
-                ...orderDetail?.delivery,
-                status: updatedDeliveryStatus,
-              },
-            };
-
-            setOrderDetail(updatedDetail);
-            onStatusUpdate(orderId, "PACKAGING", {
-              status: updatedDeliveryStatus,
-            });
-
-            reload();
-
-            notification.success({
-              message: "Thành công",
-              description: "Trạng thái đơn hàng đã được cập nhật thành công",
-              duration: 3,
-            });
-          }
-
-          setSelectedOrderId(null);
-        } catch (error: any) {
-          if (actionType === "finish" && error.response?.status === 400) {
-            Modal.confirm({
-              title: "Lỗi đơn hàng",
-              icon: <ExclamationCircleOutlined />,
-              content: "Đơn hàng bị lỗi. Bạn cần phải hủy đơn hàng.",
-              okText: "Hủy đơn hàng",
-              cancelText: "Đóng",
-              onOk: async () => {
-                try {
-                  await privateAxios.patch("/orders/cancel", {
-                    orderId: orderId,
-                    cancelReason: "Lỗi tạo đơn vận chuyển giao hàng.",
-                  });
-
-                  const updatedDetail = { ...orderDetail, status: "CANCELED" };
-                  setOrderDetail(updatedDetail);
-                  onStatusUpdate(orderId, "CANCELED");
-
-                  notification.success({
-                    message: "Thành công",
-                    description: "Đơn hàng đã được hủy thành công",
-                    duration: 3,
-                  });
-
-                  reload();
-                } catch (cancelError) {
-                  notification.error({
-                    message: "Lỗi",
-                    description: "Có lỗi xảy ra khi hủy đơn hàng",
-                    duration: 3,
-                  });
-                }
-              },
-            });
-          } else {
-            notification.error({
-              message: "Lỗi",
-              description: "Có lỗi xảy ra khi cập nhật trạng thái đơn hàng",
-              duration: 3,
-            });
-          }
-        }
-      },
+      onOk: onConfirm,
     });
   };
 
@@ -393,11 +403,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
             variant="h5"
             fontWeight="bold"
             sx={{
-              fontSize: "1.5rem",
-              color: theme.palette.text.primary,
-              textTransform: "none",
-              marginRight: "100px",
-              fontFamily: "REM",
+              fontSize: "1.5rem", color: theme.palette.text.primary, textTransform: "none", marginRight: "100px", fontFamily: "REM",
             }}
           >
             Chi tiết đơn hàng
@@ -419,17 +425,13 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              marginTop: "20px",
+              display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px",
             }}
           >
             <Typography
               variant="body2"
               sx={{
-                color: theme.palette.text.secondary,
-                fontWeight: 500,
+                color: theme.palette.text.secondary, fontWeight: 500,
               }}
             >
               Ngày tạo đơn hàng:{" "}
@@ -441,8 +443,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                 <Typography
                   variant="body2"
                   sx={{
-                    color: theme.palette.text.secondary,
-                    fontWeight: 500,
+                    color: theme.palette.text.secondary, fontWeight: 500,
                   }}
                 >
                   Mã đơn hàng: {orderDetail.delivery.deliveryTrackingCode}
@@ -466,11 +467,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
           </div>
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              marginTop: "20px",
-              alignItems: "center",
+              display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px", alignItems: "center",
             }}
           >
             {orderDetail.status === "CANCELED" && (
@@ -491,9 +488,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                 }
                 variant="outlined"
                 sx={{
-                  color: theme.palette.error.main,
-                  borderColor: theme.palette.error.main,
-                  fontWeight: 500,
+                  color: theme.palette.error.main, borderColor: theme.palette.error.main, fontWeight: 500,
                 }}
               />
             )}
@@ -512,10 +507,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
             <Grid
               size={12}
               sx={{
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                borderTop: `1px solid ${theme.palette.divider}`,
-                paddingTop: "10px",
-                paddingBottom: "10px",
+                borderBottom: `1px solid ${theme.palette.divider}`, borderTop: `1px solid ${theme.palette.divider}`, paddingTop: "10px", paddingBottom: "10px",
               }}
             >
               <Stack
@@ -535,13 +527,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                   <Chip
                     label="Thông tin người nhận"
                     sx={{
-                      fontSize: "18px",
-                      fontWeight: "bold",
-                      backgroundColor: "#fff",
-                      color: "#000",
-                      padding: "18px 25px",
-                      fontFamily: "REM",
-                      border: "2px solid black",
+                      fontSize: "18px", fontWeight: "bold", backgroundColor: "#fff", color: "#000", padding: "18px 25px", fontFamily: "REM", border: "2px solid black",
                     }}
                   />
                   <InfoRow
@@ -566,13 +552,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                   <Chip
                     label="Thông tin thanh toán"
                     sx={{
-                      fontSize: "18px",
-                      fontWeight: "bold",
-                      backgroundColor: "#fff",
-                      color: "#000",
-                      padding: "18px 25px",
-                      fontFamily: "REM",
-                      border: "2px solid black",
+                      fontSize: "18px", fontWeight: "bold", backgroundColor: "#fff", color: "#000", padding: "18px 25px", fontFamily: "REM", border: "2px solid black",
                     }}
                   />
                   <InfoRow
@@ -604,14 +584,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
               <Chip
                 label="Thông tin sản phẩm"
                 sx={{
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                  backgroundColor: "#fff",
-                  color: "#000",
-                  padding: "18px 25px",
-                  fontFamily: "REM",
-                  border: "2px solid black",
-                  marginBottom: "20px",
+                  fontSize: "18px", fontWeight: "bold", backgroundColor: "#fff", color: "#000", padding: "18px 25px", fontFamily: "REM", border: "2px solid black", marginBottom: "20px",
                 }}
               />
               <TableContainer component={Paper}>
@@ -646,11 +619,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                             <img
                               src={item.comics.coverImage}
                               alt={item.comics.title}
-                              style={{
-                                width: 50,
-                                height: "auto",
-                                margin: "auto",
-                              }}
+                              style={{ width: 50, height: "auto", margin: "auto", }}
                             />
                           </TableCell>
                           <TableCell className="!font-semibold !text-start">
@@ -685,16 +654,12 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
               >
                 <StyledPaper
                   sx={{
-                    padding: "16px",
-                    backgroundColor: "rgba(0, 0, 0, 0.05)",
-                    borderRadius: "8px",
+                    padding: "16px", backgroundColor: "rgba(0, 0, 0, 0.05)", borderRadius: "8px",
                   }}
                 >
                   <div
                     style={{
-                      display: "flex",
-                      gap: "5px",
-                      alignItems: "center",
+                      display: "flex", gap: "5px", alignItems: "center",
                     }}
                   >
                     <EditOutlinedIcon sx={{ fontSize: "16px" }} />
@@ -708,6 +673,100 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                 </StyledPaper>
               </Grid>
             )}
+            <Grid size={12} sx={{ paddingLeft: "20px", paddingRight: "20px", marginTop: "20px" }}>
+              {orderDetail.packageImages?.length > 0 &&
+                (["DELIVERING", "DELIVERED", "SUCCESSFUL", "FAILED", "CANCELED"].includes(orderDetail.status) ||
+                  (orderDetail.status === "PACKAGING" && orderDetail.delivery?.status === "ready_to_pick")) && (
+                  <>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', fontFamily: 'REM', marginBottom: '10px' }}>
+                      Ảnh đóng gói:
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      {orderDetail.packageImages.map((image: string, index: number) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            position: 'relative',
+                            width: 100,
+                            height: 100,
+                            border: '2px solid #ddd',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <img
+                            src={image}
+                            alt={`Package Image ${index}`}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                            }}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  </>
+                )}
+            </Grid>
+
+            <Grid size={12} sx={{ paddingLeft: "20px", paddingRight: "20px" }}>
+              {orderDetail.status === "PACKAGING" && orderDetail.delivery?.status !== "ready_to_pick" && (
+                <>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', fontFamily: 'REM' }}>
+                      Chọn ảnh đóng gói:
+                    </Typography>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageChange}
+                      style={{ display: 'none' }}
+                      id="upload-images"
+                    />
+                    <label htmlFor="upload-images">
+                      <Button sx={{ backgroundColor: '#6a6a6a', color: 'white', fontFamily: 'REM', padding: '3px 10px' }} component="span">
+                        Chọn ảnh
+                      </Button>
+                    </label>
+                  </Box>
+
+                  {selectedImages.length > 0 && (
+                    <Box sx={{ display: 'flex', marginTop: '15px', gap: '10px', flexWrap: 'wrap' }}>
+                      {selectedImages.map((image, index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            position: 'relative', width: 100, height: 100, border: '2px solid #ddd', borderRadius: '8px', overflow: 'hidden',
+                          }}
+                        >
+                          <img
+                            src={image}
+                            alt={`Selected Image ${index}`}
+                            style={{
+                              width: '100%', height: '100%', objectFit: 'cover',
+                            }}
+                          />
+                          <IconButton
+                            onClick={() => handleRemoveImage(image)}
+                            sx={{
+                              position: 'absolute', top: '4px', right: '4px', width: '20px', height: '20px', color: '#fff', backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                              '&:hover': {
+                                backgroundColor: 'rgba(0, 0, 0, 0.7)'
+                              },
+                            }}
+                          >
+                            <CloseIcon sx={{ fontSize: '16px' }} />
+                          </IconButton>
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
+                </>
+              )}
+            </Grid>
+
           </Grid>
         </Stack>
       </DialogContent>
@@ -722,11 +781,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
         {orderDetail.status === "PENDING" && (
           <Button
             sx={{
-              backgroundColor: "#fff",
-              color: "#000",
-              padding: "5px 20px",
-              fontWeight: "bold",
-              border: "1px solid black",
+              backgroundColor: "#fff", color: "#000", padding: "5px 20px", fontWeight: "bold", border: "1px solid black",
             }}
             onClick={() => handleConfirmAction("start")}
           >
@@ -737,12 +792,11 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
           orderDetail.delivery?.status !== "ready_to_pick" && (
             <Button
               sx={{
-                backgroundColor: "#4A4A4A",
-                color: "#fff",
-                padding: "5px 20px",
-                fontWeight: "bold",
+                backgroundColor: "#4A4A4A", color: "#fff", padding: "5px 20px", fontWeight: "bold",
+                "&.Mui-disabled": { backgroundColor: "#a9a9a9", color: "#fff", opacity: 0.8, },
               }}
               onClick={() => handleConfirmAction("finish")}
+              disabled={imageUploadLoading}
             >
               Hoàn tất đóng gói
             </Button>

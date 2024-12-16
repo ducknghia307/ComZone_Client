@@ -554,6 +554,42 @@ const OrderDetailMod: React.FC<OrderDetailProps> = ({ open, onClose, orderId, on
                                 </Typography>
                             </StyledPaper>
                         </Grid>
+                        <Grid size={12} sx={{ paddingLeft: "20px", paddingRight: "20px", marginTop: "10px" }}>
+                            {orderDetail.packageImages?.length > 0 &&
+                                (["DELIVERING", "DELIVERED", "SUCCESSFUL", "FAILED", "CANCELED"].includes(orderDetail.status) ||
+                                    (orderDetail.status === "PACKAGING" && orderDetail.delivery?.status === "ready_to_pick")) && (
+                                    <>
+                                        <Typography variant="body2" sx={{ fontWeight: 'bold', fontFamily: 'REM', marginBottom: '10px' }}>
+                                            Ảnh đóng gói từ người bán:
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                            {orderDetail.packageImages.map((image: string, index: number) => (
+                                                <Box
+                                                    key={index}
+                                                    sx={{
+                                                        position: 'relative',
+                                                        width: 100,
+                                                        height: 100,
+                                                        border: '2px solid #ddd',
+                                                        borderRadius: '8px',
+                                                        overflow: 'hidden',
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={image}
+                                                        alt={`Package Image ${index}`}
+                                                        style={{
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            objectFit: 'cover',
+                                                        }}
+                                                    />
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    </>
+                                )}
+                        </Grid>
                     </Grid>
                 </Stack>
             </DialogContent>

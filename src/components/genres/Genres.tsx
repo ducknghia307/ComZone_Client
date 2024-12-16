@@ -13,6 +13,7 @@ import LazyLoad from "react-lazyload";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import { Tooltip } from "antd";
+import displayPastTimeFromNow from "../../utils/displayPastTimeFromNow";
 
 interface GenresProps {
   filteredGenres: string[];
@@ -28,7 +29,6 @@ interface Seller {
   };
   comics: Comic[];
 }
-
 
 const Genres: React.FC<GenresProps> = ({
   filteredGenres,
@@ -102,25 +102,32 @@ const Genres: React.FC<GenresProps> = ({
         console.log("Search API Response:", response.data);
 
         // Destructure the response
-        const { comics: regularComics = [], auctions: auctionComicsData = [], sellers: sellersData = [] } = response.data;
+        const {
+          comics: regularComics = [],
+          auctions: auctionComicsData = [],
+          sellers: sellersData = [],
+        } = response.data;
 
         // Update state variables
         setComics(regularComics);
         setAuctionComics(auctionComicsData);
         setSellers(sellersData);
         console.log("Sellers Data:", sellers);
-
       } else {
         // Existing logic for fetching comics without a search query
         const response = await publicAxios.get(
           `/comics/count/status/available?load=${comicsCount || comicsEachLoad}`
         );
 
-        const fetchedComics = Array.isArray(response.data[0]) ? response.data[0] : [];
+        const fetchedComics = Array.isArray(response.data[0])
+          ? response.data[0]
+          : [];
         setComics(fetchedComics);
 
         const auctionComics = await publicAxios.get<Comic[]>("/auction");
-        setAuctionComics(Array.isArray(auctionComics.data) ? auctionComics.data : []);
+        setAuctionComics(
+          Array.isArray(auctionComics.data) ? auctionComics.data : []
+        );
       }
     } catch (error) {
       console.error("Error fetching comics:", error);
@@ -137,8 +144,8 @@ const Genres: React.FC<GenresProps> = ({
     const genreMatch =
       filteredGenres.length > 0
         ? filteredGenres.every((genre) =>
-          comic.genres.some((comicGenre) => comicGenre.name === genre)
-        )
+            comic.genres.some((comicGenre) => comicGenre.name === genre)
+          )
         : true;
 
     const authorMatch =
@@ -162,9 +169,9 @@ const Genres: React.FC<GenresProps> = ({
     const genreMatch =
       filteredGenres.length > 0
         ? comic.comics.genres &&
-        comic.comics.genres.some((genre) =>
-          filteredGenres.includes(genre.name)
-        )
+          comic.comics.genres.some((genre) =>
+            filteredGenres.includes(genre.name)
+          )
         : true;
     const authorMatch =
       filteredAuthors.length > 0
@@ -272,8 +279,13 @@ const Genres: React.FC<GenresProps> = ({
                     fontFamily: "REM",
                   }}
                 />
-                <div className={`all-genres-cards ${sortedAuctionComics.length < 4 ? 'align-left' : 'grid-layout'}`}>
-
+                <div
+                  className={`all-genres-cards ${
+                    sortedAuctionComics.length < 4
+                      ? "align-left"
+                      : "grid-layout"
+                  }`}
+                >
                   {sortedAuctionComics.length > 0 ? (
                     sortedAuctionComics.map((comic) => (
                       <div className="auction-card" key={comic.id}>
@@ -325,7 +337,11 @@ const Genres: React.FC<GenresProps> = ({
                     fontFamily: "REM",
                   }}
                 />
-                <div className={`all-genres-cards ${comics.length > 4 ? 'grid-layout' : 'flex-layout'}`}>
+                <div
+                  className={`all-genres-cards ${
+                    comics.length > 4 ? "grid-layout" : "flex-layout"
+                  }`}
+                >
                   {sortedRegularComics.length > 0 ? (
                     sortedRegularComics.map((comic) => (
                       <div className="hot-comic-card" key={comic.id}>
@@ -367,14 +383,15 @@ const Genres: React.FC<GenresProps> = ({
                 <div className="space-y-4">
                   {sellers.length > 0 ? (
                     sellers
-                      .filter((sellerObj) =>
-                        sellerObj.seller &&
-                        sellerObj.seller.name &&
-                        (searchQuery
-                          ? sellerObj.seller.name
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase())
-                          : true)
+                      .filter(
+                        (sellerObj) =>
+                          sellerObj.seller &&
+                          sellerObj.seller.name &&
+                          (searchQuery
+                            ? sellerObj.seller.name
+                                .toLowerCase()
+                                .includes(searchQuery.toLowerCase())
+                            : true)
                       )
                       .map((sellerObj) => (
                         <div
@@ -387,7 +404,10 @@ const Genres: React.FC<GenresProps> = ({
                               <Chip
                                 avatar={
                                   <img
-                                    src={sellerObj.seller.avatar || "/default-avatar.jpg"}
+                                    src={
+                                      sellerObj.seller.avatar ||
+                                      "/default-avatar.jpg"
+                                    }
                                     alt={`${sellerObj.seller.name}'s avatar`}
                                     className="w-8 h-8 rounded-full"
                                   />
@@ -398,10 +418,11 @@ const Genres: React.FC<GenresProps> = ({
                                       {sellerObj.seller.name}
                                     </span>
                                     <StoreOutlinedIcon
-                                      className={`transition-colors duration-200 ${sellerObj.comics.length > 0
-                                        ? "text-black"
-                                        : "group-hover:text-red-500 text-black"
-                                        }`}
+                                      className={`transition-colors duration-200 ${
+                                        sellerObj.comics.length > 0
+                                          ? "text-black"
+                                          : "group-hover:text-red-500 text-black"
+                                      }`}
                                       style={{ fontSize: "20px" }}
                                     />
                                   </div>
@@ -417,23 +438,35 @@ const Genres: React.FC<GenresProps> = ({
                                   border: "1px solid #000",
                                   boxShadow: "2px 2px #ccc",
                                   transition: "all 0.3s ease-in-out",
-                                  cursor: sellerObj.comics.length > 0 ? "pointer" : "not-allowed",
+                                  cursor:
+                                    sellerObj.comics.length > 0
+                                      ? "pointer"
+                                      : "not-allowed",
                                 }}
                                 onClick={() => {
                                   if (sellerObj.comics.length > 0) {
-                                    navigate(`/seller/shop/all/${sellerObj.seller.id}`);
+                                    navigate(
+                                      `/seller/shop/all/${sellerObj.seller.id}`
+                                    );
                                   }
                                 }}
                               />
                             ) : (
                               <Tooltip
-                                title={<span style={{ whiteSpace: 'nowrap' }}>Người bán này chưa bán truyện nào</span>}
+                                title={
+                                  <span style={{ whiteSpace: "nowrap" }}>
+                                    Người bán này chưa bán truyện nào
+                                  </span>
+                                }
                                 placement="top"
                               >
                                 <Chip
                                   avatar={
                                     <img
-                                      src={sellerObj.seller.avatar || "/default-avatar.jpg"}
+                                      src={
+                                        sellerObj.seller.avatar ||
+                                        "/default-avatar.jpg"
+                                      }
                                       alt={`${sellerObj.seller.name}'s avatar`}
                                       className="w-8 h-8 rounded-full"
                                     />
@@ -444,10 +477,11 @@ const Genres: React.FC<GenresProps> = ({
                                         {sellerObj.seller.name}
                                       </span>
                                       <StoreOutlinedIcon
-                                        className={`transition-colors duration-200 ${sellerObj.comics.length > 0
-                                          ? "text-black"
-                                          : "group-hover:text-red-500 text-black"
-                                          }`}
+                                        className={`transition-colors duration-200 ${
+                                          sellerObj.comics.length > 0
+                                            ? "text-black"
+                                            : "group-hover:text-red-500 text-black"
+                                        }`}
                                         style={{ fontSize: "20px" }}
                                       />
                                     </div>
@@ -472,7 +506,11 @@ const Genres: React.FC<GenresProps> = ({
                             {sellerObj.comics.length > 0 && (
                               <button
                                 className="text-blue-500 text-sm hover:underline"
-                                onClick={() => navigate(`/seller/shop/all/${sellerObj.seller.id}`)}
+                                onClick={() =>
+                                  navigate(
+                                    `/seller/shop/all/${sellerObj.seller.id}`
+                                  )
+                                }
                               >
                                 Xem tất cả
                               </button>
@@ -490,7 +528,9 @@ const Genres: React.FC<GenresProps> = ({
                                 >
                                   <div>
                                     <img
-                                      src={comic.coverImage || "/default-cover.jpg"}
+                                      src={
+                                        comic.coverImage || "/default-cover.jpg"
+                                      }
                                       alt={comic.title}
                                       className="w-full h-40 object-cover rounded-t-lg"
                                     />
@@ -516,7 +556,9 @@ const Genres: React.FC<GenresProps> = ({
                         </div>
                       ))
                   ) : (
-                    <p className="text-sm text-gray-500">Không tìm thấy người bán nào</p>
+                    <p className="text-sm text-gray-500">
+                      Không tìm thấy người bán nào
+                    </p>
                   )}
                 </div>
               </div>
@@ -570,10 +612,11 @@ const Genres: React.FC<GenresProps> = ({
                               )}
                               {comic?.edition !== "REGULAR" && (
                                 <span
-                                  className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${comic?.edition === "SPECIAL"
-                                    ? "bg-yellow-600"
-                                    : "bg-red-800"
-                                    } text-white text-[0.5em] font-light text-nowrap justify-center`}
+                                  className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${
+                                    comic?.edition === "SPECIAL"
+                                      ? "bg-yellow-600"
+                                      : "bg-red-800"
+                                  } text-white text-[0.5em] font-light text-nowrap justify-center`}
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -610,7 +653,11 @@ const Genres: React.FC<GenresProps> = ({
                                 <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM13 12H17V14H11V7H13V12Z"></path>
                               </svg>
                               <p className="count-time">
-                                Đăng bán từ {countTimes[comic.id]}
+                                {displayPastTimeFromNow(
+                                  comic.onSaleSince
+                                    ? comic.onSaleSince
+                                    : new Date()
+                                )}
                               </p>
                             </div>
                           </div>
@@ -625,9 +672,8 @@ const Genres: React.FC<GenresProps> = ({
             </InfiniteScroll>
           )}
         </>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 };
 

@@ -25,7 +25,8 @@ import Loading from "../loading/Loading";
 import socket from "../../services/socket";
 
 export default function ComicsDetailTemp() {
-  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+  const { userId, isLoggedIn } = useAppSelector((state) => state.auth);
+
   const [currentComics, setCurrentComics] = useState<Comic>();
   const [seller, setSeller] = useState<UserInfo>();
   const [imageList, setImageList] = useState<string[]>([]);
@@ -37,6 +38,7 @@ export default function ComicsDetailTemp() {
   const [comicsListFromSeller, setComicsListFromSeller] = useState<
     Comic[] | []
   >([]);
+
   const [hasMore, setHasMore] = useState(true);
   const dispatch = useAppDispatch();
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -44,6 +46,7 @@ export default function ComicsDetailTemp() {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const { id } = useParams();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
@@ -100,7 +103,6 @@ export default function ComicsDetailTemp() {
 
   const checkIsInCart = () => {
     const cartKey = "cart";
-    const userId = userInfo?.id;
 
     if (userId) {
       const allCarts = JSON.parse(localStorage.getItem(cartKey) || "{}");
@@ -110,6 +112,7 @@ export default function ComicsDetailTemp() {
       setIsInCart(exists);
     }
   };
+
   const handleBuyNow = async () => {
     if (!currentComics) return;
 
@@ -142,7 +145,7 @@ export default function ComicsDetailTemp() {
 
         if (exists) {
           messageApi.warning({
-            key: "a",
+            key: "cart",
             type: "info",
             content: "Truyện này đã được thêm vào giỏ hàng.",
           });
@@ -151,6 +154,12 @@ export default function ComicsDetailTemp() {
           localStorage.setItem(cartKey, JSON.stringify(allCarts));
 
           window.dispatchEvent(new Event("cartUpdated"));
+
+          messageApi.success({
+            key: "cart",
+            content: "Thêm truyện vào giỏ hàng thành công.",
+            duration: 5,
+          });
         }
       } catch (error) {
         console.error("Error adding item to cart:", error);
@@ -170,10 +179,8 @@ export default function ComicsDetailTemp() {
   }, [id]);
 
   useEffect(() => {
-    if (userInfo) {
-      checkIsInCart();
-    }
-  }, [id]);
+    checkIsInCart();
+  }, [currentComics]);
 
   const handleOpenChat = async (comics: Comic) => {
     if (!isLoggedIn) {
@@ -242,6 +249,7 @@ export default function ComicsDetailTemp() {
                   handleAddToCart={handleAddToCart}
                   handleBuyNow={handleBuyNow}
                   isInCart={isInCart}
+                  setIsInCart={setIsInCart}
                 />
               )}
             </div>

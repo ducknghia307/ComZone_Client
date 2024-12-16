@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import Loading from "../loading/Loading";
-import { useAppSelector } from "../../redux/hooks";
 import EmptyIcon from "../../assets/notFound/empty.png";
 
 const renderer = ({ days, hours, minutes, seconds }: any) => {
@@ -143,34 +142,36 @@ const AllAuctions = ({
               <img
                 src={comic.comics.coverImage}
                 alt={comic.comics.title}
-                className="object-cover mx-auto"
+                className="object-cover mx-auto rounded-t"
               />
-              <p className="title">{comic.comics.title}</p>
-              <Chip
-                label={comic.comics.condition}
-                icon={<ChangeCircleOutlinedIcon />}
-                size="medium"
-              />
-              {activeTab === "ONGOING" ? (
-                <>
-                  <p className="endtime">KẾT THÚC TRONG</p>
-                  <Countdown
-                    date={new Date(comic.endTime)}
-                    renderer={renderer}
-                  />
-                </>
-              ) : (
-                <p className="text-center m-2 REM bg-orange-200 rounded-xl">
-                  SẮP DIỄN RA
-                </p>
-              )}
-              <Button
-                className="detail-button"
-                onClick={() => handleDetailClick(comic.id)}
-                variant="contained"
-              >
-                Xem Chi Tiết
-              </Button>
+              <div className="p-2">
+                <p className="title">{comic.comics.title}</p>
+                <Chip
+                  label={comic.comics.condition}
+                  icon={<ChangeCircleOutlinedIcon />}
+                  size="medium"
+                />
+                {activeTab === "ONGOING" ? (
+                  <>
+                    <p className="endtime">KẾT THÚC TRONG</p>
+                    <Countdown
+                      date={new Date(comic.endTime)}
+                      renderer={renderer}
+                    />
+                  </>
+                ) : (
+                  <p className="text-center m-2 REM bg-orange-200 rounded-xl">
+                    SẮP DIỄN RA
+                  </p>
+                )}
+                <Button
+                  className="detail-button"
+                  onClick={() => handleDetailClick(comic.id)}
+                  variant="contained"
+                >
+                  Xem Chi Tiết
+                </Button>
+              </div>
             </div>
           ))}
         </div>

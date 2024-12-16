@@ -98,8 +98,7 @@ export default function OTPVerification({
         <p className="text-[1.5em] font-semibold">XÁC THỰC BẰNG OTP</p>
 
         <p className="font-light">
-          Hệ thống đã gửi một mã OTP để xác nhận giao dịch rút tiền của bạn đến
-          số điện thoại *** ***{" "}
+          Hệ thống đã gửi một mã OTP để xác nhận đến số điện thoại *** ***{" "}
           {phoneNumber
             ? phoneNumber.slice(-3)
             : user.phone

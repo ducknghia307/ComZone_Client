@@ -22,6 +22,31 @@ const AuctionPublisher: React.FC<{ comic: Comic }> = ({ comic }) => {
           marginBottom: "15px",
         }}
       >
+        <p style={{ fontSize: "18px", fontFamily: "REM", color: "#000" }}>
+          Thể loại:
+        </p>
+        <span
+          style={{
+            fontWeight: "bold",
+            color: "#000",
+            fontSize: "18px",
+            fontFamily: "REM",
+          }}
+        >
+          {comic.genres.map((genre) => genre.name).join(", ")}
+        </span>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingBottom: "15px",
+          borderBottom: "1px solid #ddd",
+          marginBottom: "15px",
+        }}
+      >
         <p
           style={{
             fontSize: "18px",
@@ -43,6 +68,7 @@ const AuctionPublisher: React.FC<{ comic: Comic }> = ({ comic }) => {
           {comic.author}
         </span>
       </div>
+
       <div
         style={{
           display: "flex",
@@ -105,6 +131,7 @@ const AuctionPublisher: React.FC<{ comic: Comic }> = ({ comic }) => {
           {comic.quantity > 1 ? `${comic.quantity}` : `${comic.page}`}
         </span>
       </div>
+
       <div
         style={{
           display: "flex",

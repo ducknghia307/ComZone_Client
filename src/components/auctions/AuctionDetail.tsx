@@ -589,8 +589,8 @@ const ComicAuction = () => {
                     )}
                     <div
                       style={{
-                        paddingTop: "15px",
-                        paddingBottom: "20px",
+                        paddingTop: "5px",
+                        paddingBottom: "2px",
                         display: "flex",
                         alignItems: "center",
                         gap: "20px",
@@ -723,7 +723,7 @@ const ComicAuction = () => {
             )}
 
             {error && <div className="REM error-message">{error}</div>}
-            <div className="flex justify-between my-4 ">
+            <div className="flex justify-between mt-4 mb-2 ">
               <Chip
                 avatar={
                   <Avatar
@@ -737,9 +737,12 @@ const ComicAuction = () => {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "10px",
+                      gap: "4px",
                       fontSize: "16px",
-                      paddingLeft: "5px",
+                      maxWidth: "150px", // Set a max width for truncation
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                     }}
                   >
                     {users?.name}

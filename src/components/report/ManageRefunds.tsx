@@ -22,6 +22,7 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import RefundModal from "../modal/RefundModal";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { RefundRequest } from "../../common/interfaces/refund-request.interface";
+import { Avatar } from "antd";
 
 interface Order {
   id: string;
@@ -284,10 +285,10 @@ const ManageRefunds: React.FC = () => {
             <TableHead>
               <TableRow>
                 <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
-                  Tên Người Dùng
+                  Loại
                 </StyledTableCell>
                 <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
-                  Mã Đơn Hàng
+                  Tên Người Dùng
                 </StyledTableCell>
                 <StyledTableCell align="right" sx={{ whiteSpace: "nowrap" }}>
                   Thời Gian
@@ -304,9 +305,10 @@ const ManageRefunds: React.FC = () => {
                 <StyledTableCell align="right" sx={{ whiteSpace: "nowrap" }}>
                   Trạng Thái
                 </StyledTableCell>
-                <StyledTableCell align="right" sx={{ whiteSpace: "nowrap" }}>
-                  Chỉnh Sửa
-                </StyledTableCell>
+                <StyledTableCell
+                  align="right"
+                  sx={{ whiteSpace: "nowrap" }}
+                ></StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -315,9 +317,14 @@ const ManageRefunds: React.FC = () => {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((refund) => (
                     <StyledTableRow key={refund.id}>
-                      <StyledTableCell>{refund.user.name}</StyledTableCell>
                       <StyledTableCell>
-                        {refund.order?.id || refund.exchange.id}
+                        {refund.order
+                          ? `Đơn hàng #${refund.order.code}`
+                          : "Trao đổi truyện"}
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <Avatar src={refund.user.avatar} alt="" />{" "}
+                        {refund.user.name}
                       </StyledTableCell>
                       <StyledTableCell
                         align="right"
@@ -335,28 +342,6 @@ const ManageRefunds: React.FC = () => {
                           ? `${refund.description.substring(0, 50)}...`
                           : refund.description}
                       </StyledTableCell>
-                      {/* <StyledTableCell align="right">
-                                        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                                            {refund.attachedImages?.length > 0 ? (
-                                                refund.attachedImages.map((image, index) => (
-                                                    <img
-                                                        key={index}
-                                                        src={image}
-                                                        alt={`Refund Image ${index + 1}`}
-                                                        style={{
-                                                            width: '50px',
-                                                            height: '50px',
-                                                            objectFit: 'cover',
-                                                            borderRadius: '4px',
-                                                            border: '1px solid #ccc',
-                                                        }}
-                                                    />
-                                                ))
-                                            ) : (
-                                                <span style={{ fontStyle: 'italic', color: '#999' }}>Không có hình ảnh</span>
-                                            )}
-                                        </div>
-                                    </StyledTableCell> */}
                       <StyledTableCell align="right">
                         <div style={{ textAlign: "center" }}>
                           {refund.attachedImages?.length > 0 ? (
@@ -380,12 +365,18 @@ const ManageRefunds: React.FC = () => {
                         </span>
                       </StyledTableCell>
                       <StyledTableCell align="right">
-                        <IconButton
-                          color="primary"
+                        <button
                           onClick={() => handleOpenModal(refund)}
+                          className="min-w-fit relative"
                         >
-                          <EditOutlinedIcon />
-                        </IconButton>
+                          <p className="REM lg:whitespace-nowrap border border-gray-400 rounded-md px-2 py-1 duration-200 hover:bg-gray-100">
+                            Xem chi tiết
+                          </p>
+
+                          {refund.status === "PENDING" && (
+                            <span className="absolute top-0 right-0 w-2 h-2 bg-red-600 rounded-full translate-x-0.5 -translate-y-0.5"></span>
+                          )}
+                        </button>
                       </StyledTableCell>
                     </StyledTableRow>
                   ))}

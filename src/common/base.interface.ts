@@ -137,6 +137,7 @@ export interface Comic {
     condition: "SEALED" | "USED";
     coverImage: string;
   };
+  endTime: Date;
 }
 
 export interface OrderDetailData {

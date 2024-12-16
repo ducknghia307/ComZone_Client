@@ -108,9 +108,13 @@ const Genres: React.FC<GenresProps> = ({
           sellers: sellersData = [],
         } = response.data;
 
+        const ongoingAuctionComics = auctionComicsData.filter(
+          (comic) => comic.status === "ONGOING"
+        );
+
         // Update state variables
         setComics(regularComics);
-        setAuctionComics(auctionComicsData);
+        setAuctionComics(ongoingAuctionComics);
         setSellers(sellersData);
         console.log("Sellers Data:", sellers);
       } else {
@@ -144,8 +148,8 @@ const Genres: React.FC<GenresProps> = ({
     const genreMatch =
       filteredGenres.length > 0
         ? filteredGenres.every((genre) =>
-            comic.genres.some((comicGenre) => comicGenre.name === genre)
-          )
+          comic.genres.some((comicGenre) => comicGenre.name === genre)
+        )
         : true;
 
     const authorMatch =
@@ -169,15 +173,15 @@ const Genres: React.FC<GenresProps> = ({
     const genreMatch =
       filteredGenres.length > 0
         ? filteredGenres.every((genre) =>
-            comic.comics.genres.some((comicGenre) => comicGenre.name === genre)
-          )
+          comic.comics.genres.some((comicGenre) => comicGenre.name === genre)
+        )
         : true;
 
     const authorMatch =
       filteredAuthors.length > 0
         ? filteredAuthors.every((author) =>
-            comic.comics.author.includes(author)
-          )
+          comic.comics.author.includes(author)
+        )
         : true;
 
     const conditionMatch =
@@ -283,45 +287,70 @@ const Genres: React.FC<GenresProps> = ({
                   }}
                 />
                 <div
-                  className={`all-genres-cards ${
-                    sortedAuctionComics.length < 4
-                      ? "align-left"
-                      : "grid-layout"
-                  }`}
+                  className={`mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4`}
                 >
                   {sortedAuctionComics.length > 0 ? (
                     sortedAuctionComics.map((comic) => (
-                      <div className="auction-card" key={comic.id}>
+                      <div className={`bg-white  rounded-lg w-[14em] overflow-hidden border drop-shadow-md`} key={comic.id}>
                         <img
                           src={comic.comics.coverImage}
                           alt={comic.comics.title}
-                          className=" object-cover mx-auto"
+                          className="object-cover w-full h-80"
                         />
-                        <p className="title">{comic.comics.title}</p>
-                        <Chip
-                          label={comic.comics.condition}
-                          icon={<ChangeCircleOutlinedIcon />}
-                          size="medium"
-                        />
-                        <p className="endtime">KẾT THÚC TRONG</p>
-                        <Countdown
-                          date={Date.now() + 100000000}
-                          renderer={renderer}
-                        />
-                        <Button
-                          className="detail-button"
-                          variant="contained"
-                          onClick={() => handleDetailClick(comic.id)}
-                        >
-                          Xem Chi Tiết
-                        </Button>
+                        <div className="px-3 py-2">
+                          <div
+                            className={`flex flex-row justify-between w-full gap-2 pb-2 min-h-[2em] mt-2`}
+                          >
+                            {comic.comics.condition === "SEALED" && (
+                              <span className="flex items-center gap-1 basis-1/2 px-2 rounded-2xl bg-sky-800 text-white text-[0.5em] font-light text-nowrap justify-center">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  width="10"
+                                  height="10"
+                                  fill="currentColor"
+                                >
+                                  <path d="M12 1L20.2169 2.82598C20.6745 2.92766 21 3.33347 21 3.80217V13.7889C21 15.795 19.9974 17.6684 18.3282 18.7812L12 23L5.6718 18.7812C4.00261 17.6684 3 15.795 3 13.7889V3.80217C3 3.33347 3.32553 2.92766 3.78307 2.82598L12 1ZM12 3.04879L5 4.60434V13.7889C5 15.1263 5.6684 16.3752 6.7812 17.1171L12 20.5963L17.2188 17.1171C18.3316 16.3752 19 15.1263 19 13.7889V4.60434L12 3.04879ZM16.4524 8.22183L17.8666 9.63604L11.5026 16L7.25999 11.7574L8.67421 10.3431L11.5019 13.1709L16.4524 8.22183Z"></path>
+                                </svg>
+                                NGUYÊN SEAL
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-semibold line-clamp-2 h-[3rem]">{comic.comics.title}</p>
+                          {/* <Chip
+                            label={comic.comics.condition}
+                            icon={<ChangeCircleOutlinedIcon />}
+                            size="medium"
+                          /> */}
+
+                          <p className="font-normal mt-3">KẾT THÚC TRONG</p>
+                          <Countdown
+                            date={new Date(comic.endTime)}
+                            renderer={renderer}
+                          />
+                          <div className="flex justify-center mt-3 mb-3">
+                            <Button
+                              variant="contained"
+                              onClick={() => handleDetailClick(comic.id)}
+                              sx={{
+                                fontFamily: 'REM',
+                                backgroundColor: 'black',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                '&:hover': { backgroundColor: '#333' }
+                              }}
+                            >
+                              Xem Chi Tiết
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     ))
                   ) : (
-                    <div className="flex justify-center items-center w-full h-full">
+                    <div className="grid place-items-center w-full h-full col-span-full">
                       <div className="text-center text-gray-500">
                         <img
-                          className="h-40 w-full object-contain"
+                          className="h-40 w-auto object-contain mx-auto"
                           src={EmptyIcon}
                           alt="No Announcements"
                         />
@@ -330,6 +359,7 @@ const Genres: React.FC<GenresProps> = ({
                         </p>
                       </div>
                     </div>
+
                   )}
                 </div>
               </div>
@@ -350,30 +380,44 @@ const Genres: React.FC<GenresProps> = ({
                   }}
                 />
                 <div
-                  className={`all-genres-cards ${
-                    comics.length > 4 ? "grid-layout" : "flex-layout"
-                  }`}
+                  className={`mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4`}
                 >
                   {sortedRegularComics.length > 0 ? (
                     sortedRegularComics.map((comic) => (
-                      <div className="hot-comic-card" key={comic.id}>
+                      <div className={`bg-white  rounded-lg w-[14em] overflow-hidden border drop-shadow-md`} key={comic.id}>
                         <Link to={`/detail/${comic.id}`}>
                           <img
                             src={comic.coverImage || "/default-cover.jpg"}
                             alt={comic.title}
-                            className="object-cover mx-auto"
+                            className="object-cover w-full h-80"
                           />
-                          <p className="price">{formatPrice(comic.price)}</p>
-                          <p className="author">{comic.author.toUpperCase()}</p>
-                          <p className="title">{comic.title}</p>
+                          <div className="px-3 py-2">
+                            <p className=" font-bold text-xl text-red-500">{formatPrice(comic.price)}</p>
+                            <p className="font-light text-sm">{comic.author.toUpperCase()}</p>
+                            <p className="font-semibold line-clamp-3 h-[4.5em]">{comic.title}</p>
+                            <div className="w-full flex justify-start gap-1 items-center font-light text-xs mt-2">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                width={12}
+                                height={12}
+                              >
+                                <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM13 12H17V14H11V7H13V12Z"></path>
+                              </svg>
+                              <p className="count-time">
+                                Đăng bán từ {countTimes[comic.id]}
+                              </p>
+                            </div>
+                          </div>
                         </Link>
                       </div>
                     ))
                   ) : (
-                    <div className="flex justify-center items-center w-full h-full">
+                    <div className="grid place-items-center w-full h-full col-span-full">
                       <div className="text-center text-gray-500">
                         <img
-                          className="h-40 w-full object-contain"
+                          className="h-40 w-auto object-contain mx-auto"
                           src={EmptyIcon}
                           alt="No Announcements"
                         />
@@ -408,10 +452,11 @@ const Genres: React.FC<GenresProps> = ({
                         (sellerObj) =>
                           sellerObj.seller &&
                           sellerObj.seller.name &&
+                          sellerObj.comics.length > 0 &&
                           (searchQuery
                             ? sellerObj.seller.name
-                                .toLowerCase()
-                                .includes(searchQuery.toLowerCase())
+                              .toLowerCase()
+                              .includes(searchQuery.toLowerCase())
                             : true)
                       )
                       .map((sellerObj) => (
@@ -439,11 +484,10 @@ const Genres: React.FC<GenresProps> = ({
                                       {sellerObj.seller.name}
                                     </span>
                                     <StoreOutlinedIcon
-                                      className={`transition-colors duration-200 ${
-                                        sellerObj.comics.length > 0
-                                          ? "text-black"
-                                          : "group-hover:text-red-500 text-black"
-                                      }`}
+                                      className={`transition-colors duration-200 ${sellerObj.comics.length > 0
+                                        ? "text-black"
+                                        : "group-hover:text-red-500 text-black"
+                                        }`}
                                       style={{ fontSize: "20px" }}
                                     />
                                   </div>
@@ -498,11 +542,10 @@ const Genres: React.FC<GenresProps> = ({
                                         {sellerObj.seller.name}
                                       </span>
                                       <StoreOutlinedIcon
-                                        className={`transition-colors duration-200 ${
-                                          sellerObj.comics.length > 0
-                                            ? "text-black"
-                                            : "group-hover:text-red-500 text-black"
-                                        }`}
+                                        className={`transition-colors duration-200 ${sellerObj.comics.length > 0
+                                          ? "text-black"
+                                          : "group-hover:text-red-500 text-black"
+                                          }`}
                                         style={{ fontSize: "20px" }}
                                       />
                                     </div>
@@ -583,7 +626,7 @@ const Genres: React.FC<GenresProps> = ({
                         src={EmptyIcon}
                         alt="No Announcements"
                       />
-                      <p>Không tìm thấy người bán nào</p>
+                      <p className="REM">Không tìm thấy người bán nào</p>
                     </div>
                   )}
                 </div>
@@ -638,11 +681,10 @@ const Genres: React.FC<GenresProps> = ({
                               )}
                               {comic?.edition !== "REGULAR" && (
                                 <span
-                                  className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${
-                                    comic?.edition === "SPECIAL"
-                                      ? "bg-yellow-600"
-                                      : "bg-red-800"
-                                  } text-white text-[0.5em] font-light text-nowrap justify-center`}
+                                  className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${comic?.edition === "SPECIAL"
+                                    ? "bg-yellow-600"
+                                    : "bg-red-800"
+                                    } text-white text-[0.5em] font-light text-nowrap justify-center`}
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"

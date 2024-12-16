@@ -415,7 +415,7 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                     </Stack>
                                 </Stack>
                             </Paper>
-                            {exchange.post.images && exchange.post.images.length > 0 && (
+                            {exchange.post?.images && exchange.post?.images?.length > 0 ? (
                                 <Paper elevation={0} sx={{ p: 2.5, bgcolor: 'rgba(113, 0, 43, 0.04)', borderRadius: '16px' }}>
                                     <Typography variant="h6" fontWeight={600} gutterBottom sx={{ fontFamily: 'REM' }}>
                                         Hình ảnh
@@ -432,6 +432,10 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                         ))}
                                     </Stack>
                                 </Paper>
+                            ) : (
+                            <Typography sx={{ fontStyle: 'italic', color: 'gray', textAlign: 'center' }}>
+                                No images available
+                            </Typography>
                             )}
                         </Stack>
                     )}

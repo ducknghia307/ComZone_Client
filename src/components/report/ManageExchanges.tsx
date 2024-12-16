@@ -379,12 +379,32 @@ const ManageExchanges: React.FC = () => {
                         <Typography onClick={() => openUserDetail(exchange.requestUser)}>{exchange.requestUser.name}</Typography>
                       </Box>
                     </StyledTableCell>
-                    <StyledTableCell align="left">
+                    {/* <StyledTableCell align="left">
                       <Box display="flex" alignItems="center" justifyContent='center'>
                         <Avatar onClick={() => openUserDetail(exchange.post.user)} alt={exchange.post.user.avatar} src={exchange.post.user.avatar} sx={{ width: 24, height: 24, marginRight: 1.5 }} />
                         <Typography onClick={() => openUserDetail(exchange.post.user)}>{exchange.post.user.name}</Typography>
                       </Box>
+                    </StyledTableCell> */}
+                    <StyledTableCell align="left">
+                      <Box display="flex" alignItems="center" justifyContent="center">
+                        {exchange.post && exchange.post.user ? (
+                          <>
+                            <Avatar
+                              onClick={() => openUserDetail(exchange.post.user)}
+                              alt={exchange.post.user.avatar || 'User Avatar'}
+                              src={exchange.post.user.avatar}
+                              sx={{ width: 24, height: 24, marginRight: 1.5 }}
+                            />
+                            <Typography onClick={() => openUserDetail(exchange.post.user)}>
+                              {exchange.post.user.name || 'Unknown User'}
+                            </Typography>
+                          </>
+                        ) : (
+                          <Typography>No User Info</Typography>
+                        )}
+                      </Box>
                     </StyledTableCell>
+
                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                       {formatCurrency(exchange.compensationAmount)}
                     </StyledTableCell>

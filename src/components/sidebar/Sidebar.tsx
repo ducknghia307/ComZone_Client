@@ -42,7 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const location = useLocation();
-  const shouldShowConditionSection = ["/genres", "/auctions"].includes(
+  const shouldShowConditionSection = ["/genres", "/auctions", "/search"].includes(
     location.pathname
   );
 

@@ -364,7 +364,15 @@ const ManageExchanges: React.FC = () => {
                 filteredExchanges.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((exchange) => (
                   <StyledTableRow key={exchange.id}>
                     {/* <StyledTableCell>{exchange.id}</StyledTableCell> */}
-                    <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>{exchange.post.postContent.length > 25 ? exchange.post.postContent.substring(0, 25) + '...' : exchange.post.postContent}</StyledTableCell>
+                    {/* <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>{exchange.post.postContent.length > 25 ? exchange.post.postContent.substring(0, 25) + '...' : exchange.post.postContent}</StyledTableCell> */}
+                    <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
+                      {exchange.post && exchange.post.postContent
+                        ? exchange.post.postContent.length > 25
+                          ? exchange.post.postContent.substring(0, 25) + '...'
+                          : exchange.post.postContent
+                        : 'No Content'}
+                    </StyledTableCell>
+
                     <StyledTableCell align="left">
                       <Box display="flex" alignItems="center" justifyContent='center'>
                         <Avatar onClick={() => openUserDetail(exchange.requestUser)} alt={exchange.requestUser.name} src={exchange.requestUser.avatar} sx={{ width: 24, height: 24, marginRight: 1.5 }} />

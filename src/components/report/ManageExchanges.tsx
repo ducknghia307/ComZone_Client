@@ -365,13 +365,14 @@ const ManageExchanges: React.FC = () => {
                   <StyledTableRow key={exchange.id}>
                     {/* <StyledTableCell>{exchange.id}</StyledTableCell> */}
                     {/* <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>{exchange.post.postContent.length > 25 ? exchange.post.postContent.substring(0, 25) + '...' : exchange.post.postContent}</StyledTableCell> */}
-                    <StyledTableCell align="left" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
-                      {exchange.post && exchange.post.postContent
+                    <StyledTableCell align="left">
+                      {exchange.post?.postContent
                         ? exchange.post.postContent.length > 25
                           ? exchange.post.postContent.substring(0, 25) + '...'
                           : exchange.post.postContent
                         : 'No Content'}
                     </StyledTableCell>
+
 
                     <StyledTableCell align="left">
                       <Box display="flex" alignItems="center" justifyContent='center'>
@@ -387,7 +388,7 @@ const ManageExchanges: React.FC = () => {
                     </StyledTableCell> */}
                     <StyledTableCell align="left">
                       <Box display="flex" alignItems="center" justifyContent="center">
-                        {exchange.post && exchange.post.user ? (
+                        {exchange.post?.user ? (
                           <>
                             <Avatar
                               onClick={() => openUserDetail(exchange.post.user)}
@@ -404,6 +405,7 @@ const ManageExchanges: React.FC = () => {
                         )}
                       </Box>
                     </StyledTableCell>
+
 
                     <StyledTableCell align="right" sx={{ whiteSpace: 'nowrap', fontFamily: 'REM' }}>
                       {formatCurrency(exchange.compensationAmount)}

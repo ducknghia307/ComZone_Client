@@ -45,7 +45,7 @@ const RejectReasonModal: React.FC<RejectReasonModalProps> = ({
     setLoading(true);
     try {
       const apiUrl = refundRequest.exchange
-        ? `/refund-requests/reject/exchange/${refundRequest.exchange.id}`
+        ? `/refund-requests/reject/exchange/${refundRequest.id}`
         : refundRequest.order
         ? `/refund-requests/reject/order/${refundRequest.order.id}`
         : "";

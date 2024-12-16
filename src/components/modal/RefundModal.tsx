@@ -62,7 +62,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
       const apiUrl = refundRequest.order
         ? `/refund-requests/approve/order/${refundRequest.order.id}`
         : refundRequest.exchange
-        ? `/refund-requests/approve/exchange/${refundRequest.exchange.id}`
+        ? `/refund-requests/approve/exchange/${refundRequest.id}`
         : "";
 
       await privateAxios.patch(apiUrl);

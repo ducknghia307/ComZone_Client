@@ -385,7 +385,8 @@ const ModalExchangeDetail: React.FC<ModalExchangeDetailProps> = ({ isOpen, excha
                                             Nội dung yêu cầu
                                         </Typography>
                                         <Typography color="text.secondary" sx={{ fontFamily: 'REM' }}>
-                                            {exchange.post.postContent}
+                                            {/* {exchange.post.postContent} */}
+                                            {exchange.post?.postContent ? exchange.post.postContent : 'No post content available'}
                                         </Typography>
                                     </Box>
                                     <Stack direction="row" spacing={2}>

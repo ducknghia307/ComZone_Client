@@ -8,7 +8,7 @@ import OTPVerification from "../components/wallet/OTPVerification";
 export default function ProfileUser({
   setIsLoading,
 }: {
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [user, setUser] = useState<UserInfo>();
   const [currentUserData, setCurrentUserData] = useState<UserInfo>();

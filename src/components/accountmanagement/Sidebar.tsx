@@ -53,97 +53,46 @@ const Sidebar = () => {
   return (
     <div
       style={{ display: "flex", alignItems: "center", flexDirection: "column" }}
+      className="REM"
     >
-      <div className="profile-section1" style={{ paddingTop: "30px" }}>
-        <img src={userInfo?.avatar} alt="avatar" className="avatar-image" />
-        <div>
-          <p className="username">{userInfo?.name}</p>
-          <a href="/accountManagement/profile" className="edit-profile">
-            <CreateOutlinedIcon />
-            Sửa Hồ Sơ
-          </a>
-        </div>
+      <div className="flex flex-col items-center justify-center gap-2 py-4">
+        <img
+          src={userInfo?.avatar}
+          alt="avatar"
+          className="w-[8em] aspect-square rounded-full"
+        />
+        <p className="font-semibold text-lg">{userInfo?.name}</p>
       </div>
-      <div className="menu-section">
+      <div className="menu-section border-t border-gray-300 pt-4">
         <ul>
           <li
             className={`menu-item ${
-              currentUrl === "/accountmanagement/purchase" ? "active" : ""
-            }`}
-            onClick={() => {
-              handleMenuItemClick("purchase");
-              navigate("/accountmanagement/purchase");
-            }}
-          >
-            <ShoppingBagOutlinedIcon /> Lịch Sử Mua Hàng
-          </li>
-          <li
-            className={`menu-item ${
               currentUrl === "/accountmanagement/profile" ? "active" : ""
-            }`}
+            } flex items-center`}
             onClick={() => {
               handleMenuItemClick("profile");
               navigate("/accountmanagement/profile");
             }}
           >
-            <PersonOutlinedIcon /> Hồ Sơ Của Tôi
+            <PersonOutlinedIcon /> Tài Khoản
           </li>
-          {/* <li
+
+          <li
             className={`menu-item ${
-              currentUrl.includes("/accountmanagement/announcement")
-                ? "active"
-                : ""
-            } `}
-            onClick={() => handleMenuItemClick("announcement")}
+              currentUrl === "/accountmanagement/purchase" ? "active" : ""
+            } flex items-center`}
+            onClick={() => {
+              handleMenuItemClick("purchase");
+              navigate("/accountmanagement/purchase");
+            }}
           >
-            <div>
-              <NotificationsNoneIcon /> Thông báo
-            </div>
+            <ShoppingBagOutlinedIcon /> Đơn Hàng
           </li>
-          {isNotificationExpanded && (
-            <ul className="menu-item sub-menu">
-              <li
-                className={`sub-menu-item ${
-                  currentUrl === "/accountmanagement/announcement/orders"
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() =>
-                  navigate("/accountmanagement/announcement/orders")
-                }
-              >
-                Đơn Hàng
-              </li>
-              <li
-                className={`sub-menu-item ${
-                  currentUrl === "/accountmanagement/announcement/auctions"
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() =>
-                  navigate("/accountmanagement/announcement/auctions")
-                }
-              >
-                Đấu Giá
-              </li>
-              <li
-                className={`sub-menu-item ${
-                  currentUrl === "/accountmanagement/announcement/exchanges"
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() =>
-                  navigate("/accountmanagement/announcement/exchanges")
-                }
-              >
-                Trao Đổi
-              </li>
-            </ul>
-          )} */}
+
           <li
             className={`menu-item ${
               currentUrl === "/accountmanagement/auction" ? "active" : ""
-            }`}
+            } flex items-center`}
             onClick={() => {
               handleMenuItemClick("auction");
               navigate("/accountmanagement/auction");
@@ -151,28 +100,18 @@ const Sidebar = () => {
           >
             <TvOutlinedIcon /> Lịch Sử Đấu Giá
           </li>
+
           <li
             className={`menu-item ${
               currentUrl === "/accountmanagement/wallet" ? "active" : ""
-            }`}
+            } flex items-center`}
             onClick={() => {
               handleMenuItemClick("wallet");
               navigate("/accountmanagement/wallet");
             }}
           >
-            <AccountBalanceWalletOutlinedIcon /> Ví Của Tôi
+            <AccountBalanceWalletOutlinedIcon /> Số Dư & Giao Dịch
           </li>
-          {/* <li
-            className={`menu-item ${
-              currentUrl === "/accountmanagement/exchange" ? "active" : ""
-            }`}
-            onClick={() => {
-              handleMenuItemClick("exchange");
-              navigate("/accountmanagement/exchange");
-            }}
-          >
-            <MultipleStopOutlinedIcon /> Lịch Sử Trao Đổi
-          </li> */}
         </ul>
       </div>
     </div>

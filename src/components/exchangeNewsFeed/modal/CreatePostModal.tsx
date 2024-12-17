@@ -37,6 +37,7 @@ export default function CreatePostModal({
       });
     }
   };
+
   const handleRemovePreviewChapterImage = (index: number) => {
     setPreviewImages(previewImages.filter((value, i) => i !== index));
     setUploadedImagesFile(uploadedImagesFile.filter((value, i) => i !== index));

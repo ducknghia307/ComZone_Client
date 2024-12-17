@@ -36,32 +36,30 @@ const OrderManagement = () => {
     searchParams.get("search") || ""
   );
 
+  const fetchOrders = async () => {
+    setIsLoading(true);
+
+    try {
+      const response = await privateAxios.get("/orders/seller");
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data.orders;
+      console.log("orders seller", data);
+
+      setOrders(data);
+
+      if (searchParams.get("search") && searchParams.get("search").length > 0) {
+        searchOrders(searchParams.get("search"));
+        setSearchInput(searchParams.get("search"));
+      } else setFilteredOrders(data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      setIsLoading(true);
-
-      try {
-        const response = await privateAxios.get("/orders/seller");
-        const data = Array.isArray(response.data)
-          ? response.data
-          : response.data.orders;
-        console.log("orders seller", data);
-
-        setOrders(data);
-
-        if (
-          searchParams.get("search") &&
-          searchParams.get("search").length > 0
-        ) {
-          searchOrders(searchParams.get("search"));
-          setSearchInput(searchParams.get("search"));
-        } else setFilteredOrders(data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchOrders();
   }, []);
 
@@ -84,18 +82,6 @@ const OrderManagement = () => {
     setSearchInput(searchParams.get("search"));
     searchOrders(searchParams.get("search"));
   }, [searchParams.get("search")]);
-
-  const reload = async () => {
-    try {
-      const response = await privateAxios.get("/orders/seller");
-      const data = Array.isArray(response.data)
-        ? response.data
-        : response.data.orders;
-      setOrders(data);
-    } catch (error) {
-      console.error("Error reloading orders:", error);
-    }
-  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -125,7 +111,7 @@ const OrderManagement = () => {
       selectedOrder.status === "PACKAGING" &&
       selectedOrder.delivery?.status === "ready_to_pick"
     ) {
-      reload();
+      fetchOrders();
     }
 
     setSelectedOrderId(null);
@@ -452,7 +438,7 @@ const OrderManagement = () => {
           orderId={selectedOrderId}
           onStatusUpdate={handleStatusUpdate}
           order={orders.find((order) => order.id === selectedOrderId)}
-          reload={reload}
+          reload={fetchOrders}
         />
       )}
     </div>

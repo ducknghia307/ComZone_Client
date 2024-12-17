@@ -1,8 +1,10 @@
 import { Avatar } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { SellerDetails } from "../../common/base.interface";
 import moment from "moment/min/moment-with-locales";
 import { SellerShopTabs } from "../../pages/SellerShopPage";
+import ChatModal from "../../pages/ChatModal";
+import { privateAxios } from "../../middleware/axiosInstance";
 
 moment.locale("vi");
 
@@ -15,6 +17,7 @@ export default function SellerShopHeader({
   searchInput,
   handleSearchSellerComics,
   searchSellerAvailableComics,
+  setIsLoading,
 }: {
   currentSeller: SellerDetails;
   totalFeedback: number;
@@ -24,7 +27,24 @@ export default function SellerShopHeader({
   searchInput: string;
   handleSearchSellerComics: (e: React.ChangeEvent<HTMLInputElement>) => void;
   searchSellerAvailableComics: () => void;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+
+  const handleChatWithSeller = async () => {
+    setIsLoading(true);
+    await privateAxios
+      .post("chat-rooms/seller", {
+        sellerId: currentSeller.user.id,
+      })
+      .then((res) => {
+        console.log(res.data);
+        setIsChatOpen(true);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  };
+
   return (
     <div className="flex flex-col gap-4 bg-white ring-2 ring-black p-4 rounded-md">
       <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -87,17 +107,20 @@ export default function SellerShopHeader({
           </div>
         </div>
 
-        <button className="flex items-center gap-2 text-lg border border-gray-400 px-4 py-1 rounded-md duration-200 hover:bg-gray-100">
+        <button
+          onClick={handleChatWithSeller}
+          className="flex items-center gap-1 text-lg border border-gray-400 px-8 sm:px-2 py-1 rounded-md duration-200 hover:bg-gray-100"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            width="24"
-            height="24"
+            width="16"
+            height="16"
             fill="currentColor"
           >
-            <path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"></path>
+            <path d="M7.29117 20.8242L2 22L3.17581 16.7088C2.42544 15.3056 2 13.7025 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C10.2975 22 8.6944 21.5746 7.29117 20.8242ZM7.58075 18.711L8.23428 19.0605C9.38248 19.6745 10.6655 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 13.3345 4.32549 14.6175 4.93949 15.7657L5.28896 16.4192L4.63416 19.3658L7.58075 18.711Z"></path>
           </svg>
-          Theo dõi
+          Chat với người bán
         </button>
       </div>
 
@@ -109,7 +132,7 @@ export default function SellerShopHeader({
               currentTab === SellerShopTabs.ALL
                 ? "font-semibold bg-black text-white"
                 : "border border-gray-200 duration-200 hover:bg-gray-100"
-            } rounded-md`}
+            } rounded-md text-sm sm:text-base`}
           >
             Tổng Quan
           </button>
@@ -120,7 +143,7 @@ export default function SellerShopHeader({
               currentTab === SellerShopTabs.COMICS
                 ? "font-semibold bg-black text-white"
                 : "border border-gray-200 duration-200 hover:bg-gray-100"
-            } rounded-md`}
+            } rounded-md text-sm sm:text-base`}
           >
             Truyện Đang Bán
           </button>
@@ -131,7 +154,7 @@ export default function SellerShopHeader({
               currentTab === SellerShopTabs.AUCTIONS
                 ? "font-semibold bg-black text-white"
                 : "border border-gray-200 duration-200 hover:bg-gray-100"
-            } rounded-md`}
+            } rounded-md text-sm sm:text-base`}
           >
             Các Cuộc Đấu Giá
           </button>
@@ -142,7 +165,7 @@ export default function SellerShopHeader({
               currentTab === SellerShopTabs.FEEDBACK
                 ? "font-semibold bg-black text-white"
                 : "border border-gray-200 duration-200 hover:bg-gray-100"
-            } rounded-md`}
+            } rounded-md text-sm sm:text-base`}
           >
             Đánh Giá
           </button>
@@ -174,6 +197,8 @@ export default function SellerShopHeader({
           </svg>
         </div>
       </div>
+
+      <ChatModal isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} />
     </div>
   );
 }

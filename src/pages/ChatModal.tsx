@@ -69,7 +69,6 @@ export default function ChatModal({
     });
 
     socket.on("new-unread-list", (list: ChatRoom[]) => {
-      console.log("UNREAD FROM CHAT MODAL: ", list);
       if (getMessageUnreadList) getMessageUnreadList();
     });
   }, [currentRoomId]);
@@ -81,8 +80,6 @@ export default function ChatModal({
         .then((res) => {
           const list: ChatRoom[] = res.data;
           setChatRoomList(list);
-
-          if (socket) socket.emit("join-room", { userId });
 
           if (currentRoomId.length > 0) return;
           if (list.length > 0) {
@@ -223,6 +220,8 @@ export default function ChatModal({
   useEffect(() => {
     currentRoomIdRef.current = currentRoomId;
     fetchMessageList();
+
+    setMessageInput("");
   }, [currentRoomId]);
 
   const updateIsRead = async () => {

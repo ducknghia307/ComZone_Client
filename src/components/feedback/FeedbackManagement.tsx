@@ -108,8 +108,12 @@ const FeedbackManagement = () => {
       </div>
 
       {!loading && feedbacks && feedbacks.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 py-16">
-          <img src={EmptyImage} alt="" className="w-32 bg-white" />
+        <div className="flex flex-col items-center justify-center gap-4 py-16 opacity-40">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/4658/4658825.png"
+            alt=""
+            className="w-32 bg-white"
+          />
           <p>Chưa nhận đánh giá nào!</p>
         </div>
       ) : (

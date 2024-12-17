@@ -1,7 +1,7 @@
-import React from "react";
 import { Comic } from "../../common/base.interface";
 import { Link } from "react-router-dom";
 import CurrencySplitter from "../../assistants/Spliter";
+import displayPastTimeFromNow from "../../utils/displayPastTimeFromNow";
 
 export default function ShopComicsList({
   comicsList,
@@ -29,20 +29,20 @@ export default function ShopComicsList({
         </p>
       )}
 
-      <div className="grid grid-cols-[repeat(auto-fill,14em)] justify-center gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-[repeat(auto-fill,14em)] justify-center gap-1 sm:gap-4">
         {fullComicsList.length > 0 ? (
           comicsList.map((comic) => (
             <div
-              className="bg-white rounded-lg w-[14em] overflow-hidden border drop-shadow-md"
+              className="bg-white rounded-lg w-full sm:w-[14em] overflow-hidden border drop-shadow-md"
               key={comic.id}
             >
               <Link to={`/detail/${comic.id}`}>
                 <img
                   src={comic.coverImage || "/default-cover.jpg"}
                   alt={comic.title}
-                  className="object-cover w-full h-80"
+                  className="object-cover w-full aspect-[2/3]"
                 />
-                <div className="px-3 py-2">
+                <div className="px-1 phone:px-3 py-2">
                   <div
                     className={`hidden sm:flex items-center justify-between w-full gap-2 min-h-[2em]`}
                   >
@@ -83,13 +83,35 @@ export default function ShopComicsList({
                       </span>
                     )}
                   </div>
-                  <p className="font-bold text-lg text-red-500">
-                    {CurrencySplitter(comic.price)} đ
+                  <p className="font-bold text-sm sm:text-lg text-red-500">
+                    {CurrencySplitter(comic.price)}đ
                   </p>
-                  <p className="font-light">{comic.author.toUpperCase()}</p>
-                  <p className="font-semibold text-xl line-clamp-3 h-[4.4em]">
+                  <p className="font-light text-[0.5rem] sm:text-base uppercase">
+                    {comic.author}
+                  </p>
+                  <p className="font-semibold text-sm sm:text-xl line-clamp-3 h-[4.4em]">
                     {comic.title}
                   </p>
+
+                  <div className="w-full flex justify-start gap-1 items-center font-light text-xs mt-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      width={12}
+                      height={12}
+                    >
+                      <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM13 12H17V14H11V7H13V12Z"></path>
+                    </svg>
+                    <p className="count-time">
+                      Đăng bán từ{" "}
+                      {displayPastTimeFromNow(
+                        comic.onSaleSince || new Date(),
+                        null,
+                        true
+                      )}
+                    </p>
+                  </div>
                 </div>
               </Link>
             </div>

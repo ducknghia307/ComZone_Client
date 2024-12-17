@@ -706,11 +706,7 @@ const ComicAuction = () => {
             )}
 
             {error && <div className="REM error-message">{error}</div>}
-            <div
-              className="flex justify-between mt-4 mb-2"
-              onClick={() => navigate(`/seller/shop/all/${auctionData.comics.sellerId.id}`)}
-              style={{ cursor: "pointer" }} // Add a pointer cursor for better UX
-            >
+            <div className="flex justify-between mt-4 mb-2">
               <Chip
                 avatar={
                   <Avatar
@@ -718,6 +714,9 @@ const ComicAuction = () => {
                     alt="Vendor Avatar"
                     style={{ width: "30px", height: "30px" }}
                   />
+                }
+                onClick={() =>
+                  navigate(`/seller/shop/all/${auctionData.comics.sellerId.id}`)
                 }
                 label={
                   <div
@@ -739,6 +738,7 @@ const ComicAuction = () => {
                   </div>
                 }
                 style={{
+                  cursor: "pointer",
                   fontFamily: "REM",
                   fontWeight: "500",
                   fontSize: "20px",

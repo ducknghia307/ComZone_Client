@@ -9,7 +9,7 @@ import {
   IconButton,
   Chip,
 } from "@mui/material";
-import { notification } from "antd";
+import { Image, notification } from "antd";
 import CloseIcon from "@mui/icons-material/Close";
 import { privateAxios } from "../../middleware/axiosInstance";
 import RejectReasonModal from "./RejectReasonModal";
@@ -173,7 +173,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
               overflowY: "scroll",
               borderRadius: "inherit",
               "&::-webkit-scrollbar": {
-                display: "none", 
+                display: "none",
               },
               scrollbarWidth: "none",
               msOverflowStyle: "none",
@@ -290,13 +290,12 @@ const RefundModal: React.FC<RefundModalProps> = ({
                           },
                         }}
                       >
-                        <img
+                        <Image
                           src={image}
                           alt={`Refund Image ${index + 1}`}
+                          width={150}
+                          height={150}
                           style={{
-                            width: "150px",
-                            height: "150px",
-                            objectFit: "cover",
                             borderRadius: "8px",
                             border: "2px solid #c66a7a",
                             cursor: "pointer",
@@ -349,13 +348,12 @@ const RefundModal: React.FC<RefundModalProps> = ({
                           },
                         }}
                       >
-                        <img
+                        <Image
                           src={image}
                           alt={`Package Image ${index + 1}`}
+                          width={150}
+                          height={150}
                           style={{
-                            width: "150px",
-                            height: "150px",
-                            objectFit: "cover",
                             borderRadius: "8px",
                             border: "2px solid #71002b",
                             cursor: "pointer",

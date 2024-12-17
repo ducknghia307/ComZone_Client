@@ -196,7 +196,7 @@ export default function ShopOverview({
 
                 <div className="px-1 py-2">
                   <div
-                    className={`hidden sm:flex items-center justify-between w-full gap-2`}
+                    className={`hidden sm:flex items-center justify-between w-full gap-2 mb-1`}
                   >
                     {auction.comics.condition === "SEALED" && (
                       <span className="flex items-center gap-1 basis-1/2 px-2 py-1 rounded-2xl bg-sky-800 text-white text-[0.5em] font-light text-nowrap justify-center">

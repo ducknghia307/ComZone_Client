@@ -89,7 +89,7 @@ const Navbar = () => {
     return () => {
       window.removeEventListener("cartUpdated", updateCartLength);
     };
-  }, [userInfo]);
+  }, [userInfo, dispatch]);
 
   useEffect(() => {
     const handleNewNotification = (newNotification) => {
@@ -231,26 +231,29 @@ const Navbar = () => {
     if (accessToken) {
       try {
         const response = await privateAxios.get("users/profile");
-        console.log(response);
         setUserInfo(response.data);
       } catch (error) {
-        console.error("Error fetching user info:", error);
-        setLoading(false);
+        console.error("Failed to fetch user info:", error);
       }
-    } else {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchUserInfo();
+  }, [accessToken]);
+
+  useEffect(() => {
     getMessageUnreadList();
   }, [accessToken]);
 
   const handleLogout = async () => {
-    await dispatch(LogoutUser());
-    window.location.href = "/";
-    // window.location.reload();
+    const status = await dispatch(LogoutUser());
+    if (status) {
+      window.location.href = "/";
+    } else {
+      console.error("Logout failed. Navigation aborted.");
+      // Optionally, display an error message to the user
+    }
   };
 
   const handleSearch = () => {
@@ -524,9 +527,7 @@ const Navbar = () => {
                         </Tooltip>
                         {/* announcement */}
                         <Tooltip
-                          title={
-                            <p className="REM text-black">Thông Báo</p>
-                          }
+                          title={<p className="REM text-black">Thông Báo</p>}
                           color="white"
                         >
                           <div className="relative-container">

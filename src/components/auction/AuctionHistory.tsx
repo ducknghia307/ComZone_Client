@@ -306,7 +306,16 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
               borderBottom: "1px solid #EAEAEA",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
+              onClick={() =>
+                navigate(`/seller/shop/all/${auction.comics.sellerId.id}`)
+              }
+            >
               <Chip
                 avatar={
                   <Avatar

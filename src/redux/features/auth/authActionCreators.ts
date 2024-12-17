@@ -54,23 +54,21 @@ export function LoginUser(formValues: FormValues) {
 }
 
 export function LogoutUser() {
-  return async (dispatch: AppDispatch) => {
-    // Update loading state
-
+  return async (dispatch: AppDispatch): Promise<boolean> => {
     try {
       // Make API call
       await privateAxios.post("/auth/logout");
 
       // Reset state after logout
-      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
       dispatch(revertAll());
-      // Update loading state after successful logout
+      dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
+
+      return true; // Indicate success
     } catch (error: any) {
       dispatch(authSlice.actions.updateIsLoading({ isLoading: false }));
-      const err = error as ErrorResponse;
-      console.log(err);
 
-      // Update error state
+      console.error(error); // Log the error for debugging
+      return false; // Indicate failure
     }
   };
 }

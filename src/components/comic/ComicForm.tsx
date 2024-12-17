@@ -610,7 +610,7 @@ const ComicForm: React.FC<ComicFormProps> = ({
             <TextField
               fullWidth
               spellCheck="false"
-              error={formData.description.length > 1000}
+              error={formData.description.length > 2000}
               placeholder="Mô tả đặc điểm thêm, tình trạng, nội dung hay trải nghiệm của bạn về truyện..."
               multiline
               rows={5}
@@ -623,10 +623,10 @@ const ComicForm: React.FC<ComicFormProps> = ({
               helperText={
                 <p
                   className={`${
-                    formData.description.length <= 1000 && "hidden"
+                    formData.description.length <= 2000 && "hidden"
                   } REM text-xs`}
                 >
-                  Mô tả không dài quá 1000 ký tự!
+                  Mô tả không dài quá 2000 ký tự!
                 </p>
               }
             />

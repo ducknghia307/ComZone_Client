@@ -45,7 +45,7 @@ export default function IncomeManagementSection({
         <div className="flex flex-col items-center justify-center gap-1 py-[10vh] opacity-50">
           <p className="font-light uppercase">Chưa có đơn hàng thành công</p>
           <p className="text-xs italic">
-            Thống kê lợi nhuận từ đơn hàng của bạn sẽ được hiển thị ở đây
+            Thống kê doanh thu từ đơn hàng của bạn sẽ được hiển thị ở đây
           </p>
         </div>
       )}

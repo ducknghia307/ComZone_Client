@@ -13,13 +13,7 @@ import { authSlice } from "../../redux/features/auth/authSlice";
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { UserInfo } from "../../common/base.interface";
-import {
-  BookOutlined,
-  ControlOutlined,
-  LogoutOutlined,
-  ShopOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { LogoutOutlined, ShopOutlined, UserOutlined } from "@ant-design/icons";
 import RegisterSellerModal from "../RegisterSeller/RegisterSellerModal";
 import ChatModal from "../../pages/ChatModal";
 import NotificationDropdown from "../notification/Notification";
@@ -30,6 +24,7 @@ import {
   setUnreadAnnounce,
 } from "../../redux/features/notification/announcementSlice";
 import CurrencySplitter from "../../assistants/Spliter";
+import { SwapHorizontalCircle } from "@mui/icons-material";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -277,43 +272,7 @@ const Navbar = () => {
 
   const items: MenuProps["items"] = [
     {
-      key: "1",
-      label: (
-        <Link to={"/accountmanagement/profile"} className="REM text-base ">
-          Hồ sơ của tôi
-        </Link>
-      ),
-      icon: <UserOutlined style={{ fontSize: 18 }} />,
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "2",
-      label: (
-        <Link to={"/profile/recentActivities"} className="REM text-base ">
-          Trang cá nhân
-        </Link>
-      ),
-      icon: <BookOutlined style={{ fontSize: 18 }} />,
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "3",
-      label: (
-        <Link to={"/accountmanagement/profile"} className="REM text-base ">
-          Quản lí tài khoản
-        </Link>
-      ),
-      icon: <ControlOutlined style={{ fontSize: 18 }} />,
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "4",
+      key: "0",
       label: (
         <>
           {userInfo?.role === "MEMBER" && (
@@ -326,17 +285,46 @@ const Navbar = () => {
           )}
           {userInfo?.role === "SELLER" && (
             <Link to={"/sellermanagement/shop-info"} className="REM text-base">
-              Quản lí Shop
+              Quản lý Shop
             </Link>
           )}
           {userInfo?.role === "MODERATOR" && (
             <Link to={"/mod/users"} className="REM text-base">
-              Quản lí hệ thống
+              Quản lý hệ thống
+            </Link>
+          )}
+          {userInfo?.role === "ADMIN" && (
+            <Link to={"/admin/dashboard"} className="REM text-base">
+              Quản lý hệ thống
             </Link>
           )}
         </>
       ),
       icon: <ShopOutlined style={{ fontSize: 18 }} />,
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "1",
+      label: (
+        <Link to={"/accountmanagement/profile"} className="REM text-base ">
+          Quản lý tài khoản
+        </Link>
+      ),
+      icon: <UserOutlined style={{ fontSize: 18 }} />,
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "1",
+      label: (
+        <Link to={"/exchange/list/all"} className="REM text-base">
+          Quản lý trao đổi
+        </Link>
+      ),
+      icon: <SwapHorizontalCircle style={{ fontSize: 20 }} />,
     },
     {
       type: "divider",
@@ -350,7 +338,6 @@ const Navbar = () => {
   ];
 
   const getMessageUnreadList = async () => {
-    console.log("NEW MESSAGE TRIGGERED: ", userInfo?.name);
     await privateAxios
       .get("chat-messages/unread")
       .then((res) => {
@@ -604,13 +591,13 @@ const Navbar = () => {
                         placement="topRight"
                         trigger={["click"]}
                       >
-                        <div className="flex flex-row gap-1 items-center cursor-pointer duration-200 hover:opacity-50  lg:min-w-[10rem] w-full justify-end md:ml-2 ml-4">
+                        <div className="flex gap-2 items-center cursor-pointer duration-200 hover:opacity-50  lg:min-w-[10rem] w-full justify-end md:ml-2 ml-4">
                           <img
                             src={userInfo.avatar || ""}
                             alt={userInfo.name}
                             className="h-10 w-10 rounded-full"
                           />
-                          <p className="text-nowrap line-clamp-2 text-lg lg:flex hidden">
+                          <p className="text-nowrap line-clamp-1 text-lg lg:flex hidden">
                             {userInfo.name}
                           </p>
                         </div>

@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  Auction,
   BaseInterface,
   Comic,
   OrderDetailData,
@@ -17,6 +18,7 @@ import ShopComicsList from "../components/sellerShopPage/ShopComicsList";
 import ShopOverview from "../components/sellerShopPage/ShopOverview";
 import Loading from "../components/loading/Loading";
 import ShopSellerFeedback from "../components/sellerShopPage/ShopSellerFeedback";
+import ShopAuctionsList from "../components/sellerShopPage/ShopAuctionsList";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export enum SellerShopTabs {
@@ -47,6 +49,8 @@ export default function SellerShopPage() {
   const [feedbackList, setFeedbackList] = useState<SellerFeedback[]>([]);
   const [averageRating, setAverageRating] = useState<number>();
   const [totalFeedback, setTotalFeedback] = useState<number>(0);
+
+  const [auctionList, setAuctionList] = useState<Auction[]>([]);
 
   const [searchInput, setSearchInput] = useState<string>("");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -103,7 +107,20 @@ export default function SellerShopPage() {
         console.log(res.data);
         setRecentOrderItems(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  };
+
+  const fetchSellerAuctions = async () => {
+    setIsLoading(true);
+    await publicAxios
+      .get(`auction/active/seller/${id}`)
+      .then((res) => {
+        console.log("AUCTIONS: ", res.data);
+        setAuctionList(res.data);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
   };
 
   const searchSellerAvailableComics = async () => {
@@ -148,7 +165,6 @@ export default function SellerShopPage() {
 
   useEffect(() => {
     const rewriteUrl = (path: string) => {
-      console.log("first:", firstLoad);
       if (firstLoad) setFirstLoad(false);
       else window.history.pushState(null, "", `/seller/shop/${path}/${id}`);
     };
@@ -157,6 +173,7 @@ export default function SellerShopPage() {
       case SellerShopTabs.ALL:
         fetchSellerRecentOrders();
         fetchSellerComics();
+        fetchSellerAuctions();
         fetchSellerFeedback();
         rewriteUrl("all");
         break;
@@ -165,6 +182,7 @@ export default function SellerShopPage() {
         rewriteUrl("comics");
         break;
       case SellerShopTabs.AUCTIONS:
+        fetchSellerAuctions();
         rewriteUrl("auctions");
         break;
       case SellerShopTabs.FEEDBACK:
@@ -172,21 +190,11 @@ export default function SellerShopPage() {
         rewriteUrl("feedback");
         break;
     }
+
+    document
+      .getElementById("navbar-container")
+      ?.scrollIntoView({ behavior: "instant" });
   }, [currentTab]);
-
-  const shuffleArray = (array: any[]) => {
-    let currentIndex = array.length;
-    while (currentIndex != 0) {
-      const randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex],
-        array[currentIndex],
-      ];
-    }
-    return array;
-  };
 
   if (!currentSeller) return <Loading />;
 
@@ -203,6 +211,7 @@ export default function SellerShopPage() {
         searchInput={searchInput}
         handleSearchSellerComics={handleSearchSellerComics}
         searchSellerAvailableComics={searchSellerAvailableComics}
+        setIsLoading={setIsLoading}
       />
 
       {currentTab === SellerShopTabs.ALL && (
@@ -210,7 +219,8 @@ export default function SellerShopPage() {
           seller={currentSeller.user}
           setCurrentTab={setCurrentTab}
           recentOrderItems={recentOrderItems}
-          comicsList={shuffleArray(fullComicsList).slice(0, 10)}
+          comicsList={fullComicsList}
+          auctionsList={auctionList}
           feedbackList={feedbackList}
         />
       )}
@@ -221,6 +231,10 @@ export default function SellerShopPage() {
           fullComicsList={fullComicsList}
           searchParams={searchParams}
         />
+      )}
+
+      {currentTab === SellerShopTabs.AUCTIONS && (
+        <ShopAuctionsList auctionsList={auctionList} />
       )}
 
       {currentTab === SellerShopTabs.FEEDBACK && (

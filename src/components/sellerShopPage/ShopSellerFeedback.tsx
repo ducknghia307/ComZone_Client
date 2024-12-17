@@ -1,6 +1,6 @@
 import { SellerFeedback } from "../../common/interfaces/seller-feedback.interface";
 import { UserInfo } from "../../common/base.interface";
-import { Avatar, Image } from "antd";
+import { Avatar } from "antd";
 import { Rating } from "@mui/material";
 import displayPastTimeFromNow from "../../utils/displayPastTimeFromNow";
 

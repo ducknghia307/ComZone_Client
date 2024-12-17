@@ -69,7 +69,11 @@ const OrderManagement = () => {
     if (!key && searchInput.length === 0) return;
 
     await privateAxios
-      .get(`orders/search/seller?search=${key || searchInput}`)
+      .get(
+        `orders/search/seller?search=${
+          key ? key.replace("#", "") : searchInput.replace("#", "")
+        }`
+      )
       .then((res) => {
         setFilteredOrders(res.data);
       })
@@ -260,12 +264,12 @@ const OrderManagement = () => {
       prevOrders.map((order) =>
         order.id === orderId
           ? {
-            ...order,
-            status: newStatus,
-            delivery: delivery
-              ? { ...order.delivery, status: delivery.status }
-              : order.delivery,
-          }
+              ...order,
+              status: newStatus,
+              delivery: delivery
+                ? { ...order.delivery, status: delivery.status }
+                : order.delivery,
+            }
           : order
       )
     );

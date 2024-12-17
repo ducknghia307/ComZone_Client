@@ -301,7 +301,11 @@ const OrderHistory = () => {
     if (!key && searchInput.length === 0) return;
 
     await privateAxios
-      .get(`orders/search/user?search=${key || searchInput}`)
+      .get(
+        `orders/search/user?search=${
+          key ? key.replace("#", "") : searchInput.replace("#", "")
+        }`
+      )
       .then((res) => {
         console.log(res.data);
         setOrders(res.data);

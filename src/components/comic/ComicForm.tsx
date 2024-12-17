@@ -441,7 +441,7 @@ const ComicForm: React.FC<ComicFormProps> = ({
               name="price"
               value={CurrencySplitter(formData.price)}
               onChange={(e) => {
-                const numberString = e.target.value.replace(/./g, "");
+                const numberString = e.target.value.replace(/\./g, "");
                 let price = 0;
                 if (e.target.value.length === 0) price = 0;
                 else if (/^\d+$/.test(numberString)) {

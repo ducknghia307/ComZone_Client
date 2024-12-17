@@ -91,9 +91,20 @@ const Genres: React.FC<GenresProps> = ({
           sellers: sellersData = [],
         } = response.data;
 
+        console.log("All auction comics:", auctionComicsData);
+
+        const filteredAuctionComics = auctionComicsData.filter(
+          (auction: Auction) => {
+            const isValidStatus = auction.status === "ONGOING" || auction.status === "UPCOMING";
+            console.log(`Auction ${auction.id} status: ${auction.status}, Valid: ${isValidStatus}`);
+            return isValidStatus;
+          }
+        );
+
         // Update state variables
         setComics(regularComics);
-        setAuctionComics(auctionComicsData);
+        setAuctionComics(filteredAuctionComics);
+        console.log("Filtered Auction Comics:", filteredAuctionComics);
         setSellers(sellersData);
         console.log("Sellers Data:", sellers);
       } else {
@@ -127,8 +138,8 @@ const Genres: React.FC<GenresProps> = ({
     const genreMatch =
       filteredGenres.length > 0
         ? filteredGenres.every((genre) =>
-            comic.genres.some((comicGenre) => comicGenre.name === genre)
-          )
+          comic.genres.some((comicGenre) => comicGenre.name === genre)
+        )
         : true;
 
     const authorMatch =
@@ -152,17 +163,17 @@ const Genres: React.FC<GenresProps> = ({
     const genreMatch =
       filteredGenres.length > 0
         ? filteredGenres.every((genre) =>
-            auction.comics.genres.some(
-              (comicGenre) => comicGenre.name === genre
-            )
+          auction.comics.genres.some(
+            (comicGenre) => comicGenre.name === genre
           )
+        )
         : true;
 
     const authorMatch =
       filteredAuthors.length > 0
         ? filteredAuthors.every((author) =>
-            auction.comics.author.includes(author)
-          )
+          auction.comics.author.includes(author)
+        )
         : true;
 
     const conditionMatch =
@@ -170,7 +181,9 @@ const Genres: React.FC<GenresProps> = ({
         ? filteredConditions.includes(auction.comics.condition)
         : true;
 
-    return matchesSearchQuery && genreMatch && authorMatch && conditionMatch;
+    const statusMatch = auction.status && (auction.status === "ONGOING" || auction.status === "UPCOMING");
+
+    return matchesSearchQuery && genreMatch && authorMatch && conditionMatch && statusMatch;
   };
 
   const filteredAuctionComics = auctionComics.filter((auction) =>
@@ -255,8 +268,8 @@ const Genres: React.FC<GenresProps> = ({
 
           {searchQuery ? (
             comics.length === 0 &&
-            auctionComics.length === 0 &&
-            sellers.length === 0 ? (
+              auctionComics.length === 0 &&
+              sellers.length === 0 ? (
               <div className="text-center py-10">
                 <img
                   className="h-40 w-auto object-contain mx-auto"
@@ -304,16 +317,22 @@ const Genres: React.FC<GenresProps> = ({
                               {auction.comics.title}
                             </p>
                             <p className="font-semibold mt-2 mb-2 flex items-center justify-center">
-                              <span className="bg-green-100 text-green-800 px-4 py-1 rounded-full shadow-sm flex items-center gap-1 text-sm flex-nowrap whitespace-nowrap max-w-full">
+                              <span style={{ fontSize: '12px' }} className="bg-green-100 text-green-800 px-4 py-1 rounded-full shadow-sm flex items-center gap-1 flex-nowrap whitespace-nowrap max-w-full">
                                 <SellIcon sx={{ fontSize: 12 }} />
-                                Giá hiện tại:{" "}
+                                {auction.status === "UPCOMING" ? "Giá khởi điểm: " : "Giá hiện tại: "}
                                 <span className="font-bold">
-                                  {auction.currentPrice.toLocaleString("vi-VN")}
+                                  {auction.status === "UPCOMING"
+                                    ? auction.reservePrice.toLocaleString("vi-VN")
+                                    : auction.currentPrice.toLocaleString("vi-VN")}
                                   đ
                                 </span>
                               </span>
                             </p>
-                            <p className="font-normal mt-3">KẾT THÚC TRONG</p>
+                            <p className="font-normal mt-3">
+                              {auction.status === "UPCOMING"
+                                ? "DIỄN RA VÀO"
+                                : "KẾT THÚC TRONG"}
+                            </p>
                             <Countdown
                               date={new Date(auction.endTime)}
                               renderer={renderer}
@@ -445,11 +464,10 @@ const Genres: React.FC<GenresProps> = ({
                                         {sellerObj.seller.name}
                                       </span>
                                       <StoreOutlinedIcon
-                                        className={`transition-colors duration-200 ${
-                                          sellerObj.comics.length > 0
-                                            ? "text-black"
-                                            : "group-hover:text-red-500 text-black"
-                                        }`}
+                                        className={`transition-colors duration-200 ${sellerObj.comics.length > 0
+                                          ? "text-black"
+                                          : "group-hover:text-red-500 text-black"
+                                          }`}
                                         style={{ fontSize: "20px" }}
                                       />
                                     </div>
@@ -504,11 +522,10 @@ const Genres: React.FC<GenresProps> = ({
                                           {sellerObj.seller.name}
                                         </span>
                                         <StoreOutlinedIcon
-                                          className={`transition-colors duration-200 ${
-                                            sellerObj.comics.length > 0
-                                              ? "text-black"
-                                              : "group-hover:text-red-500 text-black"
-                                          }`}
+                                          className={`transition-colors duration-200 ${sellerObj.comics.length > 0
+                                            ? "text-black"
+                                            : "group-hover:text-red-500 text-black"
+                                            }`}
                                           style={{ fontSize: "20px" }}
                                         />
                                       </div>
@@ -547,7 +564,7 @@ const Genres: React.FC<GenresProps> = ({
                             {/* Comics seller */}
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                               {sellerObj.comics &&
-                              sellerObj.comics.length > 0 ? (
+                                sellerObj.comics.length > 0 ? (
                                 sellerObj.comics.slice(0, 5).map((comic) => (
                                   <Link
                                     to={`/detail/${comic.id}`}
@@ -638,11 +655,10 @@ const Genres: React.FC<GenresProps> = ({
                               )}
                               {comic?.edition !== "REGULAR" && (
                                 <span
-                                  className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${
-                                    comic?.edition === "SPECIAL"
-                                      ? "bg-yellow-600"
-                                      : "bg-red-800"
-                                  } text-white text-[0.5em] font-light text-nowrap justify-center`}
+                                  className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${comic?.edition === "SPECIAL"
+                                    ? "bg-yellow-600"
+                                    : "bg-red-800"
+                                    } text-white text-[0.5em] font-light text-nowrap justify-center`}
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"

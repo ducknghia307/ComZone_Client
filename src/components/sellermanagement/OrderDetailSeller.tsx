@@ -297,6 +297,7 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
       });
 
       setSelectedOrderId(null);
+      onClose();
     } catch (error: any) {
       if (error.response?.status === 400) {
         Modal.confirm({

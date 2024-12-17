@@ -269,6 +269,20 @@ const OrderManagement = () => {
           : order
       )
     );
+
+    setFilteredOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId
+          ? {
+              ...order,
+              status: newStatus,
+              delivery: delivery
+                ? { ...order.delivery, status: delivery.status }
+                : order.delivery,
+            }
+          : order
+      )
+    );
   };
 
   return (

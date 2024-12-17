@@ -6,7 +6,6 @@ import Footer from "./components/footer/Footer";
 import { ConfigProvider } from "antd";
 import socket, { connectSocket } from "./services/socket";
 import { useAppSelector } from "./redux/hooks";
-import { Toaster } from "sonner";
 
 function App() {
   // Get accessToken and userId from the Redux store
@@ -67,16 +66,6 @@ function App() {
         </div>
         {userId !== adminId && userId !== modId && <Footer />}
       </div>
-
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          unstyled: true,
-          classNames: {
-            toast: "mt-32 bg-white p-2 rounded-md",
-          },
-        }}
-      />
     </ConfigProvider>
   );
 }

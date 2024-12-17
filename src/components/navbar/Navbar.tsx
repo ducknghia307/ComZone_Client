@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Logo from "../../assets/hcn-logo.png";
 import {
   Link,
@@ -22,7 +22,6 @@ import {
 } from "@ant-design/icons";
 import RegisterSellerModal from "../RegisterSeller/RegisterSellerModal";
 import ChatModal from "../../pages/ChatModal";
-import { toast } from "sonner";
 import NotificationDropdown from "../notification/Notification";
 import socket from "../../services/socket";
 import {
@@ -31,10 +30,10 @@ import {
   setUnreadAnnounce,
 } from "../../redux/features/notification/announcementSlice";
 import CurrencySplitter from "../../assistants/Spliter";
+
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const { accessToken } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -48,8 +47,8 @@ const Navbar = () => {
   const [isRegisteringSeller, setIsRegisteringSeller] =
     useState<boolean>(false);
 
-  const navigate = useNavigate();
   const location1 = useLocation();
+  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
 
   const toggleMenu = () => {
@@ -204,7 +203,6 @@ const Navbar = () => {
         dispatch(setUnreadAnnounce(response.data));
       } catch (error) {
         console.error("Error fetching unread announcements:", error);
-        setLoading(false);
       }
     };
 
@@ -232,8 +230,14 @@ const Navbar = () => {
       try {
         const response = await privateAxios.get("users/profile");
         setUserInfo(response.data);
+
+        if (response.data.role === "MODERATOR") {
+          navigate("/mod/users");
+        } else if (response.data.role === "ADMIN") {
+          navigate("/admin/dashboard");
+        }
       } catch (error) {
-        console.error("Failed to fetch user info:", error);
+        console.error("Error fetching user info:", error);
       }
     }
   };
@@ -527,6 +531,7 @@ const Navbar = () => {
                         </Tooltip>
                         {/* announcement */}
                         <Tooltip
+                          title={<p className="REM text-black">Thông Báo</p>}
                           title={<p className="REM text-black">Thông Báo</p>}
                           color="white"
                         >

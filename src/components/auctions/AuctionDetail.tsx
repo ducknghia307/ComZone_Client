@@ -251,9 +251,11 @@ const ComicAuction = () => {
     }
     socket.on("bidUpdate", (data: any) => {
       console.log(data);
-
-      dispatch(setHighestBid(data.placeBid));
-      dispatch(setAuctionData(data.placeBid.auction));
+      if (data.placeBid.auction.id === id) {
+        
+        dispatch(setHighestBid(data.placeBid));
+        dispatch(setAuctionData(data.placeBid.auction));
+      }
     });
     return () => {
       socket.off("bidUpdate");

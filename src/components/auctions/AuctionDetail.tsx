@@ -25,28 +25,6 @@ import { AuctionResult } from "./AuctionResult";
 import ModalDeposit from "../modal/ModalDeposit";
 import { Popconfirm } from "antd";
 
-interface Comic {
-  id: string;
-  title: string;
-  coverImage: string;
-  previewChapter: string[];
-  sellerId: {
-    id: string;
-    name: string;
-  };
-  condition: string;
-}
-
-interface AuctionData {
-  id: string;
-  currentPrice: number;
-  priceStep: number;
-  status: string;
-  winner: {
-    id: string;
-  } | null;
-}
-
 interface HighestBid {
   user: {
     id: string;
@@ -336,7 +314,7 @@ const ComicAuction = () => {
   return (
     <div className="auction-wrapper" style={{ position: "relative" }}>
       <AuctionResult isWinner={winner} auctionStatus={auctionData?.status} />
-      {auctionAnnounce && auctionAnnounce.auction.id === id && (
+      {auctionAnnounce && auctionAnnounce.auction?.id === id && (
         <>
           {auctionAnnounce.status === "SUCCESSFUL" && (
             <div

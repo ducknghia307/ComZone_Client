@@ -144,7 +144,7 @@ const Genres: React.FC<GenresProps> = ({
     return matchesSearchQuery && genreMatch && authorMatch && conditionMatch;
   };
 
-  const filterAuctionComics = (auction: Auction) => {
+  const   filterAuctionComics = (auction: Auction) => {
     const matchesSearchQuery = searchQuery
       ? auction.comics.title.toLowerCase().includes(searchQuery.toLowerCase())
       : true;

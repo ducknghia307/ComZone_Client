@@ -156,7 +156,7 @@ export default function SubmitAmounts({
                   onChange={(e) => {
                     if (e.target.value.length === 0) setCompensationAmount(0);
                     if (e.target.value.match("[0-9]+")) {
-                      const number = parseInt(e.target.value.replace(/./g, ""));
+                      const number = parseInt(e.target.value.replace(/\./g, ""));
                       if (number < 0) setCompensationAmount(0);
                       if (number > 999999999) setCompensationAmount(999999999);
                       else setCompensationAmount(number);

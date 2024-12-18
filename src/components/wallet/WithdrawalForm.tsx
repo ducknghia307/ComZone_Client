@@ -198,7 +198,7 @@ export default function WithdrawalForm({
               type="text"
               value={CurrencySplitter(amount)}
               onChange={(e) => {
-                const value = e.target.value.replace(/./g, "");
+                const value = e.target.value.replace(/\./g, "");
                 if (value.length === 0) setAmount(0);
                 if (/^[0-9]*$/.test(value)) {
                   setAmount(Number(value));

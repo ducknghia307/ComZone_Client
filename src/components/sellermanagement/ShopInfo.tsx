@@ -8,6 +8,7 @@ import {
   SellerFeedbackResponse,
 } from "../../common/interfaces/seller-feedback.interface";
 import { Transaction } from "../../common/interfaces/transaction.interface";
+import Loading from "../loading/Loading";
 
 export interface SellerComicsData {
   comics: Comic[];
@@ -125,7 +126,9 @@ export default function ShopInfo() {
 
   return (
     <div className="REM w-full flex flex-col phone:flex-row items-stretch justify-start gap-2">
-      <div className="phone:basis-1/3 p-2 bg-white rounded-md drop-shadow-md">
+      {isLoading && <Loading />}
+
+      <div className="phone:basis-1/3 p-2 sm:p-4 bg-white rounded-md drop-shadow-md">
         <SellerDetailsSection
           user={user}
           sellerDetails={sellerDetails}
@@ -138,7 +141,7 @@ export default function ShopInfo() {
         />
       </div>
 
-      <div className="grow p-2 bg-white rounded-md drop-shadow-md">
+      <div className="grow p-2 sm:p-4 bg-white rounded-md drop-shadow-md">
         <IncomeManagementSection
           sellerOrdersData={sellerOrdersData}
           sellerTransactionsData={sellerTransactionsData}

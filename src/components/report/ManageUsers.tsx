@@ -16,6 +16,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { SelectChangeEvent } from '@mui/material/Select';
 import ModalUserInfo from '../modal/ModalUserInfo';
+import { notification } from 'antd';
 interface User {
   id: string;
   name: string;
@@ -122,9 +123,22 @@ const ManageUsers: React.FC = () => {
               user.id === selectedUserId ? { ...user, status: 'BANNED' } : user
             )
           );
+          notification.success({
+            message: 'Thành Công',
+            description: 'Người dùng đã bị cấm thành công.',
+            placement: 'topRight',
+            duration: 3,
+          });
         }
       } catch (error) {
         console.error('Error banning user:', error);
+
+        notification.error({
+          message: 'Thất Bại',
+          description: 'Có lỗi xảy ra khi cấm người dùng.',
+          placement: 'topRight',
+          duration: 3,
+        });
       } finally {
         setOpenBanModal(false);
       }
@@ -318,7 +332,7 @@ const ManageUsers: React.FC = () => {
                         <span style={getStatusColor(user.status)}>{getStatusText(user.status)}</span>
                       </StyledTableCell>
                       <StyledTableCell align="right">
-                        {user.status === 'BANNED' ? (
+                        {/* {user.status === 'BANNED' ? (
                           <IconButton color="primary" >
                             <InfoOutlinedIcon />
                           </IconButton>
@@ -326,7 +340,12 @@ const ManageUsers: React.FC = () => {
                           <IconButton color="error" onClick={() => handleOpenBanModal(user.id)}>
                             <DeleteOutlineOutlinedIcon />
                           </IconButton>
-                        )}
+                        )} */}
+                        {user.status !== 'BANNED' && (
+                        <IconButton color="error" onClick={() => handleOpenBanModal(user.id)}>
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
+                      )}
                       </StyledTableCell>
                     </StyledTableRow>
                   ))

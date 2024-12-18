@@ -66,8 +66,9 @@ export default function ConfirmDeliveryButton({
   return (
     <div className="flex items-stretch gap-2">
       <button
+        disabled={!selectedAddress}
         onClick={() => setIsAccepting(true)}
-        className="grow py-2 rounded-lg bg-sky-700  text-white hover:opacity-80 duration-200"
+        className="grow py-2 rounded-lg bg-sky-700  text-white hover:opacity-80 duration-200 disabled:bg-gray-300"
       >
         Xác nhận địa chỉ giao hàng
       </button>

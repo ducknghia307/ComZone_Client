@@ -281,7 +281,8 @@ const Genres: React.FC<GenresProps> = ({
           {searchQuery ? (
             comics.length === 0 &&
             auctionComics.length === 0 &&
-            sellers.length === 0 ? (
+            // sellers.length === 0 ? (
+              sellers.filter((sellerObj) => sellerObj.comics.length > 0).length === 0 ? (
               <div className="text-center py-10">
                 <img
                   className="h-40 w-auto object-contain mx-auto"

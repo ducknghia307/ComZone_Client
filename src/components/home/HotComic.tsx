@@ -99,8 +99,8 @@ const HotComic: React.FC = () => {
   return (
     <div className="w-full py-8">
       {/* Truyện tranh nổi bật */}
-      <div className="hot-comic-section flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Truyện Tranh Nguyên Seal</h2>
+      <div className="hot-comic-section flex justify-between items-center bg-black rounded-t-lg ">
+        <h2 className="text-2xl font-bold text-white ">Truyện Tranh Nguyên Seal</h2>
         <a
           href="hotcomic"
           className="text-red-500 font-semibold"
@@ -114,7 +114,7 @@ const HotComic: React.FC = () => {
       {loading ? (
         <p>Loading comics...</p>
       ) : (
-        <div className="hot-comic-cards mt-4 REM">
+        <div className="hot-comic-cards REMmx-[80px] relative border border-black bg-white rounded-b-lg py-5 ">
           <Carousel
             responsive={responsive}
             customButtonGroup={
@@ -132,16 +132,43 @@ const HotComic: React.FC = () => {
           >
             {/* Render comics */}
             {comics.map((comic) => (
-              <div className="hot-comic-card" key={comic.id}>
+              <div
+                className="bg-white rounded-lg w-[14em] overflow-hidden border drop-shadow-md mx-auto"
+                key={comic.id}
+              >
                 <Link to={`/detail/${comic.id}`}>
                   <img
-                    src={comic.coverImage}
+                    src={comic.coverImage || "/default-cover.jpg"}
                     alt={comic.title}
-                    className="object-cover mx-auto"
+                    className="object-cover w-full h-80"
                   />
-                  <p className="price">{formatPrice(comic.price)}</p>
-                  <p className="author">{comic.author.toUpperCase()}</p>
-                  <p className="title">{comic.title}</p>
+                  <div className="px-3 py-2">
+                    <div className="flex flex-row justify-between gap-2 pb-2  min-h-[1.7em] ">
+                      {comic?.condition === "SEALED" && (
+                        <span className="flex items-center gap-1 basis-1/2 px-2 rounded-2xl bg-sky-800 text-white text-[0.5em] font-light text-nowrap justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            width="10"
+                            height="10"
+                            fill="currentColor"
+                          >
+                            <path d="M12 1L20.2169 2.82598C20.6745 2.92766 21 3.33347 21 3.80217V13.7889C21 15.795 19.9974 17.6684 18.3282 18.7812L12 23L5.6718 18.7812C4.00261 17.6684 3 15.795 3 13.7889V3.80217C3 3.33347 3.32553 2.92766 3.78307 2.82598L12 1ZM12 3.04879L5 4.60434V13.7889C5 15.1263 5.6684 16.3752 6.7812 17.1171L12 20.5963L17.2188 17.1171C18.3316 16.3752 19 15.1263 19 13.7889V4.60434L12 3.04879ZM16.4524 8.22183L17.8666 9.63604L11.5026 16L7.25999 11.7574L8.67421 10.3431L11.5019 13.1709L16.4524 8.22183Z"></path>
+                          </svg>
+                          NGUYÊN SEAL
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-bold text-xl text-red-500">
+                      {formatPrice(comic.price)}
+                    </p>
+                    <p className="font-light text-sm">
+                      {comic.author.toUpperCase()}
+                    </p>
+                    <p className="font-semibold line-clamp-3 h-[4.5em]">
+                      {comic.title}
+                    </p>
+                  </div>
                 </Link>
               </div>
             ))}

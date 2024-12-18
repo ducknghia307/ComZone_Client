@@ -177,7 +177,7 @@ const AllAuctions = ({
                 className="object-cover w-full h-80"
               />
               <div className="px-3 py-2">
-                <div className="flex flex-row justify-between w-full gap-2 pb-2 min-h-[2em] mt-2">
+                <div className="flex flex-row justify-between w-full gap-2 pb-2 min-h-[1.5em] mt-2">
                   {comic.comics.condition === "SEALED" && (
                     <span className="flex items-center gap-1 basis-1/2 px-2 rounded-2xl bg-sky-800 text-white text-[0.5em] font-light text-nowrap justify-center">
                       <svg
@@ -215,9 +215,10 @@ const AllAuctions = ({
                     </span>
                   )}
                 </div>
-                <p className="font-bold line-clamp-6 h-[4.5rem]">
+                <p className="font-bold line-clamp-3 h-[4.5em]">
                   {comic.comics.title}
                 </p>
+
                 <p className="font-semibold mt-2 mb-2 flex items-center justify-center">
                   <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full shadow-sm flex items-center gap-1 text-sm flex-nowrap whitespace-nowrap max-w-full">
                     <SellIcon sx={{ fontSize: 12 }} />

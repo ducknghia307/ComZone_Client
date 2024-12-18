@@ -1,26 +1,25 @@
 import { Modal, notification, Popover } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { useState } from "react";
+import React, { useState } from "react";
 import { DeleteOutlined, PictureOutlined } from "@ant-design/icons";
 import { privateAxios } from "../../../middleware/axiosInstance";
-import ActionConfirm from "../../actionConfirm/ActionConfirm";
 import EmojiPicker from "emoji-picker-react";
 
 export default function CreatePostModal({
   openCreatePost,
   setOpenCreatePost,
   fetchExchangeNewsFeed,
+  setIsLoading,
 }: {
   openCreatePost: boolean;
   setOpenCreatePost: (open: boolean) => void;
   fetchExchangeNewsFeed: () => void;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [postContent, setPostContent] = useState("");
   const [uploadedImagesFile, setUploadedImagesFile] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
 
-  const [loading, setLoading] = useState(false);
-  const [isConfirming, setIsConfirming] = useState(false);
   const [postContentError, setPostContentError] = useState(false);
 
   const handlePreviewChapterChange = (
@@ -47,13 +46,12 @@ export default function CreatePostModal({
     setPostContent("");
     setPreviewImages([]);
     setUploadedImagesFile([]);
-    setIsConfirming(false);
     setOpenCreatePost(false);
   };
 
   const handleSubmit = async () => {
     handleClose();
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const imagesList: string[] = [];
@@ -100,7 +98,7 @@ export default function CreatePostModal({
         duration: 5,
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -227,7 +225,7 @@ export default function CreatePostModal({
           </div>
         </div>
 
-        <div className="w-full flex justify-end mt-4 flex-row gap-10 mt-4">
+        <div className="w-full flex justify-end flex-row gap-10 mt-4">
           <button
             className="border-none hover:opacity-70 duration-200"
             onClick={() => setOpenCreatePost(false)}
@@ -235,19 +233,12 @@ export default function CreatePostModal({
             Hủy bỏ
           </button>
           <button
-            disabled={loading || postContent.trim().length === 0}
-            onClick={() => setIsConfirming(true)}
+            disabled={postContent.trim().length === 0}
+            onClick={handleSubmit}
             className="px-12 py-2 bg-black rounded-md text-white font-bold hover:opacity-70 duration-200 disabled:bg-gray-300"
           >
             HOÀN TẤT
           </button>
-
-          <ActionConfirm
-            isOpen={isConfirming}
-            setIsOpen={setIsConfirming}
-            title="Xác nhận đăng bài?"
-            confirmCallback={() => handleSubmit()}
-          />
         </div>
       </Modal>
     </>

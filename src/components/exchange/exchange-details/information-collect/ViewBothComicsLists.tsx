@@ -1,6 +1,7 @@
 import { Avatar, Image, Modal } from "antd";
 import { Comic } from "../../../../common/base.interface";
 import { useState } from "react";
+import SingleComicsDetails from "./SingleComicsDetails";
 
 export default function ViewBothComicsLists({
   requestComicsList,
@@ -105,41 +106,12 @@ export default function ViewBothComicsLists({
         })}
       </div>
 
-      <Modal
-        open={currentComics !== undefined}
-        onCancel={(e) => {
-          e.stopPropagation();
-          setCurrentComics(undefined);
-        }}
-        centered
-        footer={null}
-      >
-        <div className="flex items-start">
-          <Image
-            src={currentComics?.coverImage}
-            className="rounded-lg"
-            width={600}
-          />
-
-          <div className="w-full flex flex-col items-stretch justify-start gap-2 text-center px-4">
-            <p className="text-lg font-semibold uppercase">
-              {currentComics?.title}
-            </p>
-            <p className="text-xs font-light">{currentComics?.author}</p>
-            <div className="flex flex-col items-start gap-1 text-start">
-              <p className="font-light text-xs">
-                Phiên bản: {getComicsEdition(currentComics)}
-              </p>
-              <p className="font-light text-xs">
-                Tình trạng: {getComicsCondition(currentComics)}
-              </p>
-              <p className="font-light text-xs">
-                Mô tả: {currentComics?.description}
-              </p>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      {currentComics && (
+        <SingleComicsDetails
+          currentComics={currentComics}
+          setCurrentComics={setCurrentComics}
+        />
+      )}
     </div>
   );
 }

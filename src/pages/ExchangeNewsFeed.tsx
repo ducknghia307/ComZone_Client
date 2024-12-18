@@ -147,6 +147,7 @@ export default function ExchangeNewsFeed() {
             openCreatePost={openCreatePost}
             setOpenCreatePost={setOpenCreatePost}
             fetchExchangeNewsFeed={fetchExchangeNewsFeed}
+            setIsLoading={setIsLoading}
           />
 
           <div className="w-full xl:w-2/3 flex flex-col items-center justify-start gap-8 py-4">

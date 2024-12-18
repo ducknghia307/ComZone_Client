@@ -139,7 +139,7 @@ export default function ExchangePost({
                   onClick={() => {
                     navigate("/exchange/list/sent-request");
                   }}
-                  className="text-[0.7em] font-light min-w-fit underline"
+                  className="font-light min-w-fit sm:whitespace-nowrap text-sm px-8 underline"
                 >
                   Xem yêu cầu của bạn
                 </button>

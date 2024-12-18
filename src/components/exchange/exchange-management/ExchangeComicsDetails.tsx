@@ -19,9 +19,6 @@ export default function ExchangeComicsDetails({
 }) {
   const [currentComics, setCurrentComics] = useState<Comic>(comics);
   const [currentImage, setCurrentImage] = useState(comics.coverImage);
-  const [isShowingDescription, setIsShowingDescription] = useState(
-    comics.description.length < 100
-  );
 
   useEffect(() => {
     setCurrentComics(comics);
@@ -199,23 +196,13 @@ export default function ExchangeComicsDetails({
               </div>
             )}
 
-            <p className="font-light text-xs">
+            <p className="font-light text-sm">
               Mô tả:{" "}
-              <span
-                className={`font-medium ${
-                  !isShowingDescription && "line-clamp-6"
-                }`}
-              >
-                {currentComics.description}
+              <span className={`font-medium`}>
+                <p className="max-h-[15em] overflow-auto">
+                  {currentComics.description}
+                </p>
               </span>
-              {currentComics.description.length > 200 && (
-                <button
-                  onClick={() => setIsShowingDescription(!isShowingDescription)}
-                  className="underline block"
-                >
-                  {isShowingDescription ? "Thu gọn" : "Xem thêm"}
-                </button>
-              )}
             </p>
 
             {currentComics.status === "AVAILABLE" && (

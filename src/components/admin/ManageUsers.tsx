@@ -14,6 +14,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import BanUserModal from '../modal/BanUserModal';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ModalUserInfo from '../modal/ModalUserInfo';
+import { notification } from 'antd';
 
 interface User {
   id: string;
@@ -116,18 +117,27 @@ const ManageUsers: React.FC = () => {
               user.id === selectedUserId ? { ...user, status: 'BANNED' } : user
             )
           );
+          notification.success({
+            message: 'Thành Công',
+            description: 'Người dùng đã bị cấm thành công.',
+            placement: 'topRight',
+            duration: 3,
+          });
         }
       } catch (error) {
         console.error('Error banning user:', error);
+
+        notification.error({
+          message: 'Thất Bại',
+          description: 'Có lỗi xảy ra khi cấm người dùng.',
+          placement: 'topRight',
+          duration: 3,
+        });
       } finally {
         setOpenBanModal(false);
       }
     }
   };
-
-  // const handleMenuClose = () => {
-  //   setAnchorEl(null);
-  // };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -287,9 +297,11 @@ const ManageUsers: React.FC = () => {
                       </span>
                     </StyledTableCell>
                     <StyledTableCell align="right">
-                      <IconButton color="error" onClick={() => handleOpenBanModal(user.id)}>
-                        <DeleteOutlineOutlinedIcon />
-                      </IconButton>
+                      {user.status !== 'BANNED' && (
+                        <IconButton color="error" onClick={() => handleOpenBanModal(user.id)}>
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
+                      )}
                     </StyledTableCell>
                   </StyledTableRow>
                 ))

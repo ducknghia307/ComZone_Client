@@ -12,6 +12,7 @@ import {
 import { Moment } from "moment";
 import dayjs from "dayjs";
 import { privateAxios } from "../../../middleware/axiosInstance";
+import { useEffect } from "react";
 
 // Define types for the comic and props
 interface Comic {
@@ -21,6 +22,7 @@ interface Comic {
   author: string;
 }
 interface AuctionFormValues {
+  id: string;
   reservePrice: number;
   maxPrice: number;
   priceStep: number;
@@ -48,19 +50,77 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
   const startTime = dayjs(form.getFieldValue("startTime"));
   const handleSubmit = async (values: AuctionFormValues) => {
     try {
-      await privateAxios.post("/auction", {
-        ...values,
-        comicsId: comic?.id,
-        status: "UPCOMING",
+      if (form.getFieldValue("id")) {
+        console.log('form.getFieldValue("id")', form.getFieldValue("id"));
+
+        await privateAxios.put(`/auction/${form.getFieldValue("id")}/start`, {
+          ...values,
+          status: "UPCOMING",
+        });
+      } else {
+        // Otherwise, create a new auction
+        await privateAxios.post("/auction", {
+          ...values,
+          comicsId: comic?.id,
+          status: "UPCOMING",
+        });
+      }
+      await privateAxios.patch("seller-subscriptions/auction", {
+        quantity: 1,
       });
 
-      await privateAxios.patch("seller-subscriptions/auction", { quantity: 1 });
+      notification.success({
+        message: "Tạo đấu giá thành công",
+        description: `Đấu giá cho truyện "${comic?.title}" đã được tạo.`,
+        duration: 5,
+      });
 
+      form.resetFields(); // Reset form fields after submission
       onSuccess();
     } catch (error) {
       console.error("Error during API call:", error);
+
+      notification.error({
+        message: "Lỗi",
+        description:
+          "Không thể thực hiện thao tác đấu giá. Vui lòng kiểm tra lại dữ liệu.",
+        duration: 5,
+      });
     }
   };
+
+  useEffect(() => {
+    const fetchAuctionData = async () => {
+      if (comic?.id) {
+        try {
+          const { data } = await privateAxios.get(
+            `/auction/comics/${comic.id}`
+          );
+          if (data.status === "STOPPED") {
+            form.setFieldsValue({
+              id: data.id, // Include the auction ID
+              reservePrice: data.reservePrice,
+              maxPrice: data.maxPrice,
+              priceStep: data.priceStep,
+              depositAmount: data.depositAmount,
+              startTime: dayjs(data.startTime),
+              endTime: dayjs(data.endTime),
+            });
+          } else {
+            form.resetFields(); // Reset the form if the auction is not stopped
+          }
+        } catch (error) {
+          console.error("Error fetching auction data:", error);
+          form.resetFields(); // Reset the form in case of an error
+        }
+      }
+    };
+
+    if (open) {
+      fetchAuctionData();
+    }
+  }, [comic?.id, open, form]);
+
   // Custom validator to check that the end time is not more than 7 days after the start time
   const validateEndTime = (value: any) => {
     const startTime = form.getFieldValue("startTime");
@@ -225,6 +285,21 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                     required: true,
                     message: "Vui lòng chọn thời gian bắt đầu",
                   },
+                  {
+                    validator: (_, value) => {
+                      if (!value) return Promise.resolve();
+
+                      const now = dayjs();
+                      const minStartTime = now.add(9, "minute");
+
+                      if (dayjs(value).isBefore(minStartTime)) {
+                        return Promise.reject(
+                          "Thời gian bắt đầu phải cách hiện tại ít nhất 10 phút"
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
                 ]}
               >
                 <DatePicker
@@ -239,21 +314,21 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                     return current && current.isBefore(dayjs().startOf("day"));
                   }}
                   disabledTime={(current) => {
-                    // Only allow times at least 1 hour from now
+                    // Only allow times at least 15 minutes from now
                     if (!current) return {};
                     const now = dayjs();
-                    const oneHourFromNow = now.add(1, "hour");
+                    const fifteenMinutesFromNow = now.add(10, "minute");
 
                     if (current.isSame(now, "day")) {
                       return {
                         disabledHours: () =>
                           Array.from({ length: 24 }, (_, i) =>
-                            i < oneHourFromNow.hour() ? i : -1
+                            i < fifteenMinutesFromNow.hour() ? i : -1
                           ).filter((x) => x !== -1),
                         disabledMinutes: () =>
-                          current.isSame(oneHourFromNow, "hour")
+                          current.isSame(fifteenMinutesFromNow, "hour")
                             ? Array.from({ length: 60 }, (_, i) =>
-                                i < oneHourFromNow.minute() ? i : -1
+                                i < fifteenMinutesFromNow.minute() ? i : -1
                               ).filter((x) => x !== -1)
                             : [],
                       };
@@ -273,6 +348,9 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                     required: true,
                     message: "Vui lòng chọn thời gian kết thúc",
                   },
+                  {
+                    validator: (_, value) => validateEndTime(value), // Attach custom validator
+                  },
                 ]}
               >
                 <DatePicker
@@ -284,15 +362,14 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                   placeholder="Chọn thời gian kết thúc"
                   disabledDate={(current) => {
                     const startTime = form.getFieldValue("startTime");
-                    if (!startTime) return true; // Disable all dates until startTime is set
+                    if (!startTime) return true;
 
                     const startDayjs = dayjs(startTime);
-                    const oneDayAfter = startDayjs.add(1, "day"); // Start time + 24 hours
+                    const oneDayAfter = startDayjs.add(1, "day");
                     const sevenDaysAfter = startDayjs.add(7, "days");
 
-                    // Allow selecting 30/11 at 12:06 PM or later
                     return (
-                      current.isBefore(oneDayAfter.startOf("day")) || // Entire day before oneDayAfter
+                      current.isBefore(oneDayAfter.startOf("day")) ||
                       current.isAfter(sevenDaysAfter.endOf("day"))
                     );
                   }}
@@ -301,9 +378,8 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                     if (!startTime || !current) return {};
 
                     const startDayjs = dayjs(startTime);
-                    const exactOneDayAfter = startDayjs.add(1, "day"); // Start time + 24 hours
+                    const exactOneDayAfter = startDayjs.add(1, "day");
 
-                    // If `endTime` is on the same day as `exactOneDayAfter`, disable earlier times
                     if (current.isSame(exactOneDayAfter, "day")) {
                       return {
                         disabledHours: () =>
@@ -319,7 +395,6 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                       };
                     }
 
-                    // No restrictions for other days within the valid range
                     return {};
                   }}
                 />

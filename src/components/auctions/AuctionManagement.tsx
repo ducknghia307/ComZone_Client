@@ -22,8 +22,12 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { privateAxios } from "../../middleware/axiosInstance";
 import AuctionModalEdit from "../comic/sellerManagement/AuctionModalEdit";
 import { Auction } from "../../common/base.interface";
-import { notification, Popconfirm } from "antd";
-import { EyeOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { Modal, notification, Popconfirm } from "antd";
+import {
+  CheckCircleOutlined,
+  EyeOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons";
 import AuctionDetailModalSeller from "../modal/AuctionDetailModalSeller";
 import EmptyImage from "../../assets/notFound/emptybox.png";
 
@@ -122,8 +126,9 @@ const AuctionManagement = () => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAuction, setSelectedAuction] = useState<Auction | null>(null);
+  const [selectedAuction, setSelectedAuction] = useState(null);
   const [openDetail, setOpenDetail] = useState(false);
+  console.log(selectedAuction);
 
   const handleOpenDetail = (auction) => {
     setSelectedAuction(auction);
@@ -180,25 +185,52 @@ const AuctionManagement = () => {
     handleModalClose();
   };
 
-  const handleStopAuction = async (auctionId: string) => {
+  const handleStopAuctioning = async (auctionId: string) => {
+    if (!auctionId) {
+      notification.error({
+        message: "Lỗi",
+        description: "Không tìm thấy đấu giá để dừng.",
+        duration: 5,
+      });
+      return;
+    }
+
     try {
-      const response = await privateAxios.patch(`/auction/${auctionId}/cancel`);
-      setAuctions((prevAuctions) =>
-        prevAuctions.map((auction) =>
-          auction.id === auctionId
-            ? { ...auction, status: "CANCELED" }
-            : auction
-        )
-      );
+      // Stop the auction for the comic
+      await privateAxios.patch(`/auction/${auctionId}/stop-auction`);
+
+      // Update the seller subscription for stopping the auction
+      await privateAxios.patch("seller-subscriptions/auction/stop", {
+        quantity: 1,
+      });
+
+      // Notify success
       notification.success({
         key: "success",
-        message: "Thành công",
-        description: "Hủy phiên đấu giá thành công!",
-        duration: 3,
+        message: "Đã dừng đấu giá truyện",
+        description: (
+          <p>
+            Truyện {selectedAuction?.comics?.title} đã được dừng đấu giá khỏi
+            các trang tìm kiếm.
+          </p>
+        ),
+        duration: 5,
       });
-      console.log(`Auction with ID ${auctionId} has been stopped.`);
+
+      // Fetch the updated auction list after stopping the auction
+      const response = await privateAxios.get("/auction/seller");
+      setAuctions(response.data); // Update auctions with the new data
+
+      // Optionally, you can reset pagination to the first page
+      setPage(0);
     } catch (error) {
-      console.error("Error stopping the auction:", error);
+      // Handle errors and notify the user
+      console.error("Lỗi khi dừng bán truyện:", error);
+      notification.error({
+        message: "Lỗi",
+        description: "Không thể dừng bán truyện. Vui lòng thử lại.",
+        duration: 5,
+      });
     }
   };
 
@@ -395,13 +427,17 @@ const AuctionManagement = () => {
                                 style={{ color: "red" }}
                               />
                             }
-                            onConfirm={() => handleStopAuction(auction.id)}
+                            onConfirm={() => handleStopAuctioning(auction.id)}
                             okText="Dừng"
                             cancelText="Thoát"
                             overlayClassName="custom-popconfirm"
                           >
                             <IconButton color="error">
-                              <DoNotDisturbOutlinedIcon />
+                              <DoNotDisturbOutlinedIcon
+                                onClick={() => {
+                                  setSelectedAuction(auction);
+                                }}
+                              />
                             </IconButton>
                           </Popconfirm>
                         )}
@@ -448,7 +484,7 @@ const AuctionManagement = () => {
             startTime: selectedAuction.startTime,
             endTime: selectedAuction.endTime,
             comics: selectedAuction.comics,
-            createdAt: selectedAuction.createdAt
+            createdAt: selectedAuction.createdAt,
           }}
           onSuccess={handleModalSuccess}
         />

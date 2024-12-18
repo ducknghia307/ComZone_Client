@@ -15,7 +15,7 @@ export const RenderCell = ({
 }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
-
+  const [auction, setAuction] = useState(null);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -28,8 +28,9 @@ export const RenderCell = ({
     await privateAxios
       .get(`auction/comics/${comicsId}`)
       .then((res) => {
-        if (res.data) navigate(`/auctiondetail/${res.data.id}`);
-        else message.warning("Không tìm thấy cuộc đấu giá!", 5);
+        if (res.data) {
+          navigate(`/auctiondetail/${res.data.id}`);
+        } else message.warning("Không tìm thấy cuộc đấu giá!", 5);
       })
       .catch((err) => {
         message.warning("Không tìm thấy cuộc đấu giá!", 5);

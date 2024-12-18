@@ -12,7 +12,7 @@ import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import { Modal, notification } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import AuctionModal from "../comic/sellerManagement/AuctionModal";
-import { Comic } from "../../common/base.interface";
+import { Auction, Comic } from "../../common/base.interface";
 import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
 import SellerSubsModal from "./SellerSubsModal";
 import { RenderCell } from "./RenderCell";
@@ -34,6 +34,7 @@ const SellerComicsManagement = ({
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [comics, setComics] = useState<Comic[]>([]);
+  const [auctions, setAuctions] = useState<Auction[]>([]);
   const [filteredComics, setFilteredComics] = useState<Comic[]>([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -66,12 +67,6 @@ const SellerComicsManagement = ({
   const handleModalSuccess = () => {
     setIsModalVisible(false);
     fetchSellerComics();
-    notification.success({
-      key: "success",
-      message: "Thành công",
-      description: "Tạo đấu giá thành công!",
-      duration: 5,
-    });
   };
 
   const handleStopSelling = (comic: Comic) => {

@@ -252,7 +252,6 @@ const ComicAuction = () => {
     socket.on("bidUpdate", (data: any) => {
       console.log(data);
       if (data.placeBid.auction.id === id) {
-        
         dispatch(setHighestBid(data.placeBid));
         dispatch(setAuctionData(data.placeBid.auction));
       }
@@ -620,7 +619,7 @@ const ComicAuction = () => {
                       <input
                         type="text"
                         placeholder="đ"
-                        className="bid-input"
+                        className="bid-input REM"
                         value={
                           bidAmount
                             ? parseFloat(bidAmount).toLocaleString("vi-VN")
@@ -689,7 +688,7 @@ const ComicAuction = () => {
                       >
                         <Button
                           variant="contained"
-                          className="bid-button"
+                          className="bid-button "
                           sx={{
                             width: "250px",
                             height: "60px",
@@ -698,7 +697,7 @@ const ComicAuction = () => {
                           }}
                           disabled={isBidDisabled || !bidAmount || error !== ""}
                         >
-                          RA GIÁ
+                          <p className="REM">RA GIÁ</p>
                         </Button>
                       </Popconfirm>
                     </div>

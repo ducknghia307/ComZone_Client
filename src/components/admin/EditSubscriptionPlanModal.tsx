@@ -10,7 +10,7 @@ import {
     Typography
 } from '@mui/material';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { Switch } from 'antd';
+import { notification, Switch } from 'antd';
 
 interface SubscriptionPlan {
     id: string;
@@ -95,9 +95,24 @@ const EditSubscriptionPlanModal: React.FC<EditModalProps> = ({
         try {
             const response = await privateAxios.patch(`/seller-subs-plans/${plan.id}`, editedPlan);
             onUpdatePlan(response.data);
+
+            notification.success({
+                message: 'Thành Công',
+                description: 'Cập nhật gói đăng ký thành công!',
+                placement: 'topRight',
+                duration: 3,
+            });
+
             onClose();
         } catch (error) {
             console.error('Error updating subscription plan:', error);
+
+            notification.error({
+                message: 'Thất Bại',
+                description: 'Có lỗi xảy ra khi cập nhật gói đăng ký!',
+                placement: 'topRight',
+                duration: 3,
+            });
         }
     };
 

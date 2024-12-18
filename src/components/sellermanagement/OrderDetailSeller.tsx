@@ -126,8 +126,8 @@ const InfoRow = ({
     paymentMethod === "WALLET"
       ? "#32CD32"
       : paymentMethod === "COD"
-      ? "#ff9800"
-      : "#000";
+        ? "#ff9800"
+        : "#000";
 
   return (
     <Box
@@ -388,7 +388,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
   };
 
   const handleConfirmAction = async (actionType: string) => {
-    if (uploadedImagesFile.length === 0) {
+    // if (uploadedImagesFile.length === 0) {
+    if (actionType === "finish" && uploadedImagesFile.length === 0) {
       notification.warning({
         key: "packaging-images",
         message: <p className="REM">Yêu cầu ảnh đóng gói đơn hàng</p>,
@@ -796,8 +797,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
 
                   <TableBody>
                     {orders.length > 0 &&
-                    orders[0].items &&
-                    orders[0].items.length > 0 ? (
+                      orders[0].items &&
+                      orders[0].items.length > 0 ? (
                       orders[0].items.map((item: any, index: number) => (
                         <TableRow key={index}>
                           <TableCell>

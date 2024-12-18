@@ -79,37 +79,45 @@ export default function PayButton({
   const handlePayment = async () => {
     setIsConfirming(false);
 
-    setIsLoading(true);
-    await privateAxios
-      .post("/deposits/exchange", {
-        exchange: exchangeId,
-      })
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log("error:", err);
-        notification.error({
-          message: "Giao dịch cọc không thành công!",
-          duration: 2,
-        });
-      })
-      .finally(() => setIsLoading(false));
+    try {
+      setIsLoading(true);
+      await privateAxios
+        .post("/deposits/exchange", {
+          exchange: exchangeId,
+        })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log("error:", err);
+          notification.error({
+            message: "Giao dịch cọc không thành công!",
+            duration: 2,
+          });
+        })
+        .finally(() => setIsLoading(false));
 
-    await privateAxios
-      .patch(`/exchanges/pay/${exchangeId}`)
-      .then(() => {
-        notification.success({ message: "Thanh toán thành công", duration: 5 });
-        fetchExchangeDetails();
-      })
-      .catch((err) => {
-        console.log(err);
-        notification.error({
-          message: "Thanh toán không thành công!",
-          duration: 2,
+      await privateAxios
+        .patch(`/exchanges/pay/${exchangeId}`)
+        .then(() => {
+          notification.success({
+            message: "Thanh toán thành công",
+            duration: 5,
+          });
+          fetchExchangeDetails();
+        })
+        .catch((err) => {
+          console.log(err);
+          notification.error({
+            message: "Thanh toán không thành công!",
+            duration: 2,
+          });
         });
-      })
-      .finally(() => setIsLoading(false));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

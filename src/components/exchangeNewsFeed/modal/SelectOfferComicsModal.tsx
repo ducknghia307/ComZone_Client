@@ -9,6 +9,7 @@ import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
 import { useAppSelector } from "../../../redux/hooks";
 import socket from "../../../services/socket";
+import ComicsSelection from "./ComicsSelection";
 
 export default function SelectOfferComicsModal({
   post,
@@ -29,12 +30,7 @@ export default function SelectOfferComicsModal({
 }) {
   const { userId } = useAppSelector((state) => state.auth);
 
-  const [requestSelectOptionValues, setRequestSelectOptionValues] = useState<
-    { label: string; value: string; image: string }[]
-  >([]);
-  const [postSelectOptionValues, setPostSelectOptionValues] = useState<
-    { label: string; value: string; image: string }[]
-  >([]);
+  const [postUserComicsList, setPostUserComicsList] = useState<Comic[]>([]);
 
   const [selectedRequestComicsList, setSelectedRequestComicsList] = useState<
     string[]
@@ -50,38 +46,7 @@ export default function SelectOfferComicsModal({
 
   const fetchPostUserOfferComics = async () => {
     await publicAxios.get(`comics/exchange/${post.user.id}`).then((res) => {
-      const list = res.data;
-      if (!list && list.length === 0) return;
-      else {
-        setRequestSelectOptionValues([]);
-        setPostSelectOptionValues([]);
-
-        const filterSelfAvailable = userExchangeComicsList.filter(
-          (comics) => comics.status === "AVAILABLE"
-        );
-
-        filterSelfAvailable.map((comics: Comic) => {
-          setRequestSelectOptionValues((prev) => [
-            ...(prev as []),
-            {
-              label: comics.title,
-              value: comics.id,
-              image: comics.coverImage,
-            },
-          ]);
-        });
-
-        list.map((comics: Comic) => {
-          setPostSelectOptionValues((prev) => [
-            ...(prev as []),
-            {
-              label: comics.title,
-              value: comics.id,
-              image: comics.coverImage,
-            },
-          ]);
-        });
-      }
+      setPostUserComicsList(res.data);
     });
   };
 
@@ -95,7 +60,7 @@ export default function SelectOfferComicsModal({
     if (e) e.stopPropagation();
     setIsConfirming(false);
     setIsSelectingMine(true);
-    setPostSelectOptionValues([]);
+    setPostUserComicsList([]);
     setSelectedRequestComicsList([]);
     setSelectedPostComicsList([]);
     setIsSelectModalOpen("");
@@ -148,7 +113,9 @@ export default function SelectOfferComicsModal({
         open={isSelectModalOpen === post.id}
         onCancel={(e) => handleModalClose(e)}
         footer={null}
-        width={window.innerWidth * 0.4}
+        centered
+        width={1000}
+        styles={{ wrapper: { marginTop: "5px" } }}
       >
         <div className="w-full py-4 flex flex-col items-stretch justify-start gap-4">
           <p className="text-[1.5em] font-semibold">CHỌN TRUYỆN ĐỂ TRAO ĐỔI</p>
@@ -173,7 +140,7 @@ export default function SelectOfferComicsModal({
                   <p className="font-light italic">
                     Số truyện bạn đang có để trao đổi:{" "}
                     <span className="font-bold">
-                      {requestSelectOptionValues.length}
+                      {userExchangeComicsList.length}
                     </span>
                     <button
                       onClick={() => {
@@ -190,50 +157,11 @@ export default function SelectOfferComicsModal({
                   </p>
                 </div>
 
-                <div className="py-2 max-h-40 overflow-y-auto">
-                  <Select
-                    mode="multiple"
-                    style={{ width: "100%" }}
-                    placeholder={
-                      <p className="font-light italic">
-                        Chọn truyện bạn dùng để trao đổi...
-                      </p>
-                    }
-                    virtual={true}
-                    allowClear={true}
-                    size="large"
-                    value={selectedRequestComicsList}
-                    options={requestSelectOptionValues}
-                    showSearch
-                    filterOption={(input, option) =>
-                      (option?.label ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    optionRender={(option) => (
-                      <div className="h-max flex items-center gap-2">
-                        <img
-                          src={option.data.image}
-                          className="w-[2em] rounded-lg"
-                        />
-                        <p>{option.data.label}</p>
-                      </div>
-                    )}
-                    labelRender={(option) => (
-                      <div className="font-light">{option.label}</div>
-                    )}
-                    onSelect={(value: string) => {
-                      setSelectedRequestComicsList((prev) => [...prev, value]);
-                    }}
-                    onDeselect={(value: string) => {
-                      const filtered = selectedRequestComicsList.filter(
-                        (comics) => comics !== value
-                      );
-                      setSelectedRequestComicsList(filtered);
-                    }}
-                    onClear={() => setSelectedRequestComicsList([])}
-                  />
-                </div>
+                <ComicsSelection
+                  fullComicsList={userExchangeComicsList}
+                  selectedComics={selectedRequestComicsList}
+                  setSelectedComics={setSelectedRequestComicsList}
+                />
 
                 <div
                   className={`${
@@ -258,47 +186,11 @@ export default function SelectOfferComicsModal({
                   muốn để trao đổi.
                 </p>
 
-                <div className="py-2 max-h-40 overflow-y-auto">
-                  <Select
-                    mode="multiple"
-                    style={{ width: "100%" }}
-                    placeholder={
-                      <p className="font-light italic">
-                        Chọn truyện bạn muốn có để người khác trao đổi với
-                        bạn...
-                      </p>
-                    }
-                    virtual={true}
-                    allowClear={true}
-                    size="large"
-                    value={selectedPostComicsList}
-                    options={postSelectOptionValues}
-                    filterOption={(input, option) =>
-                      (option?.label ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    optionRender={(option) => (
-                      <div className="h-max flex items-center gap-2">
-                        <img
-                          src={option.data.image}
-                          className="w-[2em] rounded-lg"
-                        />
-                        <p>{option.data.label}</p>
-                      </div>
-                    )}
-                    onSelect={(value: string) => {
-                      setSelectedPostComicsList((prev) => [...prev, value]);
-                    }}
-                    onDeselect={(value: string) => {
-                      const filtered = selectedPostComicsList.filter(
-                        (comics) => comics !== value
-                      );
-                      setSelectedPostComicsList(filtered);
-                    }}
-                    onClear={() => setSelectedPostComicsList([])}
-                  />
-                </div>
+                <ComicsSelection
+                  fullComicsList={postUserComicsList}
+                  selectedComics={selectedPostComicsList}
+                  setSelectedComics={setSelectedPostComicsList}
+                />
 
                 <div
                   className={`${

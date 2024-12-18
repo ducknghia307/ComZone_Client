@@ -48,6 +48,12 @@ export default function ShopOverview({
             Phút
           </span>
         </div>
+        <div className="time-box relative basis-1/4">
+          <span className="time1">{seconds.toString().padStart(2, "0")}</span>
+          <span className="label absolute top-0 left-1/2 -translate-y-2.5 -translate-x-1/2">
+            Giây
+          </span>
+        </div>
       </div>
     );
   };
@@ -185,7 +191,7 @@ export default function ShopOverview({
             {auctionsList.map((auction) => (
               <Link
                 to={`/auctiondetail/${auction.id}`}
-                className="min-w-[20em] w-[20em] flex items-stretch gap-1 ring-1 ring-gray-700 rounded-md p-1 snap-center snap-always duration-200 hover:bg-gray-50"
+                className="min-w-[22em] w-[22em] flex items-stretch gap-1 ring-1 ring-gray-700 rounded-md p-1 snap-center snap-always duration-200 hover:bg-gray-50"
                 key={auction.id}
               >
                 <img
@@ -196,7 +202,7 @@ export default function ShopOverview({
 
                 <div className="px-1 py-2">
                   <div
-                    className={`hidden sm:flex items-center justify-between w-full gap-2 mb-1`}
+                    className={`hidden sm:flex items-center justify-between w-full gap-2 mb-2`}
                   >
                     {auction.comics.condition === "SEALED" && (
                       <span className="flex items-center gap-1 basis-1/2 px-2 py-1 rounded-2xl bg-sky-800 text-white text-[0.5em] font-light text-nowrap justify-center">
@@ -214,11 +220,10 @@ export default function ShopOverview({
                     )}
                     {auction.comics.edition !== "REGULAR" && (
                       <span
-                        className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${
-                          auction.comics?.edition === "SPECIAL"
+                        className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${auction.comics?.edition === "SPECIAL"
                             ? "bg-yellow-600"
                             : "bg-red-800"
-                        } text-white text-[0.5em] font-light text-nowrap justify-center`}
+                          } text-white text-[0.5em] font-light text-nowrap justify-center`}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

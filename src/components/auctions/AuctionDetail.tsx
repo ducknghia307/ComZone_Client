@@ -576,6 +576,51 @@ const ComicAuction = () => {
           </div>
 
           <div className="shop-info">
+            <div className="flex justify-between mt-2 mb-2">
+              <Chip
+                avatar={
+                  <Avatar
+                    src={users?.avatar}
+                    alt="Vendor Avatar"
+                    style={{ width: "30px", height: "30px" }}
+                  />
+                }
+                onClick={() =>
+                  navigate(`/seller/shop/all/${auctionData.comics.sellerId.id}`)
+                }
+                label={
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                      fontSize: "16px",
+                      maxWidth: "150px", // Set a max width for truncation
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {users?.name}
+                    <StoreOutlinedIcon
+                      style={{ fontSize: "24px", color: "#000" }}
+                    />
+                  </div>
+                }
+                style={{
+                  cursor: "pointer",
+                  fontFamily: "REM",
+                  fontWeight: "500",
+                  fontSize: "20px",
+                  padding: "20px 5px",
+                  borderRadius: "8px",
+                  backgroundColor: "#fff",
+                  color: "#000",
+                  border: "1px solid black",
+                  boxShadow: "4px 4px #ccc",
+                }}
+              />
+            </div>
             {auctionData.status === "ONGOING" && hasDeposited && (
               <>
                 {/* If the user is the highest bidder, don't display anything */}
@@ -583,7 +628,7 @@ const ComicAuction = () => {
                   <>
                     {/* Display the minimum bid if it's still valid */}
                     {auctionData.currentPrice + auctionData.priceStep <
-                    auctionData.maxPrice ? (
+                      auctionData.maxPrice ? (
                       <p
                         style={{
                           fontSize: "17px",
@@ -686,13 +731,13 @@ const ComicAuction = () => {
                     </div>
                   </div>
                 ) : isHighest ? (
-                  <div className="highest-bid-message REM">
+                  <div className="highest-bid-message REM mt-4">
                     Bạn là người có giá cao nhất!
                   </div>
                 ) : (
                   !auctionEnded &&
                   auctionData.currentPrice + auctionData.priceStep <
-                    auctionData.maxPrice && (
+                  auctionData.maxPrice && (
                     <div className="bid-row">
                       <input
                         type="text"
@@ -785,83 +830,90 @@ const ComicAuction = () => {
             )}
 
             {error && <div className="REM error-message">{error}</div>}
-            <div className="flex justify-between mt-4 mb-2">
-              <Chip
-                avatar={
-                  <Avatar
-                    src={users?.avatar}
-                    alt="Vendor Avatar"
-                    style={{ width: "30px", height: "30px" }}
-                  />
-                }
-                onClick={() =>
-                  navigate(`/seller/shop/all/${auctionData.comics.sellerId.id}`)
-                }
-                label={
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      fontSize: "16px",
-                      maxWidth: "150px", // Set a max width for truncation
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {users?.name}
-                    <StoreOutlinedIcon
-                      style={{ fontSize: "24px", color: "#000" }}
+            <div className="flex flex-col justify-between mt-4 mb-2">
+              {/* <div className="flex justify-between">
+                <Chip
+                  avatar={
+                    <Avatar
+                      src={users?.avatar}
+                      alt="Vendor Avatar"
+                      style={{ width: "30px", height: "30px" }}
                     />
-                  </div>
-                }
-                style={{
-                  cursor: "pointer",
-                  fontFamily: "REM",
-                  fontWeight: "500",
-                  fontSize: "20px",
-                  padding: "20px 5px",
-                  borderRadius: "8px",
-                  backgroundColor: "#fff",
-                  color: "#000",
-                  border: "1px solid black",
-                  boxShadow: "4px 4px #ccc",
-                }}
-              />
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
+                  }
+                  onClick={() =>
+                    navigate(`/seller/shop/all/${auctionData.comics.sellerId.id}`)
+                  }
+                  label={
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        fontSize: "16px",
+                        maxWidth: "150px", // Set a max width for truncation
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {users?.name}
+                      <StoreOutlinedIcon
+                        style={{ fontSize: "24px", color: "#000" }}
+                      />
+                    </div>
+                  }
+                  style={{
+                    cursor: "pointer",
+                    fontFamily: "REM",
+                    fontWeight: "500",
+                    fontSize: "20px",
+                    padding: "20px 5px",
+                    borderRadius: "8px",
+                    backgroundColor: "#fff",
+                    color: "#000",
+                    border: "1px solid black",
+                    boxShadow: "4px 4px #ccc",
+                  }}
+                />
+              </div> */}
+              <div className="w-full px-5">
                 {auctionData.status === "ONGOING" && hasDeposited ? (
-                  <Button
-                    variant="contained"
-                    style={{
-                      color: "#fff",
-                      backgroundColor: "#000",
-                      fontWeight: "500",
-                      fontSize: "18px",
-                      fontFamily: "REM",
-                    }}
+                  // <button
+                  //   className="w-full text-white py-3 flex justify-center items-end bg-black"
+                  //   onClick={() =>
+                  //     handleBuy(auctionData, auctionData.maxPrice, "maxPrice")
+                  //   }
+                  // >
+                  //   {/* Mua ngay với {auctionData.maxPrice.toLocaleString("vi-VN")}₫ */}
+                  //   {/* <div className="flex items-end"> 
+                  //     <span className="text-sm mr-2 REM">Mua ngay với</span>
+                  //     <span className="text-lg font-bold REM flex items-end ">
+                  //       {auctionData.maxPrice.toLocaleString("vi-VN")}₫
+                  //     </span>
+                  //   </div> */}
+                  //   <span className="flex flex-row items-end gap-1">
+                  //     <p className="text-base REM">MUA NGAY:</p>
+                  //     <p className="text-[1.25em] REM flex flex-row items-end text-end"> {auctionData.maxPrice.toLocaleString("vi-VN")} đ</p>
+                  //   </span>
+                  // </button>
+                  <button
+                    className="w-full text-white py-2 flex justify-center items-center bg-black rounded-lg"
                     onClick={() =>
                       handleBuy(auctionData, auctionData.maxPrice, "maxPrice")
                     }
                   >
-                    Mua ngay với {auctionData.maxPrice.toLocaleString("vi-VN")}₫
-                  </Button>
+                    <span className="flex items-center gap-2">
+                      <p className="text-sm font-semibold leading-none REM">MUA NGAY:</p>
+                      <p className="!text-2xl font-bold leading-none REM">{auctionData.maxPrice.toLocaleString("vi-VN")} đ</p>
+                    </span>
+
+                  </button>
+
                 ) : auctionData.winner?.id === userId &&
                   auctionData.status === "SUCCESSFUL" ? (
                   <Button
                     variant="contained"
-                    style={{
-                      color: "#fff",
-                      backgroundColor: "#000",
-                      fontWeight: "500",
-                      fontSize: "18px",
-                      fontFamily: "REM",
-                    }}
+                    className="w-full bg-black text-white font-medium text-lg py-3"
                     onClick={() =>
                       handleBuy(
                         auctionData,
@@ -870,7 +922,8 @@ const ComicAuction = () => {
                       )
                     }
                   >
-                    Thanh toán ngay
+                    {/* Thanh toán ngay */}
+                    <span className="text-sm mr-2">Thanh toán ngay</span>
                   </Button>
                 ) : null}
               </div>

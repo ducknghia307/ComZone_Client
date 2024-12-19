@@ -677,21 +677,21 @@ const ComicAuction = () => {
                   <div>
                     {auctionData.currentPrice + auctionData.priceStep >=
                       auctionData.maxPrice && (
-                      <p className="bg-red-100 rounded-md p-4"
-                        style={{
-                          fontSize: "17px",
-                          paddingTop: "10px",
-                          fontFamily: "REM",
-                          fontWeight: "400",
-                          color: "red",
-                        }}
-                      >
-                        <ErrorOutlineSharpIcon className="mr-1 " />
-                        Chỉ có thể mua ngay với giá{" "}
-                        {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
-                        thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
-                      </p>
-                    )}
+                        <p className="bg-red-100 rounded-md p-4"
+                          style={{
+                            fontSize: "17px",
+                            paddingTop: "10px",
+                            fontFamily: "REM",
+                            fontWeight: "400",
+                            color: "red",
+                          }}
+                        >
+                          <ErrorOutlineSharpIcon className="mr-1 " />
+                          Chỉ có thể mua ngay với giá{" "}
+                          {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
+                          thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
+                        </p>
+                      )}
                     <div
                       style={{
                         paddingTop: "5px",
@@ -913,7 +913,15 @@ const ComicAuction = () => {
                   auctionData.status === "SUCCESSFUL" ? (
                   <Button
                     variant="contained"
-                    className="w-full bg-black text-white font-medium text-lg py-3"
+                    style={{
+                      color: "#fff",
+                      backgroundColor: "#000",
+                      fontWeight: "500",
+                      fontSize: "18px",
+                      fontFamily: "REM",
+                      marginTop:'-40px'
+                    }}
+                    className="w-full"
                     onClick={() =>
                       handleBuy(
                         auctionData,
@@ -922,8 +930,7 @@ const ComicAuction = () => {
                       )
                     }
                   >
-                    {/* Thanh toán ngay */}
-                    <span className="text-sm mr-2">Thanh toán ngay</span>
+                    Thanh toán ngay
                   </Button>
                 ) : null}
               </div>

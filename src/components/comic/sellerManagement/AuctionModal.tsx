@@ -20,6 +20,7 @@ interface Comic {
   coverImage: string;
   title: string;
   author: string;
+  price: number;
 }
 interface AuctionFormValues {
   id: string;
@@ -98,7 +99,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
           );
           if (data.status === "STOPPED") {
             form.setFieldsValue({
-              id: data.id, // Include the auction ID
+              id: data.id,
               reservePrice: data.reservePrice,
               maxPrice: data.maxPrice,
               priceStep: data.priceStep,
@@ -107,7 +108,21 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               endTime: dayjs(data.endTime),
             });
           } else {
-            form.resetFields(); // Reset the form if the auction is not stopped
+            const roundToNearest = (
+              value: number,
+              denomination: number
+            ): number => Math.round(value / denomination) * denomination;
+            const priceStepPercentage = 0.1;
+            const priceStep =
+              Math.round((comic.price * priceStepPercentage) / 500) * 500;
+            const depositAmount = roundToNearest(comic.price * 1.2, 500); // Round to nearest 500
+            const maxPrice = roundToNearest(comic.price * 10, 500); // Round to nearest 500
+            form.setFieldsValue({
+              reservePrice: comic.price,
+              maxPrice: maxPrice,
+              priceStep: priceStep,
+              depositAmount: depositAmount,
+            });
           }
         } catch (error) {
           console.error("Error fetching auction data:", error);
@@ -214,6 +229,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                   style={{ width: "100%" }}
                   min={0}
                   placeholder="Nhập giá khởi điểm"
+                  disabled
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
@@ -232,6 +248,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                 <InputNumber
                   style={{ width: "100%" }}
                   min={0}
+                  disabled
                   placeholder="Nhập giá mua ngay"
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -250,6 +267,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                 <InputNumber
                   style={{ width: "100%" }}
                   min={0}
+                  disabled
                   placeholder="Nhập bước giá"
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -266,6 +284,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                 <InputNumber
                   style={{ width: "100%" }}
                   min={0}
+                  disabled
                   placeholder="Nhập mức cọc"
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")

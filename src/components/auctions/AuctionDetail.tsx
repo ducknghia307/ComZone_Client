@@ -55,7 +55,7 @@ const ComicAuction = () => {
     (state: any) => state.auction.highestBid
   );
   const [bids, setBids] = useState([]);
-
+  const uniqueParticipantsCount = new Set(bids.map((bid) => bid.user.id)).size;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [winner, setWinner] = useState<boolean | null>(null);
   const [isHighest, setIsHighest] = useState<boolean | null>(null);
@@ -493,6 +493,67 @@ const ComicAuction = () => {
                   }}
                 >
                   {auctionData.priceStep.toLocaleString("vi-VN")}đ
+                </h3>
+              </div>
+            </div>
+            <div
+              className="current-price"
+              style={{
+                display: "flex",
+                justifyContent: "space-around",
+                padding: "10px 15px",
+              }}
+            >
+              <div
+                className="current-price1"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  flexDirection: "column",
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: "REM",
+                    paddingBottom: "0",
+                    fontSize: "18px",
+                  }}
+                >
+                  Lượt ra giá:
+                </p>
+                <CountUp
+                  style={{
+                    fontFamily: "REM",
+                    fontSize: "28px",
+                    fontWeight: "bold",
+                    textShadow: "4px 4px #000",
+                  }}
+                  start={bids?.length}
+                  end={bids?.length}
+                  duration={1}
+                  separator="."
+                  decimals={0}
+                />
+              </div>
+              <Divider
+                sx={{ border: "1px solid grey" }}
+                orientation="vertical"
+                flexItem
+              />
+              <div className="current-price2">
+                <p style={{ fontFamily: "REM", fontSize: "18px" }}>
+                  Người tham gia
+                </p>
+                <h3
+                  style={{
+                    fontFamily: "REM",
+                    fontSize: "28px",
+                    fontWeight: "bold",
+                    textShadow: "4px 4px #000",
+                  }}
+                >
+                  {uniqueParticipantsCount}
                 </h3>
               </div>
             </div>

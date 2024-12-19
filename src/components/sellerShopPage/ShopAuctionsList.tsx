@@ -124,7 +124,7 @@ export default function ShopAuctionsList({
                 />
                 <div className="px-1 phone:px-3 py-2">
                   <div
-                    className={`hidden sm:flex items-center justify-between w-full gap-2`}
+                    className={`hidden sm:flex items-center justify-between w-full gap-2 mb-2`}
                   >
                     {auction.comics.condition === "SEALED" && (
                       <span className="flex items-center gap-1 basis-1/2 px-2 py-1 rounded-2xl bg-sky-800 text-white text-[0.5em] font-light text-nowrap justify-center">
@@ -165,7 +165,7 @@ export default function ShopAuctionsList({
                   </div>
 
                   <p className="font-semibold flex items-center justify-center">
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full shadow-sm flex items-center gap-1 text-sm flex-nowrap whitespace-nowrap max-w-full">
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full shadow-sm flex items-center gap-1 text-sm flex-nowrap whitespace-nowrap max-w-full mb-2">
                       Giá hiện tại:{" "}
                       <span className="font-bold">
                         {auction.currentPrice.toLocaleString("vi-VN")}đ
@@ -175,19 +175,19 @@ export default function ShopAuctionsList({
 
                   {auction.status === "ONGOING" ? (
                     <>
-                      <p className="font-medium py-1">KẾT THÚC TRONG</p>
+                      <p className="font-medium py-1 mb-2">KẾT THÚC TRONG</p>
                       <Countdown
                         date={new Date(auction.endTime)}
                         renderer={renderer}
                       />
                     </>
                   ) : (
-                    <p className="text-center m-2 REM bg-orange-200 py-1 rounded-xl">
+                    <p className="text-center m-2 REM bg-orange-200 py-1 rounded-xl mb-2">
                       SẮP DIỄN RA
                     </p>
                   )}
 
-                  <p className="font-semibold text-sm sm:text-xl line-clamp-3 h-[4.4em]">
+                  <p className="font-semibold text-sm sm:text-xl line-clamp-3 h-[4.4em] mt-3">
                     {auction.comics.title}
                   </p>
                 </div>

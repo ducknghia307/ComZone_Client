@@ -62,7 +62,9 @@ export default function ExchangeSearchBar({
           placeholder="Thử tìm kiếm gì đó..."
           autoComplete="off"
           value={searchKey}
-          onChange={(e) => setSearchKey(e.target.value)}
+          onChange={(e) => {
+            setSearchKey(e.target.value);
+          }}
           className="grow border rounded-lg pl-10 pr-4 py-2 font-light bg-white"
         />
         <svg

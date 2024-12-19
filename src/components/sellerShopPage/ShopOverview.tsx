@@ -220,10 +220,11 @@ export default function ShopOverview({
                     )}
                     {auction.comics.edition !== "REGULAR" && (
                       <span
-                        className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${auction.comics?.edition === "SPECIAL"
+                        className={`flex items-center gap-1 px-2 basis-1/2 py-1 rounded-2xl ${
+                          auction.comics?.edition === "SPECIAL"
                             ? "bg-yellow-600"
                             : "bg-red-800"
-                          } text-white text-[0.5em] font-light text-nowrap justify-center`}
+                        } text-white text-[0.5em] font-light text-nowrap justify-center`}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -264,7 +265,7 @@ export default function ShopOverview({
                     </p>
                   )}
 
-                  <p className="font-semibold uppercase text-sm sm:text-base line-clamp-4 h-[5.4em] sm:h-[5.8em]">
+                  <p className="font-semibold uppercase text-sm sm:text-base pr-1 line-clamp-4 h-[5.4em] sm:h-[5.8em]">
                     {auction.comics.title}
                   </p>
                 </div>

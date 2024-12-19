@@ -9,7 +9,7 @@ import {
   IconButton,
   Chip,
 } from "@mui/material";
-import { Image, notification } from "antd";
+import { Avatar, Image, notification } from "antd";
 import CloseIcon from "@mui/icons-material/Close";
 import { privateAxios } from "../../middleware/axiosInstance";
 import RejectReasonModal from "./RejectReasonModal";
@@ -62,8 +62,8 @@ const RefundModal: React.FC<RefundModalProps> = ({
       const apiUrl = refundRequest.order
         ? `/refund-requests/approve/order/${refundRequest.order.id}`
         : refundRequest.exchange
-          ? `/refund-requests/approve/exchange/${refundRequest.id}`
-          : "";
+        ? `/refund-requests/approve/exchange/${refundRequest.id}`
+        : "";
 
       await privateAxios.patch(apiUrl);
 
@@ -141,6 +141,12 @@ const RefundModal: React.FC<RefundModalProps> = ({
         return status;
     }
   };
+
+  if (!refundRequest) return;
+
+  const packagingImages = refundRequest.order
+    ? refundRequest.order.packageImages
+    : refundRequest.exchange.delivery.packagingImages;
 
   return (
     <>
@@ -245,7 +251,9 @@ const RefundModal: React.FC<RefundModalProps> = ({
                   }}
                 >
                   <Typography variant="body1" sx={{ mb: 1, fontFamily: "REM" }}>
-                    <strong style={{ color: "#c66a7a" }}>Tên Người Dùng:</strong>{" "}
+                    <strong style={{ color: "#c66a7a" }}>
+                      Tên Người Dùng:
+                    </strong>{" "}
                     {refundRequest.user.name}
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 1, fontFamily: "REM" }}>
@@ -267,7 +275,15 @@ const RefundModal: React.FC<RefundModalProps> = ({
                     fontSize: "1rem",
                   }}
                 >
-                  Hình ảnh từ người mua
+                  Hình ảnh báo cáo từ{" "}
+                  {refundRequest.order ? (
+                    "người mua"
+                  ) : (
+                    <span className="font-semibold">
+                      <Avatar src={refundRequest.user.avatar} />{" "}
+                      {refundRequest.user.name}
+                    </span>
+                  )}
                 </Typography>
                 <Box
                   sx={{
@@ -325,7 +341,17 @@ const RefundModal: React.FC<RefundModalProps> = ({
                     fontSize: "1rem",
                   }}
                 >
-                  Hình ảnh đóng gói từ người bán
+                  Hình ảnh đóng gói từ{" "}
+                  {refundRequest.order ? (
+                    "người bán"
+                  ) : (
+                    <span className="font-semibold">
+                      <Avatar
+                        src={refundRequest.exchange.delivery.from.user.avatar}
+                      />{" "}
+                      {refundRequest.exchange.delivery.from.user.name}
+                    </span>
+                  )}
                 </Typography>
                 <Box
                   sx={{
@@ -336,8 +362,8 @@ const RefundModal: React.FC<RefundModalProps> = ({
                     justifyContent: "center",
                   }}
                 >
-                  {refundRequest.order?.packageImages?.length > 0 ? (
-                    refundRequest.order.packageImages.map((image, index) => (
+                  {packagingImages && packagingImages.length > 0 ? (
+                    packagingImages.map((image, index) => (
                       <Box
                         key={index}
                         sx={{
@@ -439,7 +465,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
                               "&.Mui-disabled": {
                                 bgcolor: "#c66a7a80",
                               },
-                              marginBottom: '10px'
+                              marginBottom: "10px",
                             }}
                           >
                             {loading ? "Đang xử lý..." : "Chấp thuận"}
@@ -458,7 +484,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
                                 color: "#71002b",
                                 bgcolor: "transparent",
                               },
-                              marginBottom: '10px'
+                              marginBottom: "10px",
                             }}
                           >
                             Từ chối

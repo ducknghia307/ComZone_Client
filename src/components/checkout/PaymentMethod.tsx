@@ -205,9 +205,12 @@ const PaymentMethod = ({
                   className="w-full border p-2 rounded mb-2"
                   value={CurrencySplitter(Number(selectedAmount)) || 0}
                   onChange={(e) => {
-                    setSelectedAmount(
-                      Number(e.target.value.replace(/[^0-9.-]+/g, ""))
-                    );
+                    if (Number(e.target.value.replace(/\./g, "")) > 10000000)
+                      setSelectedAmount(99999999);
+                    else
+                      setSelectedAmount(
+                        Number(e.target.value.replace(/\./g, ""))
+                      );
                   }}
                 />
                 <p

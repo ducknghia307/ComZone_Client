@@ -97,10 +97,12 @@ const HotComic: React.FC = () => {
   };
 
   return (
-    <div className="w-full py-8">
+    <div className="REM w-full py-8">
       {/* Truyện tranh nổi bật */}
       <div className="hot-comic-section flex justify-between items-center bg-black rounded-t-lg ">
-        <h2 className="text-2xl font-bold text-white ">Truyện Tranh Nguyên Seal</h2>
+        <h2 className="text-2xl font-bold text-white ">
+          Truyện Tranh Nguyên Seal
+        </h2>
         <a
           href="hotcomic"
           className="text-red-500 font-semibold"

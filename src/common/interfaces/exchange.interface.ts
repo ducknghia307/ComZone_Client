@@ -1,4 +1,4 @@
-import { BaseInterface, Comic, UserInfo } from "../base.interface";
+import { BaseInterface, Comic, Delivery, UserInfo } from "../base.interface";
 
 export interface Exchange extends BaseInterface {
   id: string;
@@ -16,6 +16,7 @@ export interface Exchange extends BaseInterface {
   depositAmount?: number;
   compensateUser?: UserInfo;
   compensationAmount?: number;
+  delivery?: Delivery;
 }
 
 export interface ExchangePostInterface extends BaseInterface {

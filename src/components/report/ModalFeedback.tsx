@@ -7,7 +7,7 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import { privateAxios } from '../../middleware/axiosInstance';
-import { notification } from 'antd';
+import { Image, notification } from 'antd';
 interface Feedback {
     id: string;
     user: { name: string; avatar: string; };
@@ -65,6 +65,7 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
             open={isOpen}
             onClose={onClose}
             aria-labelledby="feedback-modal-title"
+            style={{ zIndex: 1000 }}
         >
             <Paper
                 elevation={24}
@@ -293,21 +294,18 @@ const ModalFeedback: React.FC<ModalFeedbackProps> = ({ isOpen, feedback, onClose
                                                         },
                                                     }}
                                                 >
-                                                    <Box
-                                                        sx={{
-                                                            position: 'relative',
-                                                            paddingTop: '100%',
+                                                    <Image
+                                                        src={image}
+                                                        alt={`Feedback ${index + 1}`}
+                                                        style={{
+                                                            width: '100%',
+                                                            height: '200px',
+                                                            objectFit: 'cover',
+                                                            borderRadius: "8px",
+                                                            border: "2px solid #c66a7a",
+                                                            cursor: "pointer",
                                                         }}
-                                                    >
-                                                        <img
-                                                            src={image}
-                                                            alt={`Feedback ${index + 1}`}
-                                                            loading="lazy"
-                                                            style={{
-                                                                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
-                                                            }}
-                                                        />
-                                                    </Box>
+                                                    />
                                                 </ImageListItem>
                                             ))}
                                         </ImageList>

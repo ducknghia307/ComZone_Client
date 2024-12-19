@@ -206,6 +206,8 @@ export interface Delivery {
     address: string;
     fullAddress?: string;
   };
+  packagingImages?: string[];
+  expiredAt: string[];
 }
 
 export interface SellerDetails extends BaseInterface {

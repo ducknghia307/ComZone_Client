@@ -90,7 +90,7 @@ export default function SellerShopPage() {
   const fetchSellerComics = async () => {
     setIsLoading(true);
     await publicAxios
-      .get(`comics/seller/${id}`)
+      .get(`comics/seller/available/${id}`)
       .then((res) => {
         setFullComicsList(res.data);
         if (!searchParams.has("search")) setCurrentComicsList(res.data);
@@ -116,7 +116,6 @@ export default function SellerShopPage() {
     await publicAxios
       .get(`auction/active/seller/${id}`)
       .then((res) => {
-        console.log("AUCTIONS: ", res.data);
         setAuctionList(res.data);
       })
       .catch((err) => console.log(err))

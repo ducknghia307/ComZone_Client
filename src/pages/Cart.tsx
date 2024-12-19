@@ -18,7 +18,7 @@ const Cart = () => {
   const [sellerSelectAll, setSellerSelectAll] = useState<
     Record<string, boolean>
   >({});
-
+  const [isAllSelected, setIsAllSelected] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const navigate = useNavigate();
 
@@ -113,10 +113,8 @@ const Cart = () => {
       comicsForSeller.length > 0 &&
       comicsForSeller.every((comic) => comic.selected);
 
-    setCartData((prevData) => ({
-      ...prevData!,
-      comics: updatedComics,
-    }));
+    setCartData({ ...cartData, comics: updatedComics });
+    updateGlobalSelectState(updatedComics);
 
     setSellerSelectAll((prev) => ({
       ...prev,
@@ -124,17 +122,54 @@ const Cart = () => {
     }));
   };
 
-  const handleSellerSelectAll = (sellerId: string) => {
-    const isCurrentlySelected = sellerSelectAll[sellerId] || false;
+  const updateGlobalSelectState = (comics: Comic[]) => {
+    const availableComics = comics.filter(
+      (comic) => comic.status === "AVAILABLE"
+    );
+    const allSelected =
+      availableComics.length > 0 &&
+      availableComics.every((comic) => comic.selected);
+    setIsAllSelected(allSelected);
+  };
 
-    setCartData((prevData) => ({
-      ...prevData!,
-      comics: prevData!.comics.map((comic) =>
-        comic.sellerId?.id === sellerId
-          ? { ...comic, selected: !isCurrentlySelected }
-          : comic
-      ),
+  const handleSelectAll = () => {
+    if (!cartData) return;
+
+    const newIsAllSelected = !isAllSelected;
+
+    // Update all available comics
+    const updatedComics = cartData.comics.map((comic) => ({
+      ...comic,
+      selected: comic.status === "AVAILABLE" ? newIsAllSelected : false,
     }));
+
+    // Update seller select all states
+    const newSellerSelectAll: Record<string, boolean> = {};
+    Object.keys(groupComicsBySeller(updatedComics)).forEach((sellerId) => {
+      const sellerComics = updatedComics.filter(
+        (comic) => comic.sellerId?.id === sellerId
+      );
+      newSellerSelectAll[sellerId] = sellerComics.every(
+        (comic) => comic.selected
+      );
+    });
+
+    setCartData({ comics: updatedComics });
+    setSellerSelectAll(newSellerSelectAll);
+    setIsAllSelected(newIsAllSelected);
+  };
+  const handleSellerSelectAll = (sellerId: string) => {
+    if (!cartData) return;
+
+    const isCurrentlySelected = sellerSelectAll[sellerId] || false;
+    const updatedComics = cartData.comics.map((comic) =>
+      comic.sellerId?.id === sellerId && comic.status === "AVAILABLE"
+        ? { ...comic, selected: !isCurrentlySelected }
+        : comic
+    );
+
+    setCartData({ comics: updatedComics });
+    updateGlobalSelectState(updatedComics);
 
     setSellerSelectAll((prev) => ({
       ...prev,
@@ -246,6 +281,11 @@ const Cart = () => {
                 ({cartData ? cartData.comics.length : 0} sản phẩm)
               </h2>
             </div>
+            <div className="flex items-center gap-2 px-4 py-2">
+              <Checkbox checked={isAllSelected} onChange={handleSelectAll}>
+                <span className="text-sm">Chọn tất cả</span>
+              </Checkbox>
+            </div>
             {isLoading ? (
               <Skeleton active />
             ) : (
@@ -306,7 +346,7 @@ const Cart = () => {
                                     alt={comic.title}
                                     className="w-16 h-24 object-cover"
                                   />
-                                  <div className="flex flex-col items-start ml-4">
+                                  <div className="flex flex-col items-start ml-4 max-w-screen-phone">
                                     <Tooltip
                                       title={
                                         <span className="font-light text-nowrap">
@@ -430,7 +470,9 @@ const Cart = () => {
                       </span>
                     </div>
                     <button
-                      className="w-full mt-4 py-2 bg-black text-white font-semibold rounded-md"
+                      className={`w-full mt-4 py-2 bg-black text-white font-semibold rounded-md ${
+                        totalPrice === 0 && "cursor-not-allowed opacity-50"
+                      }`}
                       onClick={handleCheckout}
                     >
                       THANH TOÁN

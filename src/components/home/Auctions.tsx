@@ -121,18 +121,18 @@ const Auctions: React.FC = () => {
   return (
     <div className="w-full py-8 auction-container1">
       <div className="mt-4 big-cards">
-        <div className="section-title text-xl font-bold">
-          <h2
-            className="title"
-            style={{
-              paddingBottom: "15px",
-              color: "#fff",
-              textAlign: "center",
-            }}
-          >
+        <div className="section-title text-xl font-bold flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-white">
             Các sản phẩm đang được đấu giá
           </h2>
-          <div className="line"></div>
+          <a
+            href="hotcomic"
+            className="text-red-500 font-semibold"
+            style={{ fontSize: "20px" }}
+          >
+            Xem tất cả{" "}
+            <ChevronRightIcon style={{ width: "30px", height: "30px" }} />
+          </a>
         </div>
         {ongoingComics.length === 0 ? (
           <div className="no-auctions">
@@ -144,6 +144,7 @@ const Auctions: React.FC = () => {
           </div>
         ) : (
           <Carousel
+          className="mt-6"
             responsive={responsive}
             customButtonGroup={
               <CustomButtonGroup

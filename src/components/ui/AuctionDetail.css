@@ -213,6 +213,16 @@
   background-color: #d4edda; /* Light green background */
   margin-bottom: 10px;
 }
+.error-bid-message {
+  font-size: 1.2rem;
+  color: #28a745; /* Green color to indicate success */
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #d4edda; /* Light green background */
+  margin-bottom: 10px;
+}
 
 .bid-row .bid-button {
   background-color: #000;

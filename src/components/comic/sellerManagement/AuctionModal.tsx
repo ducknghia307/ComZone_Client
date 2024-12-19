@@ -51,6 +51,39 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
   const startTime = dayjs(form.getFieldValue("startTime"));
   const handleSubmit = async (values: AuctionFormValues) => {
     try {
+      // Validate maxPrice here
+      const reservePrice = form.getFieldValue("reservePrice");
+      // Ensure you use the correct value here
+      const maxAllowedPrice = reservePrice * 20;
+      const maxPrice = form.getFieldValue("maxPrice");
+
+      // Custom validation for maxPrice
+      if (maxPrice < reservePrice) {
+        // Manually setting the error for maxPrice
+        form.setFields([
+          {
+            name: "maxPrice",
+            errors: [
+              `Giá mua ngay không được thấp hơn giá khởi điểm (${reservePrice.toLocaleString()}đ)`,
+            ],
+          },
+        ]);
+        return; // Stop further execution
+      }
+
+      if (maxPrice > maxAllowedPrice) {
+        // Manually setting the error for maxPrice
+        form.setFields([
+          {
+            name: "maxPrice",
+            errors: [
+              `Giá mua ngay không được vượt quá ${maxAllowedPrice.toLocaleString()}đ (20 lần giá khởi điểm)`,
+            ],
+          },
+        ]);
+        return; // Stop further execution
+      }
+
       if (form.getFieldValue("id")) {
         console.log('form.getFieldValue("id")', form.getFieldValue("id"));
 
@@ -112,14 +145,14 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               value: number,
               denomination: number
             ): number => Math.round(value / denomination) * denomination;
-            const priceStepPercentage = 0.1;
+            const priceStepPercentage = 0.05;
             const priceStep =
               Math.round((comic.price * priceStepPercentage) / 500) * 500;
             const depositAmount = roundToNearest(comic.price * 1.2, 500); // Round to nearest 500
-            const maxPrice = roundToNearest(comic.price * 10, 500); // Round to nearest 500
+
             form.setFieldsValue({
               reservePrice: comic.price,
-              maxPrice: maxPrice,
+
               priceStep: priceStep,
               depositAmount: depositAmount,
             });
@@ -217,7 +250,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
 
         <Form form={form} onFinish={handleSubmit} layout="vertical">
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 name="reservePrice"
                 label="Giá khởi điểm (đ)"
@@ -237,28 +270,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               </Form.Item>
             </Col>
 
-            <Col span={12}>
-              <Form.Item
-                name="maxPrice"
-                label="Giá mua ngay (đ)"
-                rules={[
-                  { required: true, message: "Vui lòng nhập giá mua ngay" },
-                ]}
-              >
-                <InputNumber
-                  style={{ width: "100%" }}
-                  min={0}
-                  disabled
-                  placeholder="Nhập giá mua ngay"
-                  formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 name="priceStep"
                 label="Bước giá (đ)"
@@ -275,7 +287,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 name="depositAmount"
                 label="Mức cọc (đ)"
@@ -293,7 +305,26 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               </Form.Item>
             </Col>
           </Row>
-          {/* Row to display start and end time next to each other */}
+          <Col span={24}>
+            <Form.Item
+              name="maxPrice"
+              label="Giá mua ngay (đ)"
+              rules={[
+                { required: true, message: "Vui lòng nhập giá mua ngay" },
+              ]}
+            >
+              <InputNumber
+                style={{ width: "100%" }}
+                min={0}
+                placeholder="Nhập giá mua ngay"
+                formatter={(value) =>
+                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+              />
+            </Form.Item>
+          </Col>
+
+          {/* Row to display start and end time  next to each other */}
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item

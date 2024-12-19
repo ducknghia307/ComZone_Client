@@ -55,7 +55,7 @@ const ComicAuction = () => {
     (state: any) => state.auction.highestBid
   );
   const [bids, setBids] = useState([]);
-  const uniqueParticipantsCount = new Set(bids.map((bid) => bid.user.id)).size;
+  const uniqueParticipantsCount = new Set(bids.map((bid) => bid?.user.id)).size;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [winner, setWinner] = useState<boolean | null>(null);
   const [isHighest, setIsHighest] = useState<boolean | null>(null);
@@ -197,11 +197,7 @@ const ComicAuction = () => {
         setPreviewChapter(comicData.previewChapter || []);
         dispatch(setAuctionData(response.data));
 
-        const responseBid = await publicAxios.get(`/bids/auction/${id}`);
-        console.log("1", responseBid);
-        const bidData = responseBid.data;
-        setBids(bidData);
-        dispatch(setHighestBid(responseBid.data[0]));
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching comic details:", error);
       } finally {
@@ -210,6 +206,25 @@ const ComicAuction = () => {
     };
     fetchComicDetails();
   }, [id, auctionAnnounce?.id, dispatch]);
+  const fetchBisOfAuction = async () => {
+    try {
+      const responseBid = await publicAxios.get(`/bids/auction/${id}`);
+      console.log("1", responseBid);
+      const bidData = responseBid.data;
+      setBids(bidData);
+      dispatch(setHighestBid(responseBid.data[0]));
+    } catch (error) {
+      console.error("Error fetching comic details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch bids on component mount or when auction ID changes
+  useEffect(() => {
+    fetchBisOfAuction();
+  }, [id, auctionAnnounce?.id, dispatch]);
+
   useEffect(() => {
     if (!userId) {
       setWinner(null);
@@ -250,10 +265,11 @@ const ComicAuction = () => {
       socket.connect();
     }
     socket.on("bidUpdate", (data: any) => {
-      console.log(data);
+      console.log("123", data);
       if (data.placeBid.auction.id === id) {
         dispatch(setHighestBid(data.placeBid));
         dispatch(setAuctionData(data.placeBid.auction));
+        fetchBisOfAuction();
       }
     });
     return () => {
@@ -589,6 +605,7 @@ const ComicAuction = () => {
                     ) : (
                       /* Display the error if the bid exceeds max price */
                       <p
+                        className="bg-red-100 rounded-md p-4"
                         style={{
                           fontSize: "17px",
                           paddingTop: "10px",
@@ -598,7 +615,7 @@ const ComicAuction = () => {
                           color: "red",
                         }}
                       >
-                        <ErrorOutlineSharpIcon className="mr-1" />
+                        <ErrorOutlineSharpIcon className="mr-1  " />
                         Chỉ có thể mua ngay với giá{" "}
                         {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
                         thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
@@ -615,7 +632,7 @@ const ComicAuction = () => {
                   <div>
                     {auctionData.currentPrice + auctionData.priceStep >=
                       auctionData.maxPrice && (
-                      <p
+                      <p className="bg-red-100 rounded-md p-4"
                         style={{
                           fontSize: "17px",
                           paddingTop: "10px",
@@ -624,7 +641,7 @@ const ComicAuction = () => {
                           color: "red",
                         }}
                       >
-                        <ErrorOutlineSharpIcon className="mr-1" />
+                        <ErrorOutlineSharpIcon className="mr-1 " />
                         Chỉ có thể mua ngay với giá{" "}
                         {auctionData.maxPrice.toLocaleString("vi-VN")}đ. Không
                         thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.

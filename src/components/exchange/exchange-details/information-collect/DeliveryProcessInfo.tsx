@@ -33,7 +33,7 @@ export default function DeliveryProcessInfo({
   secondUser: UserInfo;
   firstAddress: string;
   secondAddress: string;
-  fetchExchangeDetails: Function;
+  fetchExchangeDetails: () => void;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [isShowingReceivedDelivery, setIsShowingReceivedDelivery] =

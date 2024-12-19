@@ -250,6 +250,9 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
                   >
                     {item.message}
                   </p>
+                  <p className="text-xs text-gray-400 text-right">
+                    {new Date(item.createdAt).toLocaleString()}
+                  </p>
                 </div>
               </div>
             );

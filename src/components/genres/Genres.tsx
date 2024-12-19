@@ -283,7 +283,8 @@ const Genres: React.FC<GenresProps> = ({
             comics.length === 0 &&
             auctionComics.length === 0 &&
             // sellers.length === 0 ? (
-              sellers.filter((sellerObj) => sellerObj.comics.length > 0).length === 0 ? (
+            sellers.filter((sellerObj) => sellerObj.comics.length > 0)
+              .length === 0 ? (
               <div className="text-center py-10">
                 <img
                   className="h-40 w-auto object-contain mx-auto"
@@ -326,12 +327,9 @@ const Genres: React.FC<GenresProps> = ({
                             alt={auction.comics.title}
                             className="object-cover w-full h-80"
                           />
-                          <div className="px-3 py-2 mt-2">
-                            <p className="font-semibold line-clamp-2 h-[3rem]">
-                              {auction.comics.title}
-                            </p>
+                          <div className="px-3 py-2">
                             <div
-                              className={`hidden sm:flex items-center justify-between w-full gap-2 my-2`}
+                              className={`hidden sm:flex items-center justify-between min-h-[1.2em] w-full gap-2 my-2`}
                             >
                               {auction.comics.condition === "SEALED" && (
                                 <span className="flex items-center gap-1 basis-1/2 px-2 py-1 rounded-2xl bg-sky-800 text-white text-[0.5em] font-light text-nowrap justify-center">
@@ -370,6 +368,9 @@ const Genres: React.FC<GenresProps> = ({
                                 </span>
                               )}
                             </div>
+                            <p className="font-semibold line-clamp-2 h-[3rem]">
+                              {auction.comics.title}
+                            </p>
 
                             <p className="font-semibold mt-2 mb-2 flex items-center justify-center">
                               <span

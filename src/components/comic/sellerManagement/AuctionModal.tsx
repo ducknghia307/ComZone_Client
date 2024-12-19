@@ -13,6 +13,7 @@ import { Moment } from "moment";
 import dayjs from "dayjs";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import { useEffect } from "react";
+import InfoIcon from "@mui/icons-material/Info";
 
 // Define types for the comic and props
 interface Comic {
@@ -130,36 +131,35 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
           const { data } = await privateAxios.get(
             `/auction/comics/${comic.id}`
           );
+          const roundToNearest = (
+            value: number,
+            denomination: number
+          ): number => Math.round(value / denomination) * denomination;
+          const priceStepPercentage = 0.05;
+          const priceStep =
+            Math.round((comic.price * priceStepPercentage) / 500) * 500;
+          const depositAmount = roundToNearest(comic.price * 1.2, 500);
+
           if (data.status === "STOPPED") {
             form.setFieldsValue({
               id: data.id,
-              reservePrice: data.reservePrice,
+              reservePrice: comic.price,
               maxPrice: data.maxPrice,
-              priceStep: data.priceStep,
-              depositAmount: data.depositAmount,
+              priceStep: priceStep,
+              depositAmount: depositAmount,
               startTime: dayjs(data.startTime),
               endTime: dayjs(data.endTime),
             });
           } else {
-            const roundToNearest = (
-              value: number,
-              denomination: number
-            ): number => Math.round(value / denomination) * denomination;
-            const priceStepPercentage = 0.05;
-            const priceStep =
-              Math.round((comic.price * priceStepPercentage) / 500) * 500;
-            const depositAmount = roundToNearest(comic.price * 1.2, 500); // Round to nearest 500
-
             form.setFieldsValue({
               reservePrice: comic.price,
-
               priceStep: priceStep,
               depositAmount: depositAmount,
             });
           }
         } catch (error) {
           console.error("Error fetching auction data:", error);
-          form.resetFields(); // Reset the form in case of an error
+          form.resetFields();
         }
       }
     };
@@ -219,7 +219,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
             display: "flex",
             alignItems: "center",
             gap: 2,
-            margin: "30px 0",
+            margin: "20px 0 10px",
             p: 2,
             bgcolor: "#f5f5f5",
             borderRadius: 2,
@@ -247,6 +247,45 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
             <Typography fontSize={12}>{comic?.author}</Typography>
           </div>
         </Box>
+        <div>
+          <Typography
+            variant="body2"
+            style={{
+              marginBottom: "10px",
+              fontFamily: "REM",
+              fontStyle: "italic",
+              color: "#333",
+              padding: "10px",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "10px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "5px",
+              }}
+            >
+              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
+              Giá khởi điểm dựa trên giá của truyện.
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "5px",
+              }}
+            >
+              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
+              Bước giá dựa trên 5% của giá khởi điểm.
+            </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
+              Mức cọc dựa trên 120% của giá khởi điểm.
+            </div>
+          </Typography>
+        </div>
 
         <Form form={form} onFinish={handleSubmit} layout="vertical">
           <Row gutter={16}>

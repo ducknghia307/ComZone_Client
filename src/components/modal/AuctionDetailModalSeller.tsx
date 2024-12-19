@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,12 +6,15 @@ import {
   DialogActions,
   Typography,
   Button,
+  Chip,
 } from "@mui/material";
+import { publicAxios } from "../../middleware/axiosInstance";
 
 interface AuctionDetailModalProps {
   open: boolean;
   onClose: () => void;
   auction: {
+    id: string;
     comics: { id: string; title: string; coverImage: string };
     currentPrice?: number;
     maxPrice: number;
@@ -30,6 +33,24 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
   onClose,
   auction,
 }) => {
+  const [bids, setBids] = useState<any[]>([]);
+  const fetchBidsOfAuction = async () => {
+    try {
+      const responseBid = await publicAxios.get(`/bids/auction/${auction?.id}`);
+      const bidData = responseBid.data;
+      setBids(bidData);
+    } catch (error) {
+      console.error("Error fetching bid details:", error);
+    }
+  };
+  console.log("1", bids);
+
+  useEffect(() => {
+    if (auction?.id) {
+      fetchBidsOfAuction();
+    }
+  }, [auction?.id]);
+
   if (!auction) return null;
 
   const getStatusChipStyles = (status: string) => {
@@ -229,7 +250,39 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
                 </Typography>
               </div>
             ))}
+            {/* Display bids */}{" "}
+            {bids.length === 0 ? null : (
+              <div style={{ marginTop: "20px" }}>
+                <Chip
+                  label="Lịch sử ra giá"
+                  style={{
+                    backgroundColor: "#fff",
+                    color: "#000",
+                    border: "1px solid black",
+                    fontWeight: 600,
+                    padding: "10px",
+                    marginBottom: "10px",
+                    boxShadow: "3px 3px rgba(0,0,0,0.3)",
+                  }}
+                />
 
+                <div className="max-h-[100px] overflow-y-auto border border-[#e0e0e0] rounded-lg p-2 scrollbar-thin ">
+                  {bids.map((bid) => (
+                    <div
+                      key={bid.id}
+                      className="flex justify-between py-2 border-b border-[#f0f0f0]"
+                    >
+                      <Typography className="text-[#666]">
+                        {new Date(bid.createdAt).toLocaleString("vi-VN")}
+                      </Typography>
+                      <Typography className="font-bold text-[#000]">
+                        {bid.user.name} - {bid.price.toLocaleString("vi-VN")} đ
+                      </Typography>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {auction.winner && (
               <div
                 style={{

@@ -6,6 +6,7 @@ const { store } = makeStore();
 
 const socket = io(import.meta.env.VITE_SERVER_BASE_URL, {
   autoConnect: true,
+  transports: ["websocket"],
   query: {},
 });
 
@@ -34,7 +35,6 @@ socket.on("connect", () => {
 
 socket.on("disconnect", () => {
   console.log("Socket disconnected");
-  socket.connect();
 });
 
 export default socket;

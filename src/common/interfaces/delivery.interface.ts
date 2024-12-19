@@ -85,5 +85,7 @@ export interface Delivery extends BaseInterface {
   estimatedDeliveryTime?: Date;
   status?: DeliveryStatus;
   overallStatus?: DeliveryOverallStatus;
+  packagingImages?: string[];
+  expiredAt?: Date;
   note?: string;
 }

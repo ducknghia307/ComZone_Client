@@ -96,7 +96,7 @@ export default function InformationCollectSection({
             : "đã bị từ chối"
         }`,
         subTitle: (
-          <p className="text-red-600">
+          <p className="text-red-600 leading-tight">
             {exchangeDetails.exchange.status === "FAILED"
               ? "Trao đổi được hệ thống ghi nhận là thất bại khi một trong hai người trao đổi dừng trao đổi hoặc xảy ra vấn đề trong lúc trao đổi."
               : "Trao đổi được hệ thống ghi nhận là bị từ chối khi yêu cầu của bạn không được người đăng bài chấp thuận hoặc người đăng bài đã chấp nhận một yêu cầu trao đổi khác."}
@@ -108,7 +108,7 @@ export default function InformationCollectSection({
         return {
           title: "Xác nhận danh sách truyện hai bên dùng để trao đổi",
           subTitle: (
-            <p>
+            <p className="leading-tight">
               Sử dụng tiền bù có thể áp dụng cho cuộc trao đổi này sau khi xác
               nhận xong danh sách truyện dùng để trao đổi.
             </p>
@@ -118,7 +118,7 @@ export default function InformationCollectSection({
         return {
           title: "Xác nhận tiền bù và tiền cọc",
           subTitle: exchangeDetails.isRequestUser ? (
-            <p className="leading-relaxed">
+            <p className="leading-tight">
               Bạn sẽ tiến hành xác nhận tiền bù và tiền cọc cho cuộc trao đổi
               này, dựa trên những truyện mà bạn đã chọn để trao đổi.
               <br />
@@ -126,7 +126,7 @@ export default function InformationCollectSection({
               <span className="font-semibold">{theOther.name}</span>.
             </p>
           ) : (
-            <p>
+            <p className="leading-tight">
               Mức tiền bù và tiền cọc sẽ được đưa ra từ người yêu cầu trao đổi,
               sau đó sẽ được xác nhận bởi chính bạn để hoàn tất quá trình xác
               nhận.
@@ -137,7 +137,7 @@ export default function InformationCollectSection({
         return {
           title: "Điền thông tin giao hàng",
           subTitle: (
-            <p className="leading-relaxed">
+            <p className="leading-tight">
               Điền thông tin địa điểm bạn sẽ bàn giao truyện để giao và nhận
               truyện được trao đổi.
             </p>
@@ -147,7 +147,7 @@ export default function InformationCollectSection({
         return {
           title: "Thanh toán",
           subTitle: (
-            <p className="leading-relaxed">
+            <p className="leading-tight">
               Hoàn tất quá trình thanh toán để xác nhận hoàn tất trao đổi. Quá
               trình giao hàng sẽ tự động bắt đầu ngay sau khi ghi nhận được đầy
               đủ tiền cọc từ hai bên.
@@ -158,9 +158,10 @@ export default function InformationCollectSection({
         return {
           title: "Giao hàng & nhận hàng",
           subTitle: (
-            <p className="leading-relaxed max-w-1/2">
+            <p className="leading-tight max-w-1/2">
               Quá trình giao hàng sẽ tự động bắt đầu sau khi hệ thống ghi nhận
-              được giao dịch thanh toán và đặt cọc của hai bên.
+              được giao dịch thanh toán, đặt cọc và xác nhận hoàn tất đóng gói
+              từ hai bên.
             </p>
           ),
         };

@@ -126,7 +126,7 @@ const Auctions: React.FC = () => {
             Các sản phẩm đang được đấu giá
           </h2>
           <a
-            href="hotcomic"
+            href="auctions"
             className="text-red-500 font-semibold"
             style={{ fontSize: "20px" }}
           >

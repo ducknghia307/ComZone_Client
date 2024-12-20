@@ -140,11 +140,27 @@ const SellerCreateComic: React.FC = () => {
       return;
     }
 
-    if (isSeries && formData.episodesList.length !== formData.quantity) {
+    if (isSeries && formData.episodesList.length === 0) {
       message.warning({
-        key: "quantity-warning",
-        content:
-          "Tập truyện số hoặc tên tập không khớp với số lượng cuốn trong bộ truyện!",
+        key: "episodes-warning",
+        content: (
+          <p className="REM">
+            Vui lòng thêm tên hay số cho ít nhất 1 tập truyện!
+          </p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    if (isSeries && formData.episodesList.length > formData.quantity) {
+      message.warning({
+        key: "episodes-warning",
+        content: (
+          <p className="REM">
+            Số tên tập truyện không thể nhiều hơn số lượng truyện trong bộ!
+          </p>
+        ),
         duration: 5,
       });
       return;

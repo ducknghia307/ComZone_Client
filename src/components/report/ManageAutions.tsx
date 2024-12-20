@@ -14,7 +14,6 @@ import {
   FormControl,
   IconButton,
   InputAdornment,
-  InputLabel,
   MenuItem,
   Select,
   TextField,
@@ -24,15 +23,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import AuctionDetailMod from "../modal/AuctionDetailMod";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Auction, UserInfo } from "../../common/base.interface";
-import { SelectChangeEvent } from '@mui/material/Select';
-interface Order {
-  id: number;
-  customerName: string;
-  product: string;
-  quantity: number;
-  totalAmount: number;
-  status: string;
-}
+import { SelectChangeEvent } from "@mui/material/Select";
 
 interface SelectedAuction extends Auction {
   sellerInfo: UserInfo;
@@ -63,35 +54,35 @@ const ManageAuctions: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  // const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAuction, setSelectedAuction] = useState<SelectedAuction | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [selectedAuction, setSelectedAuction] =
+    useState<SelectedAuction | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+
+  const fetchOrdersWithItems = async () => {
+    try {
+      const response = await privateAxios.get("/auction");
+      const auctionsData = response.data;
+
+      // Check if auctionsData is an array and has expected data
+      if (!Array.isArray(auctionsData) || auctionsData.length === 0) {
+        console.error("No auctions data or unexpected format:", auctionsData);
+        setLoading(false);
+        return;
+      }
+
+      setAuctions(auctionsData);
+      console.log("Auctions:", auctionsData);
+    } catch (error) {
+      console.error("Error fetching auctions:", error);
+    } finally {
+      // Ensure loading is set to false after fetch completes or if an error occurs
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrdersWithItems = async () => {
-      try {
-        const response = await privateAxios.get("/auction");
-        const auctionsData = response.data;
-
-        // Check if auctionsData is an array and has expected data
-        if (!Array.isArray(auctionsData) || auctionsData.length === 0) {
-          console.error("No auctions data or unexpected format:", auctionsData);
-          setLoading(false);
-          return;
-        }
-
-        setAuctions(auctionsData);
-        console.log("Auctions:", auctionsData);
-      } catch (error) {
-        console.error("Error fetching auctions:", error);
-      } finally {
-        // Ensure loading is set to false after fetch completes or if an error occurs
-        setLoading(false);
-      }
-    };
-
     fetchOrdersWithItems();
   }, []);
 
@@ -115,22 +106,22 @@ const ManageAuctions: React.FC = () => {
     const sellerInfo: UserInfo = auction.comics.sellerId
       ? auction.comics.sellerId
       : {
-        createdAt: "",
-        email: "",
-        id: "",
-        name: "",
-        phone: "",
-        avatar: "",
-        refresh_token: "",
-        role: null,
-        updatedAt: "",
-        balance: 0,
-        nonWithdrawableAmount: 0,
-        last_active: null,
-        isActive: false,
-        follower_count: 0,
-        address: "",
-      };
+          createdAt: "",
+          email: "",
+          id: "",
+          name: "",
+          phone: "",
+          avatar: "",
+          refresh_token: "",
+          role: null,
+          updatedAt: "",
+          balance: 0,
+          nonWithdrawableAmount: 0,
+          last_active: null,
+          isActive: false,
+          follower_count: 0,
+          address: "",
+        };
 
     setSelectedAuction({
       ...auction,
@@ -140,10 +131,10 @@ const ManageAuctions: React.FC = () => {
     setIsModalOpen(true);
   };
 
-
   const handleModalSuccess = () => {
     // Refresh or update the auctions data if necessary
     handleModalClose();
+    fetchOrdersWithItems();
   };
 
   const getStatusChipStyles = (status: string) => {
@@ -264,18 +255,23 @@ const ManageAuctions: React.FC = () => {
       ? auction.status === selectedStatus
       : true;
     const searchMatch =
-      auction.comics.sellerId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      auction.comics.sellerId.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       auction.comics.title.toLowerCase().includes(searchTerm.toLowerCase());
     return statusMatch && searchMatch;
-  })
-    .sort((a, b) => {
-      // Sort by createdAt in descending order (most recent first)
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+  });
 
   return (
     <div style={{ paddingBottom: "40px" }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "30px",
+        }}
+      >
         {/* Search Box */}
         <TextField
           variant="outlined"
@@ -283,19 +279,38 @@ const ManageAuctions: React.FC = () => {
           value={searchTerm}
           onChange={handleSearch}
           size="small"
-          sx={{ backgroundColor: '#c66a7a', borderRadius: '4px', color: '#fff', width: '420px' }}
+          sx={{
+            backgroundColor: "#c66a7a",
+            borderRadius: "4px",
+            color: "#fff",
+            width: "420px",
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchOutlinedIcon sx={{ color: '#fff' }} />
+                <SearchOutlinedIcon sx={{ color: "#fff" }} />
               </InputAdornment>
             ),
-            style: { color: '#fff', fontFamily: 'REM' },
+            style: { color: "#fff", fontFamily: "REM" },
           }}
         />
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           {/* Filter theo trạng thái */}
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#71002b', fontFamily: 'REM', paddingRight: '10px' }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: "bold",
+              color: "#71002b",
+              fontFamily: "REM",
+              paddingRight: "10px",
+            }}
+          >
             Trạng Thái:
           </Typography>
           <FormControl size="small" sx={{ minWidth: 150, marginLeft: 1 }}>
@@ -303,15 +318,29 @@ const ManageAuctions: React.FC = () => {
               value={selectedStatus}
               onChange={handleStatusFilterChange}
               displayEmpty
-              sx={{ fontFamily: 'REM' }}
+              sx={{ fontFamily: "REM" }}
             >
-              <MenuItem sx={{ fontFamily: 'REM' }} value="">Tất Cả</MenuItem>
-              <MenuItem sx={{ fontFamily: 'REM' }} value="UPCOMING">Sắp diễn ra</MenuItem>
-              <MenuItem sx={{ fontFamily: 'REM' }} value="ONGOING">Đang diễn ra</MenuItem>
-              <MenuItem sx={{ fontFamily: 'REM' }} value="SUCCESSFUL">Thành công</MenuItem>
-              <MenuItem sx={{ fontFamily: 'REM' }} value="FAILED">Thất bại</MenuItem>
-              <MenuItem sx={{ fontFamily: 'REM' }} value="CANCELED">Đã hủy</MenuItem>
-              <MenuItem sx={{ fontFamily: 'REM' }} value="COMPLETED">Hoàn thành</MenuItem>
+              <MenuItem sx={{ fontFamily: "REM" }} value="">
+                Tất Cả
+              </MenuItem>
+              <MenuItem sx={{ fontFamily: "REM" }} value="UPCOMING">
+                Sắp diễn ra
+              </MenuItem>
+              <MenuItem sx={{ fontFamily: "REM" }} value="ONGOING">
+                Đang diễn ra
+              </MenuItem>
+              <MenuItem sx={{ fontFamily: "REM" }} value="SUCCESSFUL">
+                Thành công
+              </MenuItem>
+              <MenuItem sx={{ fontFamily: "REM" }} value="FAILED">
+                Thất bại
+              </MenuItem>
+              <MenuItem sx={{ fontFamily: "REM" }} value="CANCELED">
+                Đã hủy
+              </MenuItem>
+              <MenuItem sx={{ fontFamily: "REM" }} value="COMPLETED">
+                Hoàn thành
+              </MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -332,7 +361,9 @@ const ManageAuctions: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell style={{ fontFamily: "REM", whiteSpace: 'nowrap' }}>
+                <StyledTableCell
+                  style={{ fontFamily: "REM", whiteSpace: "nowrap" }}
+                >
                   Người Bán
                 </StyledTableCell>
                 <StyledTableCell
@@ -389,11 +420,22 @@ const ManageAuctions: React.FC = () => {
                     <React.Fragment key={auction.id}>
                       <StyledTableRow>
                         <StyledTableCell style={{ fontFamily: "REM" }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
                             <img
                               alt={auction.comics.sellerId.avatar}
                               src={auction.comics.sellerId.avatar || ""}
-                              style={{ width: 32, height: 32, borderRadius: '50%' }}
+                              style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: "50%",
+                              }}
                             />
                             {auction.comics.sellerId.name}
                           </Box>
@@ -471,6 +513,7 @@ const ManageAuctions: React.FC = () => {
           onCancel={handleModalClose}
           comic={selectedAuction.comics}
           auctionData={{
+            id: selectedAuction.id,
             reservePrice: selectedAuction.reservePrice,
             maxPrice: selectedAuction.maxPrice,
             priceStep: selectedAuction.priceStep,

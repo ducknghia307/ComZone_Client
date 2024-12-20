@@ -241,14 +241,10 @@ export default function BuyPlan({
                     value={CurrencySplitter(Number(amount)) || 0}
                     onChange={(e) => {
                       if (
-                        /^[0-9]*$/.test(
-                          e.target.value.replace(/[^0-9.-]+/g, "")
-                        ) &&
-                        e.target.value.replace(/[^0-9.-]+/g, "").length < 10
+                        /^[0-9]*$/.test(e.target.value.replace(/\./g, "")) &&
+                        e.target.value.replace(/\./g, "").length < 10
                       )
-                        setAmount(
-                          Number(e.target.value.replace(/[^0-9.-]+/g, ""))
-                        );
+                        setAmount(Number(e.target.value.replace(/\./g, "")));
                     }}
                   />
                   {amount + user.balance < plan.price && (

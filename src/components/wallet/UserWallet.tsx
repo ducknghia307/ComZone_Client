@@ -9,16 +9,10 @@ import {
   TableRow,
   Paper,
   Typography,
-  Button,
   Box,
-  IconButton,
   TablePagination,
-  TextField,
 } from "@mui/material";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import "../ui/UserWallet.css";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DepositForm from "./DepositForm";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { UserInfo } from "../../common/base.interface";

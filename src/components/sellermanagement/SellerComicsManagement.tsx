@@ -491,7 +491,7 @@ const SellerComicsManagement = ({
     } else
       return (
         <div className="REM flex flex-col gap-4">
-          <p className="text-2xl font-bold uppercase">Quản lí truyện tranh</p>
+          <p className="text-2xl font-bold uppercase">Quản lý truyện tranh</p>
 
           <div className="flex items-center justify-between my-2">
             <Button

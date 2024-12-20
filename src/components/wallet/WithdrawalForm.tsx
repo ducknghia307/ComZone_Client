@@ -201,7 +201,8 @@ export default function WithdrawalForm({
                 const value = e.target.value.replace(/\./g, "");
                 if (value.length === 0) setAmount(0);
                 if (/^[0-9]*$/.test(value)) {
-                  setAmount(Number(value));
+                  if (Number(value) > 99999000) setAmount(99999000);
+                  else setAmount(Number(value));
                 }
               }}
               className="w-full border border-gray-400 p-2 rounded-md"

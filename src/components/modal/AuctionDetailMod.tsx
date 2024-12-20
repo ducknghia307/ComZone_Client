@@ -21,10 +21,11 @@ import {
   Dialog,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { Form } from "antd";
+import { Form, Modal, notification, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { Comic, UserInfo } from "../../common/base.interface";
+import { privateAxios } from "../../middleware/axiosInstance";
 interface AuctionDetailModProps {
   open: boolean;
   onCancel: () => void;
@@ -32,6 +33,7 @@ interface AuctionDetailModProps {
   onSuccess: () => void;
   comic: Comic;
   auctionData: {
+    id: string;
     reservePrice: number;
     maxPrice: number;
     priceStep: number;
@@ -79,6 +81,24 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
     },
   }));
 
+  const handleAdjustEndtime = async () => {
+    if (!auctionData) return;
+
+    await privateAxios
+      .patch(`auction/endtime/now/${auctionData.id}`)
+      .then(() => {
+        notification.success({
+          key: "adjust",
+          message: (
+            <p className="REM">Chỉnh thời gian kết thúc đấu giá thành công</p>
+          ),
+          duration: 5,
+        });
+        onSuccess();
+      })
+      .catch((err) => console.log(err));
+  };
+
   const InfoRow = ({
     label,
     value,
@@ -112,7 +132,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
             fontWeight: "bold",
             color: "#000",
             fontSize: "16px",
-            fontFamily: 'REM'
+            fontFamily: "REM",
           }}
         >
           {label}
@@ -126,7 +146,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
               isPaid !== undefined ? (isPaid ? "#32CD32" : "#ff9800") : "#000",
             whiteSpace: "nowrap",
             wordWrap: "break-word",
-            fontFamily: 'REM'
+            fontFamily: "REM",
           }}
         >
           {value}
@@ -237,7 +257,18 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
   };
 
   return (
-    <StyledDialog open={open} maxWidth="md" fullWidth>
+    <Modal
+      open={open}
+      onCancel={(e) => {
+        e.stopPropagation();
+        onCancel();
+      }}
+      footer={null}
+      width={1000}
+      centered
+      closeIcon={null}
+      styles={{ content: { padding: "0" } }}
+    >
       <DialogTitle
         sx={{
           p: 3,
@@ -264,10 +295,10 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
               fontSize: "1.5rem",
               color: theme.palette.text.primary,
               textTransform: "uppercase",
-              fontFamily: 'REM'
+              fontFamily: "REM",
             }}
           >
-            Chi tiết đơn hàng
+            Chi tiết đấu giá
           </Typography>
           <IconButton
             onClick={onCancel}
@@ -290,22 +321,46 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
               color: theme.palette.text.secondary,
               fontWeight: 400,
               mb: "10px",
-              fontFamily: 'REM'
+              fontFamily: "REM",
             }}
           >
             Thời gian bắt đầu:{" "}
-            {new Date(auctionData.startTime).toLocaleString('vi-VN')}
+            {new Date(auctionData.startTime).toLocaleString("vi-VN")}
           </Typography>
           <Typography
             variant="body2"
             sx={{
               color: theme.palette.text.secondary,
               fontWeight: 400,
-              fontFamily: 'REM'
+              fontFamily: "REM",
             }}
           >
-            Thời gian kết thúc: {new Date(auctionData.endTime).toLocaleString('vi-VN')}
+            Thời gian kết thúc:{" "}
+            {new Date(auctionData.endTime).toLocaleString("vi-VN")}
           </Typography>
+
+          {auctionData.status === "ONGOING" && (
+            <Popconfirm
+              title={
+                <p className="REM font-semibold text-red-600">
+                  Xác nhận chỉnh thời gian kết thúc đấu giá đến hiện tại (TEST)
+                </p>
+              }
+              description={
+                <p className="REM italic">
+                  Cuộc đấu giá sẽ kết thúc sau 30 giây tính từ khi xác nhận.
+                </p>
+              }
+              onConfirm={handleAdjustEndtime}
+              onCancel={() => {}}
+              okText={<p className="REM">Xác nhận</p>}
+              cancelText={<p className="REM">Hủy bỏ</p>}
+            >
+              <button className="REM text-sm underline">
+                Chỉnh thời gian kết thúc đấu giá đến hiện tại
+              </button>
+            </Popconfirm>
+          )}
         </Box>
       </DialogTitle>
 
@@ -375,21 +430,24 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                       border: "2px solid black",
                     }}
                   />
-                  <InfoRow label="Họ tên" value={
-                    <Box display="flex" alignItems="center" gap="10px">
-                      <img
-                        src={sellerInfo.avatar || "/placeholder.png"}
-                        alt={sellerInfo.avatar}
-                        style={{
-                          width: "32px",
-                          height: "32px",
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      {sellerInfo.name}
-                    </Box>
-                  } />
+                  <InfoRow
+                    label="Họ tên"
+                    value={
+                      <Box display="flex" alignItems="center" gap="10px">
+                        <img
+                          src={sellerInfo.avatar || "/placeholder.png"}
+                          alt={sellerInfo.avatar}
+                          style={{
+                            width: "32px",
+                            height: "32px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                          }}
+                        />
+                        {sellerInfo.name}
+                      </Box>
+                    }
+                  />
                   <InfoRow label="Số điện thoại" value={sellerInfo.phone} />
                   <InfoRow label="Địa chỉ" value={sellerInfo.address} />
                 </Box>
@@ -414,17 +472,41 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                 <Table>
                   <TableHead>
                     <TableRow sx={{ backgroundColor: "rgba(0,0,0,0.05)" }}>
-                      <TableCell sx={{ color: "black", fontSize: "16px", fontFamily: 'REM' }}>
+                      <TableCell
+                        sx={{
+                          color: "black",
+                          fontSize: "16px",
+                          fontFamily: "REM",
+                        }}
+                      >
                         Ảnh Chính
                       </TableCell>
-                      <TableCell sx={{ color: "black", fontSize: "16px", fontFamily: 'REM' }}>
+                      <TableCell
+                        sx={{
+                          color: "black",
+                          fontSize: "16px",
+                          fontFamily: "REM",
+                        }}
+                      >
                         Tên Truyện
                       </TableCell>
-                      <TableCell sx={{ color: "black", fontSize: "16px", fontFamily: 'REM' }}>
+                      <TableCell
+                        sx={{
+                          color: "black",
+                          fontSize: "16px",
+                          fontFamily: "REM",
+                        }}
+                      >
                         Tác giả
                       </TableCell>
                       {/* <TableCell sx={{ color: 'black', fontSize: '16px' }}>Giá (đ)</TableCell> */}
-                      <TableCell sx={{ color: "black", fontSize: "16px", fontFamily: 'REM' }}>
+                      <TableCell
+                        sx={{
+                          color: "black",
+                          fontSize: "16px",
+                          fontFamily: "REM",
+                        }}
+                      >
                         Tập/Bộ
                       </TableCell>
                     </TableRow>
@@ -439,10 +521,14 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                           style={{ width: 50, height: "auto", margin: "auto" }}
                         />
                       </TableCell>
-                      <TableCell sx={{ fontFamily: 'REM' }}>{comic.title || "N/A"}</TableCell>
-                      <TableCell sx={{ fontFamily: 'REM' }}>{comic.author || "N/A"}</TableCell>
+                      <TableCell sx={{ fontFamily: "REM" }}>
+                        {comic.title || "N/A"}
+                      </TableCell>
+                      <TableCell sx={{ fontFamily: "REM" }}>
+                        {comic.author || "N/A"}
+                      </TableCell>
                       {/* <TableCell>{comic.price?.toLocaleString() || 'N/A'} đ</TableCell> */}
-                      <TableCell sx={{ fontFamily: 'REM' }}>
+                      <TableCell sx={{ fontFamily: "REM" }}>
                         {comic.quantity > 1 ? "Bộ truyện" : "Tập Truyện"}
                       </TableCell>
                     </TableRow>
@@ -453,7 +539,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
           </Grid>
         </Stack>
       </DialogContent>
-    </StyledDialog>
+    </Modal>
   );
 };
 

@@ -210,6 +210,45 @@ const EditComicDetail = () => {
     setContentImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
+  const checkValidChange = () => {
+    if (!coverImage) {
+      message.warning({
+        key: "image-warning",
+        content: "Yêu cầu phải thêm ảnh bìa và ảnh nội dung!",
+        duration: 5,
+      });
+      return;
+    }
+
+    if (isSeries && formData.episodesList.length === 0) {
+      message.warning({
+        key: "episodes-warning",
+        content: (
+          <p className="REM">
+            Vui lòng thêm tên hay số cho ít nhất 1 tập truyện!
+          </p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    if (isSeries && formData.episodesList.length > formData.quantity) {
+      message.warning({
+        key: "episodes-warning",
+        content: (
+          <p className="REM">
+            Số tên tập truyện không thể nhiều hơn số lượng truyện trong bộ!
+          </p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    setIsConfirming(true);
+  };
+
   const handleSubmit = async () => {
     console.log(formData);
     if (!coverImage) {
@@ -221,15 +260,27 @@ const EditComicDetail = () => {
       return;
     }
 
-    if (
-      formData.quantity > 1 &&
-      (!formData.episodesList ||
-        formData.episodesList?.length !== formData.quantity)
-    ) {
+    if (isSeries && formData.episodesList.length === 0) {
       message.warning({
-        key: "quantity-warning",
-        content:
-          "Tập truyện số hoặc tên tập không khớp với số lượng cuốn trong bộ truyện!",
+        key: "episodes-warning",
+        content: (
+          <p className="REM">
+            Vui lòng thêm tên hay số cho ít nhất 1 tập truyện!
+          </p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    if (isSeries && formData.episodesList.length > formData.quantity) {
+      message.warning({
+        key: "episodes-warning",
+        content: (
+          <p className="REM">
+            Số tên tập truyện không thể nhiều hơn số lượng truyện trong bộ!
+          </p>
+        ),
         duration: 5,
       });
       return;
@@ -848,7 +899,7 @@ const EditComicDetail = () => {
           )}
 
           <button
-            onClick={() => setIsConfirming(true)}
+            onClick={checkValidChange}
             disabled={!isChanged}
             className={`grow py-2 bg-black rounded-lg text-white font-semibold duration-200 hover:bg-gray-900 disabled:bg-gray-300`}
           >

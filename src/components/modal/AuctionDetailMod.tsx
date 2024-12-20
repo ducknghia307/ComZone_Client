@@ -99,6 +99,26 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
       .catch((err) => console.log(err));
   };
 
+  const handleAdjustPaymentDeadline = async () => {
+    if (!auctionData) return;
+
+    await privateAxios
+      .patch(`auction/payment-deadline/now/${auctionData.id}`)
+      .then(() => {
+        notification.success({
+          key: "adjust",
+          message: (
+            <p className="REM">
+              Chỉnh thời gian hết hạn thanh toán đấu giá thành công
+            </p>
+          ),
+          duration: 5,
+        });
+        onSuccess();
+      })
+      .catch((err) => console.log(err));
+  };
+
   const InfoRow = ({
     label,
     value,
@@ -361,6 +381,31 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
               </button>
             </Popconfirm>
           )}
+
+          {auctionData.status === "SUCCESSFUL" && (
+            <Popconfirm
+              title={
+                <p className="REM font-semibold text-red-600">
+                  Xác nhận chỉnh thời gian hết hạn thanh toán đấu giá thành quá
+                  hạn? (TEST)
+                </p>
+              }
+              description={
+                <p className="REM italic">
+                  Hạn thanh toán cho cuộc đấu giá này sẽ hết hạn sau khi xác
+                  nhận.
+                </p>
+              }
+              onConfirm={handleAdjustPaymentDeadline}
+              onCancel={() => {}}
+              okText={<p className="REM">Xác nhận</p>}
+              cancelText={<p className="REM">Hủy bỏ</p>}
+            >
+              <button className="REM text-sm underline">
+                Chỉnh thời gian hết hạn thanh toán cho cuộc đấu giá
+              </button>
+            </Popconfirm>
+          )}
         </Box>
       </DialogTitle>
 
@@ -448,8 +493,6 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                       </Box>
                     }
                   />
-                  <InfoRow label="Số điện thoại" value={sellerInfo.phone} />
-                  <InfoRow label="Địa chỉ" value={sellerInfo.address} />
                 </Box>
               </Stack>
             </Grid>

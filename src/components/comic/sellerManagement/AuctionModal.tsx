@@ -284,6 +284,10 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
               Mức cọc dựa trên 120% của giá khởi điểm.
             </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
+              Giá mua ngay không vượt quá 20 lần giá khởi điểm.
+            </div>
           </Typography>
         </div>
 

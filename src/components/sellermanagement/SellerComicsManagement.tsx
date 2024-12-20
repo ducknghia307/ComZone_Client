@@ -506,7 +506,7 @@ const SellerComicsManagement = ({
               onClick={() => handleAddComicsClick()}
             >
               Thêm truyện mới
-            </Button>a
+            </Button>
 
             <div className="relative basis-1/3">
               <input

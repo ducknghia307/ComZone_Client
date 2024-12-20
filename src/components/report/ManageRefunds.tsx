@@ -174,7 +174,7 @@ const ManageRefunds: React.FC = () => {
     return <CircularProgress sx={{ display: "block", margin: "50px auto" }} />;
   }
 
-  if (error) {
+  if (error || !refundRequests) {
     return (
       <Typography sx={{ color: "red", textAlign: "center", marginTop: "50px" }}>
         {error}

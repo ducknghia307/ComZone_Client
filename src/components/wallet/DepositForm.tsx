@@ -126,17 +126,21 @@ const DepositForm: React.FC<DepositFormProps> = ({
             />
           </div>
           <div className="grid md:grid-cols-4 grid-cols-2 gap-2 w-full my-4">
-            {[20000, 50000, 100000, 200000, 500000, 1000000, 1500000, 2000000]
-              // .filter((value) => value >= Math.max(0, amount - balance))
-              .map((value) => (
-                <button
-                  key={value}
-                  className="px-2 bg-white border border-gray-500 hover:bg-gray-200 duration-200 rounded text-black"
-                  onClick={() => setAmount(amount + value)}
-                >
-                  {CurrencySplitter(value)}
-                </button>
-              ))}
+            {[
+              50000, 100000, 200000, 500000, 1000000, 1500000, 2000000, 5000000,
+            ].map((value) => (
+              <button
+                key={value}
+                className={`px-2 duration-200 rounded ${
+                  amount === value
+                    ? "bg-gray-900 text-white font-semibold"
+                    : "bg-white text-black border border-gray-500 hover:bg-gray-200"
+                }`}
+                onClick={() => setAmount(value)}
+              >
+                {CurrencySplitter(value)}
+              </button>
+            ))}
           </div>
           <Typography
             sx={{

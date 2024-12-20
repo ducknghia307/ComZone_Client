@@ -104,6 +104,7 @@ export interface Auction {
   };
   currentCondition?: string;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 //comic

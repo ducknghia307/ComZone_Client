@@ -61,7 +61,7 @@ export default function ComicsDetailTemp() {
         setImageList(images);
 
         await privateAxios
-          .get(`/comics/seller/${res.data.sellerId.id}`)
+          .get(`/comics/seller/available/${res.data.sellerId.id}`)
           .then((res1) => {
             setComicsListFromSeller(res1.data);
           });

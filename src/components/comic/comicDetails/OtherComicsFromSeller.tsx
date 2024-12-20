@@ -7,9 +7,11 @@ export default function OtherComicsFromSeller({
   currentComics,
 }: {
   seller: UserInfo | undefined;
-  comicsListFromSeller: Comic[] | [];
+  comicsListFromSeller: Comic[];
   currentComics?: Comic;
 }) {
+  if (comicsListFromSeller.length === 0) return;
+
   return (
     <div className="w-full flex flex-col gap-2 bg-white px-4 py-4 rounded-xl drop-shadow-md">
       <p className="text-sm pb-2">

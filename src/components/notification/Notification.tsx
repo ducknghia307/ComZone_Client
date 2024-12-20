@@ -20,10 +20,13 @@ import { useAppDispatch } from "../../redux/hooks";
 import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
 import { AnnouncementType } from "../../common/enums/announcementType.enum";
 import "../ui/Notification.css";
+import { convertToVietnameseDate } from "../../utils/convertDateVietnamese";
 
 const NotificationDropdown = ({ announcements, setAnnouncements }) => {
   const [activeTab, setActiveTab] = useState("USER");
   const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
+  console.log("announce", filteredAnnouncements);
+
   const [role, setRole] = useState(false);
   const [unreadUser, setUnreadUser] = useState(0);
   const [unreadSeller, setUnreadSeller] = useState(0);
@@ -251,7 +254,14 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
                     {item.message}
                   </p>
                   <p className="text-xs text-gray-400 text-right">
-                    {new Date(item.createdAt).toLocaleString()}
+                    {new Date(item?.createdAt).toLocaleString("en-GB", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "2-digit",
+                    })}
                   </p>
                 </div>
               </div>

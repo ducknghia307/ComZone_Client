@@ -75,39 +75,42 @@ export default function ExchangeInformation({
 
         {exchangeDetails.exchange.depositAmount && (
           <div className="flex items-center justify-between text-sm font-light mt-4">
-            <p>Giá trị tiền cọc:</p>
+            <p>Mức tiền cọc:</p>
             <p className="font-semibold">
               {CurrencySplitter(exchangeDetails.exchange.depositAmount || 0)} đ
             </p>
           </div>
         )}
 
-        {exchangeDetails.exchange.compensationAmount && (
-          <div
-            className={`${
-              exchangeDetails.exchange.compensationAmount === 0 && "hidden"
-            } flex items-center justify-between text-sm font-light`}
-          >
-            <p>Giá trị tiền bù:</p>
-            <p
+        {exchangeDetails.exchange.compensationAmount &&
+          exchangeDetails.exchange.compensateUser && (
+            <div
               className={`${
-                !exchangeDetails.exchange.compensateUser
-                  ? "text-gray-500"
+                exchangeDetails.exchange.compensationAmount === 0 && "hidden"
+              } flex items-center justify-between text-sm font-light`}
+            >
+              <p>Mức tiền bù:</p>
+              <p
+                className={`${
+                  !exchangeDetails.exchange.compensateUser
+                    ? "text-gray-500"
+                    : exchangeDetails.exchange.compensateUser?.id ===
+                      firstUser?.id
+                    ? "text-red-600 font-semibold"
+                    : "text-green-600 font-semibold"
+                }`}
+              >
+                {!exchangeDetails.exchange.compensateUser
+                  ? ""
                   : exchangeDetails.exchange.compensateUser?.id ===
                     firstUser?.id
-                  ? "text-red-600 font-semibold"
-                  : "text-green-600 font-semibold"
-              }`}
-            >
-              {!exchangeDetails.exchange.compensateUser
-                ? ""
-                : exchangeDetails.exchange.compensateUser?.id === firstUser?.id
-                ? "- "
-                : "+ "}
-              {CurrencySplitter(exchangeDetails.exchange.compensationAmount)} đ
-            </p>
-          </div>
-        )}
+                  ? "- "
+                  : "+ "}
+                {CurrencySplitter(exchangeDetails.exchange.compensationAmount)}{" "}
+                đ
+              </p>
+            </div>
+          )}
       </div>
 
       {firstCurrentStage > 0 && (
@@ -202,7 +205,7 @@ export default function ExchangeInformation({
               setIsViewingComics(false);
             }}
             footer={null}
-            width={window.innerWidth * 0.5}
+            width={1000}
           >
             <div className="pt-8 flex flex-col gap-4">
               <p className="font-semibold text-xl">

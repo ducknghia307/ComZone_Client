@@ -298,12 +298,17 @@ const Cart = () => {
                           <thead>
                             <tr className="border-b">
                               <th>
-                                <div className="flex flex-row gap-2 items-center py-2">
+                                <div className="flex flex-row gap-2 items-center justify-start py-2">
                                   <Checkbox
                                     checked={sellerSelectAll[sellerId] || false}
                                     onChange={() =>
                                       handleSellerSelectAll(sellerId)
                                     }
+                                    disabled={groupedComics[
+                                      sellerId
+                                    ].comics.some(
+                                      (comics) => comics.status !== "AVAILABLE"
+                                    )}
                                   />
                                   <img
                                     src={groupedComics[sellerId].sellerAvt}
@@ -326,7 +331,7 @@ const Cart = () => {
                                 className={`border-b ${
                                   comic.status === "UNAVAILABLE" ||
                                   comic.status === "SOLD"
-                                    ? "opacity-30 "
+                                    ? "opacity-30"
                                     : ""
                                 }`}
                               >
@@ -415,15 +420,20 @@ const Cart = () => {
                                   </div>
                                 </td>
                                 <td className="text-center">
-                                  <p className=" flex items-start font-semibold text-red-500 gap-1 justify-center">
-                                    {comic.status === "AVAILABLE" ||
-                                    comic.status === "SOLD"
-                                      ? CurrencySplitter(comic.price)
-                                      : "N/A"}{" "}
-                                    <span className="font-light text-[0.5em] underline">
-                                      đ
-                                    </span>
-                                  </p>
+                                  {comic.price && (
+                                    <p className=" flex items-start font-semibold text-red-500 gap-1 justify-center">
+                                      {comic.status === "AVAILABLE" ? (
+                                        <p>
+                                          {CurrencySplitter(comic.price)}{" "}
+                                          <span className="text-[0.8em] underline">
+                                            đ
+                                          </span>
+                                        </p>
+                                      ) : (
+                                        ""
+                                      )}
+                                    </p>
+                                  )}
                                 </td>
                                 <td>
                                   <Popconfirm

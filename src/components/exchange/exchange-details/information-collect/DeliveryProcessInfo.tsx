@@ -336,13 +336,13 @@ export default function DeliveryProcessInfo({
             <p className="text-xl font-semibold">TIẾN HÀNH ĐÓNG GÓI</p>
 
             {!isShowingReceivedDelivery && (
-              <div className="flex items-center justify-between gap-2 my-2">
+              <div className="flex flex-col xl:flex-row items-center justify-between gap-2 my-2">
                 <p className="flex items-center gap-1 font-light text-sm">
                   Thời hạn:&ensp;
                   <span className="text-base font-semibold">72 giờ</span>
                   (sau khi thanh toán)
                 </p>
-                <span className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <p className="text-sm font-light">Còn lại:</p>
                   <TimerCountdown
                     targetDate={sendDelivery?.expiredAt || new Date()}

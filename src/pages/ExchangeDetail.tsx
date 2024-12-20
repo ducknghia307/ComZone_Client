@@ -294,7 +294,7 @@ const ExchangeDetail: React.FC = () => {
   if (!exchangeData) return;
 
   return (
-    <div className="REM min-h-[80vh] w-full flex justify-center gap-4 px-4 py-4">
+    <div className="REM min-h-[80vh] w-full flex flex-col lg:flex-row items-stretch justify-center gap-4 px-4 py-4">
       {isLoading && <Loading />}
 
       {firstCurrentStage > -1 ? (

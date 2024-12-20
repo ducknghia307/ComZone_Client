@@ -21,6 +21,7 @@ import { useAppSelector } from "../../redux/hooks";
 import { Transaction } from "../../common/interfaces/transaction.interface";
 import displayPastTimeFromNow from "../../utils/displayPastTimeFromNow";
 import WithdrawalForm from "./WithdrawalForm";
+import moment from "moment";
 
 const UserWallet = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -371,7 +372,9 @@ const UserWallet = () => {
                           #{transaction.code}
                         </TableCell>
                         <TableCell sx={{ fontFamily: "REM" }} align="center">
-                          {displayPastTimeFromNow(transaction.createdAt)}
+                          {moment(transaction.createdAt).format(
+                            "DD-MM-YYYY HH:mm"
+                          )}
                         </TableCell>
                         <TableCell sx={{ fontFamily: "REM" }} align="center">
                           {transaction.type}

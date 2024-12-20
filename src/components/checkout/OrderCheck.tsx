@@ -119,7 +119,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
               <tbody>
                 {seller.comics.map(({ comic, currentPrice }) => (
                   <tr key={comic?.id} className="px-2 py-4 text-sm">
-                    <td className="flex flex-row items-center my-2 gap-4 w-full max-w-[35rem]">
+                    <td className="flex flex-row items-center justify-start my-2 gap-4 w-full max-w-[35rem]">
                       <img
                         src={comic?.coverImage}
                         alt={comic?.title}
@@ -128,13 +128,13 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                       <h4 className="font-medium">{comic?.title}</h4>
                     </td>
                     <td className="max-w-[12rem] ">
-                      <h4 className="text-end font-light">
+                      <h4 className="text-end font-light justify-center">
                         {comic?.quantity === 1
                           ? "Truyện lẻ"
                           : `Bộ ${comic?.quantity} cuốn`}
                       </h4>
                     </td>
-                    <td className="max-w-[12rem] ">
+                    <td className="max-w-[12rem]">
                       <h4 className="text-end font-light">
                         {CurrencySplitter(currentPrice || comic?.price)}đ
                       </h4>

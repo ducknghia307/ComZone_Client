@@ -11,8 +11,8 @@ import {
 } from "antd";
 import { Moment } from "moment";
 import dayjs from "dayjs";
-import { privateAxios } from "../../../middleware/axiosInstance";
-import { useEffect } from "react";
+import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
+import { useEffect, useState } from "react";
 import InfoIcon from "@mui/icons-material/Info";
 
 // Define types for the comic and props
@@ -46,21 +46,39 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
   comic,
   onSuccess,
 }) => {
+  const [config, setConfig] = useState({
+    priceStepPercentage: 0,
+    depositPercentage: 0,
+    buyNowMultiplier: 0,
+  });
   const [form] = Form.useForm<AuctionFormValues>();
   console.log(form);
+  useEffect(() => {
+    publicAxios
+      .get("/auction-config")
+      .then((response) => {
+        console.log("123", response);
+
+        setConfig({
+          priceStepPercentage: response.data[0].priceStepConfig,
+          depositPercentage: response.data[0].depositAmountConfig,
+          buyNowMultiplier: response.data[0].maxPriceConfig,
+        });
+      })
+      .catch((error) => console.error("Error fetching config:", error));
+  }, []);
 
   const startTime = dayjs(form.getFieldValue("startTime"));
   const handleSubmit = async (values: AuctionFormValues) => {
     try {
-      // Validate maxPrice here
       const reservePrice = form.getFieldValue("reservePrice");
-      // Ensure you use the correct value here
-      const maxAllowedPrice = reservePrice * 20;
+
+      // Use the buyNowMultiplier from config state to calculate maxAllowedPrice
+      const maxAllowedPrice = reservePrice * config.buyNowMultiplier;
+
       const maxPrice = form.getFieldValue("maxPrice");
 
-      // Custom validation for maxPrice
       if (maxPrice < reservePrice) {
-        // Manually setting the error for maxPrice
         form.setFields([
           {
             name: "maxPrice",
@@ -69,20 +87,21 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
             ],
           },
         ]);
-        return; // Stop further execution
+        return;
       }
 
       if (maxPrice > maxAllowedPrice) {
-        // Manually setting the error for maxPrice
         form.setFields([
           {
             name: "maxPrice",
             errors: [
-              `Giá mua ngay không được vượt quá ${maxAllowedPrice.toLocaleString()}đ (20 lần giá khởi điểm)`,
+              `Giá mua ngay không được vượt quá ${maxAllowedPrice.toLocaleString()}đ (${
+                config.buyNowMultiplier
+              } lần giá khởi điểm)`,
             ],
           },
         ]);
-        return; // Stop further execution
+        return;
       }
 
       if (form.getFieldValue("id")) {
@@ -93,7 +112,6 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
           status: "UPCOMING",
         });
       } else {
-        // Otherwise, create a new auction
         await privateAxios.post("/auction", {
           ...values,
           comicsId: comic?.id,
@@ -110,7 +128,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
         duration: 5,
       });
 
-      form.resetFields(); // Reset form fields after submission
+      form.resetFields();
       onSuccess();
     } catch (error) {
       console.error("Error during API call:", error);
@@ -135,10 +153,16 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
             value: number,
             denomination: number
           ): number => Math.round(value / denomination) * denomination;
-          const priceStepPercentage = 0.05;
-          const priceStep =
-            Math.round((comic.price * priceStepPercentage) / 500) * 500;
-          const depositAmount = roundToNearest(comic.price * 1.2, 500);
+
+          // Use the priceStepPercentage and depositPercentage from config state
+          const priceStep = roundToNearest(
+            comic.price * (config.priceStepPercentage / 100),
+            500
+          );
+          const depositAmount = roundToNearest(
+            comic.price * (config.depositPercentage / 100),
+            500
+          );
 
           if (data.status === "STOPPED") {
             form.setFieldsValue({
@@ -167,7 +191,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
     if (open) {
       fetchAuctionData();
     }
-  }, [comic?.id, open, form]);
+  }, [comic?.id, open, form, config]);
 
   // Custom validator to check that the end time is not more than 7 days after the start time
   const validateEndTime = (value: any) => {
@@ -278,15 +302,16 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               }}
             >
               <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
-              Bước giá dựa trên 5% của giá khởi điểm.
+              Bước giá dựa trên {config.priceStepPercentage}% của giá khởi điểm.
+            </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} /> Mức
+              cọc dựa trên {config.depositPercentage}% của giá khởi điểm.
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
               <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
-              Mức cọc dựa trên 120% của giá khởi điểm.
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
-              Giá mua ngay không vượt quá 20 lần giá khởi điểm.
+              Giá mua ngay không vượt quá {config.buyNowMultiplier} lần giá khởi
+              điểm.
             </div>
           </Typography>
         </div>

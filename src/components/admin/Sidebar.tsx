@@ -23,6 +23,7 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { LogoutUser } from "../../redux/features/auth/authActionCreators";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { UserInfo } from "../../common/base.interface";
+import GavelOutlinedIcon from '@mui/icons-material/GavelOutlined';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -74,6 +75,11 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       title: "Gói Đăng Ký",
       path: "/admin/subscription",
       icon: <ViewHeadlineOutlinedIcon sx={{ color: 'inherit' }} />
+    },
+    {
+      title: "Quản Lý Đấu Giá",
+      path: "/admin/auction",
+      icon: <GavelOutlinedIcon sx={{ color: 'inherit' }} />
     }
   ];
 

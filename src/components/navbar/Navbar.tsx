@@ -351,6 +351,7 @@ const Navbar = () => {
     "/admin/dashboard",
     "/admin/users",
     "/admin/subscription",
+    "/admin/auction",
     "/mod/users",
     "/mod/comics",
     "/mod/orders",

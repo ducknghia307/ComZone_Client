@@ -24,6 +24,8 @@ import AuctionDetailMod from "../modal/AuctionDetailMod";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Auction, UserInfo } from "../../common/base.interface";
 import { SelectChangeEvent } from "@mui/material/Select";
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import EditAuctionMod from "./EditAuctionMod";
 
 interface SelectedAuction extends Auction {
   sellerInfo: UserInfo;
@@ -59,6 +61,7 @@ const ManageAuctions: React.FC = () => {
     useState<SelectedAuction | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const fetchOrdersWithItems = async () => {
     try {
@@ -106,22 +109,22 @@ const ManageAuctions: React.FC = () => {
     const sellerInfo: UserInfo = auction.comics.sellerId
       ? auction.comics.sellerId
       : {
-          createdAt: "",
-          email: "",
-          id: "",
-          name: "",
-          phone: "",
-          avatar: "",
-          refresh_token: "",
-          role: null,
-          updatedAt: "",
-          balance: 0,
-          nonWithdrawableAmount: 0,
-          last_active: null,
-          isActive: false,
-          follower_count: 0,
-          address: "",
-        };
+        createdAt: "",
+        email: "",
+        id: "",
+        name: "",
+        phone: "",
+        avatar: "",
+        refresh_token: "",
+        role: null,
+        updatedAt: "",
+        balance: 0,
+        nonWithdrawableAmount: 0,
+        last_active: null,
+        isActive: false,
+        follower_count: 0,
+        address: "",
+      };
 
     setSelectedAuction({
       ...auction,
@@ -261,6 +264,20 @@ const ManageAuctions: React.FC = () => {
       auction.comics.title.toLowerCase().includes(searchTerm.toLowerCase());
     return statusMatch && searchMatch;
   });
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedAuction(null);
+  };
+
+  const handleEditIconClick = (auction: SelectedAuction) => {
+    setSelectedAuction({
+      ...auction,
+      sellerInfo: auction.comics.sellerId,
+      comics: auction.comics,
+    });
+    setIsEditModalOpen(true);
+  };
 
   return (
     <div style={{ paddingBottom: "40px" }}>
@@ -479,6 +496,13 @@ const ManageAuctions: React.FC = () => {
                           {auction.currentPrice?.toLocaleString()} đ
                         </StyledTableCell>
                         <StyledTableCell align="left">
+                          {/* <IconButton
+                            color="default"
+                            onClick={() => handleEditIconClick(auction as SelectedAuction)}
+                            sx={{ mr: 1 }}
+                          >
+                            <EditOutlinedIcon />
+                          </IconButton> */}
                           <IconButton
                             color="default"
                             onClick={() =>
@@ -507,24 +531,36 @@ const ManageAuctions: React.FC = () => {
       </Paper>
 
       {selectedAuction && (
-        <AuctionDetailMod
-          // onClose={onclose}
-          open={isModalOpen}
-          onCancel={handleModalClose}
-          comic={selectedAuction.comics}
-          auctionData={{
-            id: selectedAuction.id,
-            reservePrice: selectedAuction.reservePrice,
-            maxPrice: selectedAuction.maxPrice,
-            priceStep: selectedAuction.priceStep,
-            startTime: selectedAuction.startTime,
-            endTime: selectedAuction.endTime,
-            currentPrice: selectedAuction.currentPrice,
-            sellerInfo: selectedAuction.sellerInfo,
-            status: selectedAuction.status,
-          }}
-          onSuccess={handleModalSuccess}
-        />
+        <>
+
+          <AuctionDetailMod
+            // onClose={onclose}
+            open={isModalOpen}
+            onCancel={handleModalClose}
+            comic={selectedAuction.comics}
+            auctionData={{
+              id: selectedAuction.id,
+              reservePrice: selectedAuction.reservePrice,
+              maxPrice: selectedAuction.maxPrice,
+              priceStep: selectedAuction.priceStep,
+              startTime: selectedAuction.startTime,
+              endTime: selectedAuction.endTime,
+              currentPrice: selectedAuction.currentPrice,
+              sellerInfo: selectedAuction.sellerInfo,
+              status: selectedAuction.status,
+            }}
+            onSuccess={handleModalSuccess}
+          />
+          {/* <EditAuctionMod
+            open={isEditModalOpen}
+            onClose={handleEditModalClose}
+            auctionData={selectedAuction}
+            onSuccess={() => {
+              setIsEditModalOpen(false);
+              fetchOrdersWithItems();
+            }}
+          /> */}
+        </>
       )}
     </div>
   );

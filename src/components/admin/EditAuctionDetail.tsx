@@ -2,19 +2,19 @@ import React, { useState, useEffect } from "react";
 import {
     Box, Button, Table, TableBody, TableContainer, TableHead, TableRow, Paper, TextField, InputAdornment, Typography, styled, TablePagination, IconButton,
 } from "@mui/material";
-import { privateAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import EditSubscriptionPlanModal from "./EditSubscriptionPlanModal";
 import AddSubscriptionPlanModal from "./AddSubscriptionPlanModal";
+import EditAuctionConfigModal from "./EditAuctionConfigModal";
 
-interface SubscriptionPlan {
+interface AuctionConfig {
     id: string;
-    price: number;
-    duration: number;
-    auctionTime: number;
-    sellTime: number;
+    priceStepConfig: number;
+    depositAmountConfig: number;
+    maxPriceConfig: number;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -42,29 +42,35 @@ const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
     color: '#000',
 }));
 const AdminAuction: React.FC = () => {
-    const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+    const [auctions, setAuctions] = useState<AuctionConfig[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState('');
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
-    // const [addModalOpen, setAddModalOpen] = useState(false);
+    const [selectedAuction, setSelectedAuction] = useState<AuctionConfig | null>(null);
+
+    const [config, setConfig] = useState({
+        id: "",
+        priceStepConfig: 0,
+        depositAmountConfig: 0,
+        maxPriceConfig: 0,
+    });
 
     useEffect(() => {
-        const fetchPlans = async () => {
-            try {
-                const response = await privateAxios.get('/auction-config');
-                setPlans(response.data);
-                console.log("config", response.data);
+        publicAxios
+            .get("/auction-config")
+            .then((response) => {
+                console.log("123", response);
 
-            } catch (error) {
-                console.error('Error fetching subscription plans:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchPlans();
+                setConfig({
+                    id: response.data[0].id,
+                    priceStepConfig: response.data[0].priceStepConfig,
+                    depositAmountConfig: response.data[0].depositAmountConfig,
+                    maxPriceConfig: response.data[0].maxPriceConfig,
+                });
+            })
+            .catch((error) => console.error("Error fetching config:", error));
     }, []);
 
     const handleChangePage = (event: unknown, newPage: number) => {
@@ -76,28 +82,19 @@ const AdminAuction: React.FC = () => {
         setPage(0);
     };
 
-    const handleEditClick = (plan: SubscriptionPlan) => {
-        setSelectedPlan(plan);
+    const handleEditClick = (config: AuctionConfig) => {
+        setSelectedAuction(config);
         setEditModalOpen(true);
     };
 
-    const handleUpdatePlan = (updatedPlan: SubscriptionPlan) => {
-        setPlans(prevPlans =>
-            prevPlans.map(plan =>
-                plan.id === updatedPlan.id ? updatedPlan : plan
+    const handleUpdateConfig = (updatedConfig: AuctionConfig) => {
+        setConfig(updatedConfig);
+        setAuctions((prevAuctions) =>
+            prevAuctions.map((config) =>
+                config.id === updatedConfig.id ? updatedConfig : config
             )
         );
-    };
-
-    const filteredPlans = plans.filter((plan) =>
-        String(plan.id).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        String(plan.price).toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const paginatedPlans = filteredPlans.slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-    );
+    };        
 
     return (
         <Box sx={{ paddingBottom: '40px' }}>
@@ -131,54 +128,29 @@ const AdminAuction: React.FC = () => {
                     <Table sx={{ minWidth: 700 }} aria-label="subscription plans table">
                         <TableHead>
                             <TableRow >
-                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Tên Gói</StyledTableCell>
-                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Giá (VND)</StyledTableCell>
-                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Giới Hạn Lượt Bán</StyledTableCell>
-                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Thời Hạn (Tháng)</StyledTableCell>
-                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Bán đấu giá (Lần)</StyledTableCell>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Bước Giá</StyledTableCell>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Mức Cọc</StyledTableCell>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>Giá Mua Ngay</StyledTableCell>
                                 <StyledTableCell align="right" style={{ fontFamily: 'REM' }}>Chỉnh Sửa</StyledTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {loading ? (
-                                <TableRow>
-                                    <TableCell colSpan={4} align="center">
-                                        Loading...
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                paginatedPlans.map((plan) => {
-                                    let planName = "Gói Dùng Thử"; // Mặc định
-                                    if (plan.price === 0) {
-                                        planName = "Gói Dùng Thử";
-                                    } else if (plan.price > 300000 && plan.price < 1000000) {
-                                        planName = "Gói Nâng Cấp";
-                                    } else if (plan.price >= 1000000) {
-                                        planName = "Gói Không Giới Hạn";
-                                    }
-                                    return (
-                                        <StyledTableRow key={plan.id}>
-                                            {/* <StyledTableCell sx={{ fontFamily: 'REM' }}>{plan.id}</StyledTableCell> */}
-                                            <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>
-                                                {planName}
-                                            </StyledTableCell>
-                                            <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.price.toLocaleString()}</StyledTableCell>
-                                            <StyledTableCell sx={{ fontFamily: 'REM' }}>{plan.sellTime}</StyledTableCell>
-                                            <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.duration}</StyledTableCell>
-                                            <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{plan.auctionTime}</StyledTableCell>
-                                            <StyledTableCell align="right" >
-                                                <IconButton color="error" onClick={() => handleEditClick(plan)}>
-                                                    <EditOutlinedIcon />
-                                                </IconButton>
-                                            </StyledTableCell>
-                                        </StyledTableRow>
-                                    )
-                                })
-                            )}
+                            <StyledTableRow>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>
+                                    {config.maxPriceConfig} %
+                                </StyledTableCell>
+                                <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{config.depositAmountConfig} %</StyledTableCell>
+                                <StyledTableCell sx={{ fontFamily: 'REM' }}>{config.priceStepConfig} %</StyledTableCell>
+                                <StyledTableCell align="right">
+                                    <IconButton color="error" onClick={() => handleEditClick(config)}>
+                                        <EditOutlinedIcon />
+                                    </IconButton>
+                                </StyledTableCell>
+                            </StyledTableRow>
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <StyledTablePagination
+                {/* <StyledTablePagination
                     rowsPerPageOptions={[5, 10, 15]}
                     sx={{
                         display: 'flex',
@@ -186,29 +158,22 @@ const AdminAuction: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'flex-end',
                     }}
-                    count={filteredPlans.length}
+                    count={auctions.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
-            {selectedPlan && (
-                <EditSubscriptionPlanModal
-                    open={editModalOpen}
-                    onClose={() => setEditModalOpen(false)}
-                    plan={selectedPlan}
-                    onUpdatePlan={handleUpdatePlan}
-                />
-            )}
-            {/* {addModalOpen && (
-                <AddSubscriptionPlanModal
-                    open={addModalOpen}
-                    onClose={() => setAddModalOpen(false)}
-                    onAddPlan={(newPlan) => setPlans((prevPlans) => [...prevPlans, newPlan])}
-                />
-            )} */}
+                /> */}
 
+                {editModalOpen && selectedAuction && (
+                    <EditAuctionConfigModal
+                        open={editModalOpen}
+                        onClose={() => setEditModalOpen(false)}
+                        config={selectedAuction}
+                        onUpdateConfig={handleUpdateConfig}
+                    />
+                )}
+            </Paper>
         </Box>
     );
 };

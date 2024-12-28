@@ -137,10 +137,10 @@ const AdminAuction: React.FC = () => {
                         <TableBody>
                             <StyledTableRow>
                                 <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>
-                                    {config.maxPriceConfig} %
+                                    {config.priceStepConfig} %
                                 </StyledTableCell>
                                 <StyledTableCell align="center" sx={{ fontFamily: 'REM' }}>{config.depositAmountConfig} %</StyledTableCell>
-                                <StyledTableCell sx={{ fontFamily: 'REM' }}>{config.priceStepConfig} %</StyledTableCell>
+                                <StyledTableCell sx={{ fontFamily: 'REM' }}>{config.maxPriceConfig} lần</StyledTableCell>
                                 <StyledTableCell align="right">
                                     <IconButton color="error" onClick={() => handleEditClick(config)}>
                                         <EditOutlinedIcon />

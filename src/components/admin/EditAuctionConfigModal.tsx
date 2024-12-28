@@ -152,7 +152,7 @@ const EditAuctionConfigModal: React.FC<EditAuctionConfigModalProps> = ({
                     />
                     <TextField
                         fullWidth
-                        label="Giá Mua Ngay (%)"
+                        label="Giá Mua Ngay (lần)"
                         name="maxPriceConfig"
                         type="number"
                         value={editedConfig.maxPriceConfig}

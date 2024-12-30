@@ -17,6 +17,7 @@ import { SellerSubscription } from "../../common/interfaces/seller-subscription.
 import SellerSubsModal from "./SellerSubsModal";
 import { RenderCell } from "./RenderCell";
 import moment from "moment/min/moment-with-locales";
+import CreateNewComics from "./create-new-comics/CreateNewComics";
 
 moment.locale("vi");
 
@@ -42,6 +43,8 @@ const SellerComicsManagement = ({
 
   const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [isCreatingComics, setIsCreatingComics] = useState<boolean>(false);
 
   const [isRegisteringPlan, setIsRegisteringPlan] = useState<boolean>(false);
 
@@ -503,7 +506,7 @@ const SellerComicsManagement = ({
                 fontFamily: "inherit",
               }}
               startIcon={<AddIcon />}
-              onClick={() => handleAddComicsClick()}
+              onClick={() => setIsCreatingComics(true)}
             >
               Thêm truyện mới
             </Button>
@@ -593,9 +596,15 @@ const SellerComicsManagement = ({
       );
   };
 
+  if (loading) return;
+
   return (
     <div className="w-full bg-white p-4 rounded-lg drop-shadow-lg">
-      {!loading && renderContent()}
+      {isCreatingComics ? (
+        <CreateNewComics setIsCreatingComics={setIsCreatingComics} />
+      ) : (
+        renderContent()
+      )}
       {(!sellerSubscription || !sellerSubscription.isActive) && (
         <SellerSubsModal
           isOpen={isRegisteringPlan}

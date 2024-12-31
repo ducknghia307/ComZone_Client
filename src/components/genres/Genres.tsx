@@ -261,7 +261,7 @@ const Genres: React.FC<GenresProps> = ({
         <Loading />
       ) : (
         <>
-          <div className="all-genres-section flex justify-between items-center REM">
+          <div className="flex justify-between items-center REM w-full bg-white p-5 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold uppercase">
               {searchQuery
                 ? `Kết quả tìm kiếm cho: "${searchQuery}"`
@@ -314,7 +314,7 @@ const Genres: React.FC<GenresProps> = ({
                       }}
                     />
                     <div
-                      className={`mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4`}
+                      className={`mt-4 REM grid grid-cols-[repeat(auto-fill,14em)] gap-4`}
                     >
                       {sortedAuctionComics.map((auction) => (
                         <div
@@ -439,7 +439,7 @@ const Genres: React.FC<GenresProps> = ({
                       }}
                     />
                     <div
-                      className={`mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4`}
+                      className={`mt-4 REM grid justify-center grid-cols-2 gap-4`}
                     >
                       {sortedRegularComics.map((comic) => (
                         <div
@@ -701,12 +701,12 @@ const Genres: React.FC<GenresProps> = ({
                 </div>
               }
             >
-              <div className="mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4">
+              <div className="mt-4 grid justify-start gap-4 grid-cols-[repeat(auto-fill,minmax(12em,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(12em,1fr))] md:gap-6 lg:gap-4">
                 {sortedComics.length > 0 ? (
                   sortedComics.map((comic) => (
                     <LazyLoad key={comic.id} once>
                       <div
-                        className="bg-white  rounded-lg w-[14em] overflow-hidden border drop-shadow-md"
+                        className="bg-white rounded-lg w-fit overflow-hidden border drop-shadow-md"
                         key={comic.id}
                       >
                         <Link to={`/detail/${comic.id}`}>

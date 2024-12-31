@@ -1,9 +1,3 @@
-.all-genres-section {
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-top: 32px;
-}
-
 .all-genres-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

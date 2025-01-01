@@ -22,21 +22,23 @@ const AllGenres = () => {
   };
 
   return (
-    <div className="homepage w-full overflow-x-hidden flex px-4">
-      <div className="min-w-fit">
-        <Sidebar
-          onGenreFilterChange={handleGenreFilterChange}
-          onAuthorFilterChange={handleAuthorFilterChange}
-          onConditionFilterChange={handleConditionFilterChange}
-        />
-      </div>
+    <div className="homepage w-full flex justify-center">
+      <div className="w-full overflow-x-hidden flex px-8 py-5 gap-5 max-w-screen-2xl">
+        <div className="min-w-fit max-lg:hidden">
+          <Sidebar
+            onGenreFilterChange={handleGenreFilterChange}
+            onAuthorFilterChange={handleAuthorFilterChange}
+            onConditionFilterChange={handleConditionFilterChange}
+          />
+        </div>
 
-      <div className="grow min-w-[30em]">
-        <Genres
-          filteredGenres={filteredGenres}
-          filteredAuthors={filteredAuthors}
-          filteredConditions={filteredConditions}
-        />
+        <div className="grow min-w-[20em]">
+          <Genres
+            filteredGenres={filteredGenres}
+            filteredAuthors={filteredAuthors}
+            filteredConditions={filteredConditions}
+          />
+        </div>
       </div>
     </div>
   );

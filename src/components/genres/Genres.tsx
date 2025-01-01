@@ -43,7 +43,7 @@ const Genres: React.FC<GenresProps> = ({
   const [totalComicsQuantity, setTotalComicsQuantity] = useState<number>(0);
   const [auctionComics, setAuctionComics] = useState<Auction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState<"new" | "asc" | "desc">("new");
   const location = useLocation();
   const navigate = useNavigate();
   const [countTimes, setCountTimes] = useState<{ [key: string]: string }>({});
@@ -208,20 +208,43 @@ const Genres: React.FC<GenresProps> = ({
     filterRegularComics(comic)
   );
 
-  const sortedComics = [...filteredRegularComics].sort((a, b) =>
-    sortOrder === "asc" ? a.price - b.price : b.price - a.price
-  );
+  const sortComics = (
+    comics: Comic[] | Auction[],
+    type: "regular" | "auction"
+  ) => {
+    return [...comics].sort((a, b) => {
+      if (sortOrder === "new") {
+        const dateA =
+          type === "regular"
+            ? new Date(a.createdAt).getTime()
+            : new Date((a as Auction).startTime).getTime();
+        const dateB =
+          type === "regular"
+            ? new Date(b.createdAt).getTime()
+            : new Date((b as Auction).startTime).getTime();
+        return dateB - dateA;
+      }
 
-  const sortedRegularComics = [...filteredRegularComics].sort((a, b) =>
-    sortOrder === "asc" ? a.price - b.price : b.price - a.price
-  );
+      if (type === "regular") {
+        return sortOrder === "asc"
+          ? (b as Comic).price - (a as Comic).price
+          : (a as Comic).price - (b as Comic).price;
+      } else {
+        return sortOrder === "asc"
+          ? (b as Auction).currentPrice - (a as Auction).currentPrice
+          : (a as Auction).currentPrice - (b as Auction).currentPrice;
+      }
+    });
+  };
 
-  const sortedAuctionComics = [...filteredAuctionComics].sort((a, b) =>
-    sortOrder === "asc"
-      ? a.currentPrice - b.currentPrice
-      : b.currentPrice - a.currentPrice
-  );
-
+  const sortedRegularComics = sortComics(
+    filteredRegularComics,
+    "regular"
+  ) as Comic[];
+  const sortedAuctionComics = sortComics(
+    filteredAuctionComics,
+    "auction"
+  ) as Auction[];
   const formatPrice = (price: number | null | undefined) => {
     if (price == null) {
       return "N/A"; // Handle null or undefined price gracefully
@@ -230,7 +253,7 @@ const Genres: React.FC<GenresProps> = ({
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortOrder(e.target.value === "Giá cao đến thấp" ? "desc" : "asc");
+    setSortOrder(e.target.value as "new" | "asc" | "desc");
   };
 
   const handleDetailClick = (comicId: string) => {
@@ -255,14 +278,16 @@ const Genres: React.FC<GenresProps> = ({
     fetchComics();
   }, []);
 
+  const sortedComics = sortComics(filteredRegularComics, "regular") as Comic[];
+
   return (
     <div className="mb-10">
       {loading ? (
         <Loading />
       ) : (
         <>
-          <div className="all-genres-section flex justify-between items-center REM">
-            <h2 className="text-2xl font-bold uppercase">
+          <div className="flex justify-between md:items-center gap-3 items-start w-full bg-white p-5 rounded-lg shadow-md md:flex-row flex-col lg:max-w-screen-xl mx-auto">
+            <h2 className="text-2xl font-bold uppercase break-words w-fit">
               {searchQuery
                 ? `Kết quả tìm kiếm cho: "${searchQuery}"`
                 : "Tất cả thể loại"}
@@ -273,8 +298,9 @@ const Genres: React.FC<GenresProps> = ({
                 className="border rounded p-1"
                 onChange={handleSortChange}
               >
-                <option>Giá thấp đến cao</option>
-                <option>Giá cao đến thấp</option>
+                <option value="new">Mới nhất</option>
+                <option value="desc">Giá thấp đến cao</option>
+                <option value="asc">Giá cao đến thấp</option>
               </select>
             </div>
           </div>
@@ -313,13 +339,11 @@ const Genres: React.FC<GenresProps> = ({
                         fontFamily: "REM",
                       }}
                     />
-                    <div
-                      className={`mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4`}
-                    >
+                    <div className="mt-4 grid sm:justify-start justify-items-center gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(12em,1fr))] md:gap-6 lg:gap-4">
                       {sortedAuctionComics.map((auction) => (
                         <div
                           onClick={() => handleDetailClick(auction.id)}
-                          className={`bg-white rounded-lg w-[14em] overflow-hidden border drop-shadow-md cursor-pointer`}
+                          className={`bg-white rounded-lg w-fit overflow-hidden border drop-shadow-md cursor-pointer`}
                           key={auction.id}
                         >
                           <img
@@ -438,12 +462,10 @@ const Genres: React.FC<GenresProps> = ({
                         fontFamily: "REM",
                       }}
                     />
-                    <div
-                      className={`mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4`}
-                    >
+                    <div className="mt-4 grid sm:justify-start justify-items-center gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(12em,1fr))] md:gap-6 lg:gap-4">
                       {sortedRegularComics.map((comic) => (
                         <div
-                          className={`bg-white  rounded-lg w-[14em] overflow-hidden border drop-shadow-md`}
+                          className={`bg-white rounded-lg w-fit overflow-hidden border drop-shadow-md`}
                           key={comic.id}
                         >
                           <Link to={`/detail/${comic.id}`}>
@@ -701,12 +723,12 @@ const Genres: React.FC<GenresProps> = ({
                 </div>
               }
             >
-              <div className="mt-4 REM grid justify-center grid-cols-[repeat(auto-fill,14em)] gap-4">
+              <div className="mt-4 grid sm:justify-start justify-items-center gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(12em,1fr))] md:gap-6 lg:gap-4">
                 {sortedComics.length > 0 ? (
                   sortedComics.map((comic) => (
                     <LazyLoad key={comic.id} once>
                       <div
-                        className="bg-white  rounded-lg w-[14em] overflow-hidden border drop-shadow-md"
+                        className="bg-white rounded-lg w-fit overflow-hidden border drop-shadow-md"
                         key={comic.id}
                       >
                         <Link to={`/detail/${comic.id}`}>

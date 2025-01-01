@@ -32,7 +32,7 @@ const AllGenres = () => {
           />
         </div>
 
-        <div className="grow min-w-[30em]">
+        <div className="grow min-w-[20em]">
           <Genres
             filteredGenres={filteredGenres}
             filteredAuthors={filteredAuthors}

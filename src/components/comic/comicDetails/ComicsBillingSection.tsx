@@ -1,5 +1,7 @@
 import { Comic } from "../../../common/base.interface";
 import CurrencySplitter from "../../../assistants/Spliter";
+import { Modal } from "antd";
+import { useState } from "react";
 
 interface ComicsBillingSectionProps {
   currentComics: Comic | undefined;
@@ -16,6 +18,19 @@ export default function ComicsBillingSection({
   isInCart,
   setIsInCart,
 }: ComicsBillingSectionProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+  const handleBuyNowClick = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <div>
       <div className="w-full flex flex-col gap-2 py-4">
@@ -30,21 +45,24 @@ export default function ComicsBillingSection({
 
       <div className="w-full flex flex-col gap-2">
         <button
-          className="w-full px-4 py-2 bg-red-500 rounded-md text-white text-[1.2em] duration-200 hover:bg-red-600"
-          onClick={() => handleBuyNow()}
+          className={`w-full px-4 py-2 bg-red-500 rounded-md text-white text-[1.2em] duration-200 hover:bg-red-600`}
+          onClick={handleBuyNowClick}
         >
           MUA NGAY
         </button>
         <button
           className={`w-full flex items-center justify-center gap-4 px-4 py-2 border ${
             isInCart
-              ? "bg-green-600 text-white hover:bg-green-700 duration-200"
+              ? "bg-green-600 text-white hover:bg-green-700 duration-200 cursor-not-allowed"
               : "border-gray-400 hover:bg-gray-100 duration-500"
           } rounded-md text-[1.2em]`}
           onClick={() => {
-            handleAddToCart();
-            setIsInCart(true);
+            if (!isInCart) {
+              handleAddToCart();
+              setIsInCart(true);
+            }
           }}
+          disabled={isInCart}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -62,6 +80,33 @@ export default function ComicsBillingSection({
           {!isInCart && "THÊM VÀO GIỎ HÀNG"}
         </button>
       </div>
+      <Modal
+        title="Xác nhận mua ngay"
+        open={isModalOpen}
+        okText="Xác nhận"
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <p>
+          Bạn có muốn mua ngay truyện{" "}
+          <span className="font-bold">{currentComics?.title}</span>?
+        </p>
+        <div className="w-full items-center justify-end gap-3 flex flex-row">
+          <button
+            className="px-5 py-2 bg-white font-bold hover:opacity-70 duration-300"
+            onClick={handleCancel}
+          >
+            Hủy
+          </button>
+          <button
+            className="px-5 py-2 bg-black text-white font-bold rounded-lg hover:opacity-70 duration-300"
+            onClick={handleBuyNow}
+          >
+            Xác nhận
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

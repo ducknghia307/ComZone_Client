@@ -42,9 +42,11 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const { isLoggedIn } = useAppSelector((state) => state.auth);
   const location = useLocation();
-  const shouldShowConditionSection = ["/genres", "/auctions", "/search"].includes(
-    location.pathname
-  );
+  const shouldShowConditionSection = [
+    "/genres",
+    "/auctions",
+    "/search",
+  ].includes(location.pathname);
 
   useEffect(() => {
     const fetchGenresAndAuthors = async () => {
@@ -122,9 +124,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <div className="sidebar REM">
-      <div className="sidebar-header">
+      <div className="sidebar-header border-b border-gray-200 p-5">
         <h2 className="uppercase">Khám phá truyện</h2>
-        <div className="line-header"></div>
       </div>
 
       {loading ? (
@@ -132,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <CircularProgress />
         </div>
       ) : (
-        <>
+        <div className="p-5">
           {/* Genre Section */}
           <div className="genre-section REM">
             <div
@@ -220,7 +221,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               </FormGroup>
             </Collapse>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

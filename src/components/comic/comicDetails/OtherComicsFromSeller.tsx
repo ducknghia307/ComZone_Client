@@ -10,7 +10,7 @@ export default function OtherComicsFromSeller({
   comicsListFromSeller: Comic[];
   currentComics?: Comic;
 }) {
-  if (comicsListFromSeller.length === 0) return;
+  if (comicsListFromSeller.length <= 1) return;
 
   return (
     <div className="w-full flex flex-col gap-2 bg-white px-4 py-4 rounded-xl drop-shadow-md">
@@ -18,7 +18,6 @@ export default function OtherComicsFromSeller({
         Các truyện khác của{" "}
         <span className="font-semibold">{seller?.name}</span>
       </p>
-
       <ComicsHorizontalMenu
         comicsList={comicsListFromSeller.filter(
           (comics) => comics.id !== currentComics?.id

@@ -199,23 +199,56 @@ const AdminAuction: React.FC = () => {
     const [isEdited, setIsEdited] = useState(false);
     const [loading, setLoading] = useState(true);
 
+    // useEffect(() => {
+    //     publicAxios
+    //         .get("/auction-config")
+    //         .then((response) => {
+    //             const fetchedConfig = response.data[0];
+    //             setConfig({
+    //                 id: fetchedConfig.id,
+    //                 priceStepConfig: fetchedConfig.priceStepConfig,
+    //                 depositAmountConfig: fetchedConfig.depositAmountConfig,
+    //                 maxPriceConfig: fetchedConfig.maxPriceConfig,
+    //             });
+    //             setOriginalConfig({
+    //                 id: fetchedConfig.id,
+    //                 priceStepConfig: fetchedConfig.priceStepConfig,
+    //                 depositAmountConfig: fetchedConfig.depositAmountConfig,
+    //                 maxPriceConfig: fetchedConfig.maxPriceConfig,
+    //             });
+    //             setLoading(false);
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error fetching config:", error);
+    //             notification.error({
+    //                 message: "Lỗi",
+    //                 description: "Không thể tải cấu hình đấu giá. Vui lòng thử lại sau!",
+    //             });
+    //             setLoading(false);
+    //         });
+    // }, []);
+
     useEffect(() => {
         publicAxios
             .get("/auction-config")
             .then((response) => {
-                const fetchedConfig = response.data[0];
-                setConfig({
-                    id: fetchedConfig.id,
-                    priceStepConfig: fetchedConfig.priceStepConfig,
-                    depositAmountConfig: fetchedConfig.depositAmountConfig,
-                    maxPriceConfig: fetchedConfig.maxPriceConfig,
-                });
-                setOriginalConfig({
-                    id: fetchedConfig.id,
-                    priceStepConfig: fetchedConfig.priceStepConfig,
-                    depositAmountConfig: fetchedConfig.depositAmountConfig,
-                    maxPriceConfig: fetchedConfig.maxPriceConfig,
-                });
+                const fetchedConfig = response.data[0]; // Ensure response.data[0] exists
+                if (fetchedConfig && fetchedConfig.id) {
+                    setConfig({
+                        id: fetchedConfig.id,
+                        priceStepConfig: fetchedConfig.priceStepConfig || 0,
+                        depositAmountConfig: fetchedConfig.depositAmountConfig || 0,
+                        maxPriceConfig: fetchedConfig.maxPriceConfig || 0,
+                    });
+                    setOriginalConfig({
+                        id: fetchedConfig.id,
+                        priceStepConfig: fetchedConfig.priceStepConfig || 0,
+                        depositAmountConfig: fetchedConfig.depositAmountConfig || 0,
+                        maxPriceConfig: fetchedConfig.maxPriceConfig || 0,
+                    });
+                } else {
+                    throw new Error("Invalid configuration data received");
+                }
                 setLoading(false);
             })
             .catch((error) => {
@@ -226,7 +259,7 @@ const AdminAuction: React.FC = () => {
                 });
                 setLoading(false);
             });
-    }, []);
+    }, []);    
 
     const handleInputChange = (field: string, value: string | number) => {
         const updatedConfig = { ...config, [field]: value };

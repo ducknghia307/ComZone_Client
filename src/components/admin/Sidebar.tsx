@@ -77,7 +77,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       icon: <ViewHeadlineOutlinedIcon sx={{ color: 'inherit' }} />
     },
     {
-      title: "Quản Lý Đấu Giá",
+      title: "Cài Đặt Đấu Giá",
       path: "/admin/auction",
       icon: <GavelOutlinedIcon sx={{ color: 'inherit' }} />
     }

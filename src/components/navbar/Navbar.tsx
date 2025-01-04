@@ -351,7 +351,8 @@ const Navbar = () => {
     "/admin/dashboard",
     "/admin/users",
     "/admin/subscription",
-    "/admin/auction",
+    "/admin/auction/settingPrice",
+    "/admin/auction/auctionCriteria",
     "/mod/users",
     "/mod/comics",
     "/mod/orders",
@@ -649,34 +650,40 @@ const Navbar = () => {
               <>
                 <div className="hidden md:flex lg:w-full lg:ml-20 lg:mb-0 mb-2 mt-2 lg:text-base md:text-sm">
                   <Link
-                    className={`text-black px-6 hover:text-black ${
-                      location.pathname === "/" ? "font-bold" : ""
+                    className={`duration-300 px-6 ${
+                      location.pathname === "/"
+                        ? "font-bold text-black"
+                        : "text-gray-400 hover:text-black "
                     }`}
                     to="/"
                   >
                     <li>TRANG CHỦ</li>
                   </Link>
                   <Link
-                    className={`text-black px-6 hover:text-black ${
-                      location.pathname === "/auctions" ? "font-bold" : ""
+                    className={` duration-300 px-6 hover:text-black ${
+                      location.pathname === "/auctions"
+                        ? "font-bold text-black"
+                        : "text-gray-400 hover:text-black"
                     }`}
                     to="/auctions"
                   >
                     <li>CÁC CUỘC ĐẤU GIÁ</li>
                   </Link>
                   <Link
-                    className={`text-black px-6 hover:text-black ${
-                      location.pathname === "/genres" ? "font-bold" : ""
+                    className={` duration-300 px-6 hover:text-black ${
+                      location.pathname === "/genres"
+                        ? "font-bold text-black"
+                        : "text-gray-400 hover:text-black"
                     }`}
                     to="/genres"
                   >
                     <li>TẤT CẢ THỂ LOẠI</li>
                   </Link>
                   <Link
-                    className={`text-black px-6 hover:text-black ${
+                    className={` duration-300 px-6 hover:text-black ${
                       location.pathname === "/exchange-news-feed"
-                        ? "font-bold"
-                        : ""
+                        ? "font-bold text-black"
+                        : "text-gray-400 hover:text-black"
                     }`}
                     to="/exchange-news-feed"
                   >

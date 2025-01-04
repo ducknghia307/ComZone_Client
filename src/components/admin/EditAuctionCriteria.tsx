@@ -10,7 +10,7 @@ import {
 } from "antd";
 import { publicAxios } from "../../middleware/axiosInstance";
 
-const AdminAuction: React.FC = () => {
+const EditAuctionCriteria: React.FC = () => {
   const [config, setConfig] = useState({
     id: "",
     priceStepConfig: 0,
@@ -100,41 +100,24 @@ const AdminAuction: React.FC = () => {
           style={{ color: "#71002b" }}
           className="text-center mb-11 text-[#71002b]"
         >
-          Cài đặt thông số đấu giá
+          Cài đặt tiêu chí đánh giá
         </Typography.Title>
         <Form layout="vertical">
-          <Form.Item label="Bước Giá (%)" style={{ width: "100%" }}>
-            <Input
-              type="number"
-              value={config.priceStepConfig}
-              onChange={(e) =>
-                handleInputChange("priceStepConfig", Number(e.target.value))
-              }
-              className="w-full"
-            />
-          </Form.Item>
-          <Form.Item label="Mức Cọc (%)" style={{ width: "100%" }}>
-            <Input
-              type="number"
-              value={config.depositAmountConfig}
-              onChange={(e) =>
-                handleInputChange("depositAmountConfig", Number(e.target.value))
-              }
-            />
-          </Form.Item>
-          <Form.Item label="Giá Mua Ngay (Lần)" style={{ width: "100%" }}>
-            <Input
-              type="number"
-              value={config.maxPriceConfig}
-              onChange={(e) =>
-                handleInputChange("maxPriceConfig", Number(e.target.value))
-              }
-              className="w-full"
-            />
+          <Form.Item style={{ width: "100%" }}>
+            <div className="flex flex-row gap-3 items-center">
+              <p>Đầy đủ thông tin về cuốn truyện</p>
+              <Switch defaultChecked />
+            </div>
           </Form.Item>
           <Form.Item style={{ width: "100%" }}>
             <div className="flex flex-row gap-3 items-center">
-              <p>Cho phép người dùng nhập giá mua ngay</p>
+              <p>Tình trạng truyện</p>
+              <Switch defaultChecked />
+            </div>
+          </Form.Item>
+          <Form.Item style={{ width: "100%" }}>
+            <div className="flex flex-row gap-3 items-center">
+              <p>Phiên bản của cuốn truyện</p>
               <Switch defaultChecked />
             </div>
           </Form.Item>
@@ -159,4 +142,4 @@ const AdminAuction: React.FC = () => {
   );
 };
 
-export default AdminAuction;
+export default EditAuctionCriteria;

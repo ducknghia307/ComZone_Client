@@ -46,7 +46,8 @@ import ExchangeManagement from "../../pages/ExchangeManagement";
 import AnnouncementExchange from "../../pages/AnnoucementExchange";
 import SellerShopPage from "../../pages/SellerShopPage";
 import ModDeliveries from "../../pages/ModDeliveries";
-import AdminAuction from "../../pages/AdminAuction";
+import AdminAuctionSetting from "../../pages/AdminAuctionSetting";
+import AdminAuctionCriteria from "../../pages/AdminAuctionCriteria";
 
 const AppRouter = () => {
   return (
@@ -150,7 +151,14 @@ const AppRouter = () => {
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/subscription" element={<AdminSubscription />} />
-        <Route path="/admin/auction" element={<AdminAuction />} />
+        <Route
+          path="/admin/auction/settingPrice"
+          element={<AdminAuctionSetting />}
+        />
+        <Route
+          path="/admin/auction/auctionCriteria"
+          element={<AdminAuctionCriteria />}
+        />
       </Routes>
     </div>
   );

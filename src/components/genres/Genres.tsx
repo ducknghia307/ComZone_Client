@@ -286,7 +286,7 @@ const Genres: React.FC<GenresProps> = ({
         <Loading />
       ) : (
         <>
-          <div className="flex justify-between md:items-center gap-3 items-start w-full bg-white p-5 rounded-lg shadow-md md:flex-row flex-col lg:max-w-screen-xl mx-auto">
+          <div className="flex justify-between md:items-center gap-3 items-start w-full bg-white p-5 rounded-lg shadow-md md:flex-row flex-col lg:max-w-screen-xl mx-auto REM">
             <h2 className="text-2xl font-bold uppercase break-words w-fit">
               {searchQuery
                 ? `Kết quả tìm kiếm cho: "${searchQuery}"`
@@ -728,7 +728,7 @@ const Genres: React.FC<GenresProps> = ({
                   sortedComics.map((comic) => (
                     <LazyLoad key={comic.id} once>
                       <div
-                        className="bg-white rounded-lg w-fit overflow-hidden border drop-shadow-md"
+                        className={`bg-white rounded-lg w-fit overflow-hidden border drop-shadow-md cursor-pointer transition-transform duration-300 hover:scale-105 hover:drop-shadow-lg`}
                         key={comic.id}
                       >
                         <Link to={`/detail/${comic.id}`}>

@@ -529,7 +529,7 @@ const Navbar = () => {
                               trigger={"click"}
                               placement="bottom"
                             >
-                              <li className="items-center cursor-pointer duration-200 hover:opacity-50 ml-4 sm:flex hidden">
+                              <li className="items-center cursor-pointer duration-200 hover:opacity-50 ml-4 flex">
                                 <Badge
                                   count={unreadAnnounce}
                                   overflowCount={9}
@@ -591,7 +591,7 @@ const Navbar = () => {
                         placement="topRight"
                         trigger={["click"]}
                       >
-                        <div className="flex gap-2 items-center cursor-pointer duration-200 hover:opacity-50  lg:min-w-[10rem] w-full justify-end md:ml-2 ml-4">
+                        <div className="hidden sm:flex gap-2 items-center cursor-pointer duration-200 hover:opacity-50 lg:min-w-[10rem] w-full justify-end md:ml-2 ml-4">
                           <img
                             src={userInfo.avatar || ""}
                             alt={userInfo.name}

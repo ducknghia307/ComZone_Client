@@ -49,7 +49,9 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
 
       try {
         setLoading(true);
-        const response = await privateAxios.get(`/bids/user/auction/${auction.id}`);
+        const response = await privateAxios.get(
+          `/bids/user/auction/${auction.id}`
+        );
         setUserBids(response.data);
       } catch (error) {
         console.error("Error fetching user bids:", error);
@@ -145,21 +147,22 @@ const AuctionDetailModal: React.FC<AuctionDetailModalProps> = ({
   );
   const formattedEndTime = new Date(auction.endTime).toLocaleString("vi-VN");
 
-  const isWin = auction.status === "SUCCESSFUL" && auction.winner?.id === userId;
+  const isWin =
+    auction.status === "SUCCESSFUL" && auction.winner?.id === userId;
 
   const statusText = isWin
     ? "Đấu giá thành công"
     : auction.status === "SUCCESSFUL" ||
       (auction.status === "COMPLETED" && auction.winner?.id !== userId)
-      ? "Đấu giá thất bại"
-      : translateStatus(auction.status);
+    ? "Đấu giá thất bại"
+    : translateStatus(auction.status);
 
   const statusStyles = isWin
     ? getStatusChipStyles("SUCCESSFUL")
     : auction.status === "SUCCESSFUL" ||
       (auction.status === "COMPLETED" && auction.winner?.id !== userId)
-      ? getStatusChipStyles("FAILED")
-      : getStatusChipStyles(auction.status);
+    ? getStatusChipStyles("FAILED")
+    : getStatusChipStyles(auction.status);
 
   return (
     <Dialog

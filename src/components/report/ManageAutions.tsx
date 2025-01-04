@@ -24,7 +24,7 @@ import AuctionDetailMod from "../modal/AuctionDetailMod";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Auction, UserInfo } from "../../common/base.interface";
 import { SelectChangeEvent } from "@mui/material/Select";
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import EditAuctionMod from "./EditAuctionMod";
 
 interface SelectedAuction extends Auction {
@@ -109,22 +109,22 @@ const ManageAuctions: React.FC = () => {
     const sellerInfo: UserInfo = auction.comics.sellerId
       ? auction.comics.sellerId
       : {
-        createdAt: "",
-        email: "",
-        id: "",
-        name: "",
-        phone: "",
-        avatar: "",
-        refresh_token: "",
-        role: null,
-        updatedAt: "",
-        balance: 0,
-        nonWithdrawableAmount: 0,
-        last_active: null,
-        isActive: false,
-        follower_count: 0,
-        address: "",
-      };
+          createdAt: "",
+          email: "",
+          id: "",
+          name: "",
+          phone: "",
+          avatar: "",
+          refresh_token: "",
+          role: null,
+          updatedAt: "",
+          balance: 0,
+          nonWithdrawableAmount: 0,
+          last_active: null,
+          isActive: false,
+          follower_count: 0,
+          address: "",
+        };
 
     setSelectedAuction({
       ...auction,
@@ -205,6 +205,15 @@ const ManageAuctions: React.FC = () => {
           fontWeight: "bold",
           display: "inline-block",
         };
+      case "PENDING_APPROVAL":
+        return {
+          color: "#a64dff",
+          backgroundColor: "#f2e6ff",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
       case "CANCELED":
         return {
           color: "#757575",
@@ -224,6 +233,8 @@ const ManageAuctions: React.FC = () => {
         return "Thành công";
       case "COMPLETED":
         return "Hoàn thành";
+      case "PENDING_APPROVAL":
+        return "Chờ duyệt";
       case "UPCOMING":
         return "Sắp diễn ra";
       case "PROCESSING":
@@ -532,7 +543,6 @@ const ManageAuctions: React.FC = () => {
 
       {selectedAuction && (
         <>
-
           <AuctionDetailMod
             // onClose={onclose}
             open={isModalOpen}

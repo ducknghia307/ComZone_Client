@@ -42,6 +42,15 @@ const getStatusChipStyles = (status: string) => {
         fontWeight: "bold",
         display: "inline-block",
       };
+    case "PENDING_APPROVAL":
+      return {
+        color: "#a64dff",
+        backgroundColor: "#f2e6ff",
+        borderRadius: "8px",
+        padding: "8px 20px",
+        fontWeight: "bold",
+        display: "inline-block",
+      };
     case "UPCOMING":
       return {
         color: "#6226EF",
@@ -103,6 +112,8 @@ const translateStatus = (status: string) => {
   switch (status) {
     case "SUCCESSFUL":
       return "Thành công";
+    case "PENDING_APPROVAL":
+      return "Chờ duyệt";
     case "UPCOMING":
       return "Sắp diễn ra";
     case "PROCESSING":
@@ -325,6 +336,14 @@ const AuctionManagement = () => {
                     style={{
                       color: "white",
                       textAlign: "center",
+                    }}
+                  >
+                    Thời Lượng
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      color: "white",
+                      textAlign: "center",
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -386,10 +405,18 @@ const AuctionManagement = () => {
                       {truncateText(auction.comics.title, 20)}
                     </TableCell>
                     <TableCell align="center">
-                      {new Date(auction.startTime).toLocaleString()}
+                      {auction.startTime
+                        ? new Date(auction.startTime).toLocaleString()
+                        : "Chưa có"}
                     </TableCell>
                     <TableCell align="center">
-                      {new Date(auction.endTime).toLocaleString()}
+                      {auction.endTime
+                        ? new Date(auction.endTime).toLocaleString()
+                        : "Chưa có"}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      {auction?.duration} Ngày
                     </TableCell>
                     <TableCell align="center">
                       {auction.reservePrice.toLocaleString()} đ

@@ -29,6 +29,7 @@ interface AuctionFormValues {
   maxPrice: number;
   priceStep: number;
   depositAmount: number;
+  duration: number;
   startTime: Moment | null;
   endTime: Moment | null;
 }
@@ -112,10 +113,9 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
           status: "UPCOMING",
         });
       } else {
-        await privateAxios.post("/auction", {
+        await privateAxios.post("/auction/request", {
           ...values,
           comicsId: comic?.id,
-          status: "UPCOMING",
         });
       }
       await privateAxios.patch("seller-subscriptions/auction", {
@@ -171,6 +171,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               maxPrice: data.maxPrice,
               priceStep: priceStep,
               depositAmount: depositAmount,
+              duration: data.duration,
               startTime: dayjs(data.startTime),
               endTime: dayjs(data.endTime),
             });
@@ -288,7 +289,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               style={{
                 display: "flex",
                 alignItems: "center",
-                marginBottom: "5px",
+                marginBottom: "3px",
               }}
             >
               <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
@@ -298,13 +299,19 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               style={{
                 display: "flex",
                 alignItems: "center",
-                marginBottom: "5px",
+                marginBottom: "3px",
               }}
             >
               <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
               Bước giá dựa trên {config.priceStepPercentage}% của giá khởi điểm.
             </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "3px",
+              }}
+            >
               <InfoIcon fontSize="small" style={{ marginRight: "5px" }} /> Mức
               cọc dựa trên {config.depositPercentage}% của giá khởi điểm.
             </div>
@@ -341,7 +348,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
             <Col span={8}>
               <Form.Item
                 name="priceStep"
-                label="Bước giá (đ)"
+                label="Bước giá tối thiểu (đ)"
                 rules={[{ required: true, message: "Vui lòng nhập bước giá" }]}
               >
                 <InputNumber
@@ -373,27 +380,50 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               </Form.Item>
             </Col>
           </Row>
-          <Col span={24}>
-            <Form.Item
-              name="maxPrice"
-              label="Giá mua ngay (đ)"
-              rules={[
-                { required: true, message: "Vui lòng nhập giá mua ngay" },
-              ]}
-            >
-              <InputNumber
-                style={{ width: "100%" }}
-                min={0}
-                placeholder="Nhập giá mua ngay"
-                formatter={(value) =>
-                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                }
-              />
-            </Form.Item>
-          </Col>
+          <Row gutter={16}>
+            <Col span={13}>
+              <Form.Item
+                name="maxPrice"
+                label="Giá mua ngay (đ)"
+                rules={[
+                  { required: true, message: "Vui lòng nhập giá mua ngay" },
+                ]}
+              >
+                <InputNumber
+                  style={{ width: "100%" }}
+                  min={0}
+                  placeholder="Nhập giá mua ngay"
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                />
+              </Form.Item>
+            </Col>
+            <Col span={11}>
+              <Form.Item
+                name="duration"
+                label="Thời lượng đấu giá (Ngày)"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng nhập thời lượng đấu giá",
+                  },
+                ]}
+              >
+                <InputNumber
+                  style={{ width: "100%" }}
+                  min={0}
+                  placeholder="Nhập thời lượng đấu giá"
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
           {/* Row to display start and end time  next to each other */}
-          <Row gutter={16}>
+          {/* <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="startTime"
@@ -518,7 +548,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                 />
               </Form.Item>
             </Col>
-          </Row>
+          </Row> */}
 
           <Form.Item>
             <Button
@@ -533,7 +563,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               htmlType="submit"
               block
             >
-              Tạo đấu giá
+              Gửi yêu cầu đấu giá
             </Button>
           </Form.Item>
         </Form>

@@ -166,7 +166,7 @@ const Auctions: React.FC = () => {
                 onClick={() => handleDetailClick(comic.id)}
               >
                 <img
-                  src={comic.comics.coverImage}
+                  src={comic.comics?.coverImage}
                   alt={comic.comics.title}
                   className="object-cover w-full h-80"
                 />

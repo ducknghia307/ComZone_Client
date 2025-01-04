@@ -240,6 +240,15 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
           fontWeight: "bold",
           display: "inline-block",
         };
+      case "PENDING_APPROVAL":
+        return {
+          color: "#a64dff",
+          backgroundColor: "#f2e6ff",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
       case "CANCELED":
         return {
           color: "#757575",
@@ -263,6 +272,8 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
         return "Sắp diễn ra";
       case "PROCESSING":
         return "Đang xử lí";
+      case "PENDING_APPROVAL":
+        return "Chờ duyệt";
       case "ONGOING":
         return "Đang diễn ra";
       case "FAILED":

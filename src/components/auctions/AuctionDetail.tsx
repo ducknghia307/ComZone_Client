@@ -535,7 +535,7 @@ const ComicAuction = () => {
               <div className="flex flex-col gap-5 items-center justify-center">
                 <div className="current-price2">
                   <p style={{ fontFamily: "REM", fontSize: "18px" }}>
-                    Bước Giá
+                    Bước giá tối thiểu
                   </p>
                   <h3
                     style={{

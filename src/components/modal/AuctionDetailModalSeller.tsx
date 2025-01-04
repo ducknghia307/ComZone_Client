@@ -71,6 +71,15 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
           padding: "8px 20px",
           fontWeight: "bold",
         };
+      case "PENDING_APPROVAL":
+        return {
+          color: "#a64dff",
+          backgroundColor: "#f2e6ff",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+          display: "inline-block",
+        };
       case "ONGOING":
         return {
           color: "#2196f3",
@@ -112,6 +121,8 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
         return "Thành công";
       case "COMPLETED":
         return "Hoàn thành";
+      case "PENDING_APPROVAL":
+        return "Chờ duyệt";
       case "ONGOING":
         return "Đang diễn ra";
       case "UPCOMING":

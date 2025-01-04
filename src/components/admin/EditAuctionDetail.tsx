@@ -104,6 +104,9 @@ const AdminAuction: React.FC = () => {
         </Typography.Title>
         <Form layout="vertical">
           <Form.Item label="Bước Giá (%)" style={{ width: "100%" }}>
+            <Typography.Text type="secondary">
+              Bước giá sẽ dựa trên bao nhiêu % của giá của truyện.
+            </Typography.Text>
             <Input
               type="number"
               value={config.priceStepConfig}
@@ -114,6 +117,9 @@ const AdminAuction: React.FC = () => {
             />
           </Form.Item>
           <Form.Item label="Mức Cọc (%)" style={{ width: "100%" }}>
+            <Typography.Text type="secondary">
+              Mức cọc sẽ là tỷ lệ phần trăm của giá trị đấu giá.
+            </Typography.Text>
             <Input
               type="number"
               value={config.depositAmountConfig}
@@ -123,6 +129,9 @@ const AdminAuction: React.FC = () => {
             />
           </Form.Item>
           <Form.Item label="Giá Mua Ngay (Lần)" style={{ width: "100%" }}>
+            <Typography.Text type="secondary">
+              Giá mua ngay là giá tối đa mà người dùng có thể đặt.
+            </Typography.Text>
             <Input
               type="number"
               value={config.maxPriceConfig}

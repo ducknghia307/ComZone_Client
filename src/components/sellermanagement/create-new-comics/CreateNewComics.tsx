@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import MainComicsInformation from "./MainComicsInformation";
 import EditionAndCondition from "./EditionAndCondition";
+import { Genre } from "../../../common/base.interface";
 
 export default function CreateNewComics({
   setIsCreatingComics,
@@ -10,6 +11,10 @@ export default function CreateNewComics({
   const [currentStep, setCurrentStep] = useState<number>(0);
 
   const [isCollection, setIsCollection] = useState<boolean>(false);
+
+  const [title, setTitle] = useState<string>("");
+  const [author, setAuthor] = useState<string>("");
+  const [genres, setGenres] = useState<Genre>();
 
   return (
     <div className="REM flex flex-col gap-8">

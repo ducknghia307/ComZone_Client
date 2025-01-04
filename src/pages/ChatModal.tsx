@@ -273,7 +273,7 @@ export default function ChatModal({
       }}
       footer={null}
       centered
-      width={window.innerWidth * 0.8}
+      width={1000}
     >
       {isLoading && <Loading />}
       <div className="h-[90vh] xl:max-h-[1000px] flex items-stretch">

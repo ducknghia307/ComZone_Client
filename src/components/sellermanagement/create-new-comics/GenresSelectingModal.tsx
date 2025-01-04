@@ -6,10 +6,14 @@ export default function GenresSelectingModal({
   open,
   setOpen,
   genresList,
+  genres,
+  setGenres,
 }: {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   genresList: Genre[];
+  genres: Genre[];
+  setGenres: React.Dispatch<React.SetStateAction<Genre[]>>;
 }) {
   const [currentGenresList, setCurrentGenresList] =
     useState<Genre[]>(genresList);
@@ -18,7 +22,7 @@ export default function GenresSelectingModal({
   const [genresSearchInput, setGenresSearchInput] = useState<string>("");
   const searchInputRef = useRef<string>("");
 
-  const genreLimit = 5;
+  const genreLimit = 3;
 
   const handleSearchGenres = () => {
     if (genresSearchInput.length === 0) setCurrentGenresList(genresList);
@@ -42,6 +46,16 @@ export default function GenresSelectingModal({
   useEffect(() => {
     setCurrentGenresList(genresList);
   }, [genresList]);
+
+  useEffect(() => {
+    setSelectedGenres(genres);
+  }, [genres, open]);
+
+  const handleSelectGenres = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setGenres(selectedGenres);
+    setOpen(false);
+  };
 
   return (
     <Modal
@@ -110,7 +124,10 @@ export default function GenresSelectingModal({
                     else setSelectedGenres((prev) => [...prev, genre]);
                   }}
                   className={`relative flex flex-col items-baseline gap-1 rounded-lg ${
-                    isSelected ? "ring-2 ring-gray-800" : ""
+                    isSelected
+                      ? "ring-2 ring-gray-800"
+                      : selectedGenres.length === genreLimit &&
+                        "opacity-30 cursor-default"
                   } border border-gray-300 p-2 duration-200`}
                 >
                   <p className="font-semibold">{genre.name}</p>
@@ -145,7 +162,7 @@ export default function GenresSelectingModal({
         )}
 
         <div className="min-w-fit sm:basis-1/3 flex items-center justify-between gap-4">
-          <p>
+          <p className="min-w-fit">
             Đã chọn:{" "}
             <span className="font-semibold">
               {selectedGenres.length} / {genreLimit}
@@ -154,7 +171,7 @@ export default function GenresSelectingModal({
           <div className="grow flex items-center gap-1">
             <button
               onClick={() => setSelectedGenres([])}
-              className={`sm:min-w-fit p-2 basis-1/3 border border-gray-400 rounded duration-200 hover:bg-gray-100 ${
+              className={`hidden sm:block min-w-fit p-2 basis-1/3 border border-gray-400 rounded duration-200 hover:bg-gray-100 ${
                 selectedGenres.length === 0 && "hidden"
               }`}
             >
@@ -162,10 +179,11 @@ export default function GenresSelectingModal({
             </button>
             <button
               disabled={selectedGenres.length === 0}
+              onClick={handleSelectGenres}
               className="grow p-2 bg-green-700 text-white font-semibold rounded duration-200 hover:bg-green-900 disabled:bg-gray-300"
             >
               {selectedGenres.length === 0
-                ? "Chọn ít nhất 1 thể loại truyện"
+                ? "Chọn ít nhất một"
                 : "Hoàn tất"}
             </button>
           </div>

@@ -10,7 +10,7 @@ const CarouselComponent: React.FC = () => {
     <Carousel autoplay className="mt-1 lg:w-3/4 mx-auto">
       {imageList.map((image, index) => (
         <div key={index} className="w-full">
-          <img src={image} alt="" className="w-full h-[70vh] object-cover" />
+          <img src={image} alt="" className="w-full h-[40vh] sm:h-[70vh] object-cover" />
         </div>
       ))}
     </Carousel>

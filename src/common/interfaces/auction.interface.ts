@@ -21,3 +21,11 @@ export interface Auction extends BaseInterface {
   status: AuctionStatus;
   depositAmount: number;
 }
+
+export interface AuctionCriteria {
+  id: number;
+  isFullInfoFilled: boolean;
+  conditionLevel: number;
+  editionRestricted: boolean;
+  updatedAt: Date;
+}

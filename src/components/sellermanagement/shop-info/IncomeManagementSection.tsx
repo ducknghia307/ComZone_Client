@@ -1,4 +1,3 @@
-import React from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { SellerOrdersData, SellerTransactionsData } from "../ShopInfo";
 import CurrencySplitter from "../../../assistants/Spliter";
@@ -24,7 +23,7 @@ export default function IncomeManagementSection({
     <div className="w-full flex flex-col gap-4">
       <p className="text-2xl font-semibold">THỐNG KÊ</p>
 
-      {sellerTransactionsData.total > 0 ? (
+      {sellerOrdersData && sellerOrdersData.totalSuccessful > 0 ? (
         <div className="w-full">
           <LineChart
             xAxis={[{ scaleType: "point", data: xLabels }]}
@@ -42,9 +41,9 @@ export default function IncomeManagementSection({
           />
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center gap-1 py-[10vh] opacity-50">
-          <p className="font-light uppercase">Chưa có đơn hàng thành công</p>
-          <p className="text-xs italic">
+        <div className="flex flex-col items-center justify-center gap-1 py-[10vh] text-center">
+          <p className="font-light uppercase">Chưa có doanh thu từ đơn hàng</p>
+          <p className="text-xs italic opacity-50">
             Thống kê doanh thu từ đơn hàng của bạn sẽ được hiển thị ở đây
           </p>
         </div>

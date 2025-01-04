@@ -353,6 +353,8 @@ const Navbar = () => {
     "/admin/subscription",
     "/admin/auction/settingPrice",
     "/admin/auction/auctionCriteria",
+    "/admin/auction/editions",
+    "/admin/auction/genres",
     "/mod/users",
     "/mod/comics",
     "/mod/orders",

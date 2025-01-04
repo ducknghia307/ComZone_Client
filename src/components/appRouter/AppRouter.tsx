@@ -47,6 +47,8 @@ import SellerShopPage from "../../pages/SellerShopPage";
 import ModDeliveries from "../../pages/ModDeliveries";
 import AdminAuctionSetting from "../../pages/AdminAuctionSetting";
 import AdminAuctionCriteria from "../../pages/AdminAuctionCriteria";
+import AdminComicGenre from "../../pages/AdminComicGenre";
+import AdminComicEdition from "../../pages/AdminComicEdition";
 
 const AppRouter = () => {
   return (
@@ -157,6 +159,8 @@ const AppRouter = () => {
           path="/admin/auction/auctionCriteria"
           element={<AdminAuctionCriteria />}
         />
+        <Route path="/admin/auction/genres" element={<AdminComicGenre />} />
+        <Route path="/admin/auction/editions" element={<AdminComicEdition />} />
       </Routes>
     </div>
   );

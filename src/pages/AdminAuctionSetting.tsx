@@ -48,7 +48,7 @@ const AdminAuctionSetting: React.FC = () => {
             height: "100vh",
           }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border  REM py-12 px-4 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4   REM py-12 px-4 w-full">
             <div className="flex flex-col shadow-md rounded-lg w-full h-fit">
               <Link
                 to={"/admin/auction/settingPrice"}

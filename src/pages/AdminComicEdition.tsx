@@ -2,21 +2,15 @@ import React, { useState } from "react";
 import "../components/ui/AccountUser.css";
 import Grid from "@mui/material/Grid2";
 import Sidebar from "../components/admin/Sidebar";
-import EditAuctionDetail from "../components/admin/EditAuctionDetail";
 import { Link, useLocation } from "react-router-dom";
-import EditAuctionCriteria from "../components/admin/EditAuctionCriteria";
+import EditionsList from "../components/admin/EditionsList";
 
-const AdminAuctionCriteria: React.FC = () => {
+const AdminComicEdition: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState("users");
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const location = useLocation();
-
   const handleToggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
-  };
-
-  const handleMenuItemClick = (item: string) => {
-    setSelectedMenuItem(item);
   };
 
   return (
@@ -43,37 +37,33 @@ const AdminAuctionCriteria: React.FC = () => {
             onToggleCollapse={handleToggleCollapse}
           />
         </Grid>
-        <Grid
-          size={isCollapsed ? 11.5 : 9.5}
-          sx={{
-            height: "100%",
-          }}
-        >
+        <Grid size={isCollapsed ? 11.5 : 9.5}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4   REM py-12 px-4 w-full">
             <div className="flex flex-col shadow-md rounded-lg w-full h-fit">
               <Link
-                to={"/admin/auction/settingPrice"}
+                to={"/admin/auction/genres"}
                 className={`p-3 rounded-t-lg ${
-                  location.pathname === "/admin/auction/settingPrice"
+                  location.pathname === "/admin/auction/genres"
                     ? "bg-gray-200"
                     : "bg-white hover:bg-gray-200"
                 } hover:cursor-pointer duration-300 transition-all`}
               >
-                Cài đặt mức giá
+                Thể loại truyện
               </Link>
               <Link
-                to={"/admin/auction/auctionCriteria"}
+                to={"/admin/auction/editions"}
                 className={`p-3 rounded-b-lg ${
-                  location.pathname === "/admin/auction/auctionCriteria"
+                  location.pathname === "/admin/auction/editions"
                     ? "bg-gray-200"
                     : "bg-white hover:bg-gray-200"
                 } hover:cursor-pointer duration-300 transition-all`}
               >
-                Cài đặt tiêu chí đánh giá
+               Phiên bản
               </Link>
             </div>
-            <div className="col-span-2">
-              <EditAuctionCriteria />
+
+            <div className="col-span-2 shadow-md bg-white p-3 rounded-lg">
+              <EditionsList />
             </div>
           </div>
         </Grid>
@@ -82,4 +72,4 @@ const AdminAuctionCriteria: React.FC = () => {
   );
 };
 
-export default AdminAuctionCriteria;
+export default AdminComicEdition;

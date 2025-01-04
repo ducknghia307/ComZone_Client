@@ -1,14 +1,32 @@
 import CarouselComponent from "../components/home/Carousel";
-import HotComic from "../components/home/HotComic";
 import Auctions from "../components/home/Auctions";
 import AllGenres from "../components/home/AllGenres";
-import "../components/ui/HomePage.css";
+import LatestComics from "../components/home/LatestComics";
+import { useEffect, useState } from "react";
+import { Comic } from "../common/base.interface";
+import { publicAxios } from "../middleware/axiosInstance";
 
 const HomePage = () => {
+  const [comicsList, setComicsList] = useState<Comic[]>([]);
+
+  const fetchComicsList = async () => {
+    await publicAxios
+      .get("comics/available/latest")
+      .then((res) => {
+        console.log(res.data);
+        setComicsList(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    fetchComicsList();
+  }, []);
+
   return (
-    <div className="homepage w-full overflow-x-hidden">
+    <div className="REM w-full space-y-16 overflow-x-hidden">
       <CarouselComponent />
-      <HotComic />
+      <LatestComics comicsList={comicsList} />
       <Auctions />
       <AllGenres />
     </div>

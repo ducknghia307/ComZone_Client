@@ -1,0 +1,4 @@
+.animatedInput:focus ~ .inputText,
+.animatedInput:not(:placeholder-shown) ~ .inputText {
+  @apply transform -translate-y-10 -translate-x-2 scale-75 not-italic;
+}

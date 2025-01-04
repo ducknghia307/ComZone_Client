@@ -19,7 +19,6 @@ import Profile from "../../pages/Profile";
 import AuctionUser from "../../pages/AuctionUser";
 import WalletUser from "../../pages/WalletUser";
 import ExchangeUser from "../../pages/ExchangeUser";
-import AllHotComics from "../../pages/HotComic";
 import NotFound from "../notFound/NotFound";
 import CurrentUserRecentAct from "../../pages/CurrentUserRecentAct";
 import CurrentUserHistoryExchange from "../../pages/CurrentUserHistoryExchange";
@@ -55,7 +54,6 @@ const AppRouter = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/genres" element={<Genres />} />
-        <Route path="/hotcomic" element={<AllHotComics />} />
         <Route path="/auctions" element={<Auctions />} />
         <Route path="/detail/:id" element={<ComicDetail />} />
         <Route path="/auctiondetail/:id" element={<AuctionDetails />} />

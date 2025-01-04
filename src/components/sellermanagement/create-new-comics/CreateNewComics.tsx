@@ -1,7 +1,33 @@
-import React, { useState } from "react";
-import MainComicsInformation from "./MainComicsInformation";
+import React, { useEffect, useState } from "react";
+import MainComicsInformation, { Genre } from "./MainComicsInformation";
 import EditionAndCondition from "./EditionAndCondition";
-import { Genre } from "../../../common/base.interface";
+import { Edition } from "../../../common/interfaces/edition.interface";
+import PriceAndImages from "./PriceAndImages";
+
+export interface ComicMainInformation {
+  title: string;
+  author: string;
+  quantity: number;
+  episodesList: string[] | null;
+  genres: Genre[];
+  description: string;
+
+  coverType: "SOFT" | "HARD" | "DETACHED";
+  colorType: "GRAYSCALE" | "COLORED";
+  width?: number;
+  length?: number;
+  thickness?: number;
+
+  publisher?: string;
+  publicationYear?: number;
+  originCountry?: string;
+  releaseYear?: number;
+}
+
+export interface ConditionAndEditionResponse {
+  condition: number;
+  edition: Edition;
+}
 
 export default function CreateNewComics({
   setIsCreatingComics,
@@ -12,9 +38,31 @@ export default function CreateNewComics({
 
   const [isCollection, setIsCollection] = useState<boolean>(false);
 
-  const [title, setTitle] = useState<string>("");
-  const [author, setAuthor] = useState<string>("");
-  const [genres, setGenres] = useState<Genre>();
+  const [mainInformation, setMainInformation] =
+    useState<ComicMainInformation>();
+
+  const [conditionAndEdition, setConditionAndEdition] =
+    useState<ConditionAndEditionResponse>();
+
+  const handleGettingMainInfo = (value: ComicMainInformation) => {
+    console.log(value);
+    setMainInformation(value);
+    setCurrentStep(1);
+  };
+
+  const handleGettingConditionAndEdition = (
+    value: ConditionAndEditionResponse
+  ) => {
+    setConditionAndEdition(value);
+    setCurrentStep(2);
+  };
+
+  useEffect(() => {
+    if (document.getElementById("navbar-container"))
+      document
+        .getElementById("navbar-container")
+        .scrollIntoView({ behavior: "instant" });
+  }, [currentStep]);
 
   return (
     <div className="REM flex flex-col gap-8">
@@ -37,7 +85,7 @@ export default function CreateNewComics({
         <p className="text-2xl font-bold uppercase">Thêm truyện mới</p>
       </div>
 
-      <div className="flex items-center gap-4 px-4 lg:w-2/3 mx-auto">
+      <div className="hidden sm:flex items-center gap-4 px-4 xl:w-2/3 mx-auto">
         <div
           className={`${
             currentStep === 0 ? "font-semibold" : "font-light opacity-50"
@@ -111,7 +159,7 @@ export default function CreateNewComics({
             currentStep > 2 && "text-green-600 opacity-80"
           } flex items-center gap-1 duration-200`}
         >
-          {currentStep > 1 ? (
+          {currentStep > 2 ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -132,19 +180,25 @@ export default function CreateNewComics({
               <path d="M3 10C3 10.5523 3.44772 11 4 11L12 11C12.5523 11 13 10.5523 13 10V4C13 3.44772 12.5523 3 12 3H4C3.44772 3 3 3.44772 3 4V10ZM11 20C11 20.5523 11.4477 21 12 21H20C20.5523 21 21 20.5523 21 20V14C21 13.4477 20.5523 13 20 13H12C11.4477 13 11 13.4477 11 14V20ZM13 15H19V19H13V15ZM3 20C3 20.5523 3.44772 21 4 21H8C8.55229 21 9 20.5523 9 20V14C9 13.4477 8.55229 13 8 13H4C3.44772 13 3 13.4477 3 14V20ZM5 19V15H7V19H5ZM5 9V5L11 5L11 9L5 9ZM20 11C20.5523 11 21 10.5523 21 10V4C21 3.44772 20.5523 3 20 3H16C15.4477 3 15 3.44772 15 4V10C15 10.5523 15.4477 11 16 11H20ZM19 9H17V5H19V9Z"></path>
             </svg>
           )}
-          Hiển thị
+          Giá bán & Hiển thị
         </div>
       </div>
 
-      {currentStep === 0 && (
-        <MainComicsInformation
-          isCollection={isCollection}
-          setIsCollection={setIsCollection}
-          setCurrentStep={setCurrentStep}
-        />
-      )}
+      <MainComicsInformation
+        currentStep={currentStep}
+        isCollection={isCollection}
+        setIsCollection={setIsCollection}
+        handleGettingMainInfo={handleGettingMainInfo}
+      />
 
-      {currentStep === 1 && <EditionAndCondition />}
+      <EditionAndCondition
+        currentStep={currentStep}
+        mainInformation={mainInformation}
+        setCurrentStep={setCurrentStep}
+        handleGettingConditionAndEdition={handleGettingConditionAndEdition}
+      />
+
+      <PriceAndImages currentStep={currentStep} />
     </div>
   );
 }

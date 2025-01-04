@@ -1,7 +1,7 @@
 import CarouselComponent from "../components/home/Carousel";
 import Auctions from "../components/home/Auctions";
 import AllGenres from "../components/home/AllGenres";
-import SellingComics from "../components/home/SellingComics";
+import LatestComics from "../components/home/LatestComics";
 import { useEffect, useState } from "react";
 import { Comic } from "../common/base.interface";
 import { publicAxios } from "../middleware/axiosInstance";
@@ -11,7 +11,7 @@ const HomePage = () => {
 
   const fetchComicsList = async () => {
     await publicAxios
-      .get("comics/available/random")
+      .get("comics/available/latest")
       .then((res) => {
         console.log(res.data);
         setComicsList(res.data);
@@ -24,9 +24,9 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="REM w-full space-y-8 overflow-x-hidden">
+    <div className="REM w-full space-y-16 overflow-x-hidden">
       <CarouselComponent />
-      <SellingComics comicsList={comicsList} />
+      <LatestComics comicsList={comicsList} />
       <Auctions />
       <AllGenres />
     </div>

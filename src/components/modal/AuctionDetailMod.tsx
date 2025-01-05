@@ -70,6 +70,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
       });
     }
     console.log("Auction Status:", auctionData.status);
+    console.log("Auction Data Modal:", auctionData);
   }, [auctionData, comic, form]);
 
   const StyledDialog = styled(Dialog)(({ theme }) => ({
@@ -295,7 +296,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
         onCancel();
       }}
       footer={null}
-      width={1000}
+      width={900}
       centered
       closeIcon={null}
       styles={{ content: { padding: "0" } }}
@@ -345,30 +346,35 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
           </IconButton>
         </Box>
 
-        <Box mt={2}>
-          <Typography
-            variant="body2"
-            sx={{
-              color: theme.palette.text.secondary,
-              fontWeight: 400,
-              mb: "10px",
-              fontFamily: "REM",
-            }}
-          >
-            Thời gian bắt đầu:{" "}
-            {new Date(auctionData.startTime).toLocaleString("vi-VN")}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              color: theme.palette.text.secondary,
-              fontWeight: 400,
-              fontFamily: "REM",
-            }}
-          >
-            Thời gian kết thúc:{" "}
-            {new Date(auctionData.endTime).toLocaleString("vi-VN")}
-          </Typography>
+        <Box>
+          {auctionData.status !== "PENDING_APPROVAL" && (
+            <>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontWeight: 400,
+                  mb: "10px",
+                  fontFamily: "REM",
+                  mt: '15px'
+                }}
+              >
+                Thời gian bắt đầu:{" "}
+                {new Date(auctionData.startTime).toLocaleString("vi-VN")}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontWeight: 400,
+                  fontFamily: "REM",
+                }}
+              >
+                Thời gian kết thúc:{" "}
+                {new Date(auctionData.endTime).toLocaleString("vi-VN")}
+              </Typography>
+            </>
+          )}
 
           {auctionData.status === "ONGOING" && (
             <Popconfirm
@@ -383,7 +389,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                 </p>
               }
               onConfirm={handleAdjustEndtime}
-              onCancel={() => {}}
+              onCancel={() => { }}
               okText={<p className="REM">Xác nhận</p>}
               cancelText={<p className="REM">Hủy bỏ</p>}
             >
@@ -408,7 +414,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                 </p>
               }
               onConfirm={handleAdjustPaymentDeadline}
-              onCancel={() => {}}
+              onCancel={() => { }}
               okText={<p className="REM">Xác nhận</p>}
               cancelText={<p className="REM">Hủy bỏ</p>}
             >

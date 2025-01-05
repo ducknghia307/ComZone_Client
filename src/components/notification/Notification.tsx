@@ -91,6 +91,11 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
         navigate(`/auctiondetail/${item.auction.id}`);
       }
     }
+    if (item.auctionRequest) {
+      if (item.recipientType === "SELLER") {
+        navigate("sellermanagement/auction");
+      }
+    }
     if (item.exchange)
       navigate(`/exchange/detail/${item.exchange.id || item.exchange}`);
     console.log(item);
@@ -128,6 +133,7 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       case AnnouncementType.EXCHANGE_NEW_REQUEST:
         return NewExchangeRequestIcon;
 
+      case AnnouncementType.AUCTION_REQUEST:
       case AnnouncementType.ORDER_CONFIRMED:
       case AnnouncementType.EXCHANGE_APPROVED:
       case AnnouncementType.EXCHANGE_SUCCESSFUL:
@@ -142,6 +148,7 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       case AnnouncementType.DELIVERY_FAILED_RECEIVE:
       case AnnouncementType.DELIVERY_FAILED_SEND:
       case AnnouncementType.REFUND_REJECT:
+      case AnnouncementType.AUCTION_REQUEST_FAIL:
         return RejectIcon;
 
       case AnnouncementType.EXCHANGE_NEW_DEAL:

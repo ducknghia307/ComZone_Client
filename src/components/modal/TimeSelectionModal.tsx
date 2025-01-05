@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography } from "@mui/material";
-import { DatePicker } from "antd";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, Paper } from "@mui/material";
+import { DatePicker, notification } from "antd";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -29,15 +29,32 @@ const TimeSelectionModal: React.FC<TimeSelectionModalProps> = ({ open, onCancel,
     }, [startTime, duration]);
 
     const handleConfirm = async () => {
-        if (startTime && endTime) {
-            try {
-                await privateAxios.put(`/auction/${auctionId}/approve`, { startTime, endTime });
-                onConfirm(startTime, endTime);
-            } catch (error) {
-                console.error("Failed to approve auction:", error);
-            }
+        if (!startTime || !endTime) {
+            notification.warning({
+                message: "Cảnh báo",
+                description: "Vui lòng chọn thời gian bắt đầu trước khi xác nhận.",
+                placement: "topRight",
+            });
+            return;
         }
-    };
+    
+        try {
+            await privateAxios.put(`/auction-request/${auctionId}/approve`, { startTime, endTime });
+            notification.success({
+                message: "Thành công",
+                description: "Đã chấp nhận thành công yêu cầu đấu giá.",
+                placement: "topRight",
+            });
+            onConfirm(startTime, endTime);
+        } catch (error) {
+            notification.error({
+                message: "Lỗi",
+                description: "Không thể phê duyệt đấu giá. Vui lòng thử lại sau.",
+                placement: "topRight",
+            });
+            console.error("Failed to approve auction:", error);
+        }
+    };    
 
     const disabledStartDate = (current: dayjs.Dayjs | null) => {
         const now = dayjs().tz("Asia/Ho_Chi_Minh");
@@ -62,11 +79,41 @@ const TimeSelectionModal: React.FC<TimeSelectionModalProps> = ({ open, onCancel,
                     fontSize: "20px",
                     fontWeight: "bold",
                     color: "#71002b",
+                    textAlign: "center",
                 }}
             >
                 Chọn Thời Gian Đấu Giá
             </DialogTitle>
             <DialogContent>
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: 1,
+                        mb: 3,
+                        backgroundColor: '#FFF4E5',
+                        border: '1px solid #FFB74D',
+                        borderRadius: '8px'
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            fontFamily: "REM",
+                            fontSize: "14px",
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1
+                        }}
+                    >
+                        <span>⏱️ Thời lượng cuộc đấu giá diễn ra:</span>
+                        <span style={{
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            color: '#D32F2F'
+                        }}>
+                            {duration} ngày
+                        </span>
+                    </Typography>
+                </Paper>
                 <Box sx={{ mb: 2 }}>
                     <Typography sx={{ fontFamily: "REM", fontSize: "14px" }}>
                         <strong>Thời gian bắt đầu:</strong>
@@ -95,6 +142,11 @@ const TimeSelectionModal: React.FC<TimeSelectionModalProps> = ({ open, onCancel,
                         popupStyle={{ zIndex: 1300 }}
                         style={{ width: "100%", marginTop: "8px" }}
                     />
+                    <Typography sx={{ fontFamily: "REM", fontSize: "12px", color: "#777", mt: 1 }}>
+                        * Thời gian kết thúc sẽ được tự động tính toán dựa trên thời gian bắt đầu bạn đã chọn và thời lượng được thiết lập trước là
+                        <span style={{ fontWeight: "bold", color: "#D32F2F" }}> {duration} ngày</span>. Bạn không thể chỉnh sửa thời gian kết thúc.
+                    </Typography>
+
                 </Box>
             </DialogContent>
             <DialogActions sx={{ padding: "16px", backgroundColor: "#f9f9f9" }}>

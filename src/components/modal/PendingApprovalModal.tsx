@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Comic, UserInfo } from "../../common/base.interface";
 import TimeSelectionModal from "./TimeSelectionModal";
+import RejectReasonAuction from "./RejectReasonAuction";
 
 interface PendingApprovalModalProps {
   open: boolean;
@@ -29,6 +30,7 @@ interface PendingApprovalModalProps {
     status: string;
     duration: number;
   };
+  onStatusUpdate: (newStatus: string) => void; 
 }
 
 const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
@@ -36,23 +38,30 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
   onCancel,
   onSuccess,
   comic,
-  auctionData
+  auctionData,
+  onStatusUpdate
 }) => {
   const [loading, setLoading] = useState(false);
 
   const [timeSelectionModalOpen, setTimeSelectionModalOpen] = useState(false);
+  const [rejectReasonModalOpen, setRejectReasonModalOpen] = useState(false);
 
   const handleApprove = () => {
-    // Open the time selection modal when "Phê duyệt" is clicked
     setTimeSelectionModalOpen(true);
   };
 
+  const handleReject = (reasons: string[]) => {
+    console.log("Rejected reasons:", reasons);
+    onStatusUpdate("REJECTED");
+    setRejectReasonModalOpen(false);
+    onCancel();
+  };
+
   const handleTimeSelectionConfirm = (startTime: string, endTime: string) => {
-    // Handle the start and end time and close the modal
     console.log("Auction start time:", startTime);
     console.log("Auction end time:", endTime);
     setTimeSelectionModalOpen(false);
-    onSuccess(); // Call the success handler to close the original modal
+    onSuccess();
   };
 
   const getEditionChipStyle = (edition) => {
@@ -273,63 +282,78 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
             padding: "16px",
             backgroundColor: "#f9f9f9",
             borderTop: "1px solid #e0e0e0",
+            display: "flex",
+            justifyContent: "space-between",
           }}
           className="p-4 bg-[#f9f9f9] border-t border-[#e0e0e0]"
         >
-          <Button
-            onClick={onCancel}
-            sx={{
-              fontFamily: "REM",
-              backgroundColor: "#f0f0f0",
-              color: "#555",
-              padding: "8px 16px",
-              borderRadius: "8px",
-              textTransform: "none",
-              "&:hover": { backgroundColor: "#e0e0e0" },
-              border: "1px solid #ddd",
-            }}
-            className="bg-[#f0f0f0] text-[#555] py-2 px-4 rounded-lg border border-[#ddd] hover:bg-[#e0e0e0]"
-          >
-            Đóng
-          </Button>
-          <Button
-            color="error"
-            variant="contained"
-            disabled={loading}
-            sx={{
-              fontFamily: "REM",
-              padding: "8px 16px",
-              borderRadius: "8px",
-              textTransform: "none",
-              "&:hover": { backgroundColor: "#b71c1c" },
-            }}
-            className="py-2 px-4 rounded-lg bg-[#d32f2f] text-white hover:bg-[#b71c1c]"
-          >
-            Từ chối
-          </Button>
-          <Button
-            color="primary"
-            variant="contained"
-            disabled={loading}
-            sx={{
-              fontFamily: "REM",
-              padding: "8px 16px",
-              borderRadius: "8px",
-              textTransform: "none",
-              "&:hover": { backgroundColor: "#0d47a1" },
-            }}
-            className="py-2 px-4 rounded-lg bg-[#1976d2] text-white hover:bg-[#0d47a1]"
-            onClick={handleApprove}
-          >
-            Phê duyệt
-          </Button>
+          <Box>
+            <Button
+              onClick={onCancel}
+              sx={{
+                fontFamily: "REM",
+                backgroundColor: "#f0f0f0",
+                color: "#555",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                textTransform: "none",
+                "&:hover": { backgroundColor: "#e0e0e0" },
+                border: "1px solid #ddd",
+              }}
+              className="bg-[#f0f0f0] text-[#555] py-2 px-4 rounded-lg border border-[#ddd] hover:bg-[#e0e0e0]"
+            >
+              Đóng
+            </Button>
+          </Box>
+          <Box sx={{ display: "flex", gap: "8px" }}>
+            <Button
+              color="error"
+              variant="contained"
+              disabled={loading}
+              sx={{
+                fontFamily: "REM",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                textTransform: "none",
+                "&:hover": { backgroundColor: "#b71c1c" },
+              }}
+              className="py-2 px-4 rounded-lg bg-[#d32f2f] text-white hover:bg-[#b71c1c]"
+              onClick={() => setRejectReasonModalOpen(true)}
+            >
+              Từ chối
+            </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              disabled={loading}
+              sx={{
+                fontFamily: "REM",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                textTransform: "none",
+                "&:hover": { backgroundColor: "#0d47a1" },
+              }}
+              className="py-2 px-4 rounded-lg bg-[#1976d2] text-white hover:bg-[#0d47a1]"
+              onClick={handleApprove}
+            >
+              Phê duyệt
+            </Button>
+          </Box>
         </DialogActions>
+
       </Dialog>
       <TimeSelectionModal
         open={timeSelectionModalOpen}
         onCancel={() => setTimeSelectionModalOpen(false)}
         onConfirm={handleTimeSelectionConfirm}
-        duration={auctionData.duration} 
+        duration={auctionData.duration}
+        auctionId={auctionData.id}
+      />
+
+      <RejectReasonAuction
+        open={rejectReasonModalOpen}
+        onCancel={() => setRejectReasonModalOpen(false)}
+        onReject={handleReject}
         auctionId={auctionData.id}
       />
     </>

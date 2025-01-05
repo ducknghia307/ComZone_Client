@@ -109,6 +109,19 @@ export interface Auction {
   updatedAt?: Date;
 }
 
+export interface AuctionRequest {
+  comic: Comic;
+  id: string;
+  status: string;
+  reservePrice: number;
+  priceStep: number;
+  depositAmount: number;
+  maxPrice: number;
+  duration: number;
+  rejectionReason: string;
+  approvalDate: Date;
+}
+
 //comic
 export interface Comic {
   id: string;

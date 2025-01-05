@@ -113,9 +113,9 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
           status: "UPCOMING",
         });
       } else {
-        await privateAxios.post("/auction/request", {
+        await privateAxios.post("/auction-request", {
           ...values,
-          comicsId: comic?.id,
+          comicId: comic?.id,
         });
       }
       await privateAxios.patch("seller-subscriptions/auction", {

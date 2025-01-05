@@ -260,6 +260,16 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
           fontSize: "16px",
           whiteSpace: "nowrap",
         };
+      case "APPROVED":
+        return {
+          color: "#3f51b5",
+          backgroundColor: "#e8eaf6",
+          padding: "8px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+        };
     }
   };
 
@@ -283,6 +293,8 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
         return "Bị từ chối";
       case "CANCELED":
         return "Đã hủy";
+      case "APPROVED":
+        return "Đã duyệt";
       default:
         return status;
     }
@@ -465,11 +477,11 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                   />
                   <InfoRow
                     label="Giá khởi điểm"
-                    value={auctionData.reservePrice.toLocaleString()}
+                    value={auctionData.reservePrice?.toLocaleString()}
                   />
                   <InfoRow
                     label="Bước giá"
-                    value={auctionData.priceStep.toLocaleString()}
+                    value={auctionData.priceStep?.toLocaleString()}
                   />
                   <InfoRow
                     label="Giá hiện tại"

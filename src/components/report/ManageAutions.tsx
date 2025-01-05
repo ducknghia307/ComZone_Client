@@ -13,16 +13,19 @@ import { Box, FormControl, IconButton, InputAdornment, MenuItem, Select, TextFie
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import AuctionDetailMod from "../modal/AuctionDetailMod";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import { Auction, UserInfo } from "../../common/base.interface";
+import { Auction, AuctionRequest, Comic, UserInfo } from "../../common/base.interface";
 import { SelectChangeEvent } from "@mui/material/Select";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import EditAuctionMod from "./EditAuctionMod";
 import { Tabs } from "antd";
-import { conditionGradingScales } from "../../common/constances/comicsConditions";
 import PendingApprovalModal from "../modal/PendingApprovalModal";
+import PendingAuctionTable from "./PendingAuctionTable";
 const { TabPane } = Tabs;
-interface SelectedAuction extends Auction {
+interface SelectedAuction extends Omit<Auction, 'comics'> {
   sellerInfo: UserInfo;
+  comics: Comic;
+  duration?: number;
+  rejectionReason?: string;
+  approvalDate?: Date;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -82,10 +85,12 @@ const AuctionTable: React.FC<{
           return { color: "#e91e63", backgroundColor: "#fce4ec", borderRadius: "8px", padding: "8px 20px", fontWeight: "bold", display: "inline-block", };
         case "REJECTED":
           return { color: "#f44336", backgroundColor: "#ffebee", borderRadius: "8px", padding: "8px 20px", fontWeight: "bold", display: "inline-block", };
-        case "PENDING_APPROVAL":
+        case "PENDING":
           return { color: "#a64dff", backgroundColor: "#f2e6ff", borderRadius: "8px", padding: "8px 20px", fontWeight: "bold", display: "inline-block", };
         case "CANCELED":
           return { color: "#757575", backgroundColor: "#eeeeee", padding: "8px 20px", borderRadius: "8px", fontWeight: "bold", display: "inline-block", };
+        case "APPROVED":
+          return { color: "#3f51b5", backgroundColor: "#e8eaf6", borderRadius: "8px", padding: "8px 20px", fontWeight: "bold", display: "inline-block" };
       }
     };
 
@@ -95,7 +100,7 @@ const AuctionTable: React.FC<{
           return "Thành công";
         case "COMPLETED":
           return "Hoàn thành";
-        case "PENDING_APPROVAL":
+        case "PENDING":
           return "Chờ duyệt";
         case "UPCOMING":
           return "Sắp diễn ra";
@@ -109,20 +114,26 @@ const AuctionTable: React.FC<{
           return "Bị từ chối";
         case "CANCELED":
           return "Đã hủy";
+        case "APPROVED":
+          return "Đã duyệt";
         default:
           return status;
       }
     };
 
-    const truncateText = (text: string, maxLength: number): string => {
+    const truncateText = (text: string | undefined, maxLength: number): string => {
+      if (!text) {
+        return ""; // Return an empty string if text is undefined or null
+      }
       return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
     };
 
     const filteredAuctions = auctions.filter((auction) => {
       const statusMatch = selectedStatus ? auction.status === selectedStatus : true;
+      const sellerName = auction?.comics?.sellerId?.name?.toLowerCase() || '';
+      const title = auction?.comics?.title?.toLowerCase() || '';
       const searchMatch =
-        auction.comics.sellerId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        auction.comics.title.toLowerCase().includes(searchTerm.toLowerCase());
+        sellerName.includes(searchTerm.toLowerCase()) || title.includes(searchTerm.toLowerCase());
       return statusMatch && searchMatch;
     });
 
@@ -166,7 +177,6 @@ const AuctionTable: React.FC<{
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((auction) => (
                   <StyledTableRow key={auction.id}>
-                    {/* ... (keep existing row content) */}
                     <StyledTableCell style={{ fontFamily: "REM" }}>
                       <Box
                         sx={{
@@ -177,19 +187,19 @@ const AuctionTable: React.FC<{
                         }}
                       >
                         <img
-                          alt={auction.comics.sellerId.avatar}
-                          src={auction.comics.sellerId.avatar || ""}
+                          alt={auction?.comics?.sellerId?.avatar}
+                          src={auction?.comics?.sellerId?.avatar}
                           style={{
                             width: 32,
                             height: 32,
                             borderRadius: "50%",
                           }}
                         />
-                        {auction.comics.sellerId.name}
+                        {auction?.comics?.sellerId?.name}
                       </Box>
                     </StyledTableCell>
                     <StyledTableCell align="left" style={{ whiteSpace: "nowrap", fontFamily: "REM" }}>
-                      {truncateText(auction.comics.title, 20)}
+                      {truncateText(auction?.comics?.title, 20)}
                     </StyledTableCell>
                     <StyledTableCell align="left" style={{ fontFamily: "REM" }}>
                       <span style={getStatusChipStyles(auction.status)}>
@@ -210,7 +220,7 @@ const AuctionTable: React.FC<{
                         color="default"
                         onClick={() => handleEditClick(auction as SelectedAuction)}
                       >
-                        {auction.status === "PENDING_APPROVAL" ? (
+                        {auction.status === "PENDING" ? (
                           <EditOutlinedIcon />
                         ) : (
                           <InfoOutlinedIcon />
@@ -237,7 +247,9 @@ const AuctionTable: React.FC<{
 
 const ManageAuctions: React.FC = () => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
+  const [pendingAuctions, setPendingAuctions] = useState<AuctionRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingPending, setLoadingPending] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -246,7 +258,7 @@ const ManageAuctions: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [activeTab, setActiveTab] = useState("1");
 
-  const fetchOrdersWithItems = async () => {
+  const fetchAuctions = async () => {
     try {
       const response = await privateAxios.get("/auction");
       setAuctions(response.data);
@@ -257,9 +269,26 @@ const ManageAuctions: React.FC = () => {
     }
   };
 
+  const fetchPendingAuctions = async () => {
+    try {
+      const response = await privateAxios.get("/auction-request");
+      setPendingAuctions(response.data);
+      console.log("Pending auctions:", response.data);
+
+    } catch (error) {
+      console.error("Error fetching pending auctions:", error);
+    } finally {
+      setLoadingPending(false);
+    }
+  };
+
   useEffect(() => {
-    fetchOrdersWithItems();
-  }, []);
+    if (activeTab === "1") {
+      fetchAuctions();
+    } else if (activeTab === "2") {
+      fetchPendingAuctions();
+    }
+  }, [activeTab]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -275,18 +304,49 @@ const ManageAuctions: React.FC = () => {
     setSelectedAuction(null);
   };
 
-  const handleEditClick = (auction: SelectedAuction) => {
-    setSelectedAuction({
-      ...auction,
-      sellerInfo: auction.comics.sellerId,
-      comics: auction.comics,
-    });
+  const handleEditClick = (auction: Auction | AuctionRequest) => {
+    console.log("Clicked Auction: ", auction);
+    
+    if ('comic' in auction) {
+      const selectedAuction: SelectedAuction = {
+        id: auction.id,
+        sellerInfo: auction.comic.sellerId,
+        comics: auction.comic,
+        status: auction.status,
+        reservePrice: auction.reservePrice,
+        priceStep: auction.priceStep,
+        maxPrice: auction.maxPrice,
+        duration: auction.duration,
+        depositAmount: auction.depositAmount,
+        rejectionReason: auction.rejectionReason,
+        approvalDate: auction.approvalDate,
+        shopName: auction.comic.sellerId.name || '',
+        productName: auction.comic.title || '',
+        imgUrl: auction.comic.coverImage || '',
+        startTime: new Date().toISOString(),
+        endTime: new Date().toISOString(),
+        createdAt: new Date(),
+      };
+      setSelectedAuction(selectedAuction);
+    } else {
+      const selectedAuction: SelectedAuction = {
+        ...auction,
+        sellerInfo: auction.comics.sellerId,
+        comics: auction.comics,
+      };
+      setSelectedAuction(selectedAuction);
+    }
     setIsModalOpen(true);
   };
+  
 
   const handleModalSuccess = () => {
     handleModalClose();
-    fetchOrdersWithItems();
+    if (activeTab === "1") {
+      fetchAuctions();
+    } else if (activeTab === "2") {
+      fetchPendingAuctions();
+    }
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -296,11 +356,6 @@ const ManageAuctions: React.FC = () => {
   const handleStatusFilterChange = (event: SelectChangeEvent<string>) => {
     setSelectedStatus(event.target.value as string);
   };
-
-  const regularAuctions = auctions.filter(auction => auction.status !== "PENDING_APPROVAL");
-  const pendingAuctions = auctions.filter(auction => auction.status === "PENDING_APPROVAL");
-  console.log("auctions", regularAuctions);
-  console.log("auctions pending", pendingAuctions);
 
   return (
     <div style={{ paddingBottom: "40px" }}>
@@ -383,7 +438,7 @@ const ManageAuctions: React.FC = () => {
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
           <TabPane tab="Các Cuộc Đấu Giá" key="1">
             <AuctionTable
-              auctions={regularAuctions}
+              auctions={auctions}
               loading={loading}
               page={page}
               rowsPerPage={rowsPerPage}
@@ -395,66 +450,74 @@ const ManageAuctions: React.FC = () => {
             />
           </TabPane>
           <TabPane tab="Danh Sách Chờ Duyệt" key="2">
-            <AuctionTable
-              auctions={pendingAuctions}
-              loading={loading}
+            <PendingAuctionTable
+              pendingAuctions={pendingAuctions}
+              loading={loadingPending}
               page={page}
               rowsPerPage={rowsPerPage}
               handleChangePage={handleChangePage}
               handleChangeRowsPerPage={handleChangeRowsPerPage}
               handleEditClick={handleEditClick}
-              searchTerm={searchTerm}
-              selectedStatus=""
             />
           </TabPane>
-          <TabPane tab="Tiêu chí duyệt đấu giá" key="3">
 
+          <TabPane tab="Tiêu chí duyệt đấu giá" key="3">
           </TabPane>
         </Tabs>
       </Box>
 
       {selectedAuction && (
-  <>
-    {selectedAuction.status === 'PENDING_APPROVAL' ? (
-      <PendingApprovalModal
-        open={isModalOpen}
-        onCancel={handleModalClose}
-        comic={selectedAuction.comics}
-        auctionData={{
-          id: selectedAuction.id,
-          reservePrice: selectedAuction.reservePrice,
-          maxPrice: selectedAuction.maxPrice,
-          priceStep: selectedAuction.priceStep,
-          startTime: selectedAuction.startTime,
-          endTime: selectedAuction.endTime,
-          currentPrice: selectedAuction.currentPrice,
-          sellerInfo: selectedAuction.sellerInfo,
-          status: selectedAuction.status,
-          duration: selectedAuction.duration,
-        }}
-        onSuccess={handleModalSuccess}
-      />
-    ) : (
-      <AuctionDetailMod
-        open={isModalOpen}
-        onCancel={handleModalClose}
-        comic={selectedAuction.comics}
-        auctionData={{
-          id: selectedAuction.id,
-          reservePrice: selectedAuction.reservePrice,
-          maxPrice: selectedAuction.maxPrice,
-          priceStep: selectedAuction.priceStep,
-          startTime: selectedAuction.startTime,
-          endTime: selectedAuction.endTime,
-          currentPrice: selectedAuction.currentPrice,
-          sellerInfo: selectedAuction.sellerInfo,
-          status: selectedAuction.status,
-        }}
-        onSuccess={handleModalSuccess}
-      />
-    )}
-  </>
-)}
+        <>
+          {selectedAuction.status === 'PENDING' ? (
+            <PendingApprovalModal
+              open={isModalOpen}
+              onCancel={handleModalClose}
+              comic={selectedAuction.comics}
+              auctionData={{
+                id: selectedAuction.id,
+                reservePrice: selectedAuction.reservePrice,
+                maxPrice: selectedAuction.maxPrice,
+                priceStep: selectedAuction.priceStep,
+                startTime: selectedAuction.startTime,
+                endTime: selectedAuction.endTime,
+                currentPrice: selectedAuction.currentPrice,
+                sellerInfo: selectedAuction.sellerInfo,
+                status: selectedAuction.status,
+                duration: selectedAuction.duration,
+              }}
+              onSuccess={handleModalSuccess}
+              onStatusUpdate={(newStatus: string) => {
+                setSelectedAuction(prev => prev ? {...prev, status: newStatus} : null);
+                setPendingAuctions(prev => 
+                  prev.map(auction => 
+                    auction.id === selectedAuction.id 
+                      ? {...auction, status: newStatus}
+                      : auction
+                  )
+                );
+              }}
+            />
+          ) : (
+            <AuctionDetailMod
+              open={isModalOpen}
+              onCancel={handleModalClose}
+              comic={selectedAuction.comics}
+              auctionData={{
+                id: selectedAuction.id,
+                reservePrice: selectedAuction.reservePrice,
+                maxPrice: selectedAuction.maxPrice,
+                priceStep: selectedAuction.priceStep,
+                startTime: selectedAuction.startTime,
+                endTime: selectedAuction.endTime,
+                currentPrice: selectedAuction.currentPrice,
+                sellerInfo: selectedAuction.sellerInfo,
+                status: selectedAuction.status,
+              }}
+              onSuccess={handleModalSuccess}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 };

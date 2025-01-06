@@ -127,8 +127,12 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
         return item.auction?.comics?.coverImage || AuctionIcon;
 
       case AnnouncementType.AUCTION_REQUEST:
+<<<<<<< HEAD
       case AnnouncementType.AUCTION_REQUEST_FAIL:
         return item.auctionRequest?.comic?.coverImage || AuctionIcon;
+=======
+        return item.auctionRequest?.comics?.coverImage || AuctionIcon;
+>>>>>>> f11e362fbcd56e03b15533c9f44645a19093fcb6
 
       case AnnouncementType.EXCHANGE_NEW_REQUEST:
         return NewExchangeRequestIcon;

@@ -199,6 +199,7 @@ const EditionsList = () => {
               <StyledTableCell>Tên phiên bản</StyledTableCell>
               <StyledTableCell>Mô tả phiên bản</StyledTableCell>
               <StyledTableCell></StyledTableCell>
+              <StyledTableCell></StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -206,9 +207,16 @@ const EditionsList = () => {
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((edition) => (
                 <StyledTableRow key={edition.id}>
-                  <StyledTableCell>{edition.name}</StyledTableCell>
+                  <StyledTableCell className="text-nowrap">
+                    {edition.name}
+                  </StyledTableCell>
                   <StyledTableCell className="line-clamp-3">
                     {edition.description}
+                  </StyledTableCell>
+                  <StyledTableCell className="line-clamp-3 text-nowrap">
+                    {edition.auctionDisabled
+                      ? "Được đấu giá"
+                      : "Không được đấu giá"}
                   </StyledTableCell>
                   <StyledTableCell>
                     <Tooltip title="Xóa">

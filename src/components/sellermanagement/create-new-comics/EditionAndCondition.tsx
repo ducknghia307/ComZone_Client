@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { message, Slider } from "antd";
+import { Checkbox, message, Slider } from "antd";
 import type { SliderSingleProps } from "antd";
 import {
   ConditionGradingScale,
@@ -13,6 +13,7 @@ import {
 import { Edition } from "../../../common/interfaces/edition.interface";
 import { publicAxios } from "../../../middleware/axiosInstance";
 import { AuctionCriteria } from "../../../common/interfaces/auction.interface";
+import { evidenceAttributes } from "../../../common/constances/evidence-attribute";
 
 const formatGradingScaleToMarks = (
   gradingScale: ConditionGradingScale[]
@@ -37,6 +38,7 @@ export default function EditionAndCondition({
   setCurrentStep,
   mainInformation,
   handleGettingConditionAndEdition,
+  setEditionEvidenceFields,
 }: {
   currentStep: number;
   setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
@@ -44,12 +46,17 @@ export default function EditionAndCondition({
   handleGettingConditionAndEdition: (
     value: ConditionAndEditionResponse
   ) => void;
+  setEditionEvidenceFields: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
   const [minimumConditionLevel, setMinimumConditionLevel] = useState<number>();
   const [condition, setCondition] = useState<number>(5);
 
   const [editionList, setEditionList] = useState<Edition[]>([]);
   const [edition, setEdition] = useState<Edition>();
+
+  const [evidenceFields, setEvidenceFields] = useState<string[]>([]);
+
+  const [willNotAuction, setWillNotAuction] = useState<boolean>(false);
 
   const fetchEditions = async () => {
     await publicAxios
@@ -85,7 +92,42 @@ export default function EditionAndCondition({
       return;
     }
 
-    handleGettingConditionAndEdition({ condition, edition });
+    if (
+      !edition.auctionDisabled &&
+      !willNotAuction &&
+      evidenceFields.length === 0
+    ) {
+      message.error({
+        key: "error",
+        content: (
+          <p className="REM text-start">
+            Vui lòng chọn ít nhất 1 thuộc tính để thể hiện phiên bản truyện!
+          </p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    if (
+      !edition.auctionDisabled &&
+      !willNotAuction &&
+      evidenceFields.length === 0
+    ) {
+      message.error({
+        key: "error",
+        content: (
+          <p className="REM text-start">
+            Vui lòng chọn ít nhất 1 thuộc tính để thể hiện phiên bản truyện!
+          </p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    setEditionEvidenceFields(evidenceFields);
+    handleGettingConditionAndEdition({ condition, edition, willNotAuction });
   };
 
   if (currentStep === 1)
@@ -98,7 +140,8 @@ export default function EditionAndCondition({
 
           <p className="italic font-light text-sm">
             Chọn một mức độ thể hiện tình trạng hiện tại của{" "}
-            {mainInformation.quantity > 1 ? "bộ truyện" : "tập truyện"}:
+            {mainInformation.quantity > 1 ? "bộ truyện" : "tập truyện"}:{" "}
+            <span className="text-red-600">*</span>
           </p>
 
           <div className="px-4">
@@ -193,6 +236,12 @@ export default function EditionAndCondition({
 
         <p className="font-semibold uppercase text-lg">2. Phiên bản truyện</p>
 
+        <p className="italic font-light text-sm">
+          Chọn phiên bản của{" "}
+          {mainInformation.quantity > 1 ? "bộ truyện" : "tập truyện"}:{" "}
+          <span className="text-red-600">*</span>
+        </p>
+
         <div className="flex flex-col items-stretch justify-start gap-2">
           {editionList.map((editionDetails) => {
             const isSelected = edition && edition.id === editionDetails.id;
@@ -211,12 +260,12 @@ export default function EditionAndCondition({
                   isSelected
                     ? "ring-2 ring-black"
                     : edition
-                    ? "opacity-30 cursor-default"
+                    ? "opacity-30 hover:opacity-70"
                     : "hover:bg-gray-50"
                 } grow flex flex-col items-start justify-center gap-2 p-4 border border-gray-300 rounded-lg text-start duration-200`}
               >
                 <p className="text-xl font-semibold flex items-center gap-4">
-                  <span className="uppercase">{editionDetails.name}</span>
+                  <span className="capitalize">{editionDetails.name}</span>
                   {!editionDetails.auctionDisabled && (
                     <span className="px-2 py-1 bg-green-700 text-white rounded-md text-sm font-light flex items-center gap-1">
                       <svg
@@ -237,6 +286,133 @@ export default function EditionAndCondition({
             );
           })}
         </div>
+
+        {edition && !edition.auctionDisabled && (
+          <div className="space-y-6">
+            <div className={`space-y-2 ${willNotAuction && "opacity-30"}`}>
+              <div className="flex items-center gap-4">
+                <p className="font-semibold uppercase">
+                  Điều kiện đấu giá truyện
+                </p>
+                <button className="flex items-center gap-1 border border-gray-300 rounded text-sm font-light p-1 duration-200 hover:bg-gray-100">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                  >
+                    <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"></path>
+                  </svg>
+                  Xem điều kiện đấu giá
+                </button>
+              </div>
+
+              <p className="font-light text-sm">
+                {mainInformation.quantity > 1 ? "Bộ truyện" : "Truyện"} của bạn
+                sẽ phải được hệ thống phê duyệt để đạt điều kiện được bán dưới
+                hình thức đấu giá trên nền tảng. Do đó, bạn cần cung cấp thêm
+                thông tin để hệ thống sẽ dựa vào đó đánh giá truyện của bạn.
+              </p>
+
+              <p className="font-light text-sm">
+                Chọn những thuộc tính sau đây thể hiện{" "}
+                {mainInformation.quantity > 1 ? "bộ truyện" : "truyện"} của bạn
+                thuộc{" "}
+                <span className="font-semibold capitalize">{edition.name}</span>
+                :
+              </p>
+
+              <p className="text-xs italic">
+                Ví dụ: Chọn <span className="font-semibold">Ảnh bìa</span> nếu
+                truyện của bạn có đánh dấu
+                <span className="font-semibold capitalize">
+                  "{edition.name}"
+                </span>{" "}
+                ở trên bìa truyện của bạn.
+              </p>
+
+              <div className="space-y-2 text-sm font-light pt-4">
+                <p>Truyện:</p>
+                <div
+                  className={`grid grid-cols-${evidenceAttributes.length} items-stretch justify-center gap-2`}
+                >
+                  {evidenceAttributes.map((attribute) => {
+                    const isSelected = evidenceFields.some(
+                      (field) => field === attribute
+                    );
+                    return (
+                      <button
+                        onClick={() => {
+                          if (isSelected)
+                            setEvidenceFields(
+                              evidenceFields.filter(
+                                (field) => field !== attribute
+                              )
+                            );
+                          else
+                            setEvidenceFields((prev) => [...prev, attribute]);
+                        }}
+                        className={`border border-gray-300 rounded p-2 duration-200 ${
+                          isSelected &&
+                          "border-white ring-2 ring-green-600 text-green-600 font-semibold"
+                        }`}
+                      >
+                        {attribute}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm font-light pt-4">
+                <p>Phụ kiện:</p>
+                <div
+                  className={`grid grid-cols-4 items-stretch justify-center gap-2`}
+                >
+                  {mainInformation.merchandises.map((merch) => {
+                    const isSelected = evidenceFields.some(
+                      (field) => field === merch.name
+                    );
+                    return (
+                      <button
+                        onClick={() => {
+                          if (isSelected)
+                            setEvidenceFields(
+                              evidenceFields.filter(
+                                (field) => field !== merch.name
+                              )
+                            );
+                          else
+                            setEvidenceFields((prev) => [...prev, merch.name]);
+                        }}
+                        className={`border border-gray-300 rounded p-2 duration-200 ${
+                          isSelected &&
+                          "border-white ring-2 ring-green-600 text-green-600 font-semibold"
+                        }`}
+                      >
+                        {merch.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 mt-4">
+              <Checkbox
+                checked={willNotAuction}
+                onChange={() => {
+                  setEvidenceFields([]);
+                  setWillNotAuction(!willNotAuction);
+                }}
+              />
+              <p className="font-light text-red-600">
+                Tôi sẽ không dùng truyện này để bán dưới hình thức đấu giá.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center justify-between gap-2 mt-8">
           <button
@@ -259,7 +435,7 @@ export default function EditionAndCondition({
             onClick={handleSubmitConditionAndEdition}
             className="grow flex items-center justify-center gap-2 px-8 py-2 bg-cyan-700 text-white rounded duration-200 hover:bg-cyan-900"
           >
-            Tiếp tục{" "}
+            Tiếp tục
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"

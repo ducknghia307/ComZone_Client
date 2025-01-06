@@ -14,6 +14,7 @@ import GenresSelectingModal from "./GenresSelectingModal";
 import { publicAxios } from "../../../middleware/axiosInstance";
 import { BaseInterface } from "../../../common/base.interface";
 import { ComicMainInformation } from "./CreateNewComics";
+import { Merchandise } from "../../../common/interfaces/merchandise.interface";
 
 export interface Genre extends BaseInterface {
   name: string;
@@ -74,15 +75,15 @@ export default function MainComicsInformation({
   const [genres, setGenres] = useState<Genre[]>([]);
   const [description, setDescription] = useState<string>();
 
-  const [coverType, setCoverType] = useState<"SOFT" | "HARD" | "DETACHED">(
-    "SOFT"
-  );
-  const [colorType, setColorType] = useState<"GRAYSCALE" | "COLORED">(
-    "GRAYSCALE"
-  );
+  const [cover, setCover] = useState<"SOFT" | "HARD" | "DETACHED">("SOFT");
+  const [color, setColor] = useState<"GRAYSCALE" | "COLORED">("GRAYSCALE");
+  const [page, setPage] = useState<number>();
   const [width, setWidth] = useState<number>();
   const [length, setLength] = useState<number>();
   const [thickness, setThickness] = useState<number>();
+
+  const [merchandisesList, setMerchandisesList] = useState<Merchandise[]>([]);
+  const [merchandises, setMerchandises] = useState<Merchandise[]>([]);
 
   const [publisher, setPublisher] = useState<string>();
   const [publicationYear, setPublicationYear] = useState<number>();
@@ -103,8 +104,18 @@ export default function MainComicsInformation({
       .catch((err) => console.log(err));
   };
 
+  const fetchMerchandises = async () => {
+    await publicAxios
+      .get("merchandises")
+      .then((res) => {
+        setMerchandisesList(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
     fetchGenres();
+    fetchMerchandises();
   }, []);
 
   useEffect(() => {
@@ -192,11 +203,13 @@ export default function MainComicsInformation({
       episodesList: isCollection ? episodesList : null,
       genres,
       description,
-      coverType,
-      colorType,
+      cover,
+      color,
+      page,
       width,
       length,
       thickness,
+      merchandises,
       publisher,
       publicationYear,
       originCountry,
@@ -206,7 +219,7 @@ export default function MainComicsInformation({
 
   if (currentStep === 0)
     return (
-      <div className="flex flex-col items-stretch xl:w-1/2 mx-auto gap-8">
+      <div className="flex flex-col items-stretch xl:w-2/3 mx-auto gap-8">
         <div className="flex items-stretch gap-1">
           <button
             onClick={() => setIsCollection(false)}
@@ -293,7 +306,7 @@ export default function MainComicsInformation({
                   value={quantity}
                   onChange={(e) => {
                     if (
-                      !/^\d+$/.test(e.target.value) ||
+                      !/^[0-9]*$/.test(e.target.value) ||
                       Number(e.target.value) < 2
                     )
                       setQuantity(2);
@@ -365,19 +378,19 @@ export default function MainComicsInformation({
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <p>
               Thể loại: <span className="text-red-600">*</span>
             </p>
 
             {genres.length > 0 && (
               <div
-                className={`grow grid sm:grid-cols-${genres.length} items-center gap-1`}
+                className={`flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-1`}
               >
                 {genres.map((genre) => (
                   <span
                     key={genre.id}
-                    className="flex items-center justify-center gap-2 bg-green-600 text-white rounded text-lg px-4 py-1"
+                    className="flex items-center justify-center gap-2 bg-green-600 text-white rounded px-4 py-2"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -388,7 +401,7 @@ export default function MainComicsInformation({
                     >
                       <path d="M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z"></path>
                     </svg>{" "}
-                    {genre.name}
+                    <p className="line-clamp-1">{genre.name}</p>
                   </span>
                 ))}
               </div>
@@ -440,7 +453,11 @@ export default function MainComicsInformation({
         <div className="flex flex-col items-stretch gap-4">
           <p className="font-semibold uppercase">2. Thuộc tính vật lý</p>
 
-          <div className="grid grid-cols-2 items-stretch gap-x-2">
+          <div
+            className={`grid sm:grid-cols-${
+              isCollection ? 2 : 3
+            } items-stretch gap-2`}
+          >
             <FormControl fullWidth>
               <InputLabel sx={{ padding: "0px 8px" }}>
                 <p className="REM">
@@ -450,9 +467,9 @@ export default function MainComicsInformation({
               <Select
                 label="Bìa **"
                 sx={{ padding: "0px 8px" }}
-                value={coverType}
+                value={cover}
                 onChange={(e) =>
-                  setCoverType(e.target.value as "SOFT" | "HARD" | "DETACHED")
+                  setCover(e.target.value as "SOFT" | "HARD" | "DETACHED")
                 }
               >
                 <MenuItem value="SOFT">
@@ -476,9 +493,9 @@ export default function MainComicsInformation({
               <Select
                 label="Màu **"
                 sx={{ padding: "0px 8px" }}
-                value={colorType}
+                value={color}
                 onChange={(e) =>
-                  setColorType(e.target.value as "GRAYSCALE" | "COLORED")
+                  setColor(e.target.value as "GRAYSCALE" | "COLORED")
                 }
               >
                 <MenuItem value="GRAYSCALE">
@@ -489,6 +506,32 @@ export default function MainComicsInformation({
                 </MenuItem>
               </Select>
             </FormControl>
+
+            {!isCollection && (
+              <label className="relative cursor-text">
+                <input
+                  type="text"
+                  placeholder="Số trang"
+                  value={page}
+                  onChange={(e) => {
+                    if (e.target.value.length === 0) {
+                      setPage(undefined);
+                      return;
+                    }
+                    if (/^[0-9]*$/.test(e.target.value)) {
+                      if (Number(e.target.value) > 999999) setPage(999999);
+                      else setPage(Number(e.target.value));
+                    }
+                  }}
+                  className={`${styles.animatedInput} w-full py-4 px-4 border border-gray-400 rounded-lg border-opacity-50 outline-none focus:border-sky-600 focus:ring-1 focus:ring-sky-600 placeholder-gray-600 placeholder-opacity-0 transition duration-200`}
+                />
+                <span
+                  className={`${styles.inputText} italic text-opacity-80 bg-white font-light absolute left-4 top-1/2 -translate-y-1/2 px-1 transition duration-200`}
+                >
+                  Số trang
+                </span>
+              </label>
+            )}
           </div>
 
           <div className="flex flex-col items-stretch gap-2">
@@ -503,7 +546,7 @@ export default function MainComicsInformation({
                       setLength(undefined);
                       return;
                     }
-                    if (/^\d+$/.test(e.target.value)) {
+                    if (/^\d+([.,]\d+)?$/.test(e.target.value)) {
                       if (Number(e.target.value) > 100) setLength(100);
                       else setLength(Number(e.target.value));
                     }
@@ -527,7 +570,7 @@ export default function MainComicsInformation({
                       setWidth(undefined);
                       return;
                     }
-                    if (/^\d+$/.test(e.target.value)) {
+                    if (/^\d+([.,]\d+)?$/.test(e.target.value)) {
                       if (Number(e.target.value) > 100) setWidth(100);
                       else setWidth(Number(e.target.value));
                     }
@@ -551,7 +594,7 @@ export default function MainComicsInformation({
                       setThickness(undefined);
                       return;
                     }
-                    if (/^\d+$/.test(e.target.value)) {
+                    if (/^\d+([.,]\d+)?$/.test(e.target.value)) {
                       if (Number(e.target.value) > 100) setThickness(100);
                       else setThickness(Number(e.target.value));
                     }
@@ -566,7 +609,7 @@ export default function MainComicsInformation({
               </label>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="flex flex-col items-stretch gap-2">
               <p className="text-sm italic font-light text-sky-600">
                 * Kích thước phổ biến:
               </p>
@@ -588,7 +631,7 @@ export default function MainComicsInformation({
                         isSelected
                           ? "ring-1 ring-black font-semibold"
                           : "hover:bg-gray-100"
-                      } border border-gray-300 rounded px-4 py-2 duration-100`}
+                      } border border-gray-300 rounded px-4 py-1 duration-100`}
                     >
                       {size.length} x {size.width} x {size.thickness}{" "}
                       <span className="text-xs">(cm)</span>
@@ -601,8 +644,74 @@ export default function MainComicsInformation({
         </div>
 
         <div className="flex flex-col items-stretch gap-4">
+          <p className="font-semibold uppercase">3. Phụ kiện đính kèm</p>
+
+          <p className="text-sm font-light italic">
+            Chọn những phụ kiện sẽ được bán kèm theo{" "}
+            {isCollection ? "bộ truyện" : "truyện"} (nếu có):
+          </p>
+
+          <div className="grid sm:grid-cols-2 items-stretch justify-start gap-2">
+            {merchandisesList.map((merch, index) => {
+              const isSelected = merchandises.some(
+                (m) => m.name === merch.name
+              );
+              return (
+                <button
+                  key={index}
+                  onClick={() => {
+                    if (isSelected)
+                      setMerchandises(
+                        merchandises.filter((m) => m.name !== merch.name)
+                      );
+                    else setMerchandises((prev) => [...prev, merch]);
+                  }}
+                  className={`flex flex-col items-start justify-start gap-1 text-start border border-gray-300 rounded-md p-2 duration-300 ${
+                    isSelected && "border-white ring-2 ring-green-600"
+                  }`}
+                >
+                  <div className="flex items-center justify-start gap-1">
+                    <p
+                      className={`font-semibold duration-200 ${
+                        isSelected && "text-green-600"
+                      }`}
+                    >
+                      {merch.name}&nbsp;
+                      {merch.subName && (
+                        <span className="font-light">({merch.subName})</span>
+                      )}
+                    </p>
+
+                    {isSelected && (
+                      <span className="text-green-600">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          width="24"
+                          height="24"
+                          fill="currentColor"
+                        >
+                          <path d="M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z"></path>
+                        </svg>
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-light text-xs">
+                    {merch.description ?? ""}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+
+          <p className="w-full text-end italic text-xs font-light">
+            * Hệ thống chỉ hỗ trợ đính kèm những loại hình phụ kiện trên.
+          </p>
+        </div>
+
+        <div className="flex flex-col items-stretch gap-4">
           <p className="font-semibold uppercase">
-            3. Thông tin xuất bản{" "}
+            4. Thông tin xuất bản{" "}
             <span className="font-light normal-case italic">
               (Không bắt buộc)
             </span>
@@ -633,7 +742,7 @@ export default function MainComicsInformation({
                   if (e.target.value.length === 0)
                     setPublicationYear(undefined);
                   else {
-                    if (/^\d+$/.test(e.target.value)) {
+                    if (/^[0-9]*$/.test(e.target.value)) {
                       const numberValue = Number(e.target.value);
                       if (numberValue > new Date().getFullYear())
                         setPublicationYear(new Date().getFullYear());
@@ -682,7 +791,7 @@ export default function MainComicsInformation({
                 onChange={(e) => {
                   if (e.target.value.length === 0) setReleaseYear(undefined);
                   else {
-                    if (/^\d+$/.test(e.target.value)) {
+                    if (/^[0-9]*$/.test(e.target.value)) {
                       const numberValue = Number(e.target.value);
                       if (numberValue > new Date().getFullYear())
                         setReleaseYear(new Date().getFullYear());

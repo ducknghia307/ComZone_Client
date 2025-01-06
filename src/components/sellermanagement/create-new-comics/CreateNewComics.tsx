@@ -3,6 +3,10 @@ import MainComicsInformation, { Genre } from "./MainComicsInformation";
 import EditionAndCondition from "./EditionAndCondition";
 import { Edition } from "../../../common/interfaces/edition.interface";
 import PriceAndImages from "./PriceAndImages";
+import { privateAxios } from "../../../middleware/axiosInstance";
+import { CircularProgress } from "@mui/material";
+import { notification } from "antd";
+import { Merchandise } from "../../../common/interfaces/merchandise.interface";
 
 export interface ComicMainInformation {
   title: string;
@@ -12,11 +16,14 @@ export interface ComicMainInformation {
   genres: Genre[];
   description: string;
 
-  coverType: "SOFT" | "HARD" | "DETACHED";
-  colorType: "GRAYSCALE" | "COLORED";
-  width?: number;
+  cover: "SOFT" | "HARD" | "DETACHED";
+  color: "GRAYSCALE" | "COLORED";
+  page?: number;
   length?: number;
+  width?: number;
   thickness?: number;
+
+  merchandises: Merchandise[];
 
   publisher?: string;
   publicationYear?: number;
@@ -27,12 +34,21 @@ export interface ComicMainInformation {
 export interface ConditionAndEditionResponse {
   condition: number;
   edition: Edition;
+  willNotAuction: boolean;
+}
+
+export interface PriceAndImagesResponse {
+  coverImage: File;
+  previewChapters: File[];
+  price: number;
 }
 
 export default function CreateNewComics({
   setIsCreatingComics,
+  fetchSellerComics,
 }: {
   setIsCreatingComics: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchSellerComics: () => void;
 }) {
   const [currentStep, setCurrentStep] = useState<number>(0);
 
@@ -43,6 +59,14 @@ export default function CreateNewComics({
 
   const [conditionAndEdition, setConditionAndEdition] =
     useState<ConditionAndEditionResponse>();
+
+  const [editionEvidenceFields, setEditionEvidenceFields] = useState<string[]>(
+    []
+  );
+
+  const [createProgress, setCreateProgress] = useState<number>(0);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleGettingMainInfo = (value: ComicMainInformation) => {
     console.log(value);
@@ -57,12 +81,120 @@ export default function CreateNewComics({
     setCurrentStep(2);
   };
 
+  const handleGettingImagesAndPrice = async (value: PriceAndImagesResponse) => {
+    const priceAndImages = value;
+
+    setIsLoading(true);
+
+    let uploadedCoverImage: string;
+    const uploadedPreviewImages: string[] = [];
+
+    await privateAxios
+      .post(
+        "file/upload/image",
+        {
+          image: priceAndImages.coverImage,
+        },
+        { headers: { "Content-Type": "multipart/form-data" } }
+      )
+      .then((res) => {
+        uploadedCoverImage = res.data.imageUrl;
+        setCreateProgress(33);
+      })
+      .catch((err) => {
+        console.log("Error uploading cover image: ", err);
+        setIsLoading(false);
+      });
+
+    await Promise.all(
+      priceAndImages.previewChapters.map(async (file) => {
+        await privateAxios
+          .post(
+            "file/upload/image",
+            {
+              image: file,
+            },
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          )
+          .then((res) => {
+            uploadedPreviewImages.push(res.data.imageUrl);
+            setCreateProgress(66);
+          })
+          .catch((err) => {
+            console.log("Error uploading preview chapter images: ", err);
+            setIsLoading(false);
+          });
+      })
+    );
+
+    const comicsData = {
+      ...mainInformation,
+      genres: mainInformation.genres.map((genre) => genre.id),
+      merchandises: mainInformation.merchandises.map((merch) => merch.id),
+      ...conditionAndEdition,
+      edition: conditionAndEdition.edition.id,
+      price: priceAndImages.price,
+      coverImage: uploadedCoverImage,
+      previewChapter: uploadedPreviewImages,
+    };
+
+    console.log(comicsData);
+
+    await privateAxios
+      .post("comics", comicsData)
+      .then(() => {
+        setCreateProgress(100);
+
+        notification.success({
+          key: "success",
+          message: "Tạo truyện mới thành công",
+          description:
+            "Truyện đã được thêm vào danh sách truyện của bạn. Bạn có thể bắt đầu bán trong phần quản lý truyện.",
+          duration: 8,
+        });
+
+        fetchSellerComics();
+        setIsCreatingComics(false);
+      })
+      .catch((err) => {
+        notification.error({
+          message: "Đã có lỗi xảy ra khi thêm truyện.",
+          duration: 5,
+        });
+        console.log("Error creating comics: ", err);
+      })
+      .finally(() => setIsLoading(false));
+  };
+
   useEffect(() => {
     if (document.getElementById("navbar-container"))
       document
         .getElementById("navbar-container")
         .scrollIntoView({ behavior: "instant" });
   }, [currentStep]);
+
+  if (isLoading)
+    return (
+      <div className="REM w-full h-[70vh] flex flex-col items-center justify-center gap-4">
+        <p className="font-light text-sm">Đang tạo thông tin truyện ...</p>
+
+        <div className="relative inline-flex">
+          <CircularProgress
+            variant="determinate"
+            color="inherit"
+            value={createProgress}
+          />
+
+          <p className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-xs font-light">
+            {createProgress}%
+          </p>
+        </div>
+      </div>
+    );
 
   return (
     <div className="REM flex flex-col gap-8">
@@ -196,9 +328,16 @@ export default function CreateNewComics({
         mainInformation={mainInformation}
         setCurrentStep={setCurrentStep}
         handleGettingConditionAndEdition={handleGettingConditionAndEdition}
+        setEditionEvidenceFields={setEditionEvidenceFields}
       />
 
-      <PriceAndImages currentStep={currentStep} />
+      <PriceAndImages
+        currentStep={currentStep}
+        mainInformation={mainInformation}
+        setCurrentStep={setCurrentStep}
+        editionEvidenceFields={editionEvidenceFields}
+        handleGettingImagesAndPrice={handleGettingImagesAndPrice}
+      />
     </div>
   );
 }

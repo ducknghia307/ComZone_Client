@@ -1,6 +1,7 @@
 import { Modal } from "antd";
 import { Comic } from "../../../common/base.interface";
 import { useState } from "react";
+import { getComicsCondition } from "../../../common/constances/comicsConditions";
 
 export default function ViewComicsMessageModal({
   comicsList,
@@ -23,26 +24,6 @@ export default function ViewComicsMessageModal({
   const handleNext = () => {
     if (currentIndex === comicsList.length - 1) setCurrentIndex(0);
     else setCurrentIndex(currentIndex + 1);
-  };
-
-  const editionDisplay = () => {
-    switch (currentComics.edition) {
-      case "REGULAR":
-        return "Bản thường";
-      case "SPECIAL":
-        return "Bản đặc biệt";
-      case "LIMITED":
-        return "Bản giới hạn";
-    }
-  };
-
-  const conditionDisplay = () => {
-    switch (currentComics.condition) {
-      case "SEALED":
-        return "Nguyên seal";
-      case "USED":
-        return "Đã qua sử dụng";
-    }
   };
 
   const quantityDisplay = () => {
@@ -119,11 +100,11 @@ export default function ViewComicsMessageModal({
         <div className="self-baseline flex flex-col items-start mx-auto">
           <p className="font-semibold">
             <span className="text-xs font-medium">Phiên bản:</span>{" "}
-            {editionDisplay()}
+            {currentComics.edition.name}
           </p>
           <p className="font-semibold">
             <span className="text-xs font-medium">Tình trạng truyện:</span>{" "}
-            {conditionDisplay()}
+            {getComicsCondition(currentComics.condition).conditionName}
           </p>
           <p className="font-semibold">
             <span className="text-xs font-medium">Số lượng truyện:</span>{" "}

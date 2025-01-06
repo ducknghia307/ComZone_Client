@@ -20,7 +20,6 @@ import { useAppDispatch } from "../../redux/hooks";
 import { setUnreadAnnounce } from "../../redux/features/notification/announcementSlice";
 import { AnnouncementType } from "../../common/enums/announcementType.enum";
 import "../ui/Notification.css";
-import { convertToVietnameseDate } from "../../utils/convertDateVietnamese";
 
 const NotificationDropdown = ({ announcements, setAnnouncements }) => {
   const [activeTab, setActiveTab] = useState("USER");
@@ -58,9 +57,6 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
     setUnreadSeller(unreadSellerCount);
   }, [announcements, activeTab, dispatch]);
 
-  const navigateToAll = () => {
-    navigate("/accountmanagement/announcement/orders");
-  };
   const markAllAsRead = async () => {
     try {
       await privateAxios.patch(`/announcements/mark-all-read`);

@@ -601,7 +601,7 @@ const SellerComicsManagement = ({
   return (
     <div className="w-full bg-white p-4 rounded-lg drop-shadow-lg">
       {isCreatingComics ? (
-        <CreateNewComics setIsCreatingComics={setIsCreatingComics} />
+        <CreateNewComics setIsCreatingComics={setIsCreatingComics} fetchSellerComics={fetchSellerComics} />
       ) : (
         renderContent()
       )}

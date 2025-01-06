@@ -133,9 +133,13 @@ export interface Comic {
   description: string;
   coverImage: string;
   condition: "SEALED" | "USED";
-  edition: "REGULAR" | "SPECIAL" | "LIMITED";
+  // edition: "REGULAR" | "SPECIAL" | "LIMITED";
+  edition: {
+    name: string;
+  }
   page: number | null;
   publishedDate: string | null;
+  publicationYear: string | null;
   price: number;
   status: "AVAILABLE" | "PRE_ORDER" | "UNAVAILABLE" | "SOLD";
   quantity: number;

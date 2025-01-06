@@ -15,6 +15,7 @@ import Loading from "../../loading/Loading";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import { Grid } from "@mui/system";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
+import { Edition } from "../../../common/interfaces/edition.interface";
 
 interface EditComicFormData {
   title: string;
@@ -22,9 +23,9 @@ interface EditComicFormData {
   quantity: number;
   episodesList: string[];
   description: string;
-  publishedDate: number;
-  edition: string;
-  condition: string;
+  edition: Edition;
+  condition: number;
+  publicationYear: number;
   page: number;
 }
 
@@ -45,7 +46,7 @@ export default function UpdateExchangeComics({
     quantity: comics.quantity,
     episodesList: comics.episodesList || [],
     description: comics.description,
-    publishedDate: Number(comics.publishedDate) || null,
+    publicationYear: comics.publicationYear || null,
     edition: comics.edition,
     condition: comics.condition,
     page: comics.page || null,
@@ -69,16 +70,10 @@ export default function UpdateExchangeComics({
   >([]);
   const [uploadedChaptersFile, setUploadedChaptersFile] = useState<File[]>([]);
 
-  const editionOptions = [
-    { label: "Bản thường", value: "REGULAR" },
-    { label: "Bản đặc biệt", value: "SPECIAL" },
-    { label: "Bản giới hạn", value: "LIMITED" },
-  ];
-
-  const conditionOptions = [
-    { label: "Đã sử dụng", value: "USED" },
-    { label: "Nguyên seal", value: "SEALED" },
-  ];
+  const [editionOptions, setEditionOptions] = useState<{
+    label: string;
+    value: string;
+  }>();
 
   const handleUpload = async () => {
     try {
@@ -246,8 +241,8 @@ export default function UpdateExchangeComics({
       formData.edition !== comics.edition ||
       formData.episodesList !== comics.episodesList ||
       formData.page !== comics.page ||
-      formData.publishedDate !==
-        (comics.publishedDate && Number(comics.publishedDate)) ||
+      formData.publicationYear !==
+        (comics.publicationYear && comics.publicationYear) ||
       formData.quantity !== comics.quantity ||
       formData.title !== comics.title ||
       coverImage !== comics.coverImage ||
@@ -261,7 +256,7 @@ export default function UpdateExchangeComics({
       quantity: comics.quantity,
       episodesList: comics.episodesList,
       description: comics.description,
-      publishedDate: comics.publishedDate ? Number(comics.publishedDate) : null,
+      publicationYear: comics.publicationYear ?? null,
       edition: comics.edition,
       condition: comics.condition,
       page: comics.page || null,
@@ -491,85 +486,6 @@ export default function UpdateExchangeComics({
                     Tên tác giả không chứa quá 50 ký tự!
                   </p>
                 }
-              />
-            </Grid>
-
-            <Grid size={isSeries ? 6 : 3}>
-              <Autocomplete
-                options={editionOptions}
-                getOptionLabel={(option) => option.label}
-                value={
-                  editionOptions.find(
-                    (opt) => opt.value === formData.edition
-                  ) || null
-                }
-                onChange={(event, newValue) => {
-                  setFormData({
-                    ...formData,
-                    edition: newValue ? newValue.value : "",
-                  });
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={
-                      <p className="REM">
-                        Phiên bản <span className="text-red-600">*</span>
-                      </p>
-                    }
-                  />
-                )}
-              />
-            </Grid>
-
-            <Grid size={isSeries ? 6 : 3}>
-              <Autocomplete
-                options={conditionOptions}
-                getOptionLabel={(option) => option.label}
-                value={
-                  conditionOptions.find(
-                    (opt) => opt.value === formData.condition
-                  ) || null
-                }
-                onChange={(event, newValue) => {
-                  setFormData({
-                    ...formData,
-                    condition: newValue ? newValue.value : "",
-                  });
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={
-                      <p className="REM">
-                        Tình trạng <span className="text-red-600">*</span>
-                      </p>
-                    }
-                  />
-                )}
-              />
-            </Grid>
-
-            <Grid size={isSeries ? 3 : 3}>
-              <TextField
-                fullWidth
-                label={<p className="REM">Năm xuất bản</p>}
-                type="text"
-                name="publishedDate"
-                value={formData.publishedDate || ""}
-                onChange={(e) => {
-                  let year = 0;
-                  if (e.target.value.length === 0) year = 0;
-                  if (parseInt(e.target.value) > new Date().getFullYear())
-                    year = new Date().getFullYear();
-                  else if (/^\d+$/.test(e.target.value))
-                    year = parseInt(e.target.value);
-                  setFormData({
-                    ...formData,
-                    publishedDate: year,
-                  });
-                }}
-                variant="outlined"
               />
             </Grid>
 

@@ -1,4 +1,5 @@
 import { Comic } from "../../common/base.interface";
+import { getComicsCondition } from "../../common/constances/comicsConditions";
 
 export default function SingleOfferedComics({
   comics,
@@ -13,16 +14,6 @@ export default function SingleOfferedComics({
   handleSelect: (value: number) => void;
   length: number;
 }) {
-  const edition =
-    comics.edition === "REGULAR"
-      ? "Bản thường"
-      : comics.edition === "SPECIAL"
-      ? "Bản đặc biệt"
-      : "Bản giới hạn";
-
-  const condition =
-    comics.condition === "SEALED" ? "Nguyên seal" : "Đã qua sử dụng";
-
   if (length < 10)
     return (
       <div
@@ -44,10 +35,12 @@ export default function SingleOfferedComics({
               className={`flex flex-col items-start text-[0.8rem] font-light transition-all duration-200`}
             >
               <p>
-                <span className="font-extralight">Phiên bản:</span> {edition}
+                <span className="font-extralight">Phiên bản:</span>{" "}
+                {comics.edition.name}
               </p>
               <p>
-                <span className="font-extralight">Tình trạng:</span> {condition}
+                <span className="font-extralight">Tình trạng:</span>{" "}
+                {getComicsCondition(comics.condition).conditionName}
               </p>
             </div>
           </div>
@@ -106,10 +99,12 @@ export default function SingleOfferedComics({
               } flex flex-col items-start text-[0.8rem] font-light transition-all duration-200`}
             >
               <p>
-                <span className="font-extralight">Phiên bản:</span> {edition}
+                <span className="font-extralight">Phiên bản:</span>{" "}
+                {comics.edition.name}
               </p>
               <p>
-                <span className="font-extralight">Tình trạng:</span> {condition}
+                <span className="font-extralight">Tình trạng:</span>{" "}
+                {getComicsCondition(comics.condition).conditionName}
               </p>
             </div>
           </div>

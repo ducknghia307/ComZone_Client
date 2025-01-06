@@ -477,16 +477,28 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                   />
                   <InfoRow
                     label="Giá khởi điểm"
-                    value={auctionData.reservePrice?.toLocaleString()}
+                    value={`${auctionData.reservePrice?.toLocaleString() ?? "N/A"} đ`}
                   />
+
                   <InfoRow
                     label="Bước giá"
-                    value={auctionData.priceStep?.toLocaleString()}
+                    value={`${auctionData.priceStep?.toLocaleString() ?? "N/A"} đ`}
                   />
-                  <InfoRow
-                    label="Giá hiện tại"
-                    value={auctionData?.currentPrice?.toLocaleString() ?? "N/A"}
-                  />
+
+                  {!(auctionData?.status === "APPROVED" || auctionData?.status === "REJECTED") && (
+                    <InfoRow
+                      label="Giá hiện tại"
+                      value={`${auctionData?.currentPrice?.toLocaleString() ?? "N/A"} đ`}
+                    />
+                  )}
+
+                  {(auctionData?.status === "APPROVED" || auctionData?.status === "REJECTED") && (
+                    <InfoRow
+                      label="Giá mua ngay"
+                      value={`${auctionData.maxPrice?.toLocaleString() ?? "N/A"} đ`}
+                    />
+                  )}
+
                 </Box>
 
                 <Divider orientation="vertical" flexItem />
@@ -505,7 +517,7 @@ const AuctionDetailMod: React.FC<AuctionDetailModProps> = ({
                     }}
                   />
                   <InfoRow
-                    label="Họ tên"
+                    label="Tên người bán"
                     value={
                       <Box display="flex" alignItems="center" gap="10px">
                         <img

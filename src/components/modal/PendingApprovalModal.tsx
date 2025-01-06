@@ -209,11 +209,11 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                       <strong>Tác giả:</strong> {comic.author}
                     </Typography>
                     <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
-                      <strong>Năm xuất bản:</strong> {comic.publishedDate}
+                      <strong>Năm xuất bản:</strong> {comic.publicationYear}
                     </Typography>
                   </Box>
 
-                  <Box sx={{
+                  {/* <Box sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     padding: "16px",
@@ -243,6 +243,21 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                       <strong style={{ color: '#555' }}>Phiên bản:</strong>{' '}
                       {translateEdition(comic.edition)}
                     </Box>
+                  </Box> */}
+
+                  <Box sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "16px",
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "8px"
+                  }}>
+                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                      <strong>Tình trạng:</strong> {comic.condition}
+                    </Typography>
+                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                      <strong>Phiên bản:</strong> {comic.edition?.name}
+                    </Typography>
                   </Box>
 
                   <Box

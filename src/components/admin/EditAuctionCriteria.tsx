@@ -63,22 +63,21 @@ const EditAuctionCriteria: React.FC = () => {
       console.log("editon", isEditionRestricted);
 
       if (isEditionRestricted) {
-        const disabledEditions = response.data
+        const selectedEditions = response.data
+          .filter((edition: Edition) => !edition.auctionDisabled)
+          .map((edition: Edition) => edition.id);
+
+        setSelectedEditions(selectedEditions);
+        const unselectedEditions = response.data
           .filter((edition: Edition) => edition.auctionDisabled)
           .map((edition: Edition) => edition.id);
-        setSelectedEditions(disabledEditions);
+        setUnSelectedEditions(unselectedEditions);
       }
     } catch (error) {
       console.error("Error fetching editions:", error);
     }
   };
   const handleSave = () => {
-    console.log("config", config);
-    console.log("is fill info", isFullInfoFilled);
-    console.log("condition", condition);
-    console.log("edition", editionRestricted);
-    console.log("haha", unSelectedEditions);
-
     const payload = {
       isFullInfoFilled: isFullInfoFilled,
       conditionLevel: condition,
@@ -115,6 +114,8 @@ const EditAuctionCriteria: React.FC = () => {
       .map((edition) => edition.id);
     setUnSelectedEditions(unselectedEditions);
     console.log("Unselected editions:", unselectedEditions);
+
+    setIsEdited(true);
   };
   const handleSwitchChange = (checked: boolean) => {
     setIsEdited(true);
@@ -150,7 +151,6 @@ const EditAuctionCriteria: React.FC = () => {
           });
           setEditionRestricter(fetchedConfig.editionRestricted);
           if (fetchedConfig.editionRestricted) {
-            console.log("a");
             setIsEdtionRestricted(fetchedConfig.editionRestricted);
             fetchEditions();
           }
@@ -170,6 +170,14 @@ const EditAuctionCriteria: React.FC = () => {
         setLoading(false);
       });
   }, []);
+  useEffect(() => {
+    if (editionRestricted) {
+      fetchEditions();
+    } else {
+      setSelectedEditions([]);
+      setUnSelectedEditions([]);
+    }
+  }, [editionRestricted]);
   if (loading) {
     return <Typography>Loading...</Typography>;
   }

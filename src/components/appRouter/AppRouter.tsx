@@ -49,6 +49,7 @@ import AdminAuctionSetting from "../../pages/AdminAuctionSetting";
 import AdminAuctionCriteria from "../../pages/AdminAuctionCriteria";
 import AdminComicGenre from "../../pages/AdminComicGenre";
 import AdminComicEdition from "../../pages/AdminComicEdition";
+import AdminComicMerchandise from "../../pages/AdminComicMerchandise";
 
 const AppRouter = () => {
   return (
@@ -156,8 +157,13 @@ const AppRouter = () => {
           path="/admin/auction/auctionCriteria"
           element={<AdminAuctionCriteria />}
         />
-        <Route path="/admin/auction/genres" element={<AdminComicGenre />} />
-        <Route path="/admin/auction/editions" element={<AdminComicEdition />} />
+
+        <Route path="/admin/comic/genres" element={<AdminComicGenre />} />
+        <Route path="/admin/comic/editions" element={<AdminComicEdition />} />
+        <Route
+          path="/admin/comic/merchandises"
+          element={<AdminComicMerchandise />}
+        />
       </Routes>
     </div>
   );

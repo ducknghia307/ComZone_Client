@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import "../components/ui/AccountUser.css";
 import Grid from "@mui/material/Grid2";
 import Sidebar from "../components/admin/Sidebar";
+import EditAuctionDetail from "../components/admin/EditAuctionDetail";
 import { Link, useLocation } from "react-router-dom";
-import EditionsList from "../components/admin/EditionsList";
+import EditAuctionCriteria from "../components/admin/EditAuctionCriteria";
+import MerchandisesList from "../components/admin/MerchandisesList";
 
-const AdminComicEdition: React.FC = () => {
+const AdminComicMerchandise: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const location = useLocation();
@@ -43,7 +45,7 @@ const AdminComicEdition: React.FC = () => {
               <Link
                 to={"/admin/comic/genres"}
                 className={`p-3 rounded-t-lg ${
-                  location.pathname === "/admin/auction/genres"
+                  location.pathname === "/admin/comic/genres"
                     ? "bg-gray-200"
                     : "bg-white hover:bg-gray-200"
                 } hover:cursor-pointer duration-300 transition-all`}
@@ -53,7 +55,7 @@ const AdminComicEdition: React.FC = () => {
               <Link
                 to={"/admin/comic/editions"}
                 className={`p-3 rounded-b-lg ${
-                  location.pathname === "/admin/auction/editions"
+                  location.pathname === "/admin/comic/editions"
                     ? "bg-gray-200"
                     : "bg-white hover:bg-gray-200"
                 } hover:cursor-pointer duration-300 transition-all`}
@@ -63,7 +65,7 @@ const AdminComicEdition: React.FC = () => {
               <Link
                 to={"/admin/comic/merchandises"}
                 className={`p-3 rounded-b-lg ${
-                  location.pathname === "/admin/auction/merchandises"
+                  location.pathname === "/admin/comic/merchandises"
                     ? "bg-gray-200"
                     : "bg-white hover:bg-gray-200"
                 } hover:cursor-pointer duration-300 transition-all`}
@@ -73,7 +75,7 @@ const AdminComicEdition: React.FC = () => {
             </div>
 
             <div className="col-span-2 shadow-md bg-white p-3 rounded-lg">
-              <EditionsList />
+              <MerchandisesList />
             </div>
           </div>
         </Grid>
@@ -82,4 +84,4 @@ const AdminComicEdition: React.FC = () => {
   );
 };
 
-export default AdminComicEdition;
+export default AdminComicMerchandise;

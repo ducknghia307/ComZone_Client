@@ -218,7 +218,7 @@ const GenresList = () => {
                 <StyledTableRow key={genre.id}>
                   <StyledTableCell>{genre.name}</StyledTableCell>
                   <StyledTableCell className="line-clamp-3">
-                    {genre.description}
+                    {genre.description || "Không có mô tả"}
                   </StyledTableCell>
                   <StyledTableCell>
                     <Tooltip title="Xóa">

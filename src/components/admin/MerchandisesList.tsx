@@ -257,7 +257,7 @@ const MerchandisesList = () => {
                   <StyledTableCell>{merchandise.name}</StyledTableCell>
                   <StyledTableCell>{merchandise.subName}</StyledTableCell>
                   <StyledTableCell className="line-clamp-3">
-                    {merchandise.description}
+                    {merchandise.description || "Không có mô tả"}
                   </StyledTableCell>
                   <StyledTableCell>{merchandise.caution}</StyledTableCell>
                   <StyledTableCell>

@@ -223,7 +223,7 @@ const EditionsList = () => {
                     {edition.name}
                   </StyledTableCell>
                   <StyledTableCell className="line-clamp-3">
-                    {edition.description}
+                    {edition.description || "Không có mô tả"}
                   </StyledTableCell>
                   <StyledTableCell className="line-clamp-3 text-nowrap">
                     {edition.auctionDisabled

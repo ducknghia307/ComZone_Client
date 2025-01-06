@@ -43,7 +43,7 @@ const AdminComicEdition: React.FC = () => {
               <Link
                 to={"/admin/comic/genres"}
                 className={`p-3 rounded-t-lg ${
-                  location.pathname === "/admin/auction/genres"
+                  location.pathname === "/admin/comic/genres"
                     ? "bg-gray-200"
                     : "bg-white hover:bg-gray-200"
                 } hover:cursor-pointer duration-300 transition-all`}
@@ -53,7 +53,7 @@ const AdminComicEdition: React.FC = () => {
               <Link
                 to={"/admin/comic/editions"}
                 className={`p-3 rounded-b-lg ${
-                  location.pathname === "/admin/auction/editions"
+                  location.pathname === "/admin/comic/editions"
                     ? "bg-gray-200"
                     : "bg-white hover:bg-gray-200"
                 } hover:cursor-pointer duration-300 transition-all`}
@@ -63,7 +63,7 @@ const AdminComicEdition: React.FC = () => {
               <Link
                 to={"/admin/comic/merchandises"}
                 className={`p-3 rounded-b-lg ${
-                  location.pathname === "/admin/auction/merchandises"
+                  location.pathname === "/admin/comic/merchandises"
                     ? "bg-gray-200"
                     : "bg-white hover:bg-gray-200"
                 } hover:cursor-pointer duration-300 transition-all`}

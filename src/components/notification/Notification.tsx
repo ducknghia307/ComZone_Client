@@ -58,9 +58,6 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
     setUnreadSeller(unreadSellerCount);
   }, [announcements, activeTab, dispatch]);
 
-  const navigateToAll = () => {
-    navigate("/accountmanagement/announcement/orders");
-  };
   const markAllAsRead = async () => {
     try {
       await privateAxios.patch(`/announcements/mark-all-read`);

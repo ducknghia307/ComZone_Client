@@ -151,15 +151,15 @@ const AuctionPublisher: React.FC<{ comic: Comic }> = ({ comic }) => {
           Phiên Bản:
         </p>
         <Chip
-          label={comic.edition === "REGULAR" ? "Bản thường" : "Bản đặc biệt"}
+          label={comic.edition.name}
           style={{
             fontFamily: "REM",
             fontSize: "16px",
             fontWeight: "bold",
             padding: "10px 15px",
-            backgroundColor: comic.edition === "REGULAR" ? "#f8f9fa" : "#000",
-            color: comic.edition === "REGULAR" ? "#000" : "#ffffff",
-            border: comic.edition === "REGULAR" ? "1px solid #000" : "none",
+            backgroundColor: "#f8f9fa",
+            color: "#000",
+            border: "1px solid #000",
             borderRadius: "20px",
             boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
           }}

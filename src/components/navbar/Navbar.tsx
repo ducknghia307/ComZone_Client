@@ -26,6 +26,25 @@ import {
 import CurrencySplitter from "../../assistants/Spliter";
 import { SwapHorizontalCircle } from "@mui/icons-material";
 
+const adminAndModPaths = [
+  "/admin/dashboard",
+  "/admin/users",
+  "/admin/subscription",
+  "/admin/auction/settingPrice",
+  "/admin/auction/auctionCriteria",
+  "/admin/auction/editions",
+  "/admin/auction/genres",
+  "/mod/users",
+  "/mod/comics",
+  "/mod/orders",
+  "/mod/auctions",
+  "/mod/deposits",
+  "/mod/feedbacks",
+  "/mod/refunds",
+  "/mod/exchanges",
+  "/mod/deliveries",
+];
+
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -227,6 +246,9 @@ const Navbar = () => {
         const response = await privateAxios.get("users/profile");
         setUserInfo(response.data);
 
+        if (adminAndModPaths.some((path) => path === location1.pathname))
+          return;
+
         if (response.data.role === "MODERATOR") {
           navigate("/mod/users");
         } else if (response.data.role === "ADMIN") {
@@ -347,28 +369,7 @@ const Navbar = () => {
       .catch((err) => console.log(err));
   };
 
-  const adminAndModPaths = [
-    "/admin/dashboard",
-    "/admin/users",
-    "/admin/subscription",
-    "/admin/auction/settingPrice",
-    "/admin/auction/auctionCriteria",
-    "/admin/auction/editions",
-    "/admin/auction/genres",
-    "/mod/users",
-    "/mod/comics",
-    "/mod/orders",
-    "/mod/auctions",
-    "/mod/deposits",
-    "/mod/feedbacks",
-    "/mod/refunds",
-    "/mod/exchanges",
-    "/mod/deliveries",
-  ];
-
-  if (adminAndModPaths.includes(location1.pathname)) {
-    return null;
-  }
+  if (adminAndModPaths.includes(location1.pathname)) return;
 
   return (
     <>

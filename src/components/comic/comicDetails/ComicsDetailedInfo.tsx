@@ -1,5 +1,6 @@
 import { Comic, Genre } from "../../../common/base.interface";
 import dateFormat from "../../../assistants/date.format";
+import { getComicsCondition } from "../../../common/constances/comicsConditions";
 
 export default function ComicsDetailedInfo({
   currentComics,
@@ -32,23 +33,18 @@ export default function ComicsDetailedInfo({
 
       <div className="w-full flex items-center justify-center text-xs py-2 border-b">
         <p className="w-1/2 text-gray-600">Tác giả</p>
-        <p className="w-1/2">{currentComics?.author}</p>
+        <p className="w-1/2">{currentComics.author}</p>
       </div>
 
       <div className="w-full flex items-center justify-center text-xs py-2 border-b">
         <p className="w-1/2 text-gray-600">Phiên bản truyện</p>
-        <p className="w-1/2">
-          {(currentComics?.edition === "REGULAR" && "Bản thường") ||
-            (currentComics?.edition === "SPECIAL" && "Bản đặc biệt") ||
-            "Bản giới hạn"}
-        </p>
+        <p className="w-1/2">{currentComics.edition.name}</p>
       </div>
 
       <div className="flex items-center text-xs py-2 border-b">
         <p className="w-1/2 text-gray-600">Tình trạng</p>
         <p className="w-1/2">
-          {(currentComics?.condition === "SEALED" && "Nguyên seal") ||
-            "Đã qua sử dụng"}
+          {getComicsCondition(currentComics.condition).conditionName}
         </p>
       </div>
 
@@ -58,10 +54,10 @@ export default function ComicsDetailedInfo({
         } flex items-center text-xs py-2 border-b`}
       >
         <p className="w-1/2 text-gray-600">Số trang</p>
-        <p className="w-1/2">{currentComics?.page}</p>
+        <p className="w-1/2">{currentComics.page}</p>
       </div>
 
-      {currentComics.publishedDate && (
+      {/* {currentComics.publishedDate && (
         <div
           className={`${
             !currentComics?.publishedDate && "hidden"
@@ -115,7 +111,7 @@ export default function ComicsDetailedInfo({
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

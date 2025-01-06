@@ -103,10 +103,7 @@ const AppRouter = () => {
           path="/sellermanagement/feedback"
           element={<SellerManagementPage />}
         />
-        <Route
-          path="/sellermanagement/edit/:id"
-          element={<SellerEditComicDetail />}
-        />
+        <Route path="/sellermanagement/edit/:id" element={<NotFound />} />
         <Route path="/search" element={<Genres />} />
         <Route path="/exchange-news-feed" element={<ExchangeNewsFeed />} />
         <Route

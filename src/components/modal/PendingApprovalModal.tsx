@@ -40,7 +40,7 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
   onSuccess,
   comic,
   auctionData,
-  onStatusUpdate
+  onStatusUpdate,
 }) => {
   const [loading, setLoading] = useState(false);
   const [timeSelectionModalOpen, setTimeSelectionModalOpen] = useState(false);
@@ -81,10 +81,10 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
 
   const getConditionStyle = (condition) => {
     switch (condition) {
-      case 'USED':
-        return { color: '#f44336' };
-      case 'SEALED':
-        return { color: '#4caf50' };
+      case "USED":
+        return { color: "#f44336" };
+      case "SEALED":
+        return { color: "#4caf50" };
       default:
         return {};
     }
@@ -92,12 +92,12 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
 
   const getEditionStyle = (edition) => {
     switch (edition) {
-      case 'REGULAR':
-        return { color: '#1976d2' };
-      case 'SPECIAL':
-        return { color: '#ff9800' };
-      case 'LIMITED':
-        return { color: '#9e9e9e' };
+      case "REGULAR":
+        return { color: "#1976d2" };
+      case "SPECIAL":
+        return { color: "#ff9800" };
+      case "LIMITED":
+        return { color: "#9e9e9e" };
       default:
         return {};
     }
@@ -105,18 +105,25 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
 
   const translateEdition = (edition) => {
     switch (edition) {
-      case "REGULAR": return "Bản Thường";
-      case "SPECIAL": return "Bản Đặc Biệt";
-      case "LIMITED": return "Bản Giới Hạn";
-      default: return edition;
+      case "REGULAR":
+        return "Bản Thường";
+      case "SPECIAL":
+        return "Bản Đặc Biệt";
+      case "LIMITED":
+        return "Bản Giới Hạn";
+      default:
+        return edition;
     }
   };
 
   const translateCondition = (condition) => {
     switch (condition) {
-      case "SEALED": return "Nguyên Seal";
-      case "USED": return "Đã Qua Sử Dụng";
-      default: return condition;
+      case "SEALED":
+        return "Nguyên Seal";
+      case "USED":
+        return "Đã Qua Sử Dụng";
+      default:
+        return condition;
     }
   };
 

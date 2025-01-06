@@ -383,7 +383,15 @@ const SellerComicsManagement = ({
       align: "center",
       renderCell: (params) => {
         const statusMap: Record<string, string> = {
-          AVAILABLE: params.row.type === "SELL" ? "Đang bán" : "Đang đấu giá",
+          AVAILABLE:
+            params.row.type === "SELL"
+              ? "Đang bán"
+              : params.row.type === "AUCTION"
+              ? "Đang đấu giá"
+              : params.row.type === "AUCTION_REQUEST"
+              ? "Chờ duyệt"
+              : "Không xác định",
+
           UNAVAILABLE: "Chưa bán",
           PRE_ORDER: "Đang được mua",
           SOLD: "Đã bán",

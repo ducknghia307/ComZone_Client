@@ -130,7 +130,6 @@ const Checkout = () => {
     Object.values(groupedSelectedComics)
       .flatMap((group) => group.comics)
       .find((comic) => comic.auctionId)?.depositAmount || null;
-  console.log("deposit", depositAmount);
 
   useEffect(() => {
     if (comics) {

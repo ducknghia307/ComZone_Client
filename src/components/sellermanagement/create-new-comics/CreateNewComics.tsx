@@ -34,6 +34,7 @@ export interface ComicMainInformation {
 export interface ConditionAndEditionResponse {
   condition: number;
   edition: Edition;
+  evidenceFields: string[];
   willNotAuction: boolean;
 }
 
@@ -137,6 +138,10 @@ export default function CreateNewComics({
       merchandises: mainInformation.merchandises.map((merch) => merch.id),
       ...conditionAndEdition,
       edition: conditionAndEdition.edition.id,
+      editionEvidence:
+        conditionAndEdition.evidenceFields.length > 0
+          ? conditionAndEdition.evidenceFields
+          : null,
       price: priceAndImages.price,
       coverImage: uploadedCoverImage,
       previewChapter: uploadedPreviewImages,

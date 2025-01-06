@@ -11,6 +11,7 @@ import TablePagination from "@mui/material/TablePagination";
 import { Box, IconButton } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { AuctionRequest } from "../../common/base.interface";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -113,8 +114,8 @@ const PendingAuctionTable: React.FC<{
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell>Người Bán</StyledTableCell>
-                            <StyledTableCell align="left">Tên Truyện</StyledTableCell>
+                            <StyledTableCell style={{ whiteSpace: "nowrap", fontFamily: "REM" }}>Người Bán</StyledTableCell>
+                            <StyledTableCell align="left" style={{ whiteSpace: "nowrap", fontFamily: "REM" }}>Tên Truyện</StyledTableCell>
                             <StyledTableCell align="left" style={{ whiteSpace: "nowrap", fontFamily: "REM" }}>
                                 Trạng Thái Đấu Giá
                             </StyledTableCell>
@@ -127,8 +128,8 @@ const PendingAuctionTable: React.FC<{
                             <StyledTableCell align="right" style={{ whiteSpace: "nowrap", fontFamily: "REM" }}>
                                 Mức Cọc
                             </StyledTableCell>
-                            <StyledTableCell align="right">Thời Lượng Đấu Giá</StyledTableCell>
-                            <StyledTableCell align="right">Chi Tiết</StyledTableCell>
+                            <StyledTableCell align="right" style={{ whiteSpace: "nowrap", fontFamily: "REM" }}>Thời Lượng Đấu Giá</StyledTableCell>
+                            <StyledTableCell align="right" style={{ whiteSpace: "nowrap", fontFamily: "REM" }}>Chi Tiết</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -185,13 +186,20 @@ const PendingAuctionTable: React.FC<{
                                             {auction.duration} Ngày
                                         </StyledTableCell>
                                         <StyledTableCell align="right">
-                                            <IconButton
-                                                color="default"
-                                                onClick={() => handleEditClick(auction)}
-                                            >
-                                                <EditOutlinedIcon />
-                                            </IconButton>
+                                            {auction.status === "PENDING" ? (
+                                                <IconButton
+                                                    color="default"
+                                                    onClick={() => handleEditClick(auction)}
+                                                >
+                                                    <EditOutlinedIcon />
+                                                </IconButton>
+                                            ) : auction.status === "APPROVED" || auction.status === "REJECTED" ? (
+                                                <IconButton color="default" onClick={() => handleEditClick(auction)}>
+                                                    <InfoOutlinedIcon />
+                                                </IconButton>
+                                            ) : null}
                                         </StyledTableCell>
+
                                     </StyledTableRow>
                                 ))
                         )}

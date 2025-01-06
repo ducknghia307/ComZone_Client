@@ -42,12 +42,12 @@ const EditAuctionCriteria: React.FC = () => {
   const [isEdited, setIsEdited] = useState(false);
   const [loading, setLoading] = useState(true);
   const [condition, setCondition] = useState<number>();
-  const [minimumConditionLevel, setMinimumConditionLevel] = useState<number>();
   const [editions, setEditions] = useState<Edition[]>([]);
   const [selectedEditions, setSelectedEditions] = useState<string[]>([]);
   const [unSelectedEditions, setUnSelectedEditions] = useState<string[]>([]);
   const [isFullInfoFilled, setIsFullInfoFilled] = useState<boolean>(false);
-
+  const [isEditionRestricted, setIsEdtionRestricted] = useState<boolean>(false);
+  const [editionRestricted, setEditionRestricter] = useState<boolean>(false);
   const handleInputChange = (field: string, value: boolean) => {
     const updatedConfig = { ...config, [field]: value };
     setConfig(updatedConfig);
@@ -60,14 +60,37 @@ const EditAuctionCriteria: React.FC = () => {
     try {
       const response = await privateAxios.get("/editions");
       setEditions(response.data);
+      console.log("editon", isEditionRestricted);
+
+      if (isEditionRestricted) {
+        const disabledEditions = response.data
+          .filter((edition: Edition) => edition.auctionDisabled)
+          .map((edition: Edition) => edition.id);
+        setSelectedEditions(disabledEditions);
+      }
     } catch (error) {
       console.error("Error fetching editions:", error);
     }
   };
   const handleSave = () => {
+    console.log("config", config);
+    console.log("is fill info", isFullInfoFilled);
+    console.log("condition", condition);
+    console.log("edition", editionRestricted);
+    console.log("haha", unSelectedEditions);
+
+    const payload = {
+      isFullInfoFilled: isFullInfoFilled,
+      conditionLevel: condition,
+      disallowedEdition: editionRestricted ? unSelectedEditions : [],
+    };
+    console.log("payload:", payload);
+
     privateAxios
-      .put(`/auction-config/${config.id}`, { ...config, isFullInfoFilled })
+      .patch(`/auction-criteria`, payload)
       .then((response) => {
+        console.log("res", response.data);
+
         notification.success({
           message: "Thành công",
           description: "Cấu hình đã được cập nhật thành công!",
@@ -85,14 +108,17 @@ const EditAuctionCriteria: React.FC = () => {
   };
   const handleEditionChange = (values: string[]) => {
     setSelectedEditions(values);
+    console.log("Selected editions:", values);
 
     const unselectedEditions = editions
       .filter((edition) => !values.includes(edition.id))
       .map((edition) => edition.id);
-    setUnSelectedEditions(unSelectedEditions);
+    setUnSelectedEditions(unselectedEditions);
     console.log("Unselected editions:", unselectedEditions);
   };
   const handleSwitchChange = (checked: boolean) => {
+    setIsEdited(true);
+    setEditionRestricter(checked);
     if (checked) {
       fetchEditions();
     } else {
@@ -122,10 +148,14 @@ const EditAuctionCriteria: React.FC = () => {
             editionRestricted: fetchedConfig.editionRestricted || false,
             updatedAt: fetchedConfig.updatedAt || new Date(),
           });
-          setCondition(fetchedConfig.conditionLevel);
+          setEditionRestricter(fetchedConfig.editionRestricted);
           if (fetchedConfig.editionRestricted) {
+            console.log("a");
+            setIsEdtionRestricted(fetchedConfig.editionRestricted);
             fetchEditions();
           }
+          setCondition(fetchedConfig.conditionLevel);
+          setIsFullInfoFilled(fetchedConfig.isFullInfoFilled);
         } else {
           throw new Error("Invalid configuration data received");
         }
@@ -163,6 +193,7 @@ const EditAuctionCriteria: React.FC = () => {
               <Switch
                 checked={isFullInfoFilled}
                 onChange={(checked) => {
+                  setIsEdited(false);
                   setIsFullInfoFilled(checked);
                   handleInputChange("isFullInfoFilled", checked);
                 }}
@@ -178,7 +209,10 @@ const EditAuctionCriteria: React.FC = () => {
                   step={null}
                   tooltip={{ open: false }}
                   value={condition}
-                  onChange={(value: number) => setCondition(value)}
+                  onChange={(value: number) => {
+                    setCondition(value);
+                    setIsEdited(true);
+                  }}
                   max={10}
                 />
               </div>
@@ -221,11 +255,11 @@ const EditAuctionCriteria: React.FC = () => {
             <div className="flex flex-row gap-3 items-center">
               <p className="text-lg font-bold">Phiên bản của cuốn truyện</p>
               <Switch
-                defaultChecked={config.editionRestricted}
+                checked={editionRestricted}
                 onChange={handleSwitchChange}
               />
             </div>
-            {editions.length > 0 && config.editionRestricted && (
+            {editionRestricted && editions.length > 0 && (
               <Select
                 mode="multiple"
                 style={{ width: "100%", marginTop: "10px" }}

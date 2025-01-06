@@ -127,7 +127,12 @@ export default function EditionAndCondition({
     }
 
     setEditionEvidenceFields(evidenceFields);
-    handleGettingConditionAndEdition({ condition, edition, willNotAuction });
+    handleGettingConditionAndEdition({
+      condition,
+      edition,
+      evidenceFields,
+      willNotAuction,
+    });
   };
 
   if (currentStep === 1)

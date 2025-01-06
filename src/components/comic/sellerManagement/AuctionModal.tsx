@@ -14,15 +14,8 @@ import dayjs from "dayjs";
 import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
 import { useEffect, useState } from "react";
 import InfoIcon from "@mui/icons-material/Info";
+import { Comic } from "../../../common/base.interface";
 
-// Define types for the comic and props
-interface Comic {
-  id: string;
-  coverImage: string;
-  title: string;
-  author: string;
-  price: number;
-}
 interface AuctionFormValues {
   id: string;
   reservePrice: number;

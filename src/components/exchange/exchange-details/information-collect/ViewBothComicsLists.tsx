@@ -14,23 +14,6 @@ export default function ViewBothComicsLists({
 }) {
   const [currentComics, setCurrentComics] = useState<Comic>();
 
-  const getComicsEdition = (comics?: Comic) => {
-    if (!comics) return;
-    switch (comics.edition) {
-      case "REGULAR":
-        return "Bản thường";
-      case "SPECIAL":
-        return "Bản đặc biệt";
-      case "LIMITED":
-        return "Bản giới hạn";
-    }
-  };
-
-  const getComicsCondition = (comics?: Comic) => {
-    if (!comics) return;
-    return comics.condition === "SEALED" ? "Nguyên seal" : "Đã qua sử dụng";
-  };
-
   return (
     <div className="flex items-stretch justify-between gap-4">
       <div className="basis-1/2 relative flex flex-col rounded-lg border border-gray-300 pb-1 max-h-[50vh] overflow-y-auto">

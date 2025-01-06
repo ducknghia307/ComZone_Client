@@ -58,9 +58,6 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
     setUnreadSeller(unreadSellerCount);
   }, [announcements, activeTab, dispatch]);
 
-  const navigateToAll = () => {
-    navigate("/accountmanagement/announcement/orders");
-  };
   const markAllAsRead = async () => {
     try {
       await privateAxios.patch(`/announcements/mark-all-read`);
@@ -130,10 +127,12 @@ const NotificationDropdown = ({ announcements, setAnnouncements }) => {
       case AnnouncementType.AUCTION:
         return item.auction?.comics?.coverImage || AuctionIcon;
 
+      case AnnouncementType.AUCTION_REQUEST:
+        return item.auctionRequest?.comics?.coverImage || AuctionIcon;
+
       case AnnouncementType.EXCHANGE_NEW_REQUEST:
         return NewExchangeRequestIcon;
 
-      case AnnouncementType.AUCTION_REQUEST:
       case AnnouncementType.ORDER_CONFIRMED:
       case AnnouncementType.EXCHANGE_APPROVED:
       case AnnouncementType.EXCHANGE_SUCCESSFUL:

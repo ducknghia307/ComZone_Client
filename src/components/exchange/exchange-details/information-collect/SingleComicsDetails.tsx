@@ -11,17 +11,6 @@ export default function SingleComicsDetails({
 }) {
   const [currentImage, setCurrentImage] = useState(currentComics?.coverImage);
 
-  const getEdition = () => {
-    switch (currentComics.edition) {
-      case "REGULAR":
-        return "Bản thường";
-      case "SPECIAL":
-        return "Bản đặc biệt";
-      case "LIMITED":
-        return "Bản giới hạn";
-    }
-  };
-
   const getComicsExchangeStatus = () => {
     switch (currentComics.status) {
       case "UNAVAILABLE":
@@ -98,15 +87,13 @@ export default function SingleComicsDetails({
 
           <div className="flex items-center justify-between gap-2 pr-4">
             <p className="font-light text-xs">Phiên bản:</p>
-            <p className="font-semibold">{getEdition()}</p>
+            <p className="font-semibold">{currentComics.edition.name}</p>
           </div>
 
           <div className="flex items-center justify-between gap-2 pr-4">
             <p className="font-light text-xs">Tình trạng:</p>
             <p className="font-semibold">
-              {currentComics.condition === "SEALED"
-                ? "Nguyên seal"
-                : "Đã qua sử dụng"}
+              {currentComics.condition === 10 ? "Nguyên vẹn" : "Đã qua sử dụng"}
             </p>
           </div>
 
@@ -135,10 +122,10 @@ export default function SingleComicsDetails({
             </div>
           )}
 
-          {currentComics.publishedDate && (
+          {currentComics.publicationYear && (
             <div className="flex items-center justify-between gap-2 pr-4">
               <p className="font-light text-xs">Năm xuất bản:</p>
-              <p className="font-semibold">{currentComics.publishedDate}</p>
+              <p className="font-semibold">{currentComics.publicationYear}</p>
             </div>
           )}
 

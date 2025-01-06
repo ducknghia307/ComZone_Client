@@ -1,3 +1,6 @@
+import { Edition } from "./interfaces/edition.interface";
+import { Merchandise } from "./interfaces/merchandise.interface";
+
 export interface BaseInterface {
   id: string;
   createdAt?: Date;
@@ -123,37 +126,34 @@ export interface AuctionRequest {
 }
 
 //comic
-export interface Comic {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+export interface Comic extends BaseInterface {
+  sellerId: UserInfo;
   title: string;
   author: string;
-  description: string;
-  coverImage: string;
-  condition: "SEALED" | "USED";
-  edition: "REGULAR" | "SPECIAL" | "LIMITED";
-  page: number | null;
-  publishedDate: string | null;
-  price: number;
-  status: "AVAILABLE" | "PRE_ORDER" | "UNAVAILABLE" | "SOLD";
   quantity: number;
-  episodesList: string[];
-  previewChapter: string[];
-  selected?: boolean;
+  episodesList?: string[];
   genres?: Genre[];
-  sellerId: UserInfo;
+  description: string;
+  cover: "SOFT" | "HARD" | "DETACHED";
+  color: "GRAYSCALE" | "COLORED";
+  page?: number;
+  length?: number;
+  width?: number;
+  thickness?: number;
+  merchandises: Merchandise[];
+  publisher?: string;
+  publicationYear?: number;
+  originCountry?: string;
+  releaseYear?: number;
+  condition: number;
+  edition: Edition;
+  willNotAuction: boolean;
+  coverImage: string;
+  previewChapter?: string[];
+  price?: number;
   onSaleSince?: Date;
-  type: "NONE" | "AUCTION" | "SELL";
-  comics: {
-    title: string;
-    genres: Genre[];
-    author: string;
-    condition: "SEALED" | "USED";
-    coverImage: string;
-  };
-  endTime: Date;
+  type: "NONE" | "SELL" | "AUCTION" | "EXCHANGE";
+  status: "UNAVAILABLE" | "AVAILABLE" | "PRE_ORDER" | "SOLD";
 }
 
 export interface OrderDetailData {

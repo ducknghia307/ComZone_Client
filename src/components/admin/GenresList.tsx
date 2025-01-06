@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import TablePagination from "@mui/material/TablePagination";
+import { SearchOutlined } from "@ant-design/icons";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${theme.palette.mode === "light" ? "body" : "background.default"}`]: {
@@ -41,6 +42,7 @@ const GenresList = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newGenre, setNewGenre] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchGenres = async () => {
     try {
@@ -150,6 +152,13 @@ const GenresList = () => {
           </button>
         </div>
       </div>
+      <Input
+        placeholder="Tìm thể loại"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        prefix={<SearchOutlined />}
+        size="large"
+      />
       <Modal
         open={isModalVisible}
         onOk={createGenre}
@@ -201,6 +210,9 @@ const GenresList = () => {
           </TableHead>
           <TableBody>
             {genres
+              .filter((genre) =>
+                genre.name.toLowerCase().includes(searchTerm.toLowerCase())
+              )
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((genre) => (
                 <StyledTableRow key={genre.id}>

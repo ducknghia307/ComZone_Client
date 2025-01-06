@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { Modal, Tooltip, Input, message } from "antd";
+import { Genre } from "../../common/base.interface";
 import {
   TableContainer,
   Table,
@@ -11,7 +12,6 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import TablePagination from "@mui/material/TablePagination";
-import { Edition } from "../../common/interfaces/edition.interface";
 import { SearchOutlined } from "@ant-design/icons";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -35,21 +35,23 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const { TextArea } = Input;
 
-const EditionsList = () => {
-  const [editions, setEditions] = useState<Edition[]>([]);
+const MerchandisesList = () => {
+  const [merchandises, setMerchandises] = useState<Genre[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [newEdition, setNewEdition] = useState("");
+  const [newMerchandise, setNewMerchandise] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [newSubName, setNewSubName] = useState("");
+  const [newCaution, setNewCaution] = useState("");
 
-  const fetchEditions = async () => {
+  const fetchMerchandises = async () => {
     try {
-      const response = await privateAxios.get("/editions");
-      setEditions(response.data);
+      const response = await privateAxios.get("/merchandises");
+      setMerchandises(response.data);
     } catch (error) {
-      console.error("Error fetching editions:", error);
+      console.error("Error fetching merchandises:", error);
     }
   };
 
@@ -65,53 +67,65 @@ const EditionsList = () => {
     setIsModalVisible(false);
   };
 
-  const createEdition = async () => {
-    if (!newEdition.trim()) {
-      message.error("Tên phiên bản không được để trống!");
+  const createMerchandise = async () => {
+    if (!newMerchandise.trim()) {
+      message.error("Tên phụ kiện không được để trống!");
+      return;
+    }
+    if (!newSubName.trim()) {
+      message.error("Tên phụ kiện phụ không được để trống!");
       return;
     }
     if (!newDescription.trim()) {
-      message.error("Mô tả phiên bản không được để trống!");
+      message.error("Mô tả phụ kiện không được để trống!");
+      return;
+    }
+    if (!newCaution.trim()) {
+      message.error("Cảnh báo không được để trống!");
       return;
     }
 
     try {
-      await privateAxios.post("/editions", {
-        name: newEdition,
+      await privateAxios.post("/merchandises", {
+        name: newMerchandise,
+        subName: newSubName,
         description: newDescription,
+        caution: newCaution,
       });
-      message.success("Phiên bản đã được thêm thành công!");
-      fetchEditions();
-      setNewEdition("");
+      message.success("Phụ kiện đã được thêm thành công!");
+      fetchMerchandises();
+      setNewMerchandise("");
+      setNewSubName("");
       setNewDescription("");
+      setNewCaution("");
       handleOk();
     } catch (error) {
-      console.error("Error creating edition:", error);
-      message.error("Có lỗi xảy ra khi thêm phiên bản.");
+      console.error("Error creating merchandise:", error);
+      message.error("Có lỗi xảy ra khi thêm phụ kiện.");
     }
   };
 
-  const deleteEdition = async (id: string) => {
+  const deleteMerchandises = async (id: string) => {
     try {
-      await privateAxios.delete(`/editions/${id}`);
-      message.success("Phiên bản đã được xóa thành công!");
-      fetchEditions();
+      await privateAxios.delete(`/merchandises/${id}`);
+      message.success("Phụ kiện đã được xóa thành công!");
+      fetchMerchandises();
     } catch (error) {
-      console.error("Error deleting edition:", error);
-      message.error("Có lỗi xảy ra khi xóa phiên bản.");
+      console.error("Error deleting merchandise:", error);
+      message.error("Có lỗi xảy ra khi xóa phụ kiện.");
     }
   };
 
   const confirmDelete = (id: string) => {
     Modal.confirm({
       title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa phiên bản này?",
-      onOk: () => deleteEdition(id),
+      content: "Bạn có chắc chắn muốn xóa phụ kiện này?",
+      onOk: () => deleteMerchandises(id),
     });
   };
 
   useEffect(() => {
-    fetchEditions();
+    fetchMerchandises();
   }, []);
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -127,10 +141,8 @@ const EditionsList = () => {
 
   return (
     <>
-      <div className="w-full flex flex-row justify-between items-center pb-6">
-        <h2 className="text-3xl font-bold uppercase w-full text-nowrap">
-          Danh sách phiên bản
-        </h2>
+      <div className="w-full flex flex-row justify-between items-center  pb-6">
+        <h2 className="text-3xl font-bold uppercase w-full">Phụ kiện</h2>
         <div className="w-full flex justify-end">
           <button
             className="px-5 py-3 bg-[#c66a7a] rounded-lg hover:opacity-70 duration-300 text-white font-bold flex flex-row gap-3 items-center justify-center"
@@ -150,45 +162,59 @@ const EditionsList = () => {
               <path d="M5 12h14" />
               <path d="M12 5v14" />
             </svg>
-            Thêm phiên bản
+            Thêm phụ kiện
           </button>
         </div>
       </div>
       <Input
-        placeholder="Tìm phiên bản"
+        placeholder="Tìm phụ kiện"
         value={searchTerm}
-        prefix={<SearchOutlined />}
         onChange={(e) => setSearchTerm(e.target.value)}
+        prefix={<SearchOutlined />}
         size="large"
       />
       <Modal
         open={isModalVisible}
-        onOk={createEdition}
+        onOk={createMerchandise}
         onCancel={handleCancel}
         footer={null}
       >
         <div className="flex flex-col gap-5 py-3">
-          <p className="font-bold text-2xl text-center">Thêm phiên bản</p>
-          <label className="font-semibold">Tên phiên bản:</label>
+          <p className="font-bold text-2xl text-center">Thêm phụ kiện</p>
+          <label className="font-semibold">Tên phụ kiện:</label>
           <Input
-            value={newEdition}
-            onChange={(e) => setNewEdition(e.target.value)}
-            placeholder="Nhập tên phiên bản"
+            value={newMerchandise}
+            onChange={(e) => setNewMerchandise(e.target.value)}
+            placeholder="Nhập tên thể loại"
             className="p-3 rounded-lg placeholder:text-gray-300 border border-gray-300"
           />
-          <label className="font-semibold">Mô tả phiên bản:</label>
+          <label className="font-semibold">Tên phụ kiện phụ:</label>
+          <Input
+            value={newSubName}
+            onChange={(e) => setNewSubName(e.target.value)}
+            placeholder="Nhập tên phụ kiện phụ"
+            className="p-3 rounded-lg placeholder:text-gray-300 border border-gray-300"
+          />
+          <label className="font-semibold">Mô tả phụ kiện:</label>
           <TextArea
             value={newDescription}
             onChange={(e) => setNewDescription(e.target.value)}
-            placeholder="Nhập mô tả phiên bản"
+            placeholder="Nhập mô tả thể loại"
             maxLength={1000}
             rows={4}
             showCount
+            className="p-3 rounded-lg placeholder:text-gray-300 border border-gray-300 "
+          />
+          <label className="font-semibold">Cảnh báo:</label>
+          <Input
+            value={newCaution}
+            onChange={(e) => setNewCaution(e.target.value)}
+            placeholder="Nhập cảnh báo"
             className="p-3 rounded-lg placeholder:text-gray-300 border border-gray-300"
           />
           <button
             className="px-5 mt-3 py-3 bg-[#c66a7a] rounded-lg hover:opacity-70 duration-300 text-white font-bold"
-            onClick={createEdition}
+            onClick={createMerchandise}
           >
             Thêm
           </button>
@@ -205,36 +231,40 @@ const EditionsList = () => {
         >
           <TableHead>
             <TableRow>
-              <StyledTableCell>Tên phiên bản</StyledTableCell>
-              <StyledTableCell>Mô tả phiên bản</StyledTableCell>
-              <StyledTableCell></StyledTableCell>
+              <StyledTableCell className="text-nowrap">
+                Tên phụ kiện
+              </StyledTableCell>
+              <StyledTableCell className="text-nowrap">
+                Tên gọi khác
+              </StyledTableCell>
+              <StyledTableCell className="text-nowrap">
+                Mô tả phụ kiện
+              </StyledTableCell>
+              <StyledTableCell>Lưu ý</StyledTableCell>
               <StyledTableCell></StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {editions
-              .filter((edition) =>
-                edition.name.toLowerCase().includes(searchTerm.toLowerCase())
+            {merchandises
+              .filter((merchandise) =>
+                merchandise.name
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase())
               )
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((edition) => (
-                <StyledTableRow key={edition.id}>
-                  <StyledTableCell className="text-nowrap">
-                    {edition.name}
-                  </StyledTableCell>
+              .map((merchandise) => (
+                <StyledTableRow key={merchandise.id}>
+                  <StyledTableCell>{merchandise.name}</StyledTableCell>
+                  <StyledTableCell>{merchandise.subName}</StyledTableCell>
                   <StyledTableCell className="line-clamp-3">
-                    {edition.description}
+                    {merchandise.description}
                   </StyledTableCell>
-                  <StyledTableCell className="line-clamp-3 text-nowrap">
-                    {edition.auctionDisabled
-                      ? "Được đấu giá"
-                      : "Không được đấu giá"}
-                  </StyledTableCell>
+                  <StyledTableCell>{merchandise.caution}</StyledTableCell>
                   <StyledTableCell>
                     <Tooltip title="Xóa">
                       <button
                         className="opacity-50 hover:opacity-100 duration-300"
-                        onClick={() => confirmDelete(edition.id)}
+                        onClick={() => confirmDelete(merchandise.id)}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -262,7 +292,7 @@ const EditionsList = () => {
         </Table>
         <TablePagination
           rowsPerPageOptions={[20, 30, 50]}
-          count={editions.length}
+          count={merchandises.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -278,4 +308,4 @@ const EditionsList = () => {
   );
 };
 
-export default EditionsList;
+export default MerchandisesList;

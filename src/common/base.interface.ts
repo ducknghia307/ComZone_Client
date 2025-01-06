@@ -80,6 +80,8 @@ export interface Genre {
   id: string;
   name: string;
   description?: string;
+  subName?: string;
+  caution?: string;
 }
 
 export interface Auction {

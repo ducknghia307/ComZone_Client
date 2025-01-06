@@ -97,6 +97,7 @@ const ComicAuction = () => {
               comic: auctionData.comics,
               currentPrice: price,
               auctionId: auctionData.id,
+              depositAmount: auctionData.depositAmount,
               quantity: 1,
               type,
             },

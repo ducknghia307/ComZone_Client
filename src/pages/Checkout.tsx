@@ -23,6 +23,7 @@ interface SellerGroup {
     currentPrice?: number;
     auctionId?: string;
     type: string;
+    depositAmount: number;
   }[];
   delivery?: {
     cost: number;
@@ -125,6 +126,11 @@ const Checkout = () => {
     Object.values(groupedSelectedComics)
       .flatMap((group) => group.comics)
       .find((comic) => comic.auctionId)?.auctionId || null;
+  const depositAmount =
+    Object.values(groupedSelectedComics)
+      .flatMap((group) => group.comics)
+      .find((comic) => comic.auctionId)?.depositAmount || null;
+  console.log("deposit", depositAmount);
 
   useEffect(() => {
     if (comics) {
@@ -404,6 +410,7 @@ const Checkout = () => {
             </div>
             <div className="grow min-w-[20em] max-w-[25em] top-4 sticky">
               <TotalSummary
+                depositAmount={depositAmount}
                 totalPrice={totalPrice}
                 totalDeliveryPrice={totalDeliveryPrice}
                 totalQuantity={totalQuantity}

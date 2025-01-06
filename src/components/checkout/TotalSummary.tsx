@@ -9,6 +9,7 @@ export default function TotalSummary({
   handleSubmit,
   isConfirmDisabled,
   navigate,
+  depositAmount,
 }: {
   totalQuantity: number;
   totalPrice: number;
@@ -16,6 +17,7 @@ export default function TotalSummary({
   handleSubmit: () => Promise<void>;
   isConfirmDisabled: boolean;
   navigate: any;
+  depositAmount?: number;
 }) {
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
 
@@ -44,13 +46,20 @@ export default function TotalSummary({
           <p>Tổng tiền giao hàng:</p>
           <p>{CurrencySplitter(totalDeliveryPrice || 0)} đ</p>
         </div>
+        {depositAmount && (
+          <div className="w-full flex items-center justify-between">
+            <p>Tổng cọc đấu giá:</p>
+            <p>- {CurrencySplitter(depositAmount || 0)} đ</p>
+          </div>
+        )}
       </div>
 
       <div className="w-full flex items-center justify-between">
         <p className="text-xs">Tổng tiền thanh toán:</p>
         <p className="font-semibold text-red-500">
           {CurrencySplitter(
-            (totalDeliveryPrice && totalPrice + totalDeliveryPrice) ||
+            (totalDeliveryPrice &&
+              totalPrice + totalDeliveryPrice - depositAmount) ||
               totalPrice
           )}{" "}
           đ

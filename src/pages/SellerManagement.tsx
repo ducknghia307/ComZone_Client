@@ -11,6 +11,7 @@ import AuctionManagement from "../components/auctions/AuctionManagement";
 import FeedbackManagement from "../components/feedback/FeedbackManagement";
 import Loading from "../components/loading/Loading";
 import ShopInfo from "../components/sellermanagement/ShopInfo";
+import AuctionDashboard from "../components/auctions/AuctionDashboard";
 
 const SellerManagementPage: React.FC = () => {
   const currentUrl = window.location.pathname;
@@ -58,7 +59,7 @@ const SellerManagementPage: React.FC = () => {
       case "/sellermanagement/order":
         return <OrderManagement />;
       case "/sellermanagement/auction":
-        return <AuctionManagement />;
+        return <AuctionDashboard />;
       case "/sellermanagement/feedback":
         return <FeedbackManagement />;
     }

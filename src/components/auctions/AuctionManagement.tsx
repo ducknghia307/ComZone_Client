@@ -258,7 +258,6 @@ const AuctionManagement = () => {
 
   return (
     <div className="REM w-full bg-white p-4 rounded-lg drop-shadow-lg flex flex-col gap-4">
-      <p className="text-2xl font-bold uppercase">Quản lý đấu giá</p>
       {auctions.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-16">
           <img src={EmptyImage} alt="" className="w-32 bg-white" />
@@ -332,14 +331,7 @@ const AuctionManagement = () => {
                   >
                     Thời Gian Kết Thúc
                   </TableCell>
-                  <TableCell
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                    }}
-                  >
-                    Thời Lượng
-                  </TableCell>
+
                   <TableCell
                     style={{
                       color: "white",
@@ -356,7 +348,7 @@ const AuctionManagement = () => {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    Bước Giá
+                    Bước Giá Tối Thiểu
                   </TableCell>
                   <TableCell
                     style={{
@@ -382,9 +374,7 @@ const AuctionManagement = () => {
                       textAlign: "center",
                       whiteSpace: "nowrap",
                     }}
-                  >
-                    Chỉnh Sửa
-                  </TableCell>
+                  ></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -398,11 +388,19 @@ const AuctionManagement = () => {
                       />
                     </TableCell>
                     <TableCell
-                      style={{ whiteSpace: "nowrap" }}
+                      style={{
+                        whiteSpace: "normal",
+                        width: "300px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        wordWrap: "break-word",
+                      }}
                       align="center"
                       title={auction.comics.title}
                     >
-                      {truncateText(auction.comics.title, 20)}
+                      <p className="my-auto font-semibold">
+                        {auction.comics.title}
+                      </p>
                     </TableCell>
                     <TableCell align="center">
                       {auction.startTime
@@ -415,9 +413,6 @@ const AuctionManagement = () => {
                         : "Chưa có"}
                     </TableCell>
 
-                    <TableCell align="center">
-                      {auction?.duration} Ngày
-                    </TableCell>
                     <TableCell align="center">
                       {auction.reservePrice.toLocaleString()} đ
                     </TableCell>

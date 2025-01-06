@@ -402,7 +402,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
             <Col span={11}>
               <Form.Item
                 name="duration"
-                label="Thời lượng đấu giá (Ngày)"
+                label="Thời lượng đấu giá (1-7 Ngày)"
                 rules={[
                   {
                     required: true,

@@ -1,6 +1,7 @@
 import { Modal } from "antd";
 import React, { useState } from "react";
 import { Comic } from "../../../../common/base.interface";
+import { getComicsCondition } from "../../../../common/constances/comicsConditions";
 
 export default function SingleComicsDetails({
   currentComics,
@@ -11,19 +12,6 @@ export default function SingleComicsDetails({
 }) {
   const [currentImage, setCurrentImage] = useState(currentComics?.coverImage);
 
-  const getComicsExchangeStatus = () => {
-    switch (currentComics.status) {
-      case "UNAVAILABLE":
-        return <p>Không khả dụng</p>;
-      case "AVAILABLE":
-        return <p className="text-green-600">Sẵn sàng trao đổi</p>;
-      case "PRE_ORDER":
-        return <p className="text-amber-600">Đang dùng để đổi</p>;
-      case "SOLD":
-        return <p className="text-cyan-600">Đã trao đổi</p>;
-    }
-  };
-
   return (
     <Modal
       open={currentComics !== undefined}
@@ -33,16 +21,17 @@ export default function SingleComicsDetails({
       }}
       centered
       footer={null}
+      width={1000}
     >
       <div
         key={currentComics.id}
         className={`flex items-stretch gap-2 p-[0.2em] rounded-md duration-200`}
       >
-        <div className="self-baseline shrink-0 flex flex-col items-start gap-2">
+        <div className="self-baseline shrink-0 basis-1/3 flex flex-col items-start gap-2">
           <img
             src={currentImage}
             alt=""
-            className="self-center w-[15em] aspect-[2/3] rounded-md object-cover"
+            className="self-center w-full aspect-[2/3] rounded-md object-cover"
           />
 
           <div
@@ -75,25 +64,19 @@ export default function SingleComicsDetails({
           </div>
         </div>
 
-        <div className="self-stretch ml-2 w-full flex flex-col justify-center gap-2 py-2">
+        <div className="self-stretch ml-2 w-full flex flex-col justify-start gap-2 py-2">
           <div className="flex flex-col leading-tight">
-            <p className="text-lg font-semibold uppercase leading-tight">
+            <p className="text-xl font-semibold uppercase leading-tight">
               {currentComics.title}
             </p>
-            <p className="font-light uppercase text-sm">
-              {currentComics.author}
-            </p>
-          </div>
-
-          <div className="flex items-center justify-between gap-2 pr-4">
-            <p className="font-light text-xs">Phiên bản:</p>
-            <p className="font-semibold">{currentComics.edition.name}</p>
+            <p className="font-light uppercase">{currentComics.author}</p>
           </div>
 
           <div className="flex items-center justify-between gap-2 pr-4">
             <p className="font-light text-xs">Tình trạng:</p>
             <p className="font-semibold">
-              {currentComics.condition === 10 ? "Nguyên vẹn" : "Đã qua sử dụng"}
+              {getComicsCondition(currentComics.condition).conditionName} (
+              {getComicsCondition(currentComics.condition).value}/10)
             </p>
           </div>
 
@@ -104,11 +87,6 @@ export default function SingleComicsDetails({
                 ? currentComics.quantity
                 : "Truyện lẻ"}
             </p>
-          </div>
-
-          <div className="flex items-center justify-between gap-2 pr-4">
-            <p className="font-light text-xs">Trạng thái:</p>
-            <p className="font-semibold">{getComicsExchangeStatus()}</p>
           </div>
 
           {currentComics.quantity > 1 && currentComics.episodesList && (
@@ -122,28 +100,19 @@ export default function SingleComicsDetails({
             </div>
           )}
 
-          {currentComics.publicationYear && (
-            <div className="flex items-center justify-between gap-2 pr-4">
-              <p className="font-light text-xs">Năm xuất bản:</p>
-              <p className="font-semibold">{currentComics.publicationYear}</p>
-            </div>
-          )}
-
-          {currentComics.page && (
-            <div className="flex items-center justify-between gap-2 pr-4">
-              <p className="font-light text-xs">Số trang:</p>
-              <p className="font-semibold">{currentComics.page}</p>
-            </div>
-          )}
-
-          <p className="font-light text-sm">
-            Mô tả:{" "}
-            <span className={`font-medium`}>
-              <p className="max-h-[10em] overflow-auto">
-                {currentComics.description}
-              </p>
-            </span>
+          <p className="font-light">
+            Mô tả: <p className="font-medium">{currentComics.description}</p>
           </p>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentComics(undefined);
+            }}
+            className="mt-auto self-stretch border border-gray-300 rounded px-4 py-2 duration-200 hover:bg-gray-100"
+          >
+            Đóng
+          </button>
         </div>
       </div>
     </Modal>

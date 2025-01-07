@@ -3,6 +3,7 @@ import { Comic } from "../../../common/base.interface";
 import { Modal, notification, Popconfirm } from "antd";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import { DeleteFilled } from "@ant-design/icons";
+import { getComicsCondition } from "../../../common/constances/comicsConditions";
 
 export default function ExchangeComicsDetails({
   comics,
@@ -40,7 +41,7 @@ export default function ExchangeComicsDetails({
           description: (
             <button
               onClick={() => handleUndoDelete(currentComics)}
-              className="bg-sky-700 text-white px-2 py-1 rounded-md duration-200 hover:bg-sky-800"
+              className="border border-gray-300 px-2 py-1 rounded-md duration-200 hover:bg-gray-100"
             >
               Hoàn tác
             </button>
@@ -133,16 +134,10 @@ export default function ExchangeComicsDetails({
             </div>
 
             <div className="flex items-center justify-between gap-2 pr-4">
-              <p className="font-light text-xs">Phiên bản:</p>
-              <p className="font-semibold">{currentComics.edition.name}</p>
-            </div>
-
-            <div className="flex items-center justify-between gap-2 pr-4">
               <p className="font-light text-xs">Tình trạng:</p>
               <p className="font-semibold">
-                {currentComics.condition === 10
-                  ? "Nguyên vẹn"
-                  : "Đã qua sử dụng"}
+                {getComicsCondition(currentComics.condition).conditionName} (
+                {getComicsCondition(currentComics.condition).value}/10)
               </p>
             </div>
 
@@ -171,20 +166,6 @@ export default function ExchangeComicsDetails({
               </div>
             )}
 
-            {currentComics.publicationYear && (
-              <div className="flex items-center justify-between gap-2 pr-4">
-                <p className="font-light text-xs">Năm xuất bản:</p>
-                <p className="font-semibold">{currentComics.publicationYear}</p>
-              </div>
-            )}
-
-            {currentComics.page && (
-              <div className="flex items-center justify-between gap-2 pr-4">
-                <p className="font-light text-xs">Số trang:</p>
-                <p className="font-semibold">{currentComics.page}</p>
-              </div>
-            )}
-
             <p className="font-light text-sm">
               Mô tả:{" "}
               <span className={`font-medium`}>
@@ -201,9 +182,9 @@ export default function ExchangeComicsDetails({
                   description={
                     <p>Bạn có chắc chắn muốn xóa truyện này không?</p>
                   }
-                  okText={<p>Xóa</p>}
+                  okText={<p>Xóa truyện</p>}
                   okType="danger"
-                  cancelText={<p>Quay lại</p>}
+                  cancelText={<p>Hủy bỏ</p>}
                   onConfirm={handleDeleteExchangeComics}
                   icon={<DeleteFilled style={{ color: "red" }} />}
                 >

@@ -184,7 +184,7 @@ export default function GenresSelectingModal({
           </p>
           <div className="grow flex items-center gap-1">
             <button
-              onClick={() => setSelectedGenres([])}
+              onClick={() => setSelectedGenres(currentComics.genres)}
               className={`hidden sm:block min-w-fit p-2 basis-1/3 border border-gray-400 rounded duration-200 hover:bg-gray-100 ${
                 selectedGenres.length === 0 && "hidden"
               }`}

@@ -306,7 +306,7 @@ const SellerComicsManagement = ({
               description: (
                 <button
                   onClick={() => undoDelete(comic)}
-                  className="REM mt-2 px-4 py-1 bg-sky-700 text-white rounded-md duration-200 hover:bg-sky-800"
+                  className="REM mt-2 px-4 py-1 border border-gray-300 rounded-md duration-200 hover:bg-gray-100"
                 >
                   Hoàn tác
                 </button>

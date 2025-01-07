@@ -123,23 +123,6 @@ export default function EditionAndCondition({
       return;
     }
 
-    if (
-      !edition.auctionDisabled &&
-      !willNotAuction &&
-      evidenceFields.length === 0
-    ) {
-      message.error({
-        key: "error",
-        content: (
-          <p className="REM text-start">
-            Vui lòng chọn ít nhất 1 thuộc tính để thể hiện phiên bản truyện!
-          </p>
-        ),
-        duration: 5,
-      });
-      return;
-    }
-
     setEditionEvidenceFields(evidenceFields);
     handleGettingConditionAndEdition({
       condition: condition.value,

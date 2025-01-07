@@ -109,7 +109,7 @@ export default function EditionAndCondition({
             marks={formatGradingScaleToMarks(conditionGradingScales)}
             step={null}
             tooltip={{ open: false }}
-            value={condition.value}
+            value={condition?.value}
             onChange={(value: number) => {
               setCondition(
                 conditionGradingScales.find(
@@ -139,7 +139,7 @@ export default function EditionAndCondition({
               <path d="M22 20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V20ZM11 15H4V19H11V15ZM20 11H13V19H20V11ZM11 5H4V13H11V5ZM20 5H13V9H20V5Z"></path>
             </svg>
             <p className="font-light">Tình trạng:&emsp;</p>
-            <p className="text-lg font-semibold">{condition.name}</p>
+            <p className="text-lg font-semibold">{condition?.name}</p>
           </span>
 
           <span className="flex items-center gap-2">
@@ -153,10 +153,10 @@ export default function EditionAndCondition({
               <path d="M15 3H21V21H3V15H7V11H11V7H15V3ZM17 5V9H13V13H9V17H5V19H19V5H17Z"></path>
             </svg>
             <p className="font-light">Độ mới:&emsp;</p>
-            <p className="text-lg font-semibold">{condition.value}/10</p>
+            <p className="text-lg font-semibold">{condition?.value}/10</p>
           </span>
 
-          {condition.usageLevel && (
+          {condition?.usageLevel && (
             <span className="flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -168,7 +168,7 @@ export default function EditionAndCondition({
                 <path d="M12 22C6.47715 22 2 17.5228 2 12 2 6.47715 6.47715 2 12 2 17.5228 2 22 6.47715 22 12 22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12 20 7.58172 16.4183 4 12 4 7.58172 4 4 7.58172 4 12 4 16.4183 7.58172 20 12 20ZM13 10.5V15H14V17H10V15H11V12.5H10V10.5H13ZM13.5 8C13.5 8.82843 12.8284 9.5 12 9.5 11.1716 9.5 10.5 8.82843 10.5 8 10.5 7.17157 11.1716 6.5 12 6.5 12.8284 6.5 13.5 7.17157 13.5 8Z"></path>
               </svg>
               <p className="font-light">Mức độ sử dụng:&emsp;</p>
-              <p className="font-semibold">{condition.usageLevel}</p>
+              <p className="font-semibold">{condition?.usageLevel}</p>
             </span>
           )}
 
@@ -185,19 +185,19 @@ export default function EditionAndCondition({
             <p className="font-light">Quyền lợi:&emsp;</p>
             <p
               className={`${
-                condition.value >= minimumConditionLevel
+                condition?.value >= minimumConditionLevel
                   ? "text-green-600 font-semibold"
                   : "text-red-600"
               }`}
             >
-              {condition.value >= minimumConditionLevel
+              {condition?.value >= minimumConditionLevel
                 ? "Có thể đấu giá"
                 : "Không thể đấu giá"}
             </p>
           </span>
 
           <p className="text-sm h-[6em] phone:h-[5em]">
-            {condition.description}
+            {condition?.description}
           </p>
         </div>
       </div>

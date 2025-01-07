@@ -1,4 +1,4 @@
-import { message, Modal, notification } from "antd";
+import { message, Modal, notification, Slider } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { Comic } from "../../../common/base.interface";
 import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
@@ -16,6 +16,12 @@ import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import { Grid } from "@mui/system";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
 import { Edition } from "../../../common/interfaces/edition.interface";
+import {
+  ConditionGradingScale,
+  conditionGradingScales,
+  getComicsCondition,
+} from "../../../common/constances/comicsConditions";
+import { SliderSingleProps } from "antd/lib";
 
 interface EditComicFormData {
   title: string;
@@ -23,11 +29,26 @@ interface EditComicFormData {
   quantity: number;
   episodesList: string[];
   description: string;
-  edition: Edition;
   condition: number;
-  publicationYear: number;
-  page: number;
 }
+
+const formatGradingScaleToMarks = (
+  gradingScale: ConditionGradingScale[]
+): SliderSingleProps["marks"] => {
+  const marks: SliderSingleProps["marks"] = {};
+
+  gradingScale.forEach((item) => {
+    marks[item.value] = {
+      label: (
+        <p className="whitespace-nowrap text-xs">
+          {[0, 2, 5, 8, 10].some((v) => v === item.value) ? item.symbol : ""}
+        </p>
+      ),
+    };
+  });
+
+  return marks;
+};
 
 export default function UpdateExchangeComics({
   setIsOpen,
@@ -46,10 +67,7 @@ export default function UpdateExchangeComics({
     quantity: comics.quantity,
     episodesList: comics.episodesList || [],
     description: comics.description,
-    publicationYear: comics.publicationYear || null,
-    edition: comics.edition,
     condition: comics.condition,
-    page: comics.page || null,
   });
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -69,11 +87,6 @@ export default function UpdateExchangeComics({
     string[]
   >([]);
   const [uploadedChaptersFile, setUploadedChaptersFile] = useState<File[]>([]);
-
-  const [editionOptions, setEditionOptions] = useState<{
-    label: string;
-    value: string;
-  }>();
 
   const handleUpload = async () => {
     try {
@@ -180,24 +193,20 @@ export default function UpdateExchangeComics({
     }
 
     if (
-      formData.quantity > 1 &&
-      formData.quantity !== formData.episodesList.length
+      isSeries &&
+      (formData.episodesList.length === 0 ||
+        formData.episodesList.length > formData.quantity)
     ) {
       message.warning({
         key: "series",
         content: (
           <p className="REM">
-            Số lượng tên tập không trùng khợp với số truyện trong bộ!{" "}
-            <span className="font-light italic text-sm">
-              (
-              {formData.episodesList.length - formData.quantity > 0
-                ? "Dư"
-                : "Thiếu"}{" "}
-              {Math.abs(formData.episodesList.length - formData.quantity)} tập)
-            </span>
+            {formData.episodesList.length === 0
+              ? "Vui lòng nhập ít nhất tên (hoặc số) của một tập truyện!"
+              : "Số lượng tên tập truyện không phù hợp với số lượng cuốn trọng bộ!"}
           </p>
         ),
-        duration: 8,
+        duration: 5,
       });
       return;
     }
@@ -233,21 +242,17 @@ export default function UpdateExchangeComics({
     }
   };
 
-  const isChanged =
+  const isNotChanged =
     comics &&
-    (formData.author !== comics.author ||
-      formData.condition !== comics.condition ||
-      formData.description !== comics.description ||
-      formData.edition !== comics.edition ||
-      formData.episodesList !== comics.episodesList ||
-      formData.page !== comics.page ||
-      formData.publicationYear !==
-        (comics.publicationYear && comics.publicationYear) ||
-      formData.quantity !== comics.quantity ||
-      formData.title !== comics.title ||
-      coverImage !== comics.coverImage ||
-      previewChapters.length !== comics.previewChapter.length ||
-      uploadedChaptersFile.length > 0);
+    formData.author === comics.author &&
+    formData.condition === comics.condition &&
+    formData.description === comics.description &&
+    formData.episodesList === comics.episodesList &&
+    formData.quantity === comics.quantity &&
+    formData.title === comics.title &&
+    coverImage === comics.coverImage &&
+    previewChapters.length === comics.previewChapter.length &&
+    uploadedChaptersFile.length === 0;
 
   const reset = () => {
     setFormData({
@@ -256,17 +261,19 @@ export default function UpdateExchangeComics({
       quantity: comics.quantity,
       episodesList: comics.episodesList,
       description: comics.description,
-      publicationYear: comics.publicationYear ?? null,
-      edition: comics.edition,
       condition: comics.condition,
-      page: comics.page || null,
     });
+
     setCoverImage(comics.coverImage);
     setUploadedCoverImageFile(null);
     setPreviewChapters(comics.previewChapter);
     setUploadedChaptersFile([]);
     setChaptersImagePlaceholder([]);
   };
+
+  useEffect(() => {
+    reset();
+  }, []);
 
   return (
     <Modal
@@ -489,24 +496,7 @@ export default function UpdateExchangeComics({
               />
             </Grid>
 
-            {!isSeries ? (
-              <Grid size={3}>
-                <TextField
-                  fullWidth
-                  label={<p className="REM">Số trang</p>}
-                  type="number"
-                  name="page"
-                  value={formData.page || ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      page: Number(e.target.value),
-                    })
-                  }
-                  variant="outlined"
-                />
-              </Grid>
-            ) : (
+            {isSeries && (
               <>
                 <Grid size={3}>
                   <TextField
@@ -603,6 +593,79 @@ export default function UpdateExchangeComics({
               </>
             )}
 
+            <div className="w-full flex flex-col gap-4">
+              <div className="flex flex-row">
+                <h2 className="font-sm">Tình trạng truyện:</h2>
+                <p className="text-red-500">*</p>
+              </div>
+              <div className="px-4">
+                <Slider
+                  marks={formatGradingScaleToMarks(conditionGradingScales)}
+                  step={null}
+                  tooltip={{ open: false }}
+                  value={formData.condition}
+                  onChange={(value: number) =>
+                    setFormData({ ...formData, condition: value })
+                  }
+                  max={10}
+                />
+              </div>
+
+              <div className="xl:w-1/2 mx-auto flex flex-col items-stretch justify-start gap-2 px-2 sm:px-4 text-sm">
+                <span className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    fill="currentColor"
+                  >
+                    <path d="M22 20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V20ZM11 15H4V19H11V15ZM20 11H13V19H20V11ZM11 5H4V13H11V5ZM20 5H13V9H20V5Z"></path>
+                  </svg>
+                  <p className="font-light">Tình trạng:&emsp;</p>
+                  <p className="text-base font-semibold">
+                    {getComicsCondition(formData.condition).conditionState}
+                  </p>
+                </span>
+
+                <span className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                  >
+                    <path d="M15 3H21V21H3V15H7V11H11V7H15V3ZM17 5V9H13V13H9V17H5V19H19V5H17Z"></path>
+                  </svg>
+                  <p className="font-light">Độ mới:&emsp;</p>
+                  <p className="text-base font-semibold">
+                    {getComicsCondition(formData.condition).value}/10
+                  </p>
+                </span>
+
+                <span className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    fill="currentColor"
+                  >
+                    <path d="M12 22C6.47715 22 2 17.5228 2 12 2 6.47715 6.47715 2 12 2 17.5228 2 22 6.47715 22 12 22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12 20 7.58172 16.4183 4 12 4 7.58172 4 4 7.58172 4 12 4 16.4183 7.58172 20 12 20ZM13 10.5V15H14V17H10V15H11V12.5H10V10.5H13ZM13.5 8C13.5 8.82843 12.8284 9.5 12 9.5 11.1716 9.5 10.5 8.82843 10.5 8 10.5 7.17157 11.1716 6.5 12 6.5 12.8284 6.5 13.5 7.17157 13.5 8Z"></path>
+                  </svg>
+                  <p className="font-light">Mức độ sử dụng:&emsp;</p>
+                  <p className="text-base font-semibold">
+                    {getComicsCondition(formData.condition).usageLevel}
+                  </p>
+                </span>
+
+                <p className="text-sm font-light italic h-[6em] phone:h-[5em]">
+                  {getComicsCondition(formData.condition).description}
+                </p>
+              </div>
+            </div>
+
             <Grid size={12}>
               <p className="REM py-2">
                 Thêm mô tả cho truyện của bạn:{" "}
@@ -638,7 +701,7 @@ export default function UpdateExchangeComics({
           </Grid>
 
           <div className="w-full flex items-stretch gap-2 mt-8 mb-4 REM">
-            {isChanged ? (
+            {!isNotChanged ? (
               <button
                 onClick={(e) => {
                   e.preventDefault();
@@ -662,8 +725,8 @@ export default function UpdateExchangeComics({
 
             <button
               onClick={() => setIsConfirming(true)}
-              disabled={!isChanged}
-              className={`grow py-2 bg-black rounded-lg text-white font-semibold duration-200 hover:bg-gray-900 disabled:bg-gray-300`}
+              disabled={isNotChanged}
+              className={`grow py-2 bg-gray-800 rounded-lg text-white font-semibold duration-200 hover:bg-gray-600 disabled:bg-gray-300`}
             >
               CẬP NHẬT
             </button>

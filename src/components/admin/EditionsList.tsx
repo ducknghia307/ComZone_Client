@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { Modal, Tooltip, Input, message } from "antd";
+import {
+  Modal,
+  Tooltip,
+  Input,
+  message,
+  Dropdown,
+  Menu,
+  MenuProps,
+  Switch,
+} from "antd";
 import {
   TableContainer,
   Table,
@@ -12,7 +21,8 @@ import {
 import { styled } from "@mui/material/styles";
 import TablePagination from "@mui/material/TablePagination";
 import { Edition } from "../../common/interfaces/edition.interface";
-import { SearchOutlined } from "@ant-design/icons";
+import { EditOutlined, SearchOutlined, SmileOutlined } from "@ant-design/icons";
+import { DeleteOutline } from "@mui/icons-material";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${theme.palette.mode === "light" ? "body" : "background.default"}`]: {
@@ -43,6 +53,26 @@ const EditionsList = () => {
   const [newEdition, setNewEdition] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingEdition, setEditingEdition] = useState<Edition | null>(null);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isSpecial, setIsSpecial] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const getMenuItems = (editionId: string): MenuProps["items"] => [
+    {
+      key: "1",
+      label: "Chỉnh sửa",
+      icon: <EditOutlined style={{ fontSize: 18 }} />,
+      onClick: () => showModal(editions.find((e) => e.id === editionId)),
+    },
+    {
+      key: "2",
+      label: "Xóa",
+      icon: <DeleteOutline style={{ fontSize: 18 }} />,
+      onClick: () => confirmDelete(editionId),
+      danger: true,
+    },
+  ];
 
   const fetchEditions = async () => {
     try {
@@ -53,12 +83,23 @@ const EditionsList = () => {
     }
   };
 
-  const showModal = () => {
+  const showModal = (editionToEdit: Edition | null = null) => {
+    if (editionToEdit) {
+      setEditingEdition(editionToEdit);
+      setIsSpecial(editionToEdit.isSpecial);
+      setIsEditing(true);
+    } else {
+      setNewEdition("");
+      setNewDescription("");
+      setIsSpecial(false);
+      setIsEditing(false);
+    }
     setIsModalVisible(true);
   };
 
   const handleOk = () => {
     setIsModalVisible(false);
+    setEditingEdition(null);
   };
 
   const handleCancel = () => {
@@ -79,6 +120,7 @@ const EditionsList = () => {
       await privateAxios.post("/editions", {
         name: newEdition,
         description: newDescription,
+        isSpecial,
       });
       message.success("Phiên bản đã được thêm thành công!");
       fetchEditions();
@@ -110,6 +152,33 @@ const EditionsList = () => {
     });
   };
 
+  const handleEditSubmit = async () => {
+    if (!editingEdition) return;
+
+    if (!editingEdition.name.trim()) {
+      message.error("Tên phiên bản không được để trống!");
+      return;
+    }
+    if (!editingEdition.description.trim()) {
+      message.error("Mô tả phiên bản không được để trống!");
+      return;
+    }
+
+    try {
+      await privateAxios.patch(`/editions/${editingEdition.id}`, {
+        name: editingEdition.name,
+        description: editingEdition.description,
+        isSpecial: editingEdition.isSpecial,
+      });
+      message.success("Cập nhật phiên bản thành công!");
+      setIsEditModalVisible(false);
+      fetchEditions();
+    } catch (error) {
+      console.error("Error updating edition:", error);
+      message.error("Có lỗi xảy ra khi cập nhật phiên bản.");
+    }
+  };
+
   useEffect(() => {
     fetchEditions();
   }, []);
@@ -125,6 +194,15 @@ const EditionsList = () => {
     setPage(0);
   };
 
+  const handleSubmit = async () => {
+    if (isEditing) {
+      await handleEditSubmit();
+    } else {
+      await createEdition();
+    }
+    setIsModalVisible(false);
+  };
+
   return (
     <>
       <div className="w-full flex flex-row justify-between items-center pb-6">
@@ -134,7 +212,7 @@ const EditionsList = () => {
         <div className="w-full flex justify-end">
           <button
             className="px-5 py-3 bg-[#c66a7a] rounded-lg hover:opacity-70 duration-300 text-white font-bold flex flex-row gap-3 items-center justify-center"
-            onClick={showModal}
+            onClick={() => showModal()}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -163,34 +241,153 @@ const EditionsList = () => {
       />
       <Modal
         open={isModalVisible}
-        onOk={createEdition}
-        onCancel={handleCancel}
+        onOk={handleSubmit}
+        onCancel={handleOk}
         footer={null}
       >
         <div className="flex flex-col gap-5 py-3">
-          <p className="font-bold text-2xl text-center">Thêm phiên bản</p>
+          <p className="font-bold text-2xl text-center">
+            {isEditing ? "Chỉnh sửa phiên bản" : "Thêm phiên bản"}
+          </p>
           <label className="font-semibold">Tên phiên bản:</label>
           <Input
-            value={newEdition}
-            onChange={(e) => setNewEdition(e.target.value)}
+            value={isEditing ? editingEdition?.name : newEdition}
+            onChange={(e) => {
+              if (isEditing) {
+                setEditingEdition((prev) =>
+                  prev ? { ...prev, name: e.target.value } : null
+                );
+              } else {
+                setNewEdition(e.target.value);
+              }
+            }}
             placeholder="Nhập tên phiên bản"
             className="p-3 rounded-lg placeholder:text-gray-300 border border-gray-300"
           />
           <label className="font-semibold">Mô tả phiên bản:</label>
           <TextArea
-            value={newDescription}
-            onChange={(e) => setNewDescription(e.target.value)}
+            value={isEditing ? editingEdition?.description : newDescription}
+            onChange={(e) => {
+              if (isEditing) {
+                setEditingEdition((prev) =>
+                  prev ? { ...prev, description: e.target.value } : null
+                );
+              } else {
+                setNewDescription(e.target.value);
+              }
+            }}
             placeholder="Nhập mô tả phiên bản"
             maxLength={1000}
             rows={4}
             showCount
             className="p-3 rounded-lg placeholder:text-gray-300 border border-gray-300"
           />
+          <div className="flex flex-row gap-3 items-center justify-start">
+            <div className="flex flex-row gap-1 items-center">
+              <label className="font-semibold">Highlight phiên bản</label>
+              <Tooltip title="Khi bấm chọn thì phiên bản sẽ được hiện thị trên giao diện của người dùng">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#CCC"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4" />
+                  <path d="M12 8h.01" />
+                </svg>
+              </Tooltip>
+              :
+            </div>
+            <Switch
+              checked={isEditing ? editingEdition?.isSpecial : isSpecial}
+              onChange={(checked) => {
+                if (isEditing) {
+                  setEditingEdition((prev) =>
+                    prev ? { ...prev, isSpecial: checked } : null
+                  );
+                } else {
+                  setIsSpecial(checked);
+                }
+              }}
+            />
+          </div>
           <button
             className="px-5 mt-3 py-3 bg-[#c66a7a] rounded-lg hover:opacity-70 duration-300 text-white font-bold"
-            onClick={createEdition}
+            onClick={handleSubmit}
           >
-            Thêm
+            {isEditing ? "Cập nhật" : "Thêm"}
+          </button>
+        </div>
+      </Modal>
+      <Modal
+        open={isEditModalVisible}
+        onCancel={() => setIsEditModalVisible(false)}
+        footer={null}
+      >
+        <div className="flex flex-col gap-5 py-3">
+          <p className="font-bold text-2xl text-center">Chỉnh sửa phiên bản</p>
+          <label className="font-semibold">Tên phiên bản:</label>
+          <Input
+            value={editingEdition?.name}
+            onChange={(e) =>
+              setEditingEdition((prev) =>
+                prev ? { ...prev, name: e.target.value } : null
+              )
+            }
+            placeholder="Nhập tên phiên bản"
+            className="p-3 rounded-lg placeholder:text-gray-300 border border-gray-300"
+          />
+          <label className="font-semibold">Mô tả phiên bản:</label>
+          <TextArea
+            value={editingEdition?.description}
+            onChange={(e) =>
+              setEditingEdition((prev) =>
+                prev ? { ...prev, description: e.target.value } : null
+              )
+            }
+            placeholder="Nhập mô tả phiên bản"
+            maxLength={1000}
+            rows={4}
+            showCount
+            className="p-3 rounded-lg placeholder:text-gray-300 border border-gray-300"
+          />
+          <div className="w-full flex flex-row gap-3">
+            <label className="font-semibold">Highlight phiên bản:</label>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ccc"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4" />
+              <path d="M12 8h.01" />
+            </svg>
+          </div>
+          <Switch
+            checked={editingEdition?.isSpecial || false}
+            onChange={(checked) =>
+              setEditingEdition((prev) =>
+                prev ? { ...prev, isSpecial: checked } : null
+              )
+            }
+          />
+          <button
+            className="px-5 mt-3 py-3 bg-[#c66a7a] rounded-lg hover:opacity-70 duration-300 text-white font-bold"
+            onClick={handleEditSubmit}
+          >
+            Cập nhật
           </button>
         </div>
       </Modal>
@@ -207,7 +404,13 @@ const EditionsList = () => {
             <TableRow>
               <StyledTableCell>Tên phiên bản</StyledTableCell>
               <StyledTableCell>Mô tả phiên bản</StyledTableCell>
-              <StyledTableCell></StyledTableCell>
+              <StyledTableCell className="text-nowrap">
+                Được đấu giá
+              </StyledTableCell>
+
+              <StyledTableCell className="text-nowrap">
+                Highlight phiên bản
+              </StyledTableCell>
               <StyledTableCell></StyledTableCell>
             </TableRow>
           </TableHead>
@@ -225,17 +428,24 @@ const EditionsList = () => {
                   <StyledTableCell className="line-clamp-3">
                     {edition.description || "Không có mô tả"}
                   </StyledTableCell>
-                  <StyledTableCell className="line-clamp-3 text-nowrap">
-                    {edition.auctionDisabled
-                      ? "Được đấu giá"
-                      : "Không được đấu giá"}
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    <Tooltip title="Xóa">
-                      <button
-                        className="opacity-50 hover:opacity-100 duration-300"
-                        onClick={() => confirmDelete(edition.id)}
-                      >
+
+                  <StyledTableCell className="line-clamp-3">
+                    <div className="flex items-center justify-center">
+                      {edition.auctionDisabled ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="green"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                      ) : (
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -243,18 +453,74 @@ const EditionsList = () => {
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="red"
-                          strokeWidth="2"
+                          strokeWidth="3"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <path d="M3 6h18" />
-                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                          <line x1="10" x2="10" y1="11" y2="17" />
-                          <line x1="14" x2="14" y1="11" y2="17" />
+                          <path d="M18 6 6 18" />
+                          <path d="m6 6 12 12" />
+                        </svg>
+                      )}
+                    </div>
+                  </StyledTableCell>
+                  <StyledTableCell className="line-clamp-3">
+                    <div className="flex items-center justify-center">
+                      {edition.isSpecial ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="green"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="red"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M18 6 6 18" />
+                          <path d="m6 6 12 12" />
+                        </svg>
+                      )}
+                    </div>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    <Dropdown
+                      menu={{ items: getMenuItems(edition.id) }}
+                      trigger={["click"]}
+                      placement="bottomRight"
+                    >
+                      <button className="opacity-50 hover:opacity-100 duration-300">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="black"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <circle cx="12" cy="12" r="1" />
+                          <circle cx="12" cy="5" r="1" />
+                          <circle cx="12" cy="19" r="1" />
                         </svg>
                       </button>
-                    </Tooltip>
+                    </Dropdown>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}

@@ -300,12 +300,7 @@ const Navbar = () => {
       label: (
         <>
           {userInfo?.role === "MEMBER" && (
-            <p
-              className="REM text-base"
-              onClick={() => setIsRegisteringSeller(true)}
-            >
-              Trở thành Người bán
-            </p>
+            <p className="REM text-base">Trở thành Người bán</p>
           )}
           {userInfo?.role === "SELLER" && (
             <Link to={"/sellermanagement/shop-info"} className="REM text-base">
@@ -325,6 +320,9 @@ const Navbar = () => {
         </>
       ),
       icon: <ShopOutlined style={{ fontSize: 18 }} />,
+      onClick: () => {
+        if (userInfo?.role === "MEMBER") setIsRegisteringSeller(true);
+      },
     },
     {
       type: "divider",

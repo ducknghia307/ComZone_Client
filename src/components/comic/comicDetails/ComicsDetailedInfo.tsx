@@ -57,22 +57,16 @@ export default function ComicsDetailedInfo({
         <p className="w-1/2">{currentComics.page}</p>
       </div>
 
-      {/* {currentComics.publishedDate && (
-        <div
-          className={`${
-            !currentComics?.publishedDate && "hidden"
-          } flex items-center text-xs py-2 border-b`}
-        >
-          <p className="w-1/2 text-gray-600">Năm phát hành</p>
-          <p className="w-1/2">{currentComics.publishedDate}</p>
-        </div>
-      )}
-
       <div
         className={`${
-          !currentComics?.publishedDate && "hidden"
+          !currentComics?.publicationYear && "hidden"
         } flex items-center text-xs py-2 border-b`}
       >
+        <p className="w-1/2 text-gray-600">Năm phát hành</p>
+        <p className="w-1/2">{currentComics.publicationYear}</p>
+      </div>
+
+      <div className={` flex items-center text-xs py-2 border-b`}>
         <p className="w-1/2 text-gray-600">Truyện lẻ / Bộ truyện</p>
         <p className="w-1/2">
           {currentComics?.quantity === 1 ? "Truyện lẻ" : "Bộ truyện"}
@@ -80,22 +74,14 @@ export default function ComicsDetailedInfo({
       </div>
 
       {currentComics?.quantity > 1 && (
-        <div
-          className={`${
-            !currentComics?.publishedDate && "hidden"
-          } flex items-center text-xs py-2 border-b`}
-        >
+        <div className={` flex items-center text-xs py-2 border-b`}>
           <p className="w-1/2 text-gray-600">Số lượng cuốn</p>
           <p className="w-1/2">{currentComics?.quantity}</p>
         </div>
       )}
 
       {currentComics?.quantity > 1 && currentComics.episodesList && (
-        <div
-          className={`${
-            !currentComics?.publishedDate && "hidden"
-          } flex items-center text-xs py-2 border-b`}
-        >
+        <div className={` flex items-center text-xs py-2 border-b`}>
           <p className="w-1/2 text-gray-600">Tên tập, số tập:</p>
           <div className="w-1/2 flex items-center justify-start gap-2 flex-wrap">
             {currentComics.episodesList.map((eps, index) => (
@@ -111,7 +97,72 @@ export default function ComicsDetailedInfo({
             ))}
           </div>
         </div>
-      )} */}
+      )}
+      <div
+        className={`${
+          currentComics.merchandises.length === 0 && "hidden"
+        } flex items-center text-xs py-2 border-b`}
+      >
+        <p className="w-1/2 text-gray-600">Phụ kiện đính kèm</p>
+        <div className="w-1/2 flex items-center justify-start gap-2 flex-wrap">
+          {currentComics.merchandises.map((mer, index) => (
+            <>
+              <span
+                key={index}
+                className="px-2 py-1 rounded-md border border-gray-300"
+              >
+                {mer.name}
+              </span>
+            </>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center text-xs py-2 border-b">
+        <p className="w-1/2 text-gray-600">Bìa</p>
+        <p className="w-1/2">
+          {currentComics.cover === "SOFT"
+            ? "Bìa mềm"
+            : currentComics.cover === "HARD"
+            ? "Bìa cứng"
+            : "Bìa rời"}
+        </p>
+      </div>
+
+      <div className="flex items-center text-xs py-2 border-b">
+        <p className="w-1/2 text-gray-600">Màu sắc</p>
+        <p className="w-1/2">
+          {currentComics.color === "GRAYSCALE" ? "Đen trắng" : "Có màu"}
+        </p>
+      </div>
+      <div
+        className={`${
+          !currentComics.originCountry && "hidden"
+        } flex items-center text-xs py-2 border-b`}
+      >
+        <p className="w-1/2 text-gray-600">Xuất xứ</p>
+        <p className={`w-1/2`}>{currentComics.originCountry}</p>
+      </div>
+      <div
+        className={`${
+          !currentComics.length &&
+          !currentComics.width &&
+          !currentComics.thickness &&
+          "hidden"
+        } flex items-center text-xs py-2 border-b`}
+      >
+        <p className="w-1/2 text-gray-600">Kích thước</p>
+        <p
+          className={`${
+            !currentComics.length &&
+            !currentComics.width &&
+            !currentComics.thickness &&
+            "hidden"
+          }w-1/2`}
+        >
+          {`${currentComics.length} x ${currentComics.width} x ${currentComics.thickness} (cm)`}
+        </p>
+      </div>
     </div>
   );
 }

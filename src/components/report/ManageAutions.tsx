@@ -19,6 +19,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Tabs } from "antd";
 import PendingApprovalModal from "../modal/PendingApprovalModal";
 import PendingAuctionTable from "./PendingAuctionTable";
+import CriteriaTable from "./CriteriaTable";
 const { TabPane } = Tabs;
 interface SelectedAuction extends Omit<Auction, 'comics'> {
   sellerInfo: UserInfo;
@@ -306,7 +307,7 @@ const ManageAuctions: React.FC = () => {
 
   const handleEditClick = (auction: Auction | AuctionRequest) => {
     console.log("Clicked Auction: ", auction);
-    
+
     if ('comic' in auction) {
       const selectedAuction: SelectedAuction = {
         id: auction.id,
@@ -338,7 +339,7 @@ const ManageAuctions: React.FC = () => {
     }
     setIsModalOpen(true);
   };
-  
+
 
   const handleModalSuccess = () => {
     handleModalClose();
@@ -449,7 +450,7 @@ const ManageAuctions: React.FC = () => {
               selectedStatus={selectedStatus}
             />
           </TabPane>
-          <TabPane tab="Danh Sách Chờ Duyệt" key="2">
+          <TabPane tab="Quản Lý Duyệt Đấu Giá" key="2">
             <PendingAuctionTable
               pendingAuctions={pendingAuctions}
               loading={loadingPending}
@@ -461,7 +462,8 @@ const ManageAuctions: React.FC = () => {
             />
           </TabPane>
 
-          <TabPane tab="Tiêu chí duyệt đấu giá" key="3">
+          <TabPane tab="Tiêu Chí Duyệt Đấu Giá" key="3">
+            <CriteriaTable />
           </TabPane>
         </Tabs>
       </Box>
@@ -487,11 +489,11 @@ const ManageAuctions: React.FC = () => {
               }}
               onSuccess={handleModalSuccess}
               onStatusUpdate={(newStatus: string) => {
-                setSelectedAuction(prev => prev ? {...prev, status: newStatus} : null);
-                setPendingAuctions(prev => 
-                  prev.map(auction => 
-                    auction.id === selectedAuction.id 
-                      ? {...auction, status: newStatus}
+                setSelectedAuction(prev => prev ? { ...prev, status: newStatus } : null);
+                setPendingAuctions(prev =>
+                  prev.map(auction =>
+                    auction.id === selectedAuction.id
+                      ? { ...auction, status: newStatus }
                       : auction
                   )
                 );

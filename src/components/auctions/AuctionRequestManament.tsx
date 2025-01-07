@@ -164,10 +164,10 @@ const AuctionRequestManagement = () => {
                 {auctionRequest?.duration} Ngày
               </TableCell>
               <TableCell align="center">
-                {auctionRequest.reservePrice.toLocaleString()} đ
+                {auctionRequest.reservePrice?.toLocaleString()} đ
               </TableCell>
               <TableCell align="center">
-                {auctionRequest.priceStep.toLocaleString()} đ
+                {auctionRequest.priceStep?.toLocaleString()} đ
               </TableCell>
               <TableCell align="center">
                 {auctionRequest.maxPrice?.toLocaleString()} đ

@@ -98,7 +98,14 @@ const SellerComicsManagement = ({
       auctionCriteria.isFullInfoFilled &&
       Object.entries(comic).some(
         ([key, value]) =>
-          !["onSaleSince", "deletedAt", "page", "episodesList"].includes(key) &&
+          ![
+            "onSaleSince",
+            "deletedAt",
+            "page",
+            "episodesList",
+            "merchandises",
+            "editionEvidence",
+          ].includes(key) &&
           (value === null || value === undefined)
       )
     ) {
@@ -158,6 +165,23 @@ const SellerComicsManagement = ({
           </div>
         ),
         duration: 8,
+      });
+    } else if (comic.edition.auctionDisabled) {
+      notification.error({
+        key: "auction",
+        message: (
+          <p className="REM text-start font-light">
+            Truyện <span className="font-semibold">"{comic.title}"</span> không
+            thuộc phiên bản có thể được bán qua đấu giá!
+          </p>
+        ),
+        description: (
+          <p className="text-xs REM">
+            Phiên bản hiện tại:{" "}
+            <span className="font-semibold">{comic.edition.name}</span>
+          </p>
+        ),
+        duration: 5,
       });
     } else {
       setSelectedComic(comic);

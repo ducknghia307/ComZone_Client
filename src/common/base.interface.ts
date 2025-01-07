@@ -80,6 +80,8 @@ export interface Genre {
   id: string;
   name: string;
   description?: string;
+  subName?: string;
+  caution?: string;
 }
 
 export interface Auction {
@@ -150,6 +152,7 @@ export interface Comic extends BaseInterface {
   willNotAuction: boolean;
   coverImage: string;
   previewChapter?: string[];
+  editionEvidence?: string[];
   price?: number;
   onSaleSince?: Date;
   type: "NONE" | "SELL" | "AUCTION" | "EXCHANGE";

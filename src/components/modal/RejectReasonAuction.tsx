@@ -104,26 +104,50 @@ const RejectReasonAuction: React.FC<RejectReasonAuctionProps> = ({
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={selectedReasons.includes("Chưa nhập đủ thông tin truyện")}
-                  onChange={() => handleCheckboxChange("Chưa nhập đủ thông tin truyện")}
+                  checked={selectedReasons.includes(
+                    "Các ảnh đính kèm không đầy đủ hoặc không phù hợp với phiên bản truyện mà người bán đã chọn."
+                  )}
+                  onChange={() =>
+                    handleCheckboxChange(
+                      "Các ảnh đính kèm không đầy đủ hoặc không phù hợp với phiên bản truyện mà người bán đã chọn."
+                    )
+                  }
                 />
               }
               label={
                 <Typography sx={{ fontFamily: "REM", fontSize: "14px" }}>
-                  Chưa nhập đủ thông tin truyện
+                  Các ảnh đính kèm không đầy đủ hoặc không phù hợp với phiên bản truyện mà người bán đã chọn.
+                </Typography>
+              }
+            />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={selectedReasons.includes("Nội dung ảnh chụp không liên quan đến phiên bản truyện.")}
+                  onChange={() =>
+                    handleCheckboxChange("Nội dung ảnh chụp không liên quan đến phiên bản truyện.")
+                  }
+                />
+              }
+              label={
+                <Typography sx={{ fontFamily: "REM", fontSize: "14px" }}>
+                  Nội dung ảnh chụp không liên quan đến phiên bản truyện.
                 </Typography>
               }
             />
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={selectedReasons.includes("Tình trạng truyện quá tệ để đấu giá")}
-                  onChange={() => handleCheckboxChange("Tình trạng truyện quá tệ để đấu giá")}
+                  checked={selectedReasons.includes("Ảnh bị mờ hoặc không rõ ràng, không thể xác định thông tin.")}
+                  onChange={() =>
+                    handleCheckboxChange("Ảnh bị mờ hoặc không rõ ràng, không thể xác định thông tin.")
+                  }
                 />
               }
               label={
                 <Typography sx={{ fontFamily: "REM", fontSize: "14px" }}>
-                  Tình trạng truyện quá tệ để đấu giá
+                  Ảnh bị mờ hoặc không rõ ràng, không thể xác định thông tin.
                 </Typography>
               }
             />

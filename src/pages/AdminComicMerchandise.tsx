@@ -5,10 +5,9 @@ import Sidebar from "../components/admin/Sidebar";
 import EditAuctionDetail from "../components/admin/EditAuctionDetail";
 import { Link, useLocation } from "react-router-dom";
 import EditAuctionCriteria from "../components/admin/EditAuctionCriteria";
-import GenresList from "../components/admin/GenresList";
-import { Modal, Input } from "antd";
+import MerchandisesList from "../components/admin/MerchandisesList";
 
-const AdminComicGenre: React.FC = () => {
+const AdminComicMerchandise: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const location = useLocation();
@@ -76,7 +75,7 @@ const AdminComicGenre: React.FC = () => {
             </div>
 
             <div className="col-span-2 shadow-md bg-white p-3 rounded-lg">
-              <GenresList />
+              <MerchandisesList />
             </div>
           </div>
         </Grid>
@@ -85,4 +84,4 @@ const AdminComicGenre: React.FC = () => {
   );
 };
 
-export default AdminComicGenre;
+export default AdminComicMerchandise;

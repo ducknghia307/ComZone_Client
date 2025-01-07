@@ -483,7 +483,7 @@ const SellerComicsManagement = ({
             Bắt đầu đăng bán truyện tranh ngay
           </p>
           <button
-            onClick={() => handleAddComicsClick()}
+            onClick={() => setIsCreatingComics(true)}
             className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md font-semibold text-lg duration-200 hover:bg-green-700"
           >
             <svg

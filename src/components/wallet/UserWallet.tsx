@@ -50,61 +50,90 @@ const UserWallet = () => {
       });
       const data = await response.data;
       console.log("1", data);
-      const formattedTransactions = data.map((transaction: Transaction) => ({
-        code: transaction.code,
-        createdAt: transaction.createdAt,
-        type:
-          (transaction.type === "ADD" &&
-            (transaction.walletDeposit
-              ? "Nạp tiền"
-              : transaction.order
-              ? "Nhận tiền"
-              : "")) ||
-          (transaction.withdrawal &&
-            transaction.type === "SUBTRACT" &&
-            "Rút tiền") ||
-          "Thanh toán",
-        amount: `${
-          transaction.type === "ADD" ? "+" : "-"
-        }${transaction.amount.toLocaleString("vi-VN")} đ`,
-        status: transaction.status,
-        note:
-          transaction.type === "SUBTRACT"
-            ? transaction.order
-              ? `Thanh toán đơn hàng #${transaction.order.code}`
-              : transaction.exchange
-              ? `Thanh toán trao đổi`
-              : transaction.deposit?.exchange
-              ? `Tiền cọc trao đổi`
-              : transaction.deposit?.auction
-              ? `Tiền cọc đấu giá`
-              : transaction.sellerSubscription
-              ? `Mua gói bán ComZone`
-              : transaction.withdrawal
-              ? `Rút tiền về tài khoản ngân hàng`
-              : "Thông tin giao dịch không có sẵn"
-            : transaction.type === "ADD"
-            ? transaction.order
-              ? `Nhận tiền đơn hàng #${transaction.order.code}`
-              : transaction.exchange
-              ? `Thanh toán tiền bù trao đổi`
-              : transaction.deposit?.exchange
-              ? `Hoàn trả cọc`
-              : transaction.deposit?.auction &&
-                transaction.deposit.status === "REFUNDED"
-              ? `Hoàn trả cọc đấu giá`
-              : transaction.deposit?.auction &&
-                transaction.deposit.status === "SEIZED"
-              ? `Hoàn trả cọc đấu giá do người dùng không thanh toán`
-              : transaction.walletDeposit
-              ? "Nạp tiền vào ví"
-              : transaction.refundRequest
-              ? transaction.refundRequest.order
-                ? `Hoàn tiền đơn hàng #${transaction.refundRequest.order.code}`
-                : "Nhận tiền đền bù trao đổi"
-              : "Thông tin giao dịch không có sẵn"
-            : "Thông tin giao dịch không có sẵn",
-      }));
+
+      const formattedTransactions = data.map((transaction: Transaction) => {
+        let note = "";
+
+        // Handle the 'SUBTRACT' type transactions
+        if (transaction.type === "SUBTRACT") {
+          if (transaction.order) {
+            note = `Thanh toán đơn hàng #${transaction.order.code}`;
+          } else if (transaction.exchange) {
+            note = `Thanh toán trao đổi`;
+          } else if (transaction.deposit?.exchange) {
+            note = `Tiền cọc trao đổi`;
+          } else if (transaction.deposit?.auction) {
+            note =
+              transaction.deposit.status === "USED"
+                ? `Tiền cọc đấu giá (Đã dùng để thanh toán đơn hàng)`
+                : `Tiền cọc đấu giá`;
+          } else if (transaction.sellerSubscription) {
+            note = `Mua gói bán ComZone`;
+          } else if (transaction.withdrawal) {
+            note = `Rút tiền về tài khoản ngân hàng`;
+          } else {
+            note = "Thông tin giao dịch không có sẵn";
+          }
+        }
+
+        // Handle the 'ADD' type transactions
+        else if (transaction.type === "ADD") {
+          if (
+            transaction.order &&
+            transaction.order.user.id === transaction.user.id
+          ) {
+            note = `Nhận tiền hoàn cọc từ đơn hàng #${transaction.order.code}`;
+          } else if (transaction.order) {
+            note = `Nhận tiền đơn hàng #${transaction.order.code}`;
+          } else if (transaction.exchange) {
+            note = `Thanh toán tiền bù trao đổi`;
+          } else if (transaction.deposit?.exchange) {
+            note = `Hoàn trả cọc`;
+          } else if (transaction.deposit?.auction) {
+            if (transaction.deposit.status === "REFUNDED") {
+              note = `Hoàn trả cọc đấu giá`;
+            } else if (transaction.deposit.status === "SEIZED") {
+              note = `Hoàn trả cọc đấu giá do người dùng không thanh toán`;
+            } else {
+              note = `Tiền cọc đấu giá`;
+            }
+          } else if (transaction.walletDeposit) {
+            note = "Nạp tiền vào ví";
+          } else if (transaction.refundRequest) {
+            note = transaction.refundRequest.order
+              ? `Hoàn tiền đơn hàng #${transaction.refundRequest.order.code}`
+              : "Nhận tiền đền bù trao đổi";
+          } else {
+            note = "Thông tin giao dịch không có sẵn";
+          }
+        } else {
+          note = "Thông tin giao dịch không có sẵn";
+        }
+
+        // Return the formatted transaction object
+        return {
+          code: transaction.code,
+          createdAt: transaction.createdAt,
+          type:
+            (transaction.type === "ADD" &&
+              (transaction.walletDeposit
+                ? "Nạp tiền"
+                : transaction.order
+                ? "Nhận tiền"
+                : "")) ||
+            (transaction.withdrawal &&
+              transaction.type === "SUBTRACT" &&
+              "Rút tiền") ||
+            "Thanh toán",
+          amount: `${
+            transaction.type === "ADD" ? "+" : "-"
+          }${transaction.amount.toLocaleString("vi-VN")} đ`,
+          status: transaction.status,
+          note: note, // Include the note here
+        };
+      });
+
+      // Set the formatted transactions to state
       setTransactions(formattedTransactions);
       console.log(response.data);
     } catch (error) {

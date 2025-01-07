@@ -12,6 +12,7 @@ import {
 import { styled } from "@mui/material/styles";
 import TablePagination from "@mui/material/TablePagination";
 import { Edition } from "../../common/interfaces/edition.interface";
+import { SearchOutlined } from "@ant-design/icons";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${theme.palette.mode === "light" ? "body" : "background.default"}`]: {
@@ -41,6 +42,7 @@ const EditionsList = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newEdition, setNewEdition] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchEditions = async () => {
     try {
@@ -126,7 +128,7 @@ const EditionsList = () => {
   return (
     <>
       <div className="w-full flex flex-row justify-between items-center pb-6">
-        <h2 className="text-3xl font-bold uppercase w-full">
+        <h2 className="text-3xl font-bold uppercase w-full text-nowrap">
           Danh sách phiên bản
         </h2>
         <div className="w-full flex justify-end">
@@ -152,6 +154,13 @@ const EditionsList = () => {
           </button>
         </div>
       </div>
+      <Input
+        placeholder="Tìm phiên bản"
+        value={searchTerm}
+        prefix={<SearchOutlined />}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        size="large"
+      />
       <Modal
         open={isModalVisible}
         onOk={createEdition}
@@ -204,6 +213,9 @@ const EditionsList = () => {
           </TableHead>
           <TableBody>
             {editions
+              .filter((edition) =>
+                edition.name.toLowerCase().includes(searchTerm.toLowerCase())
+              )
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((edition) => (
                 <StyledTableRow key={edition.id}>
@@ -211,7 +223,7 @@ const EditionsList = () => {
                     {edition.name}
                   </StyledTableCell>
                   <StyledTableCell className="line-clamp-3">
-                    {edition.description}
+                    {edition.description || "Không có mô tả"}
                   </StyledTableCell>
                   <StyledTableCell className="line-clamp-3 text-nowrap">
                     {edition.auctionDisabled

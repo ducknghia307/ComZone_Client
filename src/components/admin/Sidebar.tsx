@@ -83,7 +83,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
     },
     {
       title: "Cài Đặt Thuộc Tính Truyện",
-      path: "/admin/auction/genres",
+      path: "/admin/comic/genres",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"

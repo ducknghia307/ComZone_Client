@@ -46,25 +46,65 @@ export default function TotalSummary({
           <p>Tổng tiền giao hàng:</p>
           <p>{CurrencySplitter(totalDeliveryPrice || 0)} đ</p>
         </div>
+
         {depositAmount && (
           <div className="w-full flex items-center justify-between">
             <p>Tổng cọc đấu giá:</p>
             <p>- {CurrencySplitter(depositAmount || 0)} đ</p>
           </div>
         )}
+
+        {/* Calculate the remaining or refundable amount */}
+        {depositAmount >= totalPrice + totalDeliveryPrice ? (
+          <div className="w-full flex flex-col gap-1 text-green-600">
+            <div className="w-full flex items-center justify-between">
+              <p>Số tiền dư hoàn lại:</p>
+              <p>
+                {CurrencySplitter(
+                  depositAmount - totalPrice - totalDeliveryPrice
+                )}{" "}
+                đ
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="w-full flex items-center justify-between text-black">
+            <p>Tổng tiền thanh toán:</p>
+            <p>
+              {CurrencySplitter(
+                totalPrice + totalDeliveryPrice - (depositAmount || 0)
+              )}{" "}
+              đ
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="w-full flex items-center justify-between">
         <p className="text-xs">Tổng tiền thanh toán:</p>
-        <p className="font-semibold text-red-500">
+        <p
+          className={`font-semibold text-red-500
+          }`}
+        >
           {CurrencySplitter(
-            (totalDeliveryPrice &&
-              totalPrice + totalDeliveryPrice - depositAmount) ||
-              totalPrice
+            Math.max(
+              (totalDeliveryPrice &&
+                totalPrice + totalDeliveryPrice - depositAmount) ||
+                totalPrice,
+              0
+            )
           )}{" "}
           đ
         </p>
       </div>
+
+      {/* Nếu có dư tiền cọc, hiển thị thêm thông báo */}
+      {depositAmount > totalPrice + totalDeliveryPrice && (
+        <div className="text-xs text-gray-500">
+          Số tiền dư sẽ được hoàn lại vào ví của bạn sau khi đơn hàng hoàn
+          thành.
+        </div>
+      )}
 
       <div className="w-full flex flex-col gap-2 pt-4">
         <p className="text-[0.7em]">

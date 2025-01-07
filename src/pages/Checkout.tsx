@@ -240,13 +240,12 @@ const Checkout = () => {
         const sellerTotalPrice = sellerGroup.comics.reduce(
           (total, { comic, currentPrice, auctionId }) => {
             const price = currentPrice || comic?.price;
-            // Subtract the deposit amount if it's an auction
-            return auctionId
-              ? total + Number(price) - (depositAmount || 0)
-              : total + Number(price);
+
+            return Number(price);
           },
           0
         );
+        console.log("Total Price: ", sellerTotalPrice);
 
         const sellerDeliveryPrice =
           deliveryDetails.find((d) => d.sellerId === sellerId)?.deliveryFee ||
@@ -295,8 +294,9 @@ const Checkout = () => {
         const orderResponse = await privateAxios.post("/orders", {
           sellerId: sellerId,
           deliveryId: newDelivery.id,
-          totalPrice: sellerTotalPrice, // Total after subtracting deposit if applicable
+          totalPrice: sellerTotalPrice,
           paymentMethod: selectedPaymentMethod.toUpperCase(),
+          depositAmount: depositAmount,
           addressId: selectedAddress?.id,
           type: orderType,
           note: notes[sellerId] || null,
@@ -383,7 +383,7 @@ const Checkout = () => {
                 user={user}
                 auctionId={auctionId}
                 onMethodSelect={handlePaymentMethodSelect}
-                amount={totalPrice + totalDeliveryPrice}
+                amount={totalPrice + totalDeliveryPrice - (depositAmount || 0)}
                 balance={userWalletBalance}
                 fetchUserInfo={fetchUserInfo}
               />
@@ -400,7 +400,8 @@ const Checkout = () => {
                   isInvalidOrder ||
                   !selectedAddress ||
                   (selectedPaymentMethod === "wallet" &&
-                    userWalletBalance < totalPrice + totalDeliveryPrice)
+                    userWalletBalance <
+                      totalPrice + totalDeliveryPrice - (depositAmount || 0))
                 }
               />
             </div>

@@ -10,10 +10,21 @@ import {
   notification,
 } from "antd";
 import dayjs from "dayjs";
-import { privateAxios } from "../../../middleware/axiosInstance";
+import InfoIcon from "@mui/icons-material/Info";
+import { privateAxios, publicAxios } from "../../../middleware/axiosInstance";
 import { Auction, Comic } from "../../../common/base.interface";
 import { RuleObject } from "antd/lib/form";
-
+import { Moment } from "moment";
+interface AuctionFormValues {
+  id: string;
+  reservePrice: number;
+  maxPrice: number;
+  priceStep: number;
+  depositAmount: number;
+  duration: number;
+  startTime: Moment | null;
+  endTime: Moment | null;
+}
 const AuctionModalEdit = ({
   open,
   onCancel,
@@ -29,6 +40,146 @@ const AuctionModalEdit = ({
 }) => {
   const [form] = Form.useForm();
   const now = dayjs();
+  const [config, setConfig] = useState({
+    priceStepPercentage: 0,
+    depositPercentage: 0,
+    buyNowMultiplier: 0,
+  });
+  useEffect(() => {
+    const fetchAuctionData = async () => {
+      if (comic?.id) {
+        try {
+          const { data } = await privateAxios.get(
+            `/auction/comics/${comic.id}`
+          );
+          const roundToNearest = (
+            value: number,
+            denomination: number
+          ): number => Math.round(value / denomination) * denomination;
+
+          // Use the priceStepPercentage and depositPercentage from config state
+          const priceStep = roundToNearest(
+            comic.price * (config.priceStepPercentage / 100),
+            500
+          );
+          const depositAmount = roundToNearest(
+            comic.price * (config.depositPercentage / 100),
+            500
+          );
+
+          if (data.status === "STOPPED") {
+            form.setFieldsValue({
+              id: data.id,
+              reservePrice: comic.price,
+              maxPrice: data.maxPrice,
+              priceStep: priceStep,
+              depositAmount: depositAmount,
+              duration: data.duration,
+              startTime: dayjs(data.startTime),
+              endTime: dayjs(data.endTime),
+            });
+          } else {
+            form.setFieldsValue({
+              reservePrice: comic.price,
+              priceStep: priceStep,
+              depositAmount: depositAmount,
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching auction data:", error);
+          form.resetFields();
+        }
+      }
+    };
+
+    if (open) {
+      fetchAuctionData();
+    }
+  }, [comic?.id, open, form, config]);
+  useEffect(() => {
+    publicAxios
+      .get("/auction-config")
+      .then((response) => {
+        console.log("123", response);
+
+        setConfig({
+          priceStepPercentage: response.data[0].priceStepConfig,
+          depositPercentage: response.data[0].depositAmountConfig,
+          buyNowMultiplier: response.data[0].maxPriceConfig,
+        });
+      })
+      .catch((error) => console.error("Error fetching config:", error));
+  }, []);
+  const handleSubmit = async (values: AuctionFormValues) => {
+    try {
+      const reservePrice = form.getFieldValue("reservePrice");
+
+      // Use the buyNowMultiplier from config state to calculate maxAllowedPrice
+      const maxAllowedPrice = reservePrice * config.buyNowMultiplier;
+
+      const maxPrice = form.getFieldValue("maxPrice");
+
+      if (maxPrice < reservePrice) {
+        form.setFields([
+          {
+            name: "maxPrice",
+            errors: [
+              `Giá mua ngay không được thấp hơn giá khởi điểm (${reservePrice.toLocaleString()}đ)`,
+            ],
+          },
+        ]);
+        return;
+      }
+
+      if (maxPrice > maxAllowedPrice) {
+        form.setFields([
+          {
+            name: "maxPrice",
+            errors: [
+              `Giá mua ngay không được vượt quá ${maxAllowedPrice.toLocaleString()}đ (${
+                config.buyNowMultiplier
+              } lần giá khởi điểm)`,
+            ],
+          },
+        ]);
+        return;
+      }
+
+      if (form.getFieldValue("id")) {
+        console.log('form.getFieldValue("id")', form.getFieldValue("id"));
+
+        await privateAxios.put(`/auction/${form.getFieldValue("id")}/start`, {
+          ...values,
+          status: "UPCOMING",
+        });
+      } else {
+        await privateAxios.post("/auction-request", {
+          ...values,
+          comicId: comic?.id,
+        });
+      }
+      await privateAxios.patch("seller-subscriptions/auction", {
+        quantity: 1,
+      });
+
+      notification.success({
+        message: "Tạo đấu giá thành công",
+        description: `Đấu giá cho truyện "${comic?.title}" đã được tạo.`,
+        duration: 5,
+      });
+
+      form.resetFields();
+    } catch (error) {
+      console.error("Error during API call:", error);
+
+      notification.error({
+        message: "Lỗi",
+        description:
+          "Không thể thực hiện thao tác đấu giá. Vui lòng kiểm tra lại dữ liệu.",
+        duration: 5,
+      });
+    }
+  };
   useEffect(() => {
     if (auctionData) {
       console.log(auctionData.depositAmount);
@@ -82,47 +233,6 @@ const AuctionModalEdit = ({
     return Promise.resolve();
   };
 
-  const handleSubmit = async (values: {
-    reservePrice: number;
-    maxPrice: number;
-    priceStep: number;
-    depositAmount: number;
-    startTime: string;
-    endTime: string;
-  }) => {
-    try {
-      const startTime = dayjs(values.startTime);
-      const now = dayjs();
-
-      const updatedAuctionData: Auction = {
-        ...auctionData,
-        id: auctionData.id,
-        reservePrice: values.reservePrice,
-        maxPrice: values.maxPrice,
-        priceStep: values.priceStep,
-        depositAmount: values.priceStep,
-        startTime: dayjs(values.startTime).format("YYYY-MM-DDTHH:mm:ssZ"),
-        endTime: dayjs(values.endTime).format("YYYY-MM-DDTHH:mm:ssZ"),
-        status: "UPCOMING",
-        currentCondition:''
-      };
-
-      await privateAxios.put(`/auction/${auctionData.id}`, updatedAuctionData);
-
-      console.log("update", updatedAuctionData);
-      onSuccess(updatedAuctionData);
-      notification.success({
-        key: "success",
-        message: "Thành công",
-        description: "Mở lại phiên đấu giá thành công!",
-        duration: 5,
-      });
-      onCancel();
-    } catch (error) {
-      console.error("Error updating auction details:", error);
-    }
-  };
-
   return (
     <Modal
       open={open}
@@ -133,32 +243,21 @@ const AuctionModalEdit = ({
       style={{ borderRadius: "16px" }}
       centered
     >
+      <Typography
+        variant="h4"
+        fontWeight={"bold"}
+        textAlign={"center"}
+        style={{ borderBottom: "2px solid grey", paddingBottom: "5px" }}
+      >
+        Đấu giá
+      </Typography>
       <Box sx={{ px: 3, py: 1 }}>
-        {/* Header */}
-        <Box sx={{ textAlign: "center", mb: 3 }}>
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: "bold", color: "#1a1a1a" }}
-          >
-            Chi tiết cuộc đấu giá
-          </Typography>
-          {/* <Box sx={{
-                        mt: 1,
-                        height: '1px',
-                        width: 'auto',
-                        bgcolor: '#ccc',
-                        mx: 'auto',
-                        borderRadius: '2px'
-                    }} /> */}
-        </Box>
-
-        {/* Comic Info */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 2,
-            mb: 3,
+            margin: "20px 0 10px",
             p: 2,
             bgcolor: "#f5f5f5",
             borderRadius: 2,
@@ -177,43 +276,72 @@ const AuctionModalEdit = ({
             <img
               src={comic?.coverImage}
               alt="Comic Cover"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "fill",
-              }}
+              style={{ width: "100%", height: "100%", objectFit: "fill" }}
             />
           </Box>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
-              {comic?.title}
-            </Typography>
-            <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              {comic?.author}
-            </Typography>
-          </Box>
-        </Box>
 
-        {/* Form */}
-        <Form
-          form={form}
-          onFinish={handleSubmit}
-          layout="vertical"
-          style={{ marginTop: "16px" }}
-        >
-          {/* Price Fields */}
+          <div className="ml-3">
+            <Typography sx={{ fontWeight: "bold" }}>{comic?.title}</Typography>
+            <Typography fontSize={12}>{comic?.author}</Typography>
+          </div>
+        </Box>
+        <div>
+          <Typography
+            variant="body2"
+            style={{
+              marginBottom: "10px",
+              fontFamily: "REM",
+              fontStyle: "italic",
+              color: "#333",
+              padding: "10px",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "10px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "3px",
+              }}
+            >
+              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
+              Giá khởi điểm dựa trên giá của truyện.
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "3px",
+              }}
+            >
+              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
+              Bước giá dựa trên {config.priceStepPercentage}% của giá khởi điểm.
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "3px",
+              }}
+            >
+              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} /> Mức
+              cọc dựa trên {config.depositPercentage}% của giá khởi điểm.
+            </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <InfoIcon fontSize="small" style={{ marginRight: "5px" }} />
+              Giá mua ngay không vượt quá {config.buyNowMultiplier} lần giá khởi
+              điểm.
+            </div>
+          </Typography>
+        </div>
+
+        <Form form={form} onFinish={handleSubmit} layout="vertical">
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 name="reservePrice"
-                label={
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 500, color: "text.primary" }}
-                  >
-                    Giá khởi điểm (đ)
-                  </Typography>
-                }
+                label="Giá khởi điểm (đ)"
                 rules={[
                   { required: true, message: "Vui lòng nhập giá khởi điểm" },
                 ]}
@@ -222,23 +350,54 @@ const AuctionModalEdit = ({
                   style={{ width: "100%" }}
                   min={0}
                   placeholder="Nhập giá khởi điểm"
+                  disabled
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
+
+            <Col span={8}>
+              <Form.Item
+                name="priceStep"
+                label="Bước giá tối thiểu (đ)"
+                rules={[{ required: true, message: "Vui lòng nhập bước giá" }]}
+              >
+                <InputNumber
+                  style={{ width: "100%" }}
+                  min={0}
+                  disabled
+                  placeholder="Nhập bước giá"
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="depositAmount"
+                label="Mức cọc (đ)"
+                rules={[{ required: true, message: "Vui lòng nhập mức cọc" }]}
+              >
+                <InputNumber
+                  style={{ width: "100%" }}
+                  min={0}
+                  disabled
+                  placeholder="Nhập mức cọc"
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={13}>
               <Form.Item
                 name="maxPrice"
-                label={
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 500, color: "text.primary" }}
-                  >
-                    Giá mua ngay (đ)
-                  </Typography>
-                }
+                label="Giá mua ngay (đ)"
                 rules={[
                   { required: true, message: "Vui lòng nhập giá mua ngay" },
                 ]}
@@ -253,41 +412,28 @@ const AuctionModalEdit = ({
                 />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
+            <Col span={11}>
               <Form.Item
-                name="priceStep"
-                label={
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 500, color: "text.primary" }}
-                  >
-                    Bước giá (đ)
-                  </Typography>
-                }
-                rules={[{ required: true, message: "Vui lòng nhập bước giá" }]}
+                name="duration"
+                label="Thời lượng đấu giá (1-7 Ngày)"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng nhập thời lượng đấu giá",
+                  },
+                  {
+                    type: "number",
+                    min: 1,
+                    max: 7,
+                    message: "Thời lượng đấu giá phải từ 1 đến 7 ngày",
+                  },
+                ]}
               >
                 <InputNumber
                   style={{ width: "100%" }}
-                  min={0}
-                  placeholder="Nhập bước giá"
-                  formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="depositAmount"
-                label="Mức cọc (đ)"
-                rules={[{ required: true, message: "Vui lòng nhập mức cọc" }]}
-              >
-                <InputNumber
-                  style={{ width: "100%" }}
-                  min={0}
-                  placeholder="Nhập mức cọc"
+                  min={1}
+                  max={7}
+                  placeholder="Nhập thời lượng đấu giá"
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
@@ -295,116 +441,6 @@ const AuctionModalEdit = ({
               </Form.Item>
             </Col>
           </Row>
-          {/* Date Fields */}
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-            <Form.Item
-              name="startTime"
-              label={
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 500, color: "text.primary" }}
-                >
-                  Thời gian bắt đầu
-                </Typography>
-              }
-              rules={[
-                { required: true, message: "Vui lòng chọn thời gian bắt đầu" },
-                { validator: validateStartTime }, // Custom validation for start time
-              ]}
-            >
-              <DatePicker
-                showTime={{
-                  format: "HH:mm",
-                }}
-                format="YYYY-MM-DD HH:mm"
-                style={{ width: "100%" }}
-                placeholder="Chọn thời gian bắt đầu"
-                disabledDate={(current) => {
-                  return current && current.isBefore(now.startOf("day"));
-                }}
-                disabledTime={(current) => {
-                  const now = dayjs();
-                  const oneHourFromNow = now.add(1, "hour");
-
-                  // Disable times that are less than 1 hour ahead of now
-                  if (current.isSame(now, "day")) {
-                    return {
-                      disabledHours: () =>
-                        Array.from({ length: 24 }, (_, i) =>
-                          i < oneHourFromNow.hour() ? i : -1
-                        ).filter((x) => x !== -1),
-                      disabledMinutes: () =>
-                        current.isSame(oneHourFromNow, "hour")
-                          ? Array.from({ length: 60 }, (_, i) =>
-                              i < oneHourFromNow.minute() ? i : -1
-                            ).filter((x) => x !== -1)
-                          : [],
-                    };
-                  }
-
-                  return {}; // Otherwise, allow all times
-                }}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="endTime"
-              label="Thời gian kết thúc"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng chọn thời gian kết thúc",
-                },
-                {
-                  validator: validateEndTime,
-                },
-              ]}
-            >
-              <DatePicker
-                showTime={{
-                  format: "HH:mm",
-                }}
-                format="YYYY-MM-DD HH:mm"
-                style={{ width: "100%" }}
-                placeholder="Nhập thời gian kết thúc"
-                disabledDate={(current) => {
-                  const startTime = form.getFieldValue("startTime");
-                  if (!startTime) return false;
-
-                  const startDayjs = dayjs(startTime);
-                  const oneDayAfter = startDayjs.add(1, "day");
-                  const sevenDaysAfter = startDayjs.add(7, "days");
-
-                  return (
-                    current.isBefore(oneDayAfter.startOf("day")) ||
-                    current.isAfter(sevenDaysAfter.endOf("day"))
-                  );
-                }}
-                disabledTime={() => {
-                  const startTime = form.getFieldValue("startTime");
-                  if (!startTime) return {};
-
-                  const startDayjs = dayjs(startTime);
-                  const oneDayAfter = startDayjs.add(1, "day");
-                  const hour = oneDayAfter.hour();
-                  const minute = oneDayAfter.minute();
-
-                  return {
-                    disabledHours: () => {
-                      return Array.from({ length: hour }, (_, i) => i); // Disable all hours before the required start time
-                    },
-                    disabledMinutes: (hour) => {
-                      if (hour === hour) {
-                        return Array.from({ length: minute }, (_, i) => i); // Disable minutes before the required start time
-                      }
-                      return [];
-                    },
-                  };
-                }}
-              />
-            </Form.Item>
-          </Box>
-
           {/* Submit Button */}
           <Form.Item style={{ marginTop: "10px" }}>
             <button

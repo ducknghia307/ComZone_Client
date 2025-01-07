@@ -4,6 +4,7 @@ import Grid from "@mui/material/Grid2";
 import Sidebar from "../components/admin/Sidebar";
 import { Link, useLocation } from "react-router-dom";
 import EditionsList from "../components/admin/EditionsList";
+import AdminComicTab from "../components/admin/AdminComicTab";
 
 const AdminComicEdition: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -38,41 +39,10 @@ const AdminComicEdition: React.FC = () => {
           />
         </Grid>
         <Grid size={isCollapsed ? 11.5 : 9.5}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4   REM py-12 px-4 w-full">
-            <div className="flex flex-col shadow-md rounded-lg w-full h-fit">
-              <Link
-                to={"/admin/comic/genres"}
-                className={`p-3 rounded-t-lg ${
-                  location.pathname === "/admin/comic/genres"
-                    ? "bg-gray-200"
-                    : "bg-white hover:bg-gray-200"
-                } hover:cursor-pointer duration-300 transition-all`}
-              >
-                Thể loại truyện
-              </Link>
-              <Link
-                to={"/admin/comic/editions"}
-                className={`p-3 rounded-b-lg ${
-                  location.pathname === "/admin/comic/editions"
-                    ? "bg-gray-200"
-                    : "bg-white hover:bg-gray-200"
-                } hover:cursor-pointer duration-300 transition-all`}
-              >
-                Phiên bản
-              </Link>
-              <Link
-                to={"/admin/comic/merchandises"}
-                className={`p-3 rounded-b-lg ${
-                  location.pathname === "/admin/comic/merchandises"
-                    ? "bg-gray-200"
-                    : "bg-white hover:bg-gray-200"
-                } hover:cursor-pointer duration-300 transition-all`}
-              >
-                Phụ kiện
-              </Link>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4   REM py-12 px-4 w-full">
+            <AdminComicTab />
 
-            <div className="col-span-2 shadow-md bg-white p-3 rounded-lg">
+            <div className="col-span-3 shadow-md bg-white p-3 rounded-lg">
               <EditionsList />
             </div>
           </div>

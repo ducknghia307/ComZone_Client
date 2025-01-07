@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { Modal, Tooltip, Input, message } from "antd";
+import { Modal, Tooltip, Input, message, Dropdown } from "antd";
 import { Genre } from "../../common/base.interface";
 import {
   TableContainer,
@@ -12,7 +12,9 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import TablePagination from "@mui/material/TablePagination";
-import { SearchOutlined } from "@ant-design/icons";
+import { EditOutlined, SearchOutlined } from "@ant-design/icons";
+import { MenuProps } from "antd/lib";
+import { DeleteOutline } from "@mui/icons-material";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${theme.palette.mode === "light" ? "body" : "background.default"}`]: {
@@ -43,7 +45,22 @@ const GenresList = () => {
   const [newGenre, setNewGenre] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [editingGenreId, setEditingGenreId] = useState<string | null>(null);
+  const getMenuItems = (editionId: string): MenuProps["items"] => [
+    {
+      key: "1",
+      label: "Chỉnh sửa",
+      icon: <EditOutlined style={{ fontSize: 18 }} />,
+      onClick: () => handleEdit(editionId),
+    },
+    {
+      key: "2",
+      label: "Xóa",
+      icon: <DeleteOutline style={{ fontSize: 18 }} />,
+      onClick: () => confirmDelete(editionId),
+      danger: true,
+    },
+  ];
   const fetchGenres = async () => {
     try {
       const response = await privateAxios.get("/genres");
@@ -58,11 +75,27 @@ const GenresList = () => {
   };
 
   const handleOk = () => {
+    setEditingGenreId(null);
     setIsModalVisible(false);
+    setNewGenre("");
+    setNewDescription("");
   };
 
   const handleCancel = () => {
+    setEditingGenreId(null);
     setIsModalVisible(false);
+    setNewGenre("");
+    setNewDescription("");
+  };
+
+  const handleEdit = (id: string) => {
+    const genreToEdit = genres.find((genre) => genre.id === id);
+    if (genreToEdit) {
+      setNewGenre(genreToEdit.name);
+      setNewDescription(genreToEdit.description);
+      setEditingGenreId(id);
+      showModal();
+    }
   };
 
   const createGenre = async () => {
@@ -76,18 +109,27 @@ const GenresList = () => {
     }
 
     try {
-      await privateAxios.post("/genres", {
-        name: newGenre,
-        description: newDescription,
-      });
-      message.success("Thể loại đã được thêm thành công!");
+      if (editingGenreId) {
+        await privateAxios.put(`/genres/${editingGenreId}`, {
+          name: newGenre,
+          description: newDescription,
+        });
+        message.success("Thể loại đã được cập nhật thành công!");
+      } else {
+        await privateAxios.post("/genres", {
+          name: newGenre,
+          description: newDescription,
+        });
+        message.success("Thể loại đã được thêm thành công!");
+      }
       fetchGenres();
       setNewGenre("");
       setNewDescription("");
+      setEditingGenreId(null);
       handleOk();
     } catch (error) {
-      console.error("Error creating genre:", error);
-      message.error("Có lỗi xảy ra khi thêm thể loại.");
+      console.error("Error creating/updating genre:", error);
+      message.error("Có lỗi xảy ra khi thêm/cập nhật thể loại.");
     }
   };
 
@@ -221,30 +263,29 @@ const GenresList = () => {
                     {genre.description || "Không có mô tả"}
                   </StyledTableCell>
                   <StyledTableCell>
-                    <Tooltip title="Xóa">
-                      <button
-                        className="opacity-50 hover:opacity-100 duration-300"
-                        onClick={() => confirmDelete(genre.id)}
-                      >
+                    <Dropdown
+                      menu={{ items: getMenuItems(genre.id) }}
+                      trigger={["click"]}
+                      placement="bottomRight"
+                    >
+                      <button className="opacity-50 hover:opacity-100 duration-300">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
                           height="24"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="red"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                          stroke="black"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                         >
-                          <path d="M3 6h18" />
-                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                          <line x1="10" x2="10" y1="11" y2="17" />
-                          <line x1="14" x2="14" y1="11" y2="17" />
+                          <circle cx="12" cy="12" r="1" />
+                          <circle cx="12" cy="5" r="1" />
+                          <circle cx="12" cy="19" r="1" />
                         </svg>
                       </button>
-                    </Tooltip>
+                    </Dropdown>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}

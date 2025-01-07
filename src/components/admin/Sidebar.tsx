@@ -82,7 +82,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }: SidebarProps) => {
       icon: <GavelOutlinedIcon sx={{ color: "inherit" }} />,
     },
     {
-      title: "Cài Đặt Thuộc Tính Truyện",
+      title: "Cài Đặt Truyện",
       path: "/admin/comic/genres",
       icon: (
         <svg

@@ -540,6 +540,39 @@ export default function MainComicsInformation({
           )}
         </div>
 
+        <div className="grow flex flex-col sm:flex-row items-stretch gap-1">
+          {popularSize.map((size) => {
+            const isSelected =
+              width === size.width &&
+              length === size.length &&
+              thickness === size.thickness;
+            return (
+              <button
+                onClick={() => {
+                  setWidth(size.width);
+                  setLength(size.length);
+                  setThickness(size.thickness);
+
+                  setCurrentComics({
+                    ...currentComics,
+                    width: size.width,
+                    length: size.length,
+                    thickness: size.thickness,
+                  });
+                }}
+                className={`grow ${
+                  isSelected
+                    ? "ring-1 ring-black font-semibold"
+                    : "hover:bg-gray-100"
+                } border border-gray-300 rounded px-4 py-1 duration-100`}
+              >
+                {size.length} x {size.width} x {size.thickness}{" "}
+                <span className="text-xs">(cm)</span>
+              </button>
+            );
+          })}
+        </div>
+
         <div className="flex flex-col items-stretch gap-2">
           <div className="grid grid-cols-1 sm:grid-cols-3 items-stretch gap-2">
             <label className="col-span-1 relative cursor-text">
@@ -637,39 +670,6 @@ export default function MainComicsInformation({
             <p className="text-sm italic font-light text-sky-600">
               * Kích thước phổ biến:
             </p>
-
-            <div className="grow flex flex-col sm:flex-row items-stretch gap-1">
-              {popularSize.map((size) => {
-                const isSelected =
-                  width === size.width &&
-                  length === size.length &&
-                  thickness === size.thickness;
-                return (
-                  <button
-                    onClick={() => {
-                      setWidth(size.width);
-                      setLength(size.length);
-                      setThickness(size.thickness);
-
-                      setCurrentComics({
-                        ...currentComics,
-                        width: size.width,
-                        length: size.length,
-                        thickness: size.thickness,
-                      });
-                    }}
-                    className={`grow ${
-                      isSelected
-                        ? "ring-1 ring-black font-semibold"
-                        : "hover:bg-gray-100"
-                    } border border-gray-300 rounded px-4 py-1 duration-100`}
-                  >
-                    {size.length} x {size.width} x {size.thickness}{" "}
-                    <span className="text-xs">(cm)</span>
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </div>
       </div>

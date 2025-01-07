@@ -1,18 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button, Typography } from "@mui/material";
+import { useSearchParams } from "react-router-dom";
+import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import "../ui/SellerCreateComic.css";
-import IconButton from "@mui/material/IconButton";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import GavelIcon from "@mui/icons-material/Gavel";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import { Modal, notification } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import AuctionModal from "../comic/sellerManagement/AuctionModal";
-import { Auction, Comic } from "../../common/base.interface";
+import { Comic } from "../../common/base.interface";
 import { SellerSubscription } from "../../common/interfaces/seller-subscription.interface";
 import SellerSubsModal from "./SellerSubsModal";
 import { RenderCell } from "./RenderCell";
@@ -20,7 +19,6 @@ import moment from "moment/min/moment-with-locales";
 import CreateNewComics from "./create-new-comics/CreateNewComics";
 import EditComics from "./edit-comics/EditComics";
 import { AuctionCriteria } from "../../common/interfaces/auction.interface";
-import { getComicsCondition } from "../../common/constances/comicsConditions";
 
 moment.locale("vi");
 
@@ -131,7 +129,7 @@ const SellerComicsManagement = ({
     } else if (
       auctionCriteria &&
       auctionCriteria.conditionLevel &&
-      comic.condition < auctionCriteria.conditionLevel
+      comic.condition.value < auctionCriteria.conditionLevel.value
     ) {
       notification.error({
         key: "auction",
@@ -147,19 +145,14 @@ const SellerComicsManagement = ({
             <p className="font-light text-xs">
               Yêu cầu tình trạng tối thiểu:{" "}
               <span className="font-medium">
-                {
-                  getComicsCondition(auctionCriteria.conditionLevel)
-                    .conditionName
-                }{" "}
-                ({getComicsCondition(auctionCriteria.conditionLevel).value}/10)
+                {auctionCriteria.conditionLevel.name} (
+                {auctionCriteria.conditionLevel.value}/10)
               </span>
             </p>
             <p className="font-light text-xs">
               Tình trạng hiện tại:{" "}
               <span className="font-medium">
-                {" "}
-                {getComicsCondition(comic.condition).conditionName} (
-                {getComicsCondition(comic.condition).value}/10)
+                {comic.condition.name} ({comic.condition.value}/10)
               </span>
             </p>
           </div>

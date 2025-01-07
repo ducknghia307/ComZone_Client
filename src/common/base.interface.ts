@@ -1,3 +1,4 @@
+import { Condition } from "./interfaces/condition.interface";
 import { Edition } from "./interfaces/edition.interface";
 import { Merchandise } from "./interfaces/merchandise.interface";
 
@@ -144,7 +145,7 @@ export interface Comic extends BaseInterface {
   publicationYear?: number;
   originCountry?: string;
   releaseYear?: number;
-  condition: number;
+  condition: Condition;
   edition: Edition;
   willNotAuction: boolean;
   coverImage: string;

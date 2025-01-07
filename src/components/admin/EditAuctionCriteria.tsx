@@ -1,26 +1,21 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Input,
   Typography,
   Form,
   notification,
-  Card,
   Switch,
   Slider,
   Select,
 } from "antd";
 import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import { AuctionCriteria } from "../../common/interfaces/auction.interface";
-import {
-  ConditionGradingScale,
-  conditionGradingScales,
-  getComicsCondition,
-} from "../../common/constances/comicsConditions";
 import type { SliderSingleProps } from "antd";
 import { Edition } from "../../common/interfaces/edition.interface";
+import { Condition } from "../../common/interfaces/condition.interface";
+
 const formatGradingScaleToMarks = (
-  gradingScale: ConditionGradingScale[]
+  gradingScale: Condition[]
 ): SliderSingleProps["marks"] => {
   const marks: SliderSingleProps["marks"] = {};
 
@@ -28,7 +23,7 @@ const formatGradingScaleToMarks = (
     marks[item.value] = {
       label: (
         <p className="whitespace-nowrap text-xs sm:text-base">
-          {[0, 2, 5, 8, 10].some((v) => v === item.value) ? item.symbol : ""}
+          {item.isRemarkable ? item.name : ""}
         </p>
       ),
     };
@@ -36,18 +31,23 @@ const formatGradingScaleToMarks = (
 
   return marks;
 };
+
 const EditAuctionCriteria: React.FC = () => {
   const [config, setConfig] = useState<AuctionCriteria>();
   const [originalConfig, setOriginalConfig] = useState<AuctionCriteria>();
   const [isEdited, setIsEdited] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [condition, setCondition] = useState<number>();
+  const [condition, setCondition] = useState<Condition>();
   const [editions, setEditions] = useState<Edition[]>([]);
   const [selectedEditions, setSelectedEditions] = useState<string[]>([]);
   const [unSelectedEditions, setUnSelectedEditions] = useState<string[]>([]);
   const [isFullInfoFilled, setIsFullInfoFilled] = useState<boolean>(false);
-  const [isEditionRestricted, setIsEdtionRestricted] = useState<boolean>(false);
-  const [editionRestricted, setEditionRestricter] = useState<boolean>(false);
+  const [isEditionRestricted, setIsEditionRestricted] =
+    useState<boolean>(false);
+  const [editionRestricted, setEditionRestricted] = useState<boolean>(false);
+  const [conditionGradingScales, setConditionGradingScales] = useState<
+    Condition[]
+  >([]);
   const handleInputChange = (field: string, value: boolean) => {
     const updatedConfig = { ...config, [field]: value };
     setConfig(updatedConfig);
@@ -60,7 +60,7 @@ const EditAuctionCriteria: React.FC = () => {
     try {
       const response = await privateAxios.get("/editions");
       setEditions(response.data);
-      console.log("editon", isEditionRestricted);
+      console.log("edition", isEditionRestricted);
 
       if (isEditionRestricted) {
         const selectedEditions = response.data
@@ -76,6 +76,14 @@ const EditAuctionCriteria: React.FC = () => {
     } catch (error) {
       console.error("Error fetching editions:", error);
     }
+  };
+  const fetchComicsCondition = async () => {
+    return await publicAxios
+      .get("conditions")
+      .then((res) => {
+        setConditionGradingScales(res.data);
+      })
+      .catch((err) => console.log(err));
   };
   const handleSave = () => {
     const payload = {
@@ -119,7 +127,7 @@ const EditAuctionCriteria: React.FC = () => {
   };
   const handleSwitchChange = (checked: boolean) => {
     setIsEdited(true);
-    setEditionRestricter(checked);
+    setEditionRestricted(checked);
     if (checked) {
       fetchEditions();
     } else {
@@ -127,6 +135,7 @@ const EditAuctionCriteria: React.FC = () => {
       setSelectedEditions([]);
     }
   };
+
   useEffect(() => {
     publicAxios
       .get("/auction-criteria")
@@ -149,9 +158,9 @@ const EditAuctionCriteria: React.FC = () => {
             editionRestricted: fetchedConfig.editionRestricted || false,
             updatedAt: fetchedConfig.updatedAt || new Date(),
           });
-          setEditionRestricter(fetchedConfig.editionRestricted);
+          setEditionRestricted(fetchedConfig.editionRestricted);
           if (fetchedConfig.editionRestricted) {
-            setIsEdtionRestricted(fetchedConfig.editionRestricted);
+            setIsEditionRestricted(fetchedConfig.editionRestricted);
             fetchEditions();
           }
           setCondition(fetchedConfig.conditionLevel);
@@ -169,7 +178,10 @@ const EditAuctionCriteria: React.FC = () => {
         });
         setLoading(false);
       });
+
+    fetchComicsCondition();
   }, []);
+
   useEffect(() => {
     if (editionRestricted) {
       fetchEditions();
@@ -216,9 +228,13 @@ const EditAuctionCriteria: React.FC = () => {
                   marks={formatGradingScaleToMarks(conditionGradingScales)}
                   step={null}
                   tooltip={{ open: false }}
-                  value={condition}
+                  value={condition.value}
                   onChange={(value: number) => {
-                    setCondition(value);
+                    setCondition(
+                      conditionGradingScales.find(
+                        (condition) => condition.value === value
+                      )
+                    );
                     setIsEdited(true);
                   }}
                   max={10}
@@ -236,9 +252,7 @@ const EditAuctionCriteria: React.FC = () => {
                     <path d="M22 20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V20ZM11 15H4V19H11V15ZM20 11H13V19H20V11ZM11 5H4V13H11V5ZM20 5H13V9H20V5Z"></path>
                   </svg>
                   <p className="font-light">Tình trạng:&emsp;</p>
-                  <p className="text-lg font-semibold">
-                    {getComicsCondition(condition).conditionState}
-                  </p>
+                  <p className="text-lg font-semibold">{condition.name}</p>
                 </span>
 
                 <span className="flex items-center gap-2">
@@ -252,9 +266,7 @@ const EditAuctionCriteria: React.FC = () => {
                     <path d="M15 3H21V21H3V15H7V11H11V7H15V3ZM17 5V9H13V13H9V17H5V19H19V5H17Z"></path>
                   </svg>
                   <p className="font-light">Độ mới:&emsp;</p>
-                  <p className="text-lg font-semibold">
-                    {getComicsCondition(condition).value}/10
-                  </p>
+                  <p className="text-lg font-semibold">{condition.value}/10</p>
                 </span>
               </div>
             </div>

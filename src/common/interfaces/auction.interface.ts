@@ -1,4 +1,5 @@
 import { BaseInterface, Comic, UserInfo } from "../base.interface";
+import { Condition } from "./condition.interface";
 
 export enum AuctionStatus {
   UPCOMING = "UPCOMING",
@@ -25,7 +26,7 @@ export interface Auction extends BaseInterface {
 export interface AuctionCriteria {
   id: number;
   isFullInfoFilled: boolean;
-  conditionLevel: number;
+  conditionLevel: Condition;
   editionRestricted: boolean;
   updatedAt: Date;
 }

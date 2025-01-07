@@ -3,7 +3,6 @@ import { Comic } from "../../../common/base.interface";
 import { Modal, notification, Popconfirm } from "antd";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import { DeleteFilled } from "@ant-design/icons";
-import { getComicsCondition } from "../../../common/constances/comicsConditions";
 
 export default function ExchangeComicsDetails({
   comics,
@@ -136,8 +135,8 @@ export default function ExchangeComicsDetails({
             <div className="flex items-center justify-between gap-2 pr-4">
               <p className="font-light text-xs">Tình trạng:</p>
               <p className="font-semibold">
-                {getComicsCondition(currentComics.condition).conditionName} (
-                {getComicsCondition(currentComics.condition).value}/10)
+                {currentComics.condition.name} ({currentComics.condition.value}
+                /10)
               </p>
             </div>
 

@@ -232,19 +232,18 @@ const Checkout = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
 
-    console.log("Selected Comics by Seller:", groupedSelectedComics);
-    console.log("Selected Address:", selectedAddress);
-    console.log("Selected Payment Method:", selectedPaymentMethod);
-
     try {
       const orderedComicIds: string[] = [];
       for (const sellerId in groupedSelectedComics) {
         const sellerGroup = groupedSelectedComics[sellerId];
 
         const sellerTotalPrice = sellerGroup.comics.reduce(
-          (total, { comic, currentPrice }) => {
+          (total, { comic, currentPrice, auctionId }) => {
             const price = currentPrice || comic?.price;
-            return total + Number(price);
+            // Subtract the deposit amount if it's an auction
+            return auctionId
+              ? total + Number(price) - (depositAmount || 0)
+              : total + Number(price);
           },
           0
         );
@@ -267,10 +266,7 @@ const Checkout = () => {
             wardId: selectedAddress?.ward.id,
             address: selectedAddress?.detailedAddress,
           })
-          .then((res) => {
-            return res.data;
-          })
-          .catch((err) => console.log(err));
+          .then((res) => res.data);
 
         const newSellerDeliveryInfo = await privateAxios
           .post("delivery-information", {
@@ -282,10 +278,7 @@ const Checkout = () => {
             wardId: sellerDetails?.ward.id,
             address: sellerDetails?.detailedAddress,
           })
-          .then((res) => {
-            return res.data;
-          })
-          .catch((err) => console.log(err));
+          .then((res) => res.data);
 
         const newDelivery = await privateAxios
           .post("deliveries/order", {
@@ -293,12 +286,7 @@ const Checkout = () => {
             toAddressId: newUserDeliveryInfo.id,
             deliveryFee: sellerDeliveryPrice,
           })
-          .then((res) => {
-            return res.data;
-          })
-          .catch((err) => console.log(err));
-
-        console.log(newDelivery);
+          .then((res) => res.data);
 
         const orderType = sellerGroup.comics.some(({ auctionId }) => auctionId)
           ? "AUCTION"
@@ -307,8 +295,7 @@ const Checkout = () => {
         const orderResponse = await privateAxios.post("/orders", {
           sellerId: sellerId,
           deliveryId: newDelivery.id,
-          //ĐÃ TRỪ PHÍ GIAO HÀNG
-          totalPrice: Number(sellerTotalPrice),
+          totalPrice: sellerTotalPrice, // Total after subtracting deposit if applicable
           paymentMethod: selectedPaymentMethod.toUpperCase(),
           addressId: selectedAddress?.id,
           type: orderType,
@@ -336,6 +323,7 @@ const Checkout = () => {
           );
 
           orderedComicIds.push(comic.id);
+
           if (auctionId) {
             socket.emit("updateAuctionStatus", {
               auctionId,
@@ -351,7 +339,6 @@ const Checkout = () => {
       if (storedCartData) {
         const parsedCartData = JSON.parse(storedCartData);
         const userId = user.id;
-        console.log(userId);
 
         if (userId && parsedCartData[userId]) {
           parsedCartData[userId] = parsedCartData[userId].filter(
@@ -359,18 +346,12 @@ const Checkout = () => {
           );
 
           localStorage.setItem("cart", JSON.stringify(parsedCartData));
-        } else {
-          console.error("User cart not found or user ID is missing.");
         }
       }
       sessionStorage.removeItem("selectedComics");
       navigate("/order/complete");
     } catch (error: any) {
-      if (error.response) {
-        console.error("Server responded with:", error.response.data);
-      } else {
-        console.error("Error submitting order:", error);
-      }
+      console.error("Error submitting order:", error.response?.data || error);
     } finally {
       setIsLoading(false);
     }

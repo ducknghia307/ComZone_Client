@@ -338,7 +338,7 @@ export default function EditionAndCondition({
               </p>
 
               <div className="space-y-2 text-sm font-light pt-4">
-                <p>Truyện:</p>
+                <p>{mainInformation.quantity > 1 ? "Bộ truyện" : "Truyện"}:</p>
                 <div
                   className={`grid grid-cols-${evidenceAttributes.length} items-stretch justify-center gap-2`}
                 >

@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import "../ui/SellerCreateComic.css";
 import IconButton from "@mui/material/IconButton";
-import { privateAxios } from "../../middleware/axiosInstance";
+import { privateAxios, publicAxios } from "../../middleware/axiosInstance";
 import GavelIcon from "@mui/icons-material/Gavel";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import { Modal, notification } from "antd";
@@ -18,6 +18,9 @@ import SellerSubsModal from "./SellerSubsModal";
 import { RenderCell } from "./RenderCell";
 import moment from "moment/min/moment-with-locales";
 import CreateNewComics from "./create-new-comics/CreateNewComics";
+import EditComics from "./edit-comics/EditComics";
+import { AuctionCriteria } from "../../common/interfaces/auction.interface";
+import { getComicsCondition } from "../../common/constances/comicsConditions";
 
 moment.locale("vi");
 
@@ -35,7 +38,6 @@ const SellerComicsManagement = ({
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [comics, setComics] = useState<Comic[]>([]);
-  const [auctions, setAuctions] = useState<Auction[]>([]);
   const [filteredComics, setFilteredComics] = useState<Comic[]>([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,17 +47,117 @@ const SellerComicsManagement = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [isCreatingComics, setIsCreatingComics] = useState<boolean>(false);
+  const [isEditingComics, setIsEditingComics] = useState<Comic>();
 
   const [isRegisteringPlan, setIsRegisteringPlan] = useState<boolean>(false);
 
-  const navigate = useNavigate();
+  const [auctionCriteria, setAuctionCriteria] = useState<AuctionCriteria>();
 
-  const handleAuction = (comic: any) => {
+  const fetchSellerComics = async () => {
+    setLoading(true);
+    await privateAxios
+      .get("/comics/seller")
+      .then((res) => {
+        setComics(res.data);
+        setFilteredComics(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const fetchAuctionCriteria = async () => {
+    await publicAxios
+      .get("auction-criteria")
+      .then((res) => {
+        setAuctionCriteria(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    fetchSellerComics();
+    fetchAuctionCriteria();
+  }, []);
+
+  const handleAuction = (comic: Comic) => {
     if (!sellerSubscription.canAuction) {
       notification.warning({
-        message:
-          "Gói đăng ký bán ComZone của bạn đã hết lượt đấu giá! Vui lòng đăng ký thêm!",
+        key: "auction",
+        message: (
+          <p className="REM text-start">
+            Gói đăng ký bán ComZone của bạn đã hết lượt đấu giá! Vui lòng đăng
+            ký thêm!
+          </p>
+        ),
         duration: 5,
+      });
+    } else if (
+      auctionCriteria &&
+      auctionCriteria.isFullInfoFilled &&
+      Object.entries(comic).some(
+        ([key, value]) =>
+          !["onSaleSince", "deletedAt", "page", "episodesList"].includes(key) &&
+          (value === null || value === undefined)
+      )
+    ) {
+      console.log({ comic });
+      notification.error({
+        key: "auction",
+        message: (
+          <p className="REM text-start font-light">
+            Truyện của bạn cần được cập nhật đầy đủ thông tin (bao gồm những
+            thông tin không bắt buộc) để được gửi yêu cầu duyệt đấu giá!
+          </p>
+        ),
+        description: (
+          <button
+            onClick={() => setIsEditingComics(comic)}
+            className="REM px-4 py-1 font-light border border-gray-300 rounded-md duration-200 hover:bg-gray-100"
+          >
+            Cập nhật thông tin truyện
+          </button>
+        ),
+        duration: 8,
+      });
+    } else if (
+      auctionCriteria &&
+      auctionCriteria.conditionLevel &&
+      comic.condition < auctionCriteria.conditionLevel
+    ) {
+      notification.error({
+        key: "auction",
+        message: (
+          <p className="REM text-start font-light">
+            Tình trạng truyện{" "}
+            <span className="font-semibold">"{comic.title}"</span> không đạt yêu
+            cầu tối thiểu để được phê duyệt đấu giá!
+          </p>
+        ),
+        description: (
+          <div className="REM space-y-1">
+            <p className="font-light text-xs">
+              Yêu cầu tình trạng tối thiểu:{" "}
+              <span className="font-medium">
+                {
+                  getComicsCondition(auctionCriteria.conditionLevel)
+                    .conditionName
+                }{" "}
+                ({getComicsCondition(auctionCriteria.conditionLevel).value}/10)
+              </span>
+            </p>
+            <p className="font-light text-xs">
+              Tình trạng hiện tại:{" "}
+              <span className="font-medium">
+                {" "}
+                {getComicsCondition(comic.condition).conditionName} (
+                {getComicsCondition(comic.condition).value}/10)
+              </span>
+            </p>
+          </div>
+        ),
+        duration: 8,
       });
     } else {
       setSelectedComic(comic);
@@ -219,10 +321,6 @@ const SellerComicsManagement = ({
     return genreArray.map((genre) => genre.name).join(", ");
   };
 
-  useEffect(() => {
-    fetchSellerComics();
-  }, []);
-
   const handleAddComicsClick = () => {
     if (!sellerSubscription) {
       notification.warning({
@@ -248,21 +346,7 @@ const SellerComicsManagement = ({
         duration: 5,
       });
       setIsRegisteringPlan(true);
-    } else navigate("/sellermanagement/createcomic");
-  };
-
-  const fetchSellerComics = async () => {
-    setLoading(true);
-    await privateAxios
-      .get("/comics/seller")
-      .then((res) => {
-        setComics(res.data);
-        setFilteredComics(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => setLoading(false));
+    } else setIsCreatingComics(true);
   };
 
   useEffect(() => {
@@ -464,6 +548,7 @@ const SellerComicsManagement = ({
             params={params}
             handleStopSelling={handleStopSelling}
             handleDeleteComics={handleDeleteComics}
+            setIsEditingComics={setIsEditingComics}
           />
         ),
     },
@@ -471,7 +556,7 @@ const SellerComicsManagement = ({
 
   const paginationModel = { page: 0, pageSize: 10 };
 
-  const renderContent = () => {
+  const renderComicsTable = () => {
     if (!loading && (!comics || (comics && comics.length === 0))) {
       return (
         <div
@@ -483,7 +568,7 @@ const SellerComicsManagement = ({
             Bắt đầu đăng bán truyện tranh ngay
           </p>
           <button
-            onClick={() => setIsCreatingComics(true)}
+            onClick={handleAddComicsClick}
             className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md font-semibold text-lg duration-200 hover:bg-green-700"
           >
             <svg
@@ -514,7 +599,7 @@ const SellerComicsManagement = ({
                 fontFamily: "inherit",
               }}
               startIcon={<AddIcon />}
-              onClick={() => setIsCreatingComics(true)}
+              onClick={handleAddComicsClick}
             >
               Thêm truyện mới
             </Button>
@@ -608,14 +693,23 @@ const SellerComicsManagement = ({
 
   return (
     <div className="w-full bg-white p-4 rounded-lg drop-shadow-lg">
-      {isCreatingComics ? (
+      {isCreatingComics && (
         <CreateNewComics
           setIsCreatingComics={setIsCreatingComics}
           fetchSellerComics={fetchSellerComics}
         />
-      ) : (
-        renderContent()
       )}
+
+      {isEditingComics && (
+        <EditComics
+          comics={isEditingComics}
+          setIsEditingComics={setIsEditingComics}
+          fetchSellerComics={fetchSellerComics}
+        />
+      )}
+
+      {!isCreatingComics && !isEditingComics && renderComicsTable()}
+
       {(!sellerSubscription || !sellerSubscription.isActive) && (
         <SellerSubsModal
           isOpen={isRegisteringPlan}

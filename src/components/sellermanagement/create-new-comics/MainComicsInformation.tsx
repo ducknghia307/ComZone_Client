@@ -438,7 +438,7 @@ export default function MainComicsInformation({
               Mô tả truyện: <span className="text-red-600">*</span>
             </p>
             <Input.TextArea
-              placeholder={`Thông tin chi tiết về truyện, quá trình sử dụng, trải nghiệm,...`}
+              placeholder={`Thông tin về truyện, quá trình sử dụng, trải nghiệm,...`}
               spellCheck="false"
               autoSize={{ minRows: 3, maxRows: 10 }}
               count={{ show: true, max: 2000 }}

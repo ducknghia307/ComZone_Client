@@ -76,12 +76,9 @@ export interface GetAddressCode {
   wardCode: number;
 }
 
-export interface Genre {
-  id: string;
+export interface Genre extends BaseInterface {
   name: string;
   description?: string;
-  subName?: string;
-  caution?: string;
 }
 
 export interface Auction {

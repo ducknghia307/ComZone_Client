@@ -1,12 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Modal, Radio, notification, Select, message } from "antd";
+import { Modal, Radio, notification, message, Slider, Input } from "antd";
 import React, { useEffect, useState } from "react";
 import CoverImagePlaceholder from "../../../assets/image-placeholder.jpg";
 import { UserInfo } from "../../../common/base.interface";
 import { privateAxios } from "../../../middleware/axiosInstance";
-import TextArea from "antd/es/input/TextArea";
-import { DeleteOutlined, PictureOutlined } from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons";
 import { Autocomplete, Chip, TextField } from "@mui/material";
+import {
+  ConditionGradingScale,
+  conditionGradingScales,
+  getComicsCondition,
+} from "../../../common/constances/comicsConditions";
+import { SliderSingleProps } from "antd/lib";
 
 interface NewComicOfferModalProps {
   isModalOpen: boolean;
@@ -16,6 +21,24 @@ interface NewComicOfferModalProps {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+const formatGradingScaleToMarks = (
+  gradingScale: ConditionGradingScale[]
+): SliderSingleProps["marks"] => {
+  const marks: SliderSingleProps["marks"] = {};
+
+  gradingScale.forEach((item) => {
+    marks[item.value] = {
+      label: (
+        <p className="whitespace-nowrap text-xs">
+          {[0, 2, 5, 8, 10].some((v) => v === item.value) ? item.symbol : ""}
+        </p>
+      ),
+    };
+  });
+
+  return marks;
+};
 
 const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
   isModalOpen,
@@ -27,11 +50,10 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
 }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
-  const [edition, setEdition] = useState("REGULAR");
   const [isSeries, setIsSeries] = useState<boolean>(false);
   const [quantity, setQuantity] = useState(1);
   const [episodesList, setEpisodeList] = useState<string[]>([]);
-  const [used, setUsed] = useState(1);
+  const [condition, setCondition] = useState(5);
 
   const [description, setDescription] = useState("");
 
@@ -112,8 +134,7 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
     setAuthor("");
     setPreviewImage(null);
     setUploadedImageFile(null);
-    setEdition("REGULAR");
-    setUsed(1);
+    setCondition(5);
     setPreviewChapterImages([]);
     setUploadedPreviewChapterImageFiles([]);
     setDescription("");
@@ -132,19 +153,20 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
       return;
     }
 
-    if (isSeries && episodesList.length !== quantity) {
+    if (
+      isSeries &&
+      (episodesList.length === 0 || episodesList.length > quantity)
+    ) {
       message.warning({
         key: "series",
         content: (
           <p className="REM">
-            Số lượng tên tập không trùng khợp với số truyện trong bộ!{" "}
-            <span className="font-light italic text-sm">
-              ({episodesList.length - quantity > 0 ? "Dư" : "Thiếu"}{" "}
-              {Math.abs(episodesList.length - quantity)} tập)
-            </span>
+            {episodesList.length === 0
+              ? "Vui lòng nhập ít nhất tên (hoặc số) của một tập truyện!"
+              : "Số lượng tên tập truyện không phù hợp với số lượng cuốn trọng bộ!"}
           </p>
         ),
-        duration: 8,
+        duration: 5,
       });
       return;
     }
@@ -199,13 +221,12 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
         coverImage,
         previewChapter: previewChapters,
         description,
-        edition,
-        condition: used === 1 ? "USED" : "SEALED",
+        condition,
         quantity,
         episodesList,
       };
 
-      await privateAxios.post("/comics/exchange", comicData);
+      await privateAxios.post("comics/exchange", comicData);
 
       notification.success({
         message: "Thành công",
@@ -284,181 +305,217 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
           </div>
         </div>
 
-        <div className="w-5/6 p-4">
-          <div className="w-full flex flex-row">
-            <div className="w-1/2">
-              <div className="flex flex-row gap-1">
-                <h2 className="font-sm">Tựa đề:</h2>
-                <p className="text-red-500">*</p>
-              </div>
-              <input
-                type="text"
-                placeholder="Tựa đề của truyện..."
-                className="border border-gray-300 rounded-lg mt-2 p-2 min-w-[20em]"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
+        <div className="w-5/6 p-4 space-y-4">
+          <div className="flex flex-col gap-4 w-1/2">
+            <div className="flex flex-row">
+              <h2 className="font-sm">Truyện lẻ / Bộ truyện:</h2>
+              <p className="text-red-500">*</p>
             </div>
-
-            <div className="w-1/2">
-              <div className="flex flex-row gap-1">
-                <h2 className="font-sm">Tác giả:</h2>
-                <p className="text-red-500">*</p>
-              </div>
-              <input
-                type="text"
-                placeholder="Tác giả của truyện..."
-                className="border border-gray-300 rounded-lg mt-2 p-2 min-w-[20em]"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="w-full flex flex-row mt-6">
-            <div className="flex flex-col gap-4 w-1/2">
-              <div className="flex flex-row">
-                <h2 className="font-sm">Tình trạng tối thiểu:</h2>
-                <p className="text-red-500">*</p>
-              </div>
-              <div className="flex flex-row w-full">
-                <Radio.Group
-                  onChange={(e) => setUsed(e.target.value)}
-                  value={used}
-                >
-                  <Radio value={1}>Đã sử dụng</Radio>
-                  <Radio value={2}>Còn nguyên seal</Radio>
-                </Radio.Group>
-              </div>
-            </div>
-
-            <div className="w-1/2 flex flex-col gap-2">
-              <div className="flex flex-row gap-1">
-                <h2 className="font-sm">Phiên bản:</h2>
-                <p className="text-red-500">*</p>
-              </div>
-              <Select
-                value={edition}
-                onChange={(value) => setEdition(value)}
-                style={{ width: 280 }}
-                options={[
-                  { value: "REGULAR", label: "Phiên bản thường" },
-                  { value: "SPECIAL", label: "Phiên bản đặc biệt" },
-                  { value: "LIMITED", label: "Phiên bản giới hạn" },
-                ]}
-              />
+            <div className="flex flex-row w-full items-center">
+              <Radio
+                value={isSeries}
+                checked={isSeries === false}
+                onChange={() => {
+                  setIsSeries(false);
+                  setQuantity(1);
+                  setEpisodeList([]);
+                }}
+              >
+                Truyện lẻ
+              </Radio>
+              <Radio
+                value={isSeries}
+                checked={isSeries === true}
+                onChange={() => {
+                  setIsSeries(true);
+                  setQuantity(2);
+                }}
+              >
+                Bộ truyện
+              </Radio>
             </div>
           </div>
 
-          <div className="flex items-start mt-6">
-            <div className="flex flex-col gap-4 w-1/2">
-              <div className="flex flex-row">
-                <h2 className="font-sm">Truyện lẻ / Bộ truyện:</h2>
-                <p className="text-red-500">*</p>
-              </div>
-              <div className="flex flex-row w-full items-center">
-                <Radio
-                  value={isSeries}
-                  checked={isSeries === false}
-                  onChange={() => {
-                    setIsSeries(false);
-                    setQuantity(1);
-                    setEpisodeList([]);
-                  }}
-                >
-                  Truyện lẻ
-                </Radio>
-                <Radio
-                  value={isSeries}
-                  checked={isSeries === true}
-                  onChange={() => {
-                    setIsSeries(true);
-                    setQuantity(2);
-                  }}
-                >
-                  Bộ truyện
-                </Radio>
+          <div className="w-full flex flex-col">
+            <p className="font-sm">
+              Tựa đề: <span className="text-red-500">*</span>
+            </p>
 
-                {isSeries && (
-                  <div className="flex items-center gap-2">
-                    <p className="font-light">Số lượng:</p>
-                    <input
-                      type="number"
-                      value={quantity}
-                      onChange={(e) => {
-                        if (e.target.value.length > 0) {
-                          const number = Number(e.target.value);
-                          setQuantity(number);
-                        } else setQuantity(2);
-                      }}
-                      min={2}
-                      max={99}
-                      className="w-[3em] p-1 border border-gray-300 rounded-md focus:!border-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
+            <input
+              type="text"
+              placeholder="Tựa đề của truyện..."
+              className="font-light border border-gray-300 rounded-lg mt-2 p-2 min-w-[20em]"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
 
-            {isSeries && (
-              <div className="flex flex-col gap-2 w-1/2">
-                <div className="flex flex-row">
-                  <h2 className="font-sm"> Tập truyện số hoặc tên tập:</h2>
-                  <p className="text-red-500">*</p>
-                </div>
+          <div className="w-full flex flex-col">
+            <p className="font-sm">
+              Tác giả: <span className="text-red-500">*</span>
+            </p>
 
-                <div className="flex flex-row w-full">
-                  <Autocomplete
-                    size="small"
-                    multiple
-                    value={episodesList}
-                    onChange={(event, newValue) => {
-                      setEpisodeList(newValue.map((tags) => tags.trim()));
+            <input
+              type="text"
+              placeholder="Tác giả của truyện..."
+              className="font-light border border-gray-300 rounded-lg mt-2 p-2 min-w-[20em]"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+            />
+          </div>
+
+          {isSeries && (
+            <div className="flex items-start">
+              <div className="w-full grid grid-cols-3 items-start gap-2">
+                <div className="col-span-1 flex flex-col items-start gap-2">
+                  <p className="text-sm">
+                    Số lượng: <span className="text-red-600">*</span>
+                  </p>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => {
+                      if (e.target.value.length > 0) {
+                        const number = Number(e.target.value);
+                        setQuantity(number);
+                      } else setQuantity(2);
                     }}
-                    selectOnFocus
-                    clearOnBlur
-                    handleHomeEndKeys
-                    options={[]}
-                    renderTags={(tagValue, getTagProps) =>
-                      tagValue.map((option, index) => {
-                        const { key, ...tagProps } = getTagProps({ index });
-                        return (
-                          <Chip
-                            key={key}
-                            variant="outlined"
-                            label={<p className="REM font-light">{option}</p>}
-                            {...tagProps}
-                          />
-                        );
-                      })
-                    }
-                    renderOption={(props, option) => {
-                      const { key, ...optionProps } = props;
-                      return (
-                        <li key={key} {...optionProps}>
-                          {option}
-                        </li>
-                      );
-                    }}
-                    freeSolo
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        hiddenLabel
-                        helperText={
-                          <p className="REM italic">
-                            Nhập tên tập truyện và nhấn Enter để thêm.
-                          </p>
-                        }
-                      />
-                    )}
+                    min={2}
+                    max={99}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:!border-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
+
+                <div className="col-span-2 flex flex-col items-stretch gap-2">
+                  <p className="text-sm">
+                    Tập truyện số hoặc tên tập:{" "}
+                    <span className="text-red-600">*</span>
+                  </p>
+
+                  <div className="w-full">
+                    <Autocomplete
+                      size="small"
+                      multiple
+                      value={episodesList}
+                      onChange={(event, newValue) => {
+                        setEpisodeList(newValue.map((tags) => tags.trim()));
+                      }}
+                      selectOnFocus
+                      clearOnBlur
+                      handleHomeEndKeys
+                      options={[]}
+                      renderTags={(tagValue, getTagProps) =>
+                        tagValue.map((option, index) => {
+                          const { key, ...tagProps } = getTagProps({ index });
+                          return (
+                            <Chip
+                              key={key}
+                              variant="outlined"
+                              label={<p className="REM font-light">{option}</p>}
+                              {...tagProps}
+                            />
+                          );
+                        })
+                      }
+                      renderOption={(props, option) => {
+                        const { key, ...optionProps } = props;
+                        return (
+                          <li key={key} {...optionProps}>
+                            {option}
+                          </li>
+                        );
+                      }}
+                      freeSolo
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          hiddenLabel
+                          helperText={
+                            <p className="REM italic">
+                              Nhập tên tập truyện và nhấn Enter để thêm.
+                            </p>
+                          }
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
               </div>
-            )}
+            </div>
+          )}
+
+          <div className="w-full flex flex-col gap-4">
+            <div className="flex flex-row">
+              <h2 className="font-sm">Tình trạng truyện:</h2>
+              <p className="text-red-500">*</p>
+            </div>
+            <div className="px-4">
+              <Slider
+                marks={formatGradingScaleToMarks(conditionGradingScales)}
+                step={null}
+                tooltip={{ open: false }}
+                value={condition}
+                onChange={(value: number) => setCondition(value)}
+                max={10}
+              />
+            </div>
+
+            <div className="xl:w-1/2 mx-auto flex flex-col items-stretch justify-start gap-2 px-2 sm:px-4 text-sm">
+              <span className="flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="currentColor"
+                >
+                  <path d="M22 20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V20ZM11 15H4V19H11V15ZM20 11H13V19H20V11ZM11 5H4V13H11V5ZM20 5H13V9H20V5Z"></path>
+                </svg>
+                <p className="font-light">Tình trạng:&emsp;</p>
+                <p className="text-base font-semibold">
+                  {getComicsCondition(condition).conditionState}
+                </p>
+              </span>
+
+              <span className="flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                >
+                  <path d="M15 3H21V21H3V15H7V11H11V7H15V3ZM17 5V9H13V13H9V17H5V19H19V5H17Z"></path>
+                </svg>
+                <p className="font-light">Độ mới:&emsp;</p>
+                <p className="text-base font-semibold">
+                  {getComicsCondition(condition).value}/10
+                </p>
+              </span>
+
+              <span className="flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="currentColor"
+                >
+                  <path d="M12 22C6.47715 22 2 17.5228 2 12 2 6.47715 6.47715 2 12 2 17.5228 2 22 6.47715 22 12 22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12 20 7.58172 16.4183 4 12 4 7.58172 4 4 7.58172 4 12 4 16.4183 7.58172 20 12 20ZM13 10.5V15H14V17H10V15H11V12.5H10V10.5H13ZM13.5 8C13.5 8.82843 12.8284 9.5 12 9.5 11.1716 9.5 10.5 8.82843 10.5 8 10.5 7.17157 11.1716 6.5 12 6.5 12.8284 6.5 13.5 7.17157 13.5 8Z"></path>
+                </svg>
+                <p className="font-light">Mức độ sử dụng:&emsp;</p>
+                <p className="text-base font-semibold">
+                  {getComicsCondition(condition).usageLevel}
+                </p>
+              </span>
+
+              <p className="text-sm font-light italic h-[6em] phone:h-[5em]">
+                {getComicsCondition(condition).description}
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1 mt-6">
+          <div className="flex items-center gap-1">
             <h2 className="font-sm">Ảnh xem trước nội dung truyện:</h2>
             <p className="text-red-500">*</p>
             <p className="font-light text-xs italic">
@@ -512,15 +569,23 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
             )}
           </div>
 
-          <TextArea
-            value={description}
-            spellCheck="false"
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Mô tả nội dung của truyện"
-            autoSize={{ minRows: 3, maxRows: 5 }}
-            className="mt-4 p-3"
-          />
-          <div className="w-full flex flex-row gap-16 mt-6 justify-end">
+          <div className="space-y-1">
+            <p className="text-sm">
+              Mô tả: <span className="text-red-600">*</span>
+            </p>
+            <Input.TextArea
+              placeholder={`Thông tin về truyện, quá trình sử dụng, trải nghiệm,...`}
+              spellCheck="false"
+              autoSize={{ minRows: 3, maxRows: 10 }}
+              count={{ show: true, max: 2000 }}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              styles={{ textarea: { padding: "10px 15px" } }}
+              className="REM"
+            />
+          </div>
+
+          <div className="w-full flex flex-row gap-16 pt-6 justify-end">
             <button
               className="border-none hover:opacity-70 duration-200"
               onClick={reset}

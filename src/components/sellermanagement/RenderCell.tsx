@@ -12,6 +12,7 @@ export const RenderCell = ({
   params,
   handleStopSelling,
   handleDeleteComics,
+  setIsEditingComics,
 }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -49,7 +50,7 @@ export const RenderCell = ({
         {params.row.status === "UNAVAILABLE" && (
           <MenuItem
             onClick={() => {
-              navigate(`/sellermanagement/edit/${params.row.id}`);
+              setIsEditingComics(params.row);
             }}
             sx={{ borderBottom: "1px solid #D5D5D5", color: "#0284c7" }}
           >

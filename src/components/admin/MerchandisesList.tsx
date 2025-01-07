@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { privateAxios } from "../../middleware/axiosInstance";
-import { Modal, Tooltip, Input, message } from "antd";
+import { Modal, Tooltip, Input, message, MenuProps, Dropdown } from "antd";
 import { Genre } from "../../common/base.interface";
 import {
   TableContainer,
@@ -12,7 +12,9 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import TablePagination from "@mui/material/TablePagination";
-import { SearchOutlined } from "@ant-design/icons";
+import { EditOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteOutline } from "@mui/icons-material";
+import { Merchandise } from "../../common/interfaces/merchandise.interface";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${theme.palette.mode === "light" ? "body" : "background.default"}`]: {
@@ -36,7 +38,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const { TextArea } = Input;
 
 const MerchandisesList = () => {
-  const [merchandises, setMerchandises] = useState<Genre[]>([]);
+  const [merchandises, setMerchandises] = useState<Merchandise[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -45,6 +47,24 @@ const MerchandisesList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [newSubName, setNewSubName] = useState("");
   const [newCaution, setNewCaution] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [merchandiseId, setMerchandiseId] = useState<string | null>(null);
+
+  const getMenuItems = (merchandiseId: string): MenuProps["items"] => [
+    {
+      key: "1",
+      label: "Chỉnh sửa",
+      icon: <EditOutlined style={{ fontSize: 18 }} />,
+      onClick: () => handleEdit(merchandiseId),
+    },
+    {
+      key: "2",
+      label: "Xóa",
+      icon: <DeleteOutline style={{ fontSize: 18 }} />,
+      onClick: () => confirmDelete(merchandiseId),
+      danger: true,
+    },
+  ];
 
   const fetchMerchandises = async () => {
     try {
@@ -61,13 +81,36 @@ const MerchandisesList = () => {
 
   const handleOk = () => {
     setIsModalVisible(false);
+    setMerchandiseId(null);
+    setNewMerchandise("");
+    setNewDescription("");
+    setNewSubName("");
+    setNewCaution("");
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setMerchandiseId(null);
+    setNewMerchandise("");
+    setNewDescription("");
+    setNewSubName("");
+    setNewCaution("");
   };
 
-  const createMerchandise = async () => {
+  const handleEdit = (id: string) => {
+    const merchandiseToEdit = merchandises.find((m) => m.id === id);
+    if (merchandiseToEdit) {
+      setNewMerchandise(merchandiseToEdit.name);
+      setNewSubName(merchandiseToEdit.subName);
+      setNewDescription(merchandiseToEdit.description);
+      setNewCaution(merchandiseToEdit.caution);
+      setMerchandiseId(id);
+      setIsEditing(true);
+      showModal();
+    }
+  };
+
+  const createOrUpdateMerchandise = async () => {
     if (!newMerchandise.trim()) {
       message.error("Tên phụ kiện không được để trống!");
       return;
@@ -86,23 +129,38 @@ const MerchandisesList = () => {
     }
 
     try {
-      await privateAxios.post("/merchandises", {
-        name: newMerchandise,
-        subName: newSubName,
-        description: newDescription,
-        caution: newCaution,
-      });
-      message.success("Phụ kiện đã được thêm thành công!");
+      if (isEditing && merchandiseId) {
+        await privateAxios.put(`/merchandises/${merchandiseId}`, {
+          name: newMerchandise,
+          subName: newSubName,
+          description: newDescription,
+          caution: newCaution,
+        });
+        message.success("Phụ kiện đã được cập nhật thành công!");
+      } else {
+        await privateAxios.post("/merchandises", {
+          name: newMerchandise,
+          subName: newSubName,
+          description: newDescription,
+          caution: newCaution,
+        });
+        message.success("Phụ kiện đã được thêm thành công!");
+      }
       fetchMerchandises();
-      setNewMerchandise("");
-      setNewSubName("");
-      setNewDescription("");
-      setNewCaution("");
+      resetForm();
       handleOk();
     } catch (error) {
-      console.error("Error creating merchandise:", error);
-      message.error("Có lỗi xảy ra khi thêm phụ kiện.");
+      console.error("Error creating/updating merchandise:", error);
+      message.error("Có lỗi xảy ra khi thêm hoặc cập nhật phụ kiện.");
     }
+  };
+
+  const resetForm = () => {
+    setNewMerchandise("");
+    setNewSubName("");
+    setNewDescription("");
+    setNewCaution("");
+    setIsEditing(false);
   };
 
   const deleteMerchandises = async (id: string) => {
@@ -175,7 +233,7 @@ const MerchandisesList = () => {
       />
       <Modal
         open={isModalVisible}
-        onOk={createMerchandise}
+        onOk={createOrUpdateMerchandise}
         onCancel={handleCancel}
         footer={null}
       >
@@ -205,7 +263,7 @@ const MerchandisesList = () => {
             showCount
             className="p-3 rounded-lg placeholder:text-gray-300 border border-gray-300 "
           />
-          <label className="font-semibold">Cảnh báo:</label>
+          <label className="font-semibold">Lưu ý:</label>
           <Input
             value={newCaution}
             onChange={(e) => setNewCaution(e.target.value)}
@@ -214,9 +272,9 @@ const MerchandisesList = () => {
           />
           <button
             className="px-5 mt-3 py-3 bg-[#c66a7a] rounded-lg hover:opacity-70 duration-300 text-white font-bold"
-            onClick={createMerchandise}
+            onClick={createOrUpdateMerchandise}
           >
-            Thêm
+            {isEditing ? "Cập nhật" : "Thêm"}
           </button>
         </div>
       </Modal>
@@ -261,30 +319,29 @@ const MerchandisesList = () => {
                   </StyledTableCell>
                   <StyledTableCell>{merchandise.caution}</StyledTableCell>
                   <StyledTableCell>
-                    <Tooltip title="Xóa">
-                      <button
-                        className="opacity-50 hover:opacity-100 duration-300"
-                        onClick={() => confirmDelete(merchandise.id)}
-                      >
+                    <Dropdown
+                      menu={{ items: getMenuItems(merchandise.id) }}
+                      trigger={["click"]}
+                      placement="bottomRight"
+                    >
+                      <button className="opacity-50 hover:opacity-100 duration-300">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
                           height="24"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="red"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                          stroke="black"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                         >
-                          <path d="M3 6h18" />
-                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                          <line x1="10" x2="10" y1="11" y2="17" />
-                          <line x1="14" x2="14" y1="11" y2="17" />
+                          <circle cx="12" cy="12" r="1" />
+                          <circle cx="12" cy="5" r="1" />
+                          <circle cx="12" cy="19" r="1" />
                         </svg>
                       </button>
-                    </Tooltip>
+                    </Dropdown>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}

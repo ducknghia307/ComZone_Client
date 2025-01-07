@@ -109,6 +109,26 @@ export default function PriceAndImages({
         </ul>
       </div>
 
+      {currentComics.editionEvidence &&
+        currentComics.editionEvidence.length > 0 && (
+          <p className="text-red-600 font-light">
+            * Vui lòng thêm vào{" "}
+            <span className="font-semibold">Ảnh đính kèm</span> hình ảnh có chứa{" "}
+            {currentComics.editionEvidence.length > 1 &&
+              "ít nhất 1 trong những"}{" "}
+            yếu tố sau:{" "}
+            <span className="font-semibold">
+              {currentComics.editionEvidence.map(
+                (field, index) =>
+                  field +
+                  (index < currentComics.editionEvidence.length - 1
+                    ? ", "
+                    : ".")
+              )}
+            </span>
+          </p>
+        )}
+
       <div className="flex flex-col sm:flex-row items-stretch justify-start gap-4">
         <input
           ref={coverImageInputRef}

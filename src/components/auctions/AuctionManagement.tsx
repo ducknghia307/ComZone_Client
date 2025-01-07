@@ -414,10 +414,10 @@ const AuctionManagement = () => {
                     </TableCell>
 
                     <TableCell align="center">
-                      {auction.reservePrice.toLocaleString()} đ
+                      {auction.reservePrice?.toLocaleString()} đ
                     </TableCell>
                     <TableCell align="center">
-                      {auction.priceStep.toLocaleString()} đ
+                      {auction.priceStep?.toLocaleString()} đ
                     </TableCell>
                     <TableCell align="center">
                       {auction.currentPrice?.toLocaleString()} đ

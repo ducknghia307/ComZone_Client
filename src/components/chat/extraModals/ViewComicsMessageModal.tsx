@@ -1,7 +1,8 @@
 import { Modal } from "antd";
 import { Comic } from "../../../common/base.interface";
-import { useState } from "react";
-import { getComicsCondition } from "../../../common/constances/comicsConditions";
+import { useEffect, useState } from "react";
+import { publicAxios } from "../../../middleware/axiosInstance";
+import { Condition } from "../../../common/interfaces/condition.interface";
 
 export default function ViewComicsMessageModal({
   comicsList,
@@ -104,7 +105,8 @@ export default function ViewComicsMessageModal({
           </p>
           <p className="font-semibold">
             <span className="text-xs font-medium">Tình trạng truyện:</span>{" "}
-            {getComicsCondition(currentComics.condition).conditionName}
+            {currentComics.condition.name} ({currentComics.condition.value / 10}
+            )
           </p>
           <p className="font-semibold">
             <span className="text-xs font-medium">Số lượng truyện:</span>{" "}

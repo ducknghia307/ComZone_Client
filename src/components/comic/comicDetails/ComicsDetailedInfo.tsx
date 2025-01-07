@@ -1,6 +1,4 @@
 import { Comic, Genre } from "../../../common/base.interface";
-import dateFormat from "../../../assistants/date.format";
-import { getComicsCondition } from "../../../common/constances/comicsConditions";
 
 export default function ComicsDetailedInfo({
   currentComics,
@@ -43,9 +41,7 @@ export default function ComicsDetailedInfo({
 
       <div className="flex items-center text-xs py-2 border-b">
         <p className="w-1/2 text-gray-600">Tình trạng</p>
-        <p className="w-1/2">
-          {getComicsCondition(currentComics.condition).conditionName}
-        </p>
+        <p className="w-1/2">{currentComics.condition.name}</p>
       </div>
 
       <div

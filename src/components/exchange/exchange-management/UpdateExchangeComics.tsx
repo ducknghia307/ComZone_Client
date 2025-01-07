@@ -15,13 +15,8 @@ import Loading from "../../loading/Loading";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import { Grid } from "@mui/system";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
-import { Edition } from "../../../common/interfaces/edition.interface";
-import {
-  ConditionGradingScale,
-  conditionGradingScales,
-  getComicsCondition,
-} from "../../../common/constances/comicsConditions";
 import { SliderSingleProps } from "antd/lib";
+import { Condition } from "../../../common/interfaces/condition.interface";
 
 interface EditComicFormData {
   title: string;
@@ -29,19 +24,19 @@ interface EditComicFormData {
   quantity: number;
   episodesList: string[];
   description: string;
-  condition: number;
+  condition: Condition;
 }
 
 const formatGradingScaleToMarks = (
-  gradingScale: ConditionGradingScale[]
+  gradingScale: Condition[]
 ): SliderSingleProps["marks"] => {
   const marks: SliderSingleProps["marks"] = {};
 
   gradingScale.forEach((item) => {
     marks[item.value] = {
       label: (
-        <p className="whitespace-nowrap text-xs">
-          {[0, 2, 5, 8, 10].some((v) => v === item.value) ? item.symbol : ""}
+        <p className="whitespace-nowrap text-xs sm:text-base">
+          {item.isRemarkable ? item.name : ""}
         </p>
       ),
     };
@@ -69,6 +64,10 @@ export default function UpdateExchangeComics({
     description: comics.description,
     condition: comics.condition,
   });
+
+  const [conditionGradingScales, setConditionGradingScales] = useState<
+    Condition[]
+  >([]);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
@@ -271,8 +270,18 @@ export default function UpdateExchangeComics({
     setChaptersImagePlaceholder([]);
   };
 
+  const fetchConditions = async () => {
+    await publicAxios
+      .get("conditions")
+      .then((res) => {
+        setConditionGradingScales(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
     reset();
+    fetchConditions();
   }, []);
 
   return (
@@ -603,9 +612,14 @@ export default function UpdateExchangeComics({
                   marks={formatGradingScaleToMarks(conditionGradingScales)}
                   step={null}
                   tooltip={{ open: false }}
-                  value={formData.condition}
+                  value={formData.condition.value}
                   onChange={(value: number) =>
-                    setFormData({ ...formData, condition: value })
+                    setFormData({
+                      ...formData,
+                      condition: conditionGradingScales.find(
+                        (condition) => condition.value === value
+                      ),
+                    })
                   }
                   max={10}
                 />
@@ -624,7 +638,7 @@ export default function UpdateExchangeComics({
                   </svg>
                   <p className="font-light">Tình trạng:&emsp;</p>
                   <p className="text-base font-semibold">
-                    {getComicsCondition(formData.condition).conditionState}
+                    {formData.condition.name}
                   </p>
                 </span>
 
@@ -640,28 +654,30 @@ export default function UpdateExchangeComics({
                   </svg>
                   <p className="font-light">Độ mới:&emsp;</p>
                   <p className="text-base font-semibold">
-                    {getComicsCondition(formData.condition).value}/10
+                    {formData.condition.value}/10
                   </p>
                 </span>
 
-                <span className="flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    fill="currentColor"
-                  >
-                    <path d="M12 22C6.47715 22 2 17.5228 2 12 2 6.47715 6.47715 2 12 2 17.5228 2 22 6.47715 22 12 22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12 20 7.58172 16.4183 4 12 4 7.58172 4 4 7.58172 4 12 4 16.4183 7.58172 20 12 20ZM13 10.5V15H14V17H10V15H11V12.5H10V10.5H13ZM13.5 8C13.5 8.82843 12.8284 9.5 12 9.5 11.1716 9.5 10.5 8.82843 10.5 8 10.5 7.17157 11.1716 6.5 12 6.5 12.8284 6.5 13.5 7.17157 13.5 8Z"></path>
-                  </svg>
-                  <p className="font-light">Mức độ sử dụng:&emsp;</p>
-                  <p className="text-base font-semibold">
-                    {getComicsCondition(formData.condition).usageLevel}
-                  </p>
-                </span>
+                {formData.condition.usageLevel && (
+                  <span className="flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      fill="currentColor"
+                    >
+                      <path d="M12 22C6.47715 22 2 17.5228 2 12 2 6.47715 6.47715 2 12 2 17.5228 2 22 6.47715 22 12 22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12 20 7.58172 16.4183 4 12 4 7.58172 4 4 7.58172 4 12 4 16.4183 7.58172 20 12 20ZM13 10.5V15H14V17H10V15H11V12.5H10V10.5H13ZM13.5 8C13.5 8.82843 12.8284 9.5 12 9.5 11.1716 9.5 10.5 8.82843 10.5 8 10.5 7.17157 11.1716 6.5 12 6.5 12.8284 6.5 13.5 7.17157 13.5 8Z"></path>
+                    </svg>
+                    <p className="font-light">Mức độ sử dụng:&emsp;</p>
+                    <p className="text-base font-semibold">
+                      {formData.condition.usageLevel}
+                    </p>
+                  </span>
+                )}
 
                 <p className="text-sm font-light italic h-[6em] phone:h-[5em]">
-                  {getComicsCondition(formData.condition).description}
+                  {formData.condition.description}
                 </p>
               </div>
             </div>

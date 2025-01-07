@@ -1,7 +1,6 @@
 import { Modal } from "antd";
 import React, { useState } from "react";
 import { Comic } from "../../../../common/base.interface";
-import { getComicsCondition } from "../../../../common/constances/comicsConditions";
 
 export default function SingleComicsDetails({
   currentComics,
@@ -75,8 +74,8 @@ export default function SingleComicsDetails({
           <div className="flex items-center justify-between gap-2 pr-4">
             <p className="font-light text-xs">Tình trạng:</p>
             <p className="font-semibold">
-              {getComicsCondition(currentComics.condition).conditionName} (
-              {getComicsCondition(currentComics.condition).value}/10)
+              {currentComics.condition.name} ({currentComics.condition.value}
+              /10)
             </p>
           </div>
 

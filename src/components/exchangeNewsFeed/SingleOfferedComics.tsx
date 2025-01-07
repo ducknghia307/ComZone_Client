@@ -1,5 +1,4 @@
 import { Comic } from "../../common/base.interface";
-import { getComicsCondition } from "../../common/constances/comicsConditions";
 
 export default function SingleOfferedComics({
   comics,
@@ -40,7 +39,7 @@ export default function SingleOfferedComics({
               </p>
               <p>
                 <span className="font-extralight">Tình trạng:</span>{" "}
-                {getComicsCondition(comics.condition).conditionName}
+                {comics.condition.name}
               </p>
             </div>
           </div>
@@ -104,7 +103,7 @@ export default function SingleOfferedComics({
               </p>
               <p>
                 <span className="font-extralight">Tình trạng:</span>{" "}
-                {getComicsCondition(comics.condition).conditionName}
+                {comics.condition.name}
               </p>
             </div>
           </div>

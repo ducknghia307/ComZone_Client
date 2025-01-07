@@ -21,29 +21,6 @@ export interface Genre extends BaseInterface {
   description: string;
 }
 
-const originCountriesList = [
-  "Nhật Bản",
-  "Hàn Quốc",
-  "Mỹ",
-  "Trung Quốc",
-  "Việt Nam",
-  "Pháp",
-  "Đức",
-  "Brazil",
-  "Ý",
-  "Canada",
-  "Tây Ban Nha",
-  "Argentina",
-  "Mexico",
-  "Anh",
-  "Ấn Độ",
-  "Nga",
-  "Thái Lan",
-  "Indonesia",
-  "Philippines",
-  "Singapore",
-];
-
 const popularSize = [
   {
     length: 18,
@@ -535,6 +512,38 @@ export default function MainComicsInformation({
           </div>
 
           <div className="flex flex-col items-stretch gap-2">
+            <div className="flex flex-col items-stretch gap-2">
+              <p className="text-sm italic font-light text-sky-600">
+                * Kích thước phổ biến:
+              </p>
+
+              <div className="grow flex flex-col sm:flex-row items-stretch gap-1">
+                {popularSize.map((size) => {
+                  const isSelected =
+                    width === size.width &&
+                    length === size.length &&
+                    thickness === size.thickness;
+                  return (
+                    <button
+                      onClick={() => {
+                        setWidth(size.width);
+                        setLength(size.length);
+                        setThickness(size.thickness);
+                      }}
+                      className={`grow ${
+                        isSelected
+                          ? "ring-1 ring-black font-semibold"
+                          : "hover:bg-gray-100"
+                      } border border-gray-300 rounded px-4 py-1 duration-100`}
+                    >
+                      {size.length} x {size.width} x {size.thickness}{" "}
+                      <span className="text-xs">(cm)</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-3 items-stretch gap-2">
               <label className="col-span-1 relative cursor-text">
                 <input
@@ -607,38 +616,6 @@ export default function MainComicsInformation({
                   Độ dày (cm)
                 </span>
               </label>
-            </div>
-
-            <div className="flex flex-col items-stretch gap-2">
-              <p className="text-sm italic font-light text-sky-600">
-                * Kích thước phổ biến:
-              </p>
-
-              <div className="grow flex flex-col sm:flex-row items-stretch gap-1">
-                {popularSize.map((size) => {
-                  const isSelected =
-                    width === size.width &&
-                    length === size.length &&
-                    thickness === size.thickness;
-                  return (
-                    <button
-                      onClick={() => {
-                        setWidth(size.width);
-                        setLength(size.length);
-                        setThickness(size.thickness);
-                      }}
-                      className={`grow ${
-                        isSelected
-                          ? "ring-1 ring-black font-semibold"
-                          : "hover:bg-gray-100"
-                      } border border-gray-300 rounded px-4 py-1 duration-100`}
-                    >
-                      {size.length} x {size.width} x {size.thickness}{" "}
-                      <span className="text-xs">(cm)</span>
-                    </button>
-                  );
-                })}
-              </div>
             </div>
           </div>
         </div>
@@ -765,23 +742,20 @@ export default function MainComicsInformation({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 items-stretch gap-x-2 gap-y-3">
-            <FormControl fullWidth className="col-span-2">
-              <InputLabel sx={{ padding: "0px 8px" }}>
-                <p className="REM">Xuất xứ</p>
-              </InputLabel>
-              <Select
-                label="Xuất xứ *"
-                sx={{ padding: "0px 8px" }}
+            <label className="col-span-2 relative cursor-text">
+              <input
+                type="text"
+                placeholder="Xuất xứ"
                 value={originCountry}
                 onChange={(e) => setOriginCountry(e.target.value)}
+                className={`${styles.animatedInput} w-full py-4 px-4 border border-gray-400 rounded-lg border-opacity-50 outline-none focus:border-sky-600 focus:ring-1 focus:ring-sky-600 placeholder-gray-600 placeholder-opacity-0 transition duration-200`}
+              />
+              <span
+                className={`${styles.inputText} italic text-opacity-80 bg-white font-light absolute left-4 top-1/2 -translate-y-1/2 px-1 transition duration-200`}
               >
-                {originCountriesList.map((country) => (
-                  <MenuItem key={country} value={country}>
-                    <p className="REM">{country}</p>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                Xuất xứ
+              </span>
+            </label>
 
             <label className="col-span-1 relative cursor-text">
               <input

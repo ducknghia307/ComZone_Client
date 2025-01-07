@@ -1,11 +1,18 @@
 import React, { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Chip, } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Box,
+  Chip,
+} from "@mui/material";
 import { Comic, UserInfo } from "../../common/base.interface";
 import TimeSelectionModal from "./TimeSelectionModal";
 import RejectReasonAuction from "./RejectReasonAuction";
-import CloseIcon from "@mui/icons-material/Close"
+import CloseIcon from "@mui/icons-material/Close";
 import { Card, Checkbox, Image, Typography } from "antd";
-import { conditionGradingScales } from "../../common/constances/comicsConditions";
 
 interface PendingApprovalModalProps {
   open: boolean;
@@ -27,7 +34,14 @@ interface PendingApprovalModalProps {
   onStatusUpdate: (newStatus: string) => void;
 }
 
-const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCancel, onSuccess, comic, auctionData, onStatusUpdate }) => {
+const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
+  open,
+  onCancel,
+  onSuccess,
+  comic,
+  auctionData,
+  onStatusUpdate,
+}) => {
   const [loading, setLoading] = useState(false);
   const [timeSelectionModalOpen, setTimeSelectionModalOpen] = useState(false);
   const [rejectReasonModalOpen, setRejectReasonModalOpen] = useState(false);
@@ -63,11 +77,6 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
       ...prevState,
       [name]: checked,
     }));
-  };
-
-  const translateCondition = (conditionValue: number) => {
-    const condition = conditionGradingScales.find((c) => c.value === conditionValue);
-    return condition ? condition.conditionName : "Không xác định";
   };
 
   const translateCover = (cover: string) => {
@@ -122,7 +131,13 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
             position: "relative",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             Duyệt Yêu Cầu Đấu Giá
           </Box>
           <Button
@@ -144,25 +159,47 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
         <DialogContent>
           <div className="w-full flex flex-row gap-3">
             <div className="w-2/3">
-              <Box sx={{ backgroundColor: "#fff", borderRadius: "12px", padding: "24px", boxShadow: "0 2px 8px rgba(177, 177, 177, 0.5)", mt: 2 }}>
-                <Typography style={{
-                  fontFamily: "REM",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                  marginBottom: "20px",
-                  color: "#000",
-                  textAlign: "center"
-                }}>
+              <Box
+                sx={{
+                  backgroundColor: "#fff",
+                  borderRadius: "12px",
+                  padding: "24px",
+                  boxShadow: "0 2px 8px rgba(177, 177, 177, 0.5)",
+                  mt: 2,
+                }}
+              >
+                <Typography
+                  style={{
+                    fontFamily: "REM",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    marginBottom: "20px",
+                    color: "#000",
+                    textAlign: "center",
+                  }}
+                >
                   Thông tin truyện
                 </Typography>
 
-                <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <Box sx={{
-                    padding: "16px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "8px"
-                  }}>
-                    <Typography style={{ fontFamily: "REM", fontSize: "16px", fontWeight: "bold", color: "#555", marginBottom: "8px", }}>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: "20px" }}
+                >
+                  <Box
+                    sx={{
+                      padding: "16px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Typography
+                      style={{
+                        fontFamily: "REM",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        color: "#555",
+                        marginBottom: "8px",
+                      }}
+                    >
                       Ảnh bìa:
                     </Typography>
                     <Image.PreviewGroup
@@ -185,7 +222,13 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                       />
                     </Image.PreviewGroup>
                   </Box>
-                  <Box sx={{ padding: "16px", backgroundColor: "#f8f9fa", borderRadius: "8px" }}>
+                  <Box
+                    sx={{
+                      padding: "16px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "8px",
+                    }}
+                  >
                     <Typography
                       style={{
                         fontFamily: "REM",
@@ -198,7 +241,9 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                       Ảnh đính kèm:
                     </Typography>
                     {comic.previewChapter && comic.previewChapter.length > 0 ? (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+                      <Box
+                        sx={{ display: "flex", flexWrap: "wrap", gap: "16px" }}
+                      >
                         {comic.previewChapter.map((image, index) => (
                           <Image.PreviewGroup
                             preview={{
@@ -223,50 +268,90 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                       </Box>
                     ) : (
                       <Typography
-                        style={{ fontFamily: "REM", fontSize: "14px", color: "#777" }}
+                        style={{
+                          fontFamily: "REM",
+                          fontSize: "14px",
+                          color: "#777",
+                        }}
                       >
                         Không có hình ảnh xem trước.
                       </Typography>
                     )}
                   </Box>
 
-                  <Box sx={{
-                    padding: "16px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "8px"
-                  }}>
-                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                  <Box
+                    sx={{
+                      padding: "16px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Typography
+                      style={{
+                        fontFamily: "REM",
+                        fontSize: "16px",
+                        color: "#555",
+                      }}
+                    >
                       <strong>Tên truyện:</strong> {comic.title}
                     </Typography>
                   </Box>
 
-                  <Box sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "16px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "8px"
-                  }}>
-                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "16px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Typography
+                      style={{
+                        fontFamily: "REM",
+                        fontSize: "16px",
+                        color: "#555",
+                      }}
+                    >
                       <strong>Tác giả:</strong> {comic.author}
                     </Typography>
-                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                    <Typography
+                      style={{
+                        fontFamily: "REM",
+                        fontSize: "16px",
+                        color: "#555",
+                      }}
+                    >
                       <strong>Giá:</strong> {comic.price?.toLocaleString()} đ
                     </Typography>
                   </Box>
 
-                  <Box sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "16px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "8px"
-                  }}>
-                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
-                      <strong>Tình trạng:</strong> {translateCondition(comic.condition)}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "16px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Typography
+                      style={{
+                        fontFamily: "REM",
+                        fontSize: "16px",
+                        color: "#555",
+                      }}
+                    >
+                      <strong>Tình trạng:</strong> {comic.condition.name}
                     </Typography>
 
-                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                    <Typography
+                      style={{
+                        fontFamily: "REM",
+                        fontSize: "16px",
+                        color: "#555",
+                      }}
+                    >
                       <strong>Phiên bản:</strong> {comic.edition?.name}
                     </Typography>
                   </Box>
@@ -303,47 +388,86 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                     </Typography>
                   </Box>
 
-                  <Box sx={{
-                    padding: "16px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "8px"
-                  }}>
-                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                  <Box
+                    sx={{
+                      padding: "16px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Typography
+                      style={{
+                        fontFamily: "REM",
+                        fontSize: "16px",
+                        color: "#555",
+                      }}
+                    >
                       <strong>Mô tả:</strong> {comic.description}
                     </Typography>
                   </Box>
 
-                  <Box sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "16px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "8px"
-                  }}>
-                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
-                      <strong>Loại bìa:</strong> {translateCover(comic.cover)}
-                    </Typography>
-
-                    <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
-                      <strong>Màu sắc truyện:</strong> {translateColor(comic.color)}
-                    </Typography>
-                  </Box>
-
-                  {(comic.length && comic.width && comic.thickness) || comic.page ? (
-                    <Box sx={{
+                  <Box
+                    sx={{
                       display: "flex",
                       justifyContent: "space-between",
                       padding: "16px",
                       backgroundColor: "#f8f9fa",
-                      borderRadius: "8px"
-                    }}>
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Typography
+                      style={{
+                        fontFamily: "REM",
+                        fontSize: "16px",
+                        color: "#555",
+                      }}
+                    >
+                      <strong>Loại bìa:</strong> {translateCover(comic.cover)}
+                    </Typography>
+
+                    <Typography
+                      style={{
+                        fontFamily: "REM",
+                        fontSize: "16px",
+                        color: "#555",
+                      }}
+                    >
+                      <strong>Màu sắc truyện:</strong>{" "}
+                      {translateColor(comic.color)}
+                    </Typography>
+                  </Box>
+
+                  {(comic.length && comic.width && comic.thickness) ||
+                  comic.page ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "16px",
+                        backgroundColor: "#f8f9fa",
+                        borderRadius: "8px",
+                      }}
+                    >
                       {comic.length && comic.width && comic.thickness && (
-                        <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
-                          <strong>Kích thước truyện:</strong> {comic.length} x {comic.width} x {comic.thickness} (cm)
+                        <Typography
+                          style={{
+                            fontFamily: "REM",
+                            fontSize: "16px",
+                            color: "#555",
+                          }}
+                        >
+                          <strong>Kích thước truyện:</strong> {comic.length} x{" "}
+                          {comic.width} x {comic.thickness} (cm)
                         </Typography>
                       )}
                       {comic.page && (
-                        <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                        <Typography
+                          style={{
+                            fontFamily: "REM",
+                            fontSize: "16px",
+                            color: "#555",
+                          }}
+                        >
                           <strong>Số trang:</strong> {comic.page}
                         </Typography>
                       )}
@@ -351,40 +475,74 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                   ) : null}
 
                   {comic.publisher && comic.originCountry && (
-                    <Box sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "16px",
-                      backgroundColor: "#f8f9fa",
-                      borderRadius: "8px"
-                    }}>
-                      <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "16px",
+                        backgroundColor: "#f8f9fa",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <Typography
+                        style={{
+                          fontFamily: "REM",
+                          fontSize: "16px",
+                          color: "#555",
+                        }}
+                      >
                         <strong>Nhà xuất bản:</strong> {comic.publisher}
                       </Typography>
-                      <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                      <Typography
+                        style={{
+                          fontFamily: "REM",
+                          fontSize: "16px",
+                          color: "#555",
+                        }}
+                      >
                         <strong>Xuất xứ:</strong> {comic.originCountry}
                       </Typography>
                     </Box>
                   )}
 
                   {comic.publicationYear && comic.releaseYear && (
-                    <Box sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "16px",
-                      backgroundColor: "#f8f9fa",
-                      borderRadius: "8px"
-                    }}>
-                      <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "16px",
+                        backgroundColor: "#f8f9fa",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <Typography
+                        style={{
+                          fontFamily: "REM",
+                          fontSize: "16px",
+                          color: "#555",
+                        }}
+                      >
                         <strong>Năm xuất bản:</strong> {comic.publicationYear}
                       </Typography>
-                      <Typography style={{ fontFamily: "REM", fontSize: "16px", color: "#555" }}>
+                      <Typography
+                        style={{
+                          fontFamily: "REM",
+                          fontSize: "16px",
+                          color: "#555",
+                        }}
+                      >
                         <strong>Năm phát hành:</strong> {comic.releaseYear}
                       </Typography>
                     </Box>
                   )}
 
-                  <Box sx={{ padding: "16px", backgroundColor: "#f8f9fa", borderRadius: "8px" }}>
+                  <Box
+                    sx={{
+                      padding: "16px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "8px",
+                    }}
+                  >
                     <Typography
                       style={{
                         fontFamily: "REM",
@@ -396,8 +554,11 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                     >
                       Yếu tố thể hiện phiên bản truyện:
                     </Typography>
-                    {comic.editionEvidence && comic.editionEvidence.length > 0 ? (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                    {comic.editionEvidence &&
+                    comic.editionEvidence.length > 0 ? (
+                      <Box
+                        sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
+                      >
                         {comic.editionEvidence.map((evidence, index) => (
                           <Chip
                             key={index}
@@ -413,7 +574,11 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                       </Box>
                     ) : (
                       <Typography
-                        style={{ fontFamily: "REM", fontSize: "14px", color: "#777" }}
+                        style={{
+                          fontFamily: "REM",
+                          fontSize: "14px",
+                          color: "#777",
+                        }}
                       >
                         Không có bằng chứng phiên bản nào.
                       </Typography>
@@ -446,7 +611,13 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                 >
                   Tiêu chí duyệt đấu giá
                 </Title>
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                  }}
+                >
                   <div
                     style={{
                       display: "flex",
@@ -484,8 +655,9 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                           display: "block",
                         }}
                       >
-                        Người bán phải cung cấp đầy đủ thông tin chi tiết về truyện, bao gồm: tên truyện, tác giả,
-                        thể loại, mô tả nội dung truyện, loại bìa, và màu sắc của truyện.
+                        Người bán phải cung cấp đầy đủ thông tin chi tiết về
+                        truyện, bao gồm: tên truyện, tác giả, thể loại, mô tả
+                        nội dung truyện, loại bìa, và màu sắc của truyện.
                       </Text>
                     </div>
                   </div>
@@ -527,8 +699,8 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                           display: "block",
                         }}
                       >
-                        Tình trạng của truyện phải đạt mức trung bình trở lên, tương đương 4/10 theo thang điểm
-                        đánh giá chất lượng.
+                        Tình trạng của truyện phải đạt mức trung bình trở lên,
+                        tương đương 4/10 theo thang điểm đánh giá chất lượng.
                       </Text>
                     </div>
                   </div>
@@ -546,7 +718,9 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                   >
                     <Checkbox
                       id="criteria3"
-                      onChange={(e) => handleCheckboxChange("criteria3", e.target.checked)}
+                      onChange={(e) =>
+                        handleCheckboxChange("criteria3", e.target.checked)
+                      }
                     />
                     <div>
                       <label
@@ -568,8 +742,10 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
                           display: "block",
                         }}
                       >
-                        Kiểm tra xem yếu tố thể hiện phiên bản truyện và các ảnh đính kèm có khớp với phiên bản truyện mà người bán đã chọn hay không. 
-                        Đồng thời, từng ảnh sẽ được xem xét để đảm bảo yếu tố thể hiện phiên bản truyện là chính xác.
+                        Kiểm tra xem yếu tố thể hiện phiên bản truyện và các ảnh
+                        đính kèm có khớp với phiên bản truyện mà người bán đã
+                        chọn hay không. Đồng thời, từng ảnh sẽ được xem xét để
+                        đảm bảo yếu tố thể hiện phiên bản truyện là chính xác.
                       </Text>
                     </div>
                   </div>
@@ -597,7 +773,10 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
               padding: "8px 24px",
               borderRadius: "8px",
               textTransform: "none",
-              "&:hover": { backgroundColor: "#e0e0e0", border: "1px solid grey", },
+              "&:hover": {
+                backgroundColor: "#e0e0e0",
+                border: "1px solid grey",
+              },
               border: "1px solid #e0e0e0",
             }}
           >
@@ -623,7 +802,10 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({ open, onCan
             <Button
               color="primary"
               variant="contained"
-              disabled={!Object.values(criteriaChecked).some((value) => value) || loading}
+              disabled={
+                !Object.values(criteriaChecked).some((value) => value) ||
+                loading
+              }
               onClick={handleApprove}
               sx={{
                 fontFamily: "REM",

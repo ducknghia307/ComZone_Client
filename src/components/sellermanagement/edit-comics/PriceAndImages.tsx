@@ -33,11 +33,12 @@ export default function PriceAndImages({
   const previewChaptersInputRef = useRef<HTMLInputElement>();
 
   const maxPreviewChapters =
-    currentComics && currentComics.quantity > 1 ? 8 : 4;
+    currentComics && currentComics.quantity > 1 ? 16 : 8;
 
   const resetComicsData = () => {
     setCoverImage(currentComics.coverImage);
     setPreviewChapters(currentComics.previewChapter);
+    setPreviewChaptersPlaceholder([]);
     setPrice(currentComics.price);
   };
 
@@ -129,7 +130,7 @@ export default function PriceAndImages({
           </p>
         )}
 
-      <div className="flex flex-col sm:flex-row items-stretch justify-start gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-start justify-start gap-4">
         <input
           ref={coverImageInputRef}
           type="file"
@@ -153,7 +154,7 @@ export default function PriceAndImages({
                 if (coverImageInputRef && coverImage)
                   coverImageInputRef.current.click();
               }}
-              className="cursor-pointer group/image"
+              className="w-full cursor-pointer group/image"
             >
               <img
                 src={coverImage}
@@ -225,6 +226,7 @@ export default function PriceAndImages({
               </span>
             </button>
           ))}
+
           {previewChaptersPlaceholder.map((image, index) => (
             <button
               onClick={() => handleRemovePreviewChapters(index)}
@@ -249,6 +251,7 @@ export default function PriceAndImages({
               </span>
             </button>
           ))}
+
           <input
             ref={previewChaptersInputRef}
             type="file"

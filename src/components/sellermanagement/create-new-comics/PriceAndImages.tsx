@@ -37,7 +37,7 @@ export default function PriceAndImages({
   const previewChaptersInputRef = useRef<HTMLInputElement>();
 
   const maxPreviewChapters =
-    mainInformation && mainInformation.quantity > 1 ? 8 : 4;
+    mainInformation && mainInformation.quantity > 1 ? 16 : 8;
 
   const handleUploadCoverImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;

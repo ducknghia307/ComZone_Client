@@ -100,7 +100,7 @@ export default function CreateNewComics({
       )
       .then((res) => {
         uploadedCoverImage = res.data.imageUrl;
-        setCreateProgress(33);
+        setCreateProgress(20);
       })
       .catch((err) => {
         console.log("Error uploading cover image: ", err);
@@ -123,7 +123,10 @@ export default function CreateNewComics({
           )
           .then((res) => {
             uploadedPreviewImages.push(res.data.imageUrl);
-            setCreateProgress(66);
+            setCreateProgress(
+              (prev) =>
+                prev + Math.round(70 / priceAndImages.previewChapters.length)
+            );
           })
           .catch((err) => {
             console.log("Error uploading preview chapter images: ", err);

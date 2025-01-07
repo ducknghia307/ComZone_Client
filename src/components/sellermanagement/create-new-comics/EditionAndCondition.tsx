@@ -123,23 +123,6 @@ export default function EditionAndCondition({
       return;
     }
 
-    if (
-      !edition.auctionDisabled &&
-      !willNotAuction &&
-      evidenceFields.length === 0
-    ) {
-      message.error({
-        key: "error",
-        content: (
-          <p className="REM text-start">
-            Vui lòng chọn ít nhất 1 thuộc tính để thể hiện phiên bản truyện!
-          </p>
-        ),
-        duration: 5,
-      });
-      return;
-    }
-
     setEditionEvidenceFields(evidenceFields);
     handleGettingConditionAndEdition({
       condition: condition.value,
@@ -310,6 +293,19 @@ export default function EditionAndCondition({
 
         {edition && !edition.auctionDisabled && (
           <div className="space-y-6">
+            <div className="flex items-center gap-2 mt-4">
+              <Checkbox
+                checked={willNotAuction}
+                onChange={() => {
+                  setEvidenceFields([]);
+                  setWillNotAuction(!willNotAuction);
+                }}
+              />
+              <p className="font-light text-red-600">
+                Tôi sẽ không dùng truyện này để bán dưới hình thức đấu giá.
+              </p>
+            </div>
+
             <div className={`space-y-2 ${willNotAuction && "opacity-30"}`}>
               <div className="flex items-center gap-4">
                 <p className="font-semibold uppercase">
@@ -418,19 +414,6 @@ export default function EditionAndCondition({
                   })}
                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 mt-4">
-              <Checkbox
-                checked={willNotAuction}
-                onChange={() => {
-                  setEvidenceFields([]);
-                  setWillNotAuction(!willNotAuction);
-                }}
-              />
-              <p className="font-light text-red-600">
-                Tôi sẽ không dùng truyện này để bán dưới hình thức đấu giá.
-              </p>
             </div>
           </div>
         )}

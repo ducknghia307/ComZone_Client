@@ -5,7 +5,7 @@ import { Edition } from "../../../common/interfaces/edition.interface";
 import PriceAndImages from "./PriceAndImages";
 import { privateAxios } from "../../../middleware/axiosInstance";
 import { CircularProgress } from "@mui/material";
-import { notification } from "antd";
+import { message, notification } from "antd";
 import { Merchandise } from "../../../common/interfaces/merchandise.interface";
 import { Comic, Genre } from "../../../common/base.interface";
 import ActionConfirm from "../../actionConfirm/ActionConfirm";
@@ -88,6 +88,148 @@ export default function EditComics({
     uploadedPreviewChapters.length === 0;
 
   const handleSubmitEditingComics = async () => {
+    if (
+      currentComics.publicationYear &&
+      currentComics.releaseYear &&
+      (currentComics.publicationYear < 1800 ||
+        currentComics.releaseYear < 1800 ||
+        currentComics.publicationYear < currentComics.releaseYear)
+    ) {
+      message.error({
+        key: "form-error",
+        content: (
+          <p className="REM text-start">
+            Thời gian phát hành và xuất bản truyện không hợp lệ!
+          </p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    if (
+      currentComics.episodesList &&
+      currentComics.quantity > 1 &&
+      currentComics.episodesList.length === 0
+    ) {
+      message.error({
+        key: "form-error",
+        content: (
+          <p className="REM text-start">
+            Vui lòng nhập ít nhất tên 1 tập truyện trong bộ!
+          </p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    if (
+      !currentComics.title ||
+      !currentComics.author ||
+      currentComics.genres.length === 0 ||
+      !currentComics.description
+    ) {
+      const missingFields = [];
+      if (!currentComics.title) missingFields.push("Tựa đề");
+      if (!currentComics.author) missingFields.push("Tác giả");
+      if (currentComics.genres.length === 0) missingFields.push("Thể loại");
+      if (!currentComics.description) missingFields.push("Mô tả");
+
+      message.error({
+        key: "form-error",
+        content: (
+          <p className="REM text-start">
+            Vui lòng điền đầy đủ những thông tin bắt buộc!
+            <br />
+            <span className="text-red-600 font-semibold">
+              Thiếu:{" "}
+              {missingFields.map(
+                (field, index) =>
+                  `${field}${index < missingFields.length - 1 ? ", " : "."}`
+              )}
+            </span>
+          </p>
+        ),
+        duration: 8,
+      });
+      return;
+    }
+
+    if (!currentComics.edition) {
+      message.error({
+        key: "error",
+        content: (
+          <p className="REM text-start">Vui lòng chọn phiên bản truyện!</p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    if (
+      !currentComics.edition.auctionDisabled &&
+      !currentComics.willNotAuction &&
+      currentComics.editionEvidence &&
+      currentComics.editionEvidence.length === 0
+    ) {
+      message.error({
+        key: "error",
+        content: (
+          <p className="REM text-start">
+            Vui lòng chọn ít nhất 1 thuộc tính để thể hiện phiên bản truyện!
+          </p>
+        ),
+        duration: 5,
+      });
+      return;
+    }
+
+    if (!currentComics.coverImage) {
+      message.error({
+        key: "error",
+        content: (
+          <p className="REM text-start">Vui lòng tải lên ảnh bìa cho truyện!</p>
+        ),
+      });
+      return;
+    }
+
+    if (
+      currentComics.previewChapter.length === 0 &&
+      uploadedPreviewChapters.length === 0
+    ) {
+      message.error({
+        key: "error",
+        content: (
+          <p className="REM text-start">
+            Vui lòng tải lên ít nhất 1 ảnh đính kèm!
+          </p>
+        ),
+      });
+      return;
+    }
+
+    if (!currentComics.price) {
+      message.error({
+        key: "error",
+        content: (
+          <p className="REM text-start">Vui lòng nhập giá bán cho truyện!</p>
+        ),
+      });
+      return;
+    }
+
+    if (currentComics.price < 10000) {
+      message.error({
+        key: "error",
+        content: (
+          <p className="REM text-start">Giá bán tối thiểu là 10.000&#8363;!</p>
+        ),
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     let newCoverImage: string;
@@ -104,13 +246,12 @@ export default function EditComics({
         )
         .then((res) => {
           newCoverImage = res.data.imageUrl;
-          setUpdateProgress(33);
+          setUpdateProgress(20);
         })
         .catch((err) => {
           console.log("Error uploading cover image: ", err);
           setIsLoading(false);
         });
-    else setUpdateProgress(33);
 
     if (uploadedPreviewChapters.length > 0)
       await Promise.all(
@@ -130,7 +271,7 @@ export default function EditComics({
             .then((res) => {
               newPreviewChapters.push(res.data.imageUrl);
               setUpdateProgress(
-                (prev) => prev + Math.round(33 / uploadedPreviewChapters.length)
+                (prev) => prev + Math.round(70 / uploadedPreviewChapters.length)
               );
             })
             .catch((err) => {
@@ -139,12 +280,12 @@ export default function EditComics({
             });
         })
       );
-    else setUpdateProgress(66);
 
     const comicsData = {
       ...currentComics,
       genres: currentComics.genres.map((genre) => genre.id),
       merchandises: currentComics.merchandises.map((merch) => merch.id),
+      condition: currentComics.condition.value,
       edition: currentComics.edition.id,
       editionEvidence:
         currentComics.editionEvidence &&
@@ -257,7 +398,11 @@ export default function EditComics({
         <button
           onClick={() => {
             if (isNotChanged) setIsEditingComics(undefined);
-            else setResetTrigger(!resetTrigger);
+            else {
+              setResetTrigger(!resetTrigger);
+              setUploadedCoverImage(undefined);
+              setUploadedPreviewChapters([]);
+            }
           }}
           className="sm:basis-1/3 border border-gray-300 rounded-md py-2 duration-200 hover:bg-gray-100"
         >

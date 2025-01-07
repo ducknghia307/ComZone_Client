@@ -152,6 +152,7 @@ export interface Comic extends BaseInterface {
   willNotAuction: boolean;
   coverImage: string;
   previewChapter?: string[];
+  editionEvidence?: string[];
   price?: number;
   onSaleSince?: Date;
   type: "NONE" | "SELL" | "AUCTION" | "EXCHANGE";

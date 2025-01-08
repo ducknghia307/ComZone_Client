@@ -133,7 +133,7 @@ export default function RefundRequest({
       <div className="pt-4 flex flex-col gap-4">
         <p className="font-semibold text-xl pb-4">GẶP VẤN ĐỀ KHI NHẬN TRUYỆN</p>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-start gap-2">
           <p className="text-sm whitespace-nowrap">
             Vấn đề bạn gặp phải: <span className="text-red-600">*</span>
           </p>
@@ -147,8 +147,12 @@ export default function RefundRequest({
             placeholder={
               <p className="text-sm italic">Chọn một loại vấn đề...</p>
             }
-            optionRender={(props) => <p className="text-wrap leading-normal">{props.label}</p>}
-            labelRender={(props) => <p className="text-wrap leading-normal">{props.label}</p>}
+            optionRender={(props) => (
+              <p className="text-wrap leading-normal">{props.label}</p>
+            )}
+            labelRender={(props) => (
+              <p className="text-wrap leading-normal">{props.label}</p>
+            )}
           />
         </div>
 
@@ -159,6 +163,7 @@ export default function RefundRequest({
           <Input.TextArea
             placeholder="Mô tả cụ thể vấn đề bạn của bạn..."
             autoSize={{ minRows: 5, maxRows: 8 }}
+            spellCheck="false"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={2000}

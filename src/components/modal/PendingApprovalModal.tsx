@@ -342,7 +342,7 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                         color: "#555",
                       }}
                     >
-                      <strong>Tình trạng:</strong> {comic.condition.name}
+                      <strong>Tình trạng:</strong> {comic.condition?.name}
                     </Typography>
 
                     <Typography

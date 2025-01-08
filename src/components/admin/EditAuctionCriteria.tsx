@@ -88,8 +88,8 @@ const EditAuctionCriteria: React.FC = () => {
   const handleSave = () => {
     const payload = {
       isFullInfoFilled: isFullInfoFilled,
-      conditionLevel: condition,
-      disallowedEdition: editionRestricted ? unSelectedEditions : [],
+      conditionLevel: condition.value,
+      disallowedEdition: unSelectedEditions,
     };
     console.log("payload:", payload);
 
@@ -125,15 +125,29 @@ const EditAuctionCriteria: React.FC = () => {
 
     setIsEdited(true);
   };
-  const handleSwitchChange = (checked: boolean) => {
+  const handleEditionClick = (editionId: string) => {
+    setEditions((prevEditions) =>
+      prevEditions.map((edition) =>
+        edition.id === editionId
+          ? { ...edition, auctionDisabled: !edition.auctionDisabled }
+          : edition
+      )
+    );
+
+    setEditions((prevEditions) => {
+      const newUnselectedEditions = prevEditions
+        .filter((edition) => edition.auctionDisabled)
+        .map((edition) => edition.id);
+
+      setUnSelectedEditions(newUnselectedEditions);
+      console.log("Updated unselected editions:", {
+        unselectedEditions: newUnselectedEditions,
+      });
+
+      return prevEditions;
+    });
+
     setIsEdited(true);
-    setEditionRestricted(checked);
-    if (checked) {
-      fetchEditions();
-    } else {
-      console.log("No editions selected:", selectedEditions);
-      setSelectedEditions([]);
-    }
   };
 
   useEffect(() => {
@@ -161,8 +175,8 @@ const EditAuctionCriteria: React.FC = () => {
           setEditionRestricted(fetchedConfig.editionRestricted);
           if (fetchedConfig.editionRestricted) {
             setIsEditionRestricted(fetchedConfig.editionRestricted);
-            fetchEditions();
           }
+          fetchEditions();
           setCondition(fetchedConfig.conditionLevel);
           setIsFullInfoFilled(fetchedConfig.isFullInfoFilled);
         } else {
@@ -208,7 +222,7 @@ const EditAuctionCriteria: React.FC = () => {
           <Form.Item style={{ width: "100%" }}>
             <div className="flex flex-row gap-3 items-center">
               <p className="text-lg font-bold">
-                Đầy đủ thông tin về cuốn truyện
+                Yêu cầu toàn bộ thông tin của truyện
               </p>
               <Switch
                 checked={isFullInfoFilled}
@@ -222,7 +236,7 @@ const EditAuctionCriteria: React.FC = () => {
           </Form.Item>
           <Form.Item style={{ width: "100%" }}>
             <div className="flex flex-col gap-3 ">
-              <p className="text-lg font-bold">Tình trạng truyện</p>
+              <p className="text-lg font-bold">Tình trạng tối thiểu</p>
               <div className="px-4 w-full">
                 <Slider
                   marks={formatGradingScaleToMarks(conditionGradingScales)}
@@ -273,27 +287,32 @@ const EditAuctionCriteria: React.FC = () => {
           </Form.Item>
           <Form.Item style={{ width: "100%" }}>
             <div className="flex flex-row gap-3 items-center">
-              <p className="text-lg font-bold">Phiên bản của cuốn truyện</p>
-              <Switch
-                checked={editionRestricted}
-                onChange={handleSwitchChange}
-              />
+              <p className="text-lg font-bold">Chọn phiên bản để đấu giá</p>
             </div>
-            {editionRestricted && editions.length > 0 && (
-              <Select
-                mode="multiple"
-                style={{ width: "100%", marginTop: "10px" }}
-                placeholder="Chọn phiên bản"
-                onChange={handleEditionChange}
-                value={selectedEditions}
-              >
-                {editions.map((edition) => (
-                  <Select.Option key={edition.id} value={edition.id}>
+            <div className="flex flex-col gap-2">
+              {editions.map((edition, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleEditionClick(edition.id)}
+                  className={`px-4 py-2 text-black rounded-lg hover:bg-gray-100 duration-300 flex flex-col text-start border-2 ${
+                    !edition.auctionDisabled
+                      ? "border-green-500"
+                      : "border-gray-300"
+                  }`}
+                >
+                  <p
+                    className={`font-semibold ${
+                      !edition.auctionDisabled
+                        ? "text-green-500"
+                        : "text-gray-500"
+                    }`}
+                  >
                     {edition.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            )}
+                  </p>
+                  <p className="opacity-80 text-xs">{edition.description}</p>
+                </button>
+              ))}
+            </div>
           </Form.Item>
           <div className="flex justify-center">
             <Button

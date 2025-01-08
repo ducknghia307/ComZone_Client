@@ -15,8 +15,18 @@ const AdminComicTab = () => {
         Thể loại truyện
       </Link>
       <Link
+        to={"/admin/comic/merchandises"}
+        className={`p-3  ${
+          location.pathname === "/admin/comic/merchandises"
+            ? "bg-gray-200"
+            : "bg-white hover:bg-gray-200"
+        } hover:cursor-pointer duration-300 transition-all`}
+      >
+        Phụ kiện
+      </Link>
+      <Link
         to={"/admin/comic/editions"}
-        className={`p-3 rounded-b-lg ${
+        className={`p-3 ${
           location.pathname === "/admin/comic/editions"
             ? "bg-gray-200"
             : "bg-white hover:bg-gray-200"
@@ -25,14 +35,14 @@ const AdminComicTab = () => {
         Phiên bản
       </Link>
       <Link
-        to={"/admin/comic/merchandises"}
+        to={"/admin/comic/conditions"}
         className={`p-3 rounded-b-lg ${
-          location.pathname === "/admin/comic/merchandises"
+          location.pathname === "/admin/comic/editions"
             ? "bg-gray-200"
             : "bg-white hover:bg-gray-200"
         } hover:cursor-pointer duration-300 transition-all`}
       >
-        Phụ kiện
+        Tình trạng
       </Link>
     </div>
   );

@@ -50,6 +50,7 @@ import AdminAuctionCriteria from "../../pages/AdminAuctionCriteria";
 import AdminComicGenre from "../../pages/AdminComicGenre";
 import AdminComicEdition from "../../pages/AdminComicEdition";
 import AdminComicMerchandise from "../../pages/AdminComicMerchandise";
+import AdminComicCondition from "../../pages/AdminComicCondition";
 
 const AppRouter = () => {
   return (
@@ -159,6 +160,10 @@ const AppRouter = () => {
         />
 
         <Route path="/admin/comic/genres" element={<AdminComicGenre />} />
+        <Route
+          path="/admin/comic/conditions"
+          element={<AdminComicCondition />}
+        />
         <Route path="/admin/comic/editions" element={<AdminComicEdition />} />
         <Route
           path="/admin/comic/merchandises"

@@ -35,6 +35,7 @@ const adminAndModPaths = [
   "/admin/comic/editions",
   "/admin/comic/merchandises",
   "/admin/comic/genres",
+  "/admin/comic/conditions",
   "/mod/users",
   "/mod/comics",
   "/mod/orders",

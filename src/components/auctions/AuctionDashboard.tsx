@@ -18,7 +18,7 @@ const AuctionDashboard = () => {
           }`}
           onClick={() => setActiveTab("AUCTION")}
         >
-          Quản lí đấu giá
+          Quản lý đấu giá
         </button>
         <button
           className={`w-1/3 py-5 text-center font-bold text-lg ${

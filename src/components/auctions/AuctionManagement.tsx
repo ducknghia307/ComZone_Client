@@ -139,6 +139,7 @@ const AuctionManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAuction, setSelectedAuction] = useState(null);
   const [openDetail, setOpenDetail] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
   console.log(selectedAuction);
 
   const handleOpenDetail = (auction) => {
@@ -245,7 +246,11 @@ const AuctionManagement = () => {
     }
   };
 
-  const paginatedData = auctions.slice(
+  const filteredAuctions = auctions.filter((auction) =>
+    auction.comics.title.toLowerCase().includes(searchKeyword.toLowerCase())
+  );
+
+  const paginatedData = filteredAuctions.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -257,7 +262,7 @@ const AuctionManagement = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="REM w-full bg-white p-4 rounded-lg drop-shadow-lg flex flex-col gap-4">
+    <div className="REM w-full bg-white p-4 rounded-lg drop-shadow-lg flex flex-col">
       {auctions.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-16">
           <img src={EmptyImage} alt="" className="w-32 bg-white" />
@@ -274,6 +279,17 @@ const AuctionManagement = () => {
               }}
             >
               <TextField
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                size="small"
+                placeholder="Tìm kiếm theo tên truyện đấu giá..."
+                variant="outlined"
+                sx={{
+                  width: "340px",
+                  "& input::placeholder": {
+                    fontFamily: "REM",
+                  },
+                }}
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -283,9 +299,6 @@ const AuctionManagement = () => {
                     ),
                   },
                 }}
-                size="small"
-                placeholder="Tìm kiếm truyện đấu giá..."
-                variant="outlined"
               />
             </div>
           </Box>
@@ -302,6 +315,7 @@ const AuctionManagement = () => {
                       color: "white",
                       textAlign: "center",
                       whiteSpace: "nowrap",
+                      fontFamily: "REM",
                     }}
                   >
                     Ảnh Chính
@@ -311,6 +325,7 @@ const AuctionManagement = () => {
                       color: "white",
                       textAlign: "center",
                       whiteSpace: "nowrap",
+                      fontFamily: "REM",
                     }}
                   >
                     Tên Truyện
@@ -319,6 +334,8 @@ const AuctionManagement = () => {
                     style={{
                       color: "white",
                       textAlign: "center",
+                      whiteSpace: "nowrap",
+                      fontFamily: "REM",
                     }}
                   >
                     Thời Gian Bắt Đầu
@@ -327,6 +344,8 @@ const AuctionManagement = () => {
                     style={{
                       color: "white",
                       textAlign: "center",
+                      whiteSpace: "nowrap",
+                      fontFamily: "REM",
                     }}
                   >
                     Thời Gian Kết Thúc
@@ -337,6 +356,7 @@ const AuctionManagement = () => {
                       color: "white",
                       textAlign: "center",
                       whiteSpace: "nowrap",
+                      fontFamily: "REM",
                     }}
                   >
                     Giá Khởi Điểm
@@ -346,6 +366,7 @@ const AuctionManagement = () => {
                       color: "white",
                       textAlign: "center",
                       whiteSpace: "nowrap",
+                      fontFamily: "REM",
                     }}
                   >
                     Bước Giá Tối Thiểu
@@ -355,6 +376,7 @@ const AuctionManagement = () => {
                       color: "white",
                       textAlign: "center",
                       whiteSpace: "nowrap",
+                      fontFamily: "REM",
                     }}
                   >
                     Giá Hiện Tại
@@ -364,6 +386,7 @@ const AuctionManagement = () => {
                       color: "white",
                       textAlign: "center",
                       whiteSpace: "nowrap",
+                      fontFamily: "REM",
                     }}
                   >
                     Trạng Thái Đấu Giá
@@ -373,6 +396,7 @@ const AuctionManagement = () => {
                       color: "white",
                       textAlign: "center",
                       whiteSpace: "nowrap",
+                      fontFamily: "REM",
                     }}
                   ></TableCell>
                 </TableRow>
@@ -394,35 +418,36 @@ const AuctionManagement = () => {
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         wordWrap: "break-word",
+                        fontFamily: "REM",
                       }}
                       align="center"
                       title={auction.comics.title}
                     >
-                      <p className="my-auto font-semibold">
-                        {auction.comics.title}
+                      <p className="my-auto font-semibold" style={{ whiteSpace: "nowrap" }}>
+                        {truncateText(auction.comics.title, 12)}
                       </p>
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell align="center" sx={{ whiteSpace: "nowrap", fontFamily: "REM" }}>
                       {auction.startTime
                         ? new Date(auction.startTime).toLocaleString()
                         : "Chưa có"}
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell align="center" sx={{ whiteSpace: "nowrap", fontFamily: "REM" }}>
                       {auction.endTime
                         ? new Date(auction.endTime).toLocaleString()
                         : "Chưa có"}
                     </TableCell>
 
-                    <TableCell align="center">
+                    <TableCell align="center" sx={{ fontFamily: "REM" }}>
                       {auction?.reservePrice?.toLocaleString()} đ
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell align="center" sx={{ fontFamily: "REM" }}>
                       {auction?.priceStep?.toLocaleString()} đ
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell align="center" sx={{ fontFamily: "REM" }}>
                       {auction.currentPrice?.toLocaleString()} đ
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell align="center" sx={{ fontFamily: "REM" }}>
                       <span style={getStatusChipStyles(auction.status)}>
                         {translateStatus(auction.status)}
                       </span>

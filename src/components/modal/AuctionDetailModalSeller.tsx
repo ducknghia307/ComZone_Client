@@ -112,6 +112,14 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
           padding: "8px 20px",
           fontWeight: "bold",
         };
+      case "CANCELED":
+        return {
+          color: "#f44336",
+          backgroundColor: "#ffebee",
+          borderRadius: "8px",
+          padding: "8px 20px",
+          fontWeight: "bold",
+        };
     }
   };
 
@@ -176,6 +184,7 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
             position: "absolute",
             left: "50%",
             transform: "translateX(-50%)",
+            fontFamily: "REM",
           }}
         >
           Chi tiết đấu giá
@@ -187,6 +196,8 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
             ...getStatusChipStyles(auction.status),
             display: "inline-block",
             textAlign: "center",
+            fontSize: "14px",
+            fontFamily: "REM",
           }}
         >
           {translateStatus(auction.status)}
@@ -220,7 +231,7 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
           <div style={{ flex: 1, padding: "15px" }}>
             <Typography
               variant="h5"
-              style={{ color: "#000", marginBottom: "15px", fontWeight: 600 }}
+              style={{ color: "#000", marginBottom: "15px", fontWeight: 600, fontFamily: "REM" }}
             >
               {auction.comics.title}
             </Typography>
@@ -246,13 +257,14 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
                   paddingBottom: "8px",
                 }}
               >
-                <Typography style={{ color: "#666", fontWeight: 500 }}>
+                <Typography style={{ color: "#666", fontWeight: 500, fontFamily: "REM" }}>
                   {label}
                 </Typography>
                 <Typography
                   style={{
-                    fontWeight: "bold",
+                    fontWeight: "500",
                     color: highlight ? "#d32f2f" : "#000",
+                    fontFamily: "REM"
                   }}
                 >
                   {typeof value === "number"
@@ -274,6 +286,7 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
                     padding: "10px",
                     marginBottom: "10px",
                     boxShadow: "3px 3px rgba(0,0,0,0.3)",
+                    fontFamily: "REM",
                   }}
                 />
 
@@ -283,10 +296,10 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
                       key={bid.id}
                       className="flex justify-between py-2 border-b border-[#f0f0f0]"
                     >
-                      <Typography className="text-[#666]">
+                      <Typography className="text-[#666]" sx={{ fontFamily: "REM" }}>
                         {new Date(bid.createdAt).toLocaleString("vi-VN")}
                       </Typography>
-                      <Typography className="font-bold text-[#000]">
+                      <Typography className="font-bold text-[#000]" sx={{ fontFamily: "REM" }}>
                         {bid.user.name} - {bid.price.toLocaleString("vi-VN")} đ
                       </Typography>
                     </div>
@@ -305,10 +318,10 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
                   paddingBottom: "15px",
                 }}
               >
-                <Typography style={{ color: "#666", fontWeight: 500 }}>
+                <Typography style={{ color: "#666", fontWeight: 500, fontFamily: "REM" }}>
                   Người thắng
                 </Typography>
-                <Typography style={{ color: "#000", fontWeight: 600 }}>
+                <Typography style={{ color: "#000", fontWeight: 600, fontFamily: "REM" }}>
                   {auction.winner.name}
                 </Typography>
               </div>
@@ -322,10 +335,10 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
                   alignItems: "center",
                 }}
               >
-                <Typography style={{ color: "#666", fontWeight: 500 }}>
+                <Typography style={{ color: "#666", fontWeight: 500, fontFamily: "REM" }}>
                   Lý do
                 </Typography>
-                <Typography style={{ color: "#000", fontWeight: 600 }}>
+                <Typography style={{ color: "#000", fontWeight: 600, fontFamily: "REM" }}>
                   {auction.currentCondition}
                 </Typography>
               </div>
@@ -351,6 +364,7 @@ const AuctionDetailModalSeller: React.FC<AuctionDetailModalProps> = ({
             padding: "10px 30px",
             fontWeight: 600,
             textTransform: "none",
+            fontFamily: "REM",
             // '&:hover': { backgroundColor: '#333' }
           }}
         >

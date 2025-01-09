@@ -32,6 +32,7 @@ import { Modal, notification } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import "../ui/OrderDetailSeller.css";
 import CurrencySplitter from "../../assistants/Spliter";
+import socket from "../../services/socket";
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
@@ -126,8 +127,8 @@ const InfoRow = ({
     paymentMethod === "WALLET"
       ? "#32CD32"
       : paymentMethod === "COD"
-        ? "#ff9800"
-        : "#000";
+      ? "#ff9800"
+      : "#000";
 
   return (
     <Box
@@ -280,6 +281,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
         duration: 3,
       });
 
+      if (socket) socket.emit("new-order-status", { orderId });
+
       setSelectedOrderId(null);
     } catch (error: any) {
       notification.error({
@@ -340,6 +343,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
         duration: 3,
       });
 
+      if (socket) socket.emit("new-order-status", { orderId });
+
       setSelectedOrderId(null);
       onClose();
     } catch (error: any) {
@@ -366,6 +371,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
                 description: "Đơn hàng đã được hủy thành công",
                 duration: 3,
               });
+
+              if (socket) socket.emit("new-order-status", { orderId });
 
               reload();
             } catch (cancelError) {
@@ -797,8 +804,8 @@ const OrderDetailSeller: React.FC<OrderDetailProps> = ({
 
                   <TableBody>
                     {orders.length > 0 &&
-                      orders[0].items &&
-                      orders[0].items.length > 0 ? (
+                    orders[0].items &&
+                    orders[0].items.length > 0 ? (
                       orders[0].items.map((item: any, index: number) => (
                         <TableRow key={index}>
                           <TableCell>

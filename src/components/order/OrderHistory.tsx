@@ -15,13 +15,13 @@ import Loading from "../loading/Loading";
 import EmptyOrderIcon from "../../assets/notFound/emptybox.png";
 import { Avatar } from "antd";
 import { DeliveryStatus } from "../../common/interfaces/delivery.interface";
+import socket from "../../services/socket";
 
 interface Order {
   id: string;
   delivery?: Delivery;
   code: string;
   status: string;
-  shopName: string;
   productName: string;
   price: string;
   imgUrl: string;
@@ -69,53 +69,57 @@ const OrderHistory = () => {
     searchParams.get("search") || ""
   );
 
-  useEffect(() => {
-    const fetchOrdersWithItems = async () => {
-      setIsLoading(true);
-      try {
-        const response = await privateAxios.get("/orders/user");
-        const ordersData = response.data;
-        // Fetch items for each order
-        const ordersWithItems = await Promise.all(
-          ordersData.map(async (order: any) => {
-            const itemsResponse = await privateAxios.get(
-              `/order-items/order/${order.id}`
-            );
-            const itemsData = itemsResponse.data;
+  const fetchOrdersWithItems = async () => {
+    setIsLoading(true);
+    try {
+      const response = await privateAxios.get("/orders/user");
+      const ordersData = response.data;
+      // Fetch items for each order
+      const ordersWithItems = await Promise.all(
+        ordersData.map(async (order: any) => {
+          const itemsResponse = await privateAxios.get(
+            `/order-items/order/${order.id}`
+          );
+          const itemsData = itemsResponse.data;
 
-            const refundRequestResponse = await privateAxios.get(
-              `/refund-requests/order/${order.id}`
-            );
+          const refundRequestResponse = await privateAxios.get(
+            `/refund-requests/order/${order.id}`
+          );
 
-            const refundData = refundRequestResponse.data;
+          const refundData = refundRequestResponse.data;
 
-            return {
-              ...order,
-              items: itemsData,
-              refundRequest: refundData,
-              rejectReason: refundData?.rejectedReason,
-            };
-          })
-        );
-        setBaseOrderData(ordersWithItems);
-        setOrders(ordersWithItems);
-        console.log("ordersWithItems: ", ordersWithItems);
-        //Handle searching params
-        if (
-          searchParams.get("search") &&
-          searchParams.get("search").length > 0
-        ) {
-          searchOrders(searchParams.get("search"));
-          setSearchInput(searchParams.get("search"));
-        }
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setIsLoading(false);
+          return {
+            ...order,
+            items: itemsData,
+            refundRequest: refundData,
+            rejectReason: refundData?.rejectedReason,
+          };
+        })
+      );
+      setBaseOrderData(ordersWithItems);
+      setOrders(ordersWithItems);
+      console.log("ordersWithItems: ", ordersWithItems);
+
+      //Handle searching params
+      if (searchParams.get("search") && searchParams.get("search").length > 0) {
+        searchOrders(searchParams.get("search"));
+        setSearchInput(searchParams.get("search"));
       }
-    };
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrdersWithItems();
+
+    if (socket) {
+      socket.on("refresh-order", (orderId: string) => {
+        fetchOrdersWithItems();
+      });
+    }
   }, []);
 
   const cornerRibbonStyle = {

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import DeliveryAddress from "../components/checkout/DeliveryAddress";
 import PaymentMethod from "../components/checkout/PaymentMethod";
@@ -114,10 +115,19 @@ const Checkout = () => {
       });
       console.log(sortedAddresses);
 
-      setSelectedAddress(sortedAddresses[0] || null);
       setAddresses(sortedAddresses);
-    } catch {
-      console.log("...");
+
+      const addressSession = localStorage.getItem("selected-address");
+      if (addressSession && sortedAddresses) {
+        setSelectedAddress(
+          sortedAddresses.find(
+            (address: Address) => address.id === addressSession
+          )
+        );
+        localStorage.removeItem("selected-address");
+      } else setSelectedAddress(sortedAddresses[0] || null);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -304,6 +314,8 @@ const Checkout = () => {
 
         const orderId = orderResponse.data.id;
 
+        if (socket) socket.emit("new-order-status", { orderId });
+
         for (const {
           comic,
           currentPrice,
@@ -348,6 +360,7 @@ const Checkout = () => {
           localStorage.setItem("cart", JSON.stringify(parsedCartData));
         }
       }
+
       sessionStorage.removeItem("selectedComics");
       navigate("/order/complete");
     } catch (error: any) {
@@ -386,6 +399,7 @@ const Checkout = () => {
                 amount={totalPrice + totalDeliveryPrice - (depositAmount || 0)}
                 balance={userWalletBalance}
                 fetchUserInfo={fetchUserInfo}
+                selectedAddress={selectedAddress}
               />
             </div>
             <div className="grow min-w-[20em] max-w-[25em] top-4 sticky">

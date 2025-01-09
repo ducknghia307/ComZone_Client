@@ -7,7 +7,7 @@ import { Modal } from "antd";
 import ZaloPay from "../../assets/zalopay.png";
 import VNPay from "../../assets/vnpay.png";
 import TickCircle from "../../assets/tick-circle.png";
-import { UserInfo } from "../../common/base.interface";
+import { Address, UserInfo } from "../../common/base.interface";
 import PhoneVerification from "../wallet/PhoneVerification";
 
 const PaymentMethod = ({
@@ -17,6 +17,7 @@ const PaymentMethod = ({
   balance,
   onMethodSelect,
   fetchUserInfo,
+  selectedAddress,
 }: {
   user: UserInfo;
   auctionId: string;
@@ -24,6 +25,7 @@ const PaymentMethod = ({
   balance: number;
   onMethodSelect: (method: string) => void;
   fetchUserInfo: () => void;
+  selectedAddress: Address;
 }) => {
   const [selectedMethod, setSelectedMethod] = useState("wallet");
   const [hideBalance, setHideBalance] = useState(true);
@@ -58,6 +60,9 @@ const PaymentMethod = ({
     }
 
     try {
+      if (selectedAddress)
+        localStorage.setItem("selected-address", selectedAddress.id);
+
       localStorage.setItem("wallet-deposit", selectedAmount.toString());
 
       if (selectedWalletMethod === "ZaloPay") {
@@ -119,8 +124,11 @@ const PaymentMethod = ({
             <div className="flex flex-row gap-1 items-center">
               <h3 className="text-sm text-gray-500 ml-12">
                 Số dư ví:{" "}
-                {hideBalance ? "******" : <>{CurrencySplitter(balance || 0)}</>}{" "}
-                đ
+                {hideBalance ? (
+                  "******"
+                ) : (
+                  <>{CurrencySplitter(balance || 0)} &#8363;</>
+                )}
               </h3>
               <button
                 onClick={() => setHideBalance(!hideBalance)}
@@ -191,7 +199,7 @@ const PaymentMethod = ({
               <div className="flex justify-between mb-4">
                 <h3 className="text-base">Số dư hiện tại:</h3>
                 <div className="font-semibold">
-                  {CurrencySplitter(balance)} đ
+                  {CurrencySplitter(balance)}&#8363;
                 </div>
               </div>
 
@@ -295,7 +303,10 @@ const PaymentMethod = ({
               </div>
               <div className="w-full flex items-center justify-center mt-8">
                 <button
-                  disabled={selectedAmount < amount || !selectedWalletMethod}
+                  disabled={
+                    selectedAmount + user?.balance < amount ||
+                    !selectedWalletMethod
+                  }
                   className="bg-black text-white py-2 px-8 rounded-lg font-bold hover:opacity-90 disabled:bg-gray-300"
                   onClick={handlePayment}
                 >

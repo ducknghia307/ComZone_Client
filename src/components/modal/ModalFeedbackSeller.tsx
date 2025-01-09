@@ -15,6 +15,7 @@ import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
 import { privateAxios } from "../../middleware/axiosInstance";
 import { OrderDetailData } from "../../common/base.interface";
 import { Checkbox, message, notification } from "antd";
+import socket from "../../services/socket";
 
 interface ModalFeedbackSellerProps {
   open: boolean;
@@ -178,6 +179,8 @@ const ModalFeedbackSeller: React.FC<ModalFeedbackSellerProps> = ({
         ),
         duration: 7,
       });
+
+      if (socket) socket.emit("new-order-status", { orderId });
 
       onClose();
     } catch (error) {

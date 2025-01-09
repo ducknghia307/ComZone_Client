@@ -24,13 +24,13 @@ export default function TotalSummary({
   return (
     <div className="flex flex-col items-start gap-2 w-full bg-white rounded-lg px-4 py-4 drop-shadow-lg">
       <div className="w-full flex flex-col gap-2 pb-2 border-b border-black">
-        <div className="w-full flex items-center justify-between">
+        <div className="w-full flex items-end justify-between">
           <p className="text-xl font-bold">ĐƠN HÀNG</p>
           <button
             onClick={() => navigate("/cart")}
-            className="text-sm text-sky-700 duration-100 hover:text-sky-800"
+            className="text-xs text-sky-700 underline hover:opacity-70"
           >
-            Thay đổi
+            Quay lại giỏ hàng
           </button>
         </div>
         <p className="text-xs font-light">{totalQuantity} sản phẩm</p>
@@ -39,18 +39,18 @@ export default function TotalSummary({
       <div className="w-full flex flex-col gap-2 text-xs pb-2 border-b">
         <div className="w-full flex items-center justify-between">
           <p>Tổng tiền hàng:</p>
-          <p>{CurrencySplitter(totalPrice)} đ</p>
+          <p>{CurrencySplitter(totalPrice)} &#8363;</p>
         </div>
 
         <div className="w-full flex items-center justify-between">
           <p>Tổng tiền giao hàng:</p>
-          <p>{CurrencySplitter(totalDeliveryPrice || 0)} đ</p>
+          <p>{CurrencySplitter(totalDeliveryPrice || 0)} &#8363;</p>
         </div>
 
         {depositAmount && (
           <div className="w-full flex items-center justify-between">
             <p>Tổng cọc đấu giá:</p>
-            <p>- {CurrencySplitter(depositAmount || 0)} đ</p>
+            <p>- {CurrencySplitter(depositAmount || 0)} &#8363;</p>
           </div>
         )}
 
@@ -63,20 +63,22 @@ export default function TotalSummary({
                 {CurrencySplitter(
                   depositAmount - totalPrice - totalDeliveryPrice
                 )}{" "}
-                đ
+                &#8363;
               </p>
             </div>
           </div>
         ) : (
-          <div className="w-full flex items-center justify-between text-black">
-            <p>Tổng tiền thanh toán:</p>
-            <p>
-              {CurrencySplitter(
-                totalPrice + totalDeliveryPrice - (depositAmount || 0)
-              )}{" "}
-              đ
-            </p>
-          </div>
+          depositAmount && (
+            <div className="w-full flex items-center justify-between text-black">
+              <p>Tổng tiền thanh toán:</p>
+              <p>
+                {CurrencySplitter(
+                  totalPrice + totalDeliveryPrice - (depositAmount || 0)
+                )}{" "}
+                &#8363;
+              </p>
+            </div>
+          )
         )}
       </div>
 
@@ -94,7 +96,7 @@ export default function TotalSummary({
               0
             )
           )}{" "}
-          đ
+          &#8363;
         </p>
       </div>
 

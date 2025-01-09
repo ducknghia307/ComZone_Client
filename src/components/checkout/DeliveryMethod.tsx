@@ -111,7 +111,7 @@ const DeliveryMethod = ({
           } w-full flex items-center justify-between gap-2 text-sm`}
         >
           <p>Phí giao hàng: </p>
-          <p>{CurrencySplitter(deliveryPrice || 0)} đ</p>
+          <p>{CurrencySplitter(deliveryPrice || 0)} &#8363;</p>
         </div>
 
         <p className={`${deliveryPrice === 0 ? "inline" : "hidden"} text-sm font-light italic text-red-600`}>

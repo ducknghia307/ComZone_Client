@@ -21,6 +21,7 @@ import {
   DeliveryStatusGroup,
 } from "../../common/interfaces/delivery.interface";
 import { useSearchParams } from "react-router-dom";
+import socket from "../../services/socket";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState<OrderDetailData[]>([]);
@@ -61,6 +62,12 @@ const OrderManagement = () => {
 
   useEffect(() => {
     fetchOrders();
+
+    if (socket) {
+      socket.on("refresh-order", (orderId: string) => {
+        fetchOrders();
+      });
+    }
   }, []);
 
   const searchOrders = async (key?: string) => {

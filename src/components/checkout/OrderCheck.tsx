@@ -136,7 +136,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                     </td>
                     <td className="max-w-[12rem]">
                       <h4 className="text-end font-light">
-                        {CurrencySplitter(currentPrice || comic?.price)}đ
+                        {CurrencySplitter(currentPrice || comic?.price)} &#8363;
                       </h4>
                     </td>
                   </tr>
@@ -152,7 +152,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
             <div className="flex flex-row items-center justify-end w-full py-2 gap-2">
               <h4 className="font-extralight">Tổng tiền:</h4>
               <h4 className="font-semibold text-lg text-cyan-700">
-                {CurrencySplitter(sellerTotalPrice)}đ
+                {CurrencySplitter(sellerTotalPrice)} &#8363;
               </h4>
             </div>
           </div>

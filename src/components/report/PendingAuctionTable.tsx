@@ -100,6 +100,7 @@ const PendingAuctionTable: React.FC<{
     handleChangePage: (event: unknown, newPage: number) => void;
     handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleEditClick: (auction: AuctionRequest) => void;
+    searchTerm: string;
 }> = ({
     pendingAuctions,
     loading,
@@ -108,7 +109,17 @@ const PendingAuctionTable: React.FC<{
     handleChangePage,
     handleChangeRowsPerPage,
     handleEditClick,
+    searchTerm,
 }) => {
+        const filteredAuctions = pendingAuctions.filter((auction) => {
+            const sellerName = auction?.comic?.sellerId?.name?.toLowerCase() || "";
+            const title = auction?.comic?.title?.toLowerCase() || "";
+            return (
+                sellerName.includes(searchTerm.toLowerCase()) ||
+                title.includes(searchTerm.toLowerCase())
+            );
+        });
+
         return (
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -140,7 +151,7 @@ const PendingAuctionTable: React.FC<{
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            pendingAuctions
+                            filteredAuctions
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((auction) => (
                                     <StyledTableRow key={auction.id}>

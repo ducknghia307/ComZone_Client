@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -13,6 +13,7 @@ import TimeSelectionModal from "./TimeSelectionModal";
 import RejectReasonAuction from "./RejectReasonAuction";
 import CloseIcon from "@mui/icons-material/Close";
 import { Card, Checkbox, Image, Typography } from "antd";
+import { privateAxios } from "../../middleware/axiosInstance";
 
 interface PendingApprovalModalProps {
   open: boolean;
@@ -45,6 +46,7 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [timeSelectionModalOpen, setTimeSelectionModalOpen] = useState(false);
   const [rejectReasonModalOpen, setRejectReasonModalOpen] = useState(false);
+  const [auctionCriteria, setAuctionCriteria] = useState<any>(null);
 
   const [criteriaChecked, setCriteriaChecked] = useState({
     criteria1: false,
@@ -53,6 +55,23 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
   });
 
   const { Text, Title } = Typography;
+
+  useEffect(() => {
+    const fetchAuctionCriteria = async () => {
+      try {
+        const response = await privateAxios.get("http://localhost:3000/auction-criteria");
+        const data = response.data;
+        setAuctionCriteria(data);
+        console.log("Auction criteria:", data);
+
+      } catch (error) {
+        console.error("Error fetching auction criteria:", error);
+      }
+    };
+
+    fetchAuctionCriteria();
+  }, []);
+
 
   const handleApprove = () => {
     setTimeSelectionModalOpen(true);
@@ -438,7 +457,7 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                   </Box>
 
                   {(comic.length && comic.width && comic.thickness) ||
-                  comic.page ? (
+                    comic.page ? (
                     <Box
                       sx={{
                         display: "flex",
@@ -536,29 +555,26 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                     </Box>
                   )}
 
-                  <Box
-                    sx={{
-                      padding: "16px",
-                      backgroundColor: "#f8f9fa",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <Typography
-                      style={{
-                        fontFamily: "REM",
-                        fontSize: "16px",
-                        fontWeight: "bold",
-                        color: "#555",
-                        marginBottom: "8px",
+                  {comic.editionEvidence && comic.editionEvidence.length > 0 && (
+                    <Box
+                      sx={{
+                        padding: "16px",
+                        backgroundColor: "#f8f9fa",
+                        borderRadius: "8px",
                       }}
                     >
-                      Yếu tố thể hiện phiên bản truyện:
-                    </Typography>
-                    {comic.editionEvidence &&
-                    comic.editionEvidence.length > 0 ? (
-                      <Box
-                        sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
+                      <Typography
+                        style={{
+                          fontFamily: "REM",
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                          color: "#555",
+                          marginBottom: "8px",
+                        }}
                       >
+                        Yếu tố thể hiện phiên bản truyện:
+                      </Typography>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                         {comic.editionEvidence.map((evidence, index) => (
                           <Chip
                             key={index}
@@ -572,18 +588,8 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                           />
                         ))}
                       </Box>
-                    ) : (
-                      <Typography
-                        style={{
-                          fontFamily: "REM",
-                          fontSize: "14px",
-                          color: "#777",
-                        }}
-                      >
-                        Không có bằng chứng phiên bản nào.
-                      </Typography>
-                    )}
-                  </Box>
+                    </Box>
+                  )}
                 </Box>
               </Box>
             </div>
@@ -655,9 +661,7 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                           display: "block",
                         }}
                       >
-                        Người bán phải cung cấp đầy đủ thông tin chi tiết về
-                        truyện, bao gồm: tên truyện, tác giả, thể loại, mô tả
-                        nội dung truyện, loại bìa, và màu sắc của truyện.
+                        Người bán phải cung cấp đầy đủ thông tin chi tiết về truyện, bao gồm: tên truyện, tác giả, thể loại, mô tả nội dung truyện, loại bìa, và màu sắc của truyện.
                       </Text>
                     </div>
                   </div>
@@ -699,8 +703,15 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                           display: "block",
                         }}
                       >
-                        Tình trạng của truyện phải đạt mức trung bình trở lên,
-                        tương đương 4/10 theo thang điểm đánh giá chất lượng.
+                        Tình trạng của truyện phải đạt mức{" "}
+                        <span style={{ color: "red" }}>
+                          {auctionCriteria?.conditionLevel?.name?.toLowerCase()}
+                        </span>{" "}
+                        trở lên, tương đương{" "}
+                        <span style={{ color: "red" }}>
+                          {auctionCriteria?.conditionLevel?.value}
+                        </span>
+                        /10 theo thang điểm đánh giá chất lượng.
                       </Text>
                     </div>
                   </div>
@@ -742,10 +753,7 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                           display: "block",
                         }}
                       >
-                        Kiểm tra xem yếu tố thể hiện phiên bản truyện và các ảnh
-                        đính kèm có khớp với phiên bản truyện mà người bán đã
-                        chọn hay không. Đồng thời, từng ảnh sẽ được xem xét để
-                        đảm bảo yếu tố thể hiện phiên bản truyện là chính xác.
+                        Kiểm tra xem yếu tố thể hiện phiên bản truyện và các ảnh đính kèm có khớp với phiên bản truyện mà người bán đã chọn hay không. Đồng thời, từng ảnh sẽ được xem xét để đảm bảo yếu tố thể hiện phiên bản truyện là chính xác.
                       </Text>
                     </div>
                   </div>

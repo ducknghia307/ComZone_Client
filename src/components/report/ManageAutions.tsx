@@ -258,6 +258,7 @@ const ManageAuctions: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [activeTab, setActiveTab] = useState("1");
+  const [selectedPendingStatus, setSelectedPendingStatus] = useState<string>("");
 
   const fetchAuctions = async () => {
     try {
@@ -358,6 +359,19 @@ const ManageAuctions: React.FC = () => {
     setSelectedStatus(event.target.value as string);
   };
 
+  const filteredPendingAuctions = pendingAuctions.filter((auction) => {
+    const statusMatch = selectedPendingStatus ? auction.status === selectedPendingStatus : true;
+    const sellerName = auction?.comic?.sellerId?.name?.toLowerCase() || '';
+    const title = auction?.comic?.title?.toLowerCase() || '';
+    const searchMatch =
+      sellerName.includes(searchTerm.toLowerCase()) || title.includes(searchTerm.toLowerCase());
+    return statusMatch && searchMatch;
+  });
+
+  const handlePendingStatusFilterChange = (event: SelectChangeEvent<string>) => {
+    setSelectedPendingStatus(event.target.value as string);
+  };
+
   return (
     <div style={{ paddingBottom: "40px" }}>
       <Box sx={{ marginBottom: "30px" }}>
@@ -434,6 +448,35 @@ const ManageAuctions: React.FC = () => {
               </FormControl>
             </Box>
           )}
+
+          {activeTab === "2" && (
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#71002b",
+                  fontFamily: "REM",
+                  paddingRight: "10px",
+                }}
+              >
+                Trạng Thái:
+              </Typography>
+              <FormControl size="small" sx={{ minWidth: 150, marginLeft: 1 }}>
+                <Select
+                  value={selectedPendingStatus}
+                  onChange={handlePendingStatusFilterChange}
+                  displayEmpty
+                  sx={{ fontFamily: "REM" }}
+                >
+                  <MenuItem sx={{ fontFamily: "REM" }} value="">Tất Cả</MenuItem>
+                  <MenuItem sx={{ fontFamily: "REM" }} value="PENDING">Chờ duyệt</MenuItem>
+                  <MenuItem sx={{ fontFamily: "REM" }} value="APPROVED">Đã duyệt</MenuItem>
+                  <MenuItem sx={{ fontFamily: "REM" }} value="REJECTED">Bị từ chối</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          )}
         </Box>
 
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
@@ -452,13 +495,14 @@ const ManageAuctions: React.FC = () => {
           </TabPane>
           <TabPane tab="Quản Lý Duyệt Đấu Giá" key="2">
             <PendingAuctionTable
-              pendingAuctions={pendingAuctions}
+              pendingAuctions={filteredPendingAuctions}
               loading={loadingPending}
               page={page}
               rowsPerPage={rowsPerPage}
               handleChangePage={handleChangePage}
               handleChangeRowsPerPage={handleChangeRowsPerPage}
               handleEditClick={handleEditClick}
+              searchTerm={searchTerm}
             />
           </TabPane>
 

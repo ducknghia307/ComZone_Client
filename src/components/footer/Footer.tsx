@@ -28,7 +28,7 @@ const Footer = () => {
                   </g>{" "}
                 </g>
               </svg>
-              :support@comiczone.com
+              comzonecapstone@gmail.com
             </div>
             <div className="flex flex-row gap-2 items-center text-lg">
               <svg
@@ -51,7 +51,7 @@ const Footer = () => {
                   ></path>{" "}
                 </g>
               </svg>
-              :+0987-654-432
+              0999 888 777
             </div>
           </div>
         </div>

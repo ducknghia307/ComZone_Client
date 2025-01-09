@@ -210,9 +210,9 @@ export default function ComicsDetailTemp() {
       {isLoading && <Loading />}
       <div className="REM min-h-[200vh] bg-gray-100 pb-8">
         <div className="flex flex-col justify-start items-center gap-4 px-2 pt-4 pb-8 relative">
-          <div className="w-full flex items-start justify-center gap-4 relative">
-            <div className="w-2/3 max-w-[80em] flex flex-col justify-end gap-4 relative">
-              <div className="w-full flex justify-center gap-4">
+          <div className="w-full flex flex-col lg:flex-row items-start justify-center gap-4 relative">
+            <div className="w-full lg:basis-2/3 lg:max-w-[80em] flex flex-col items-stretch justify-end gap-4 relative">
+              <div className="w-full flex flex-col lg:flex-row items-stretch justify-center gap-4">
                 <ComicsImages
                   currentImage={currentImage}
                   setCurrentImage={setCurrentImage}
@@ -221,9 +221,31 @@ export default function ComicsDetailTemp() {
 
                 <div className="grow min-w-[20em] flex flex-col gap-2">
                   <ComicsMainInfo currentComics={currentComics} />
+
+                  <div className="block lg:hidden bg-white px-4 py-4 rounded-xl drop-shadow-md">
+                    <ComicsBillingSection
+                      currentComics={currentComics}
+                      handleAddToCart={handleAddToCart}
+                      handleBuyNow={handleBuyNow}
+                      isInCart={isInCart}
+                      setIsInCart={setIsInCart}
+                    />
+                  </div>
+
                   <ComZonePros />
                   <ComicsDetailedInfo currentComics={currentComics} />
                   <ComicsDescription currentComics={currentComics} />
+
+                  <div className="block lg:hidden bg-white px-4 py-4 rounded-xl drop-shadow-md top-1 sticky">
+                    <ComicsSeller
+                      seller={seller}
+                      comics={currentComics}
+                      handleOpenChat={handleOpenChat}
+                      currentId={userInfo?.id}
+                      totalFeedback={totalFeedback}
+                      averageRating={averageRating}
+                    />
+                  </div>
                 </div>
               </div>
               <div className="flex justify-start max-w-[80em]">
@@ -234,7 +256,7 @@ export default function ComicsDetailTemp() {
                 />
               </div>
             </div>
-            <div className="w-[25%] min-w-[20em] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-1 sticky">
+            <div className="hidden lg:block w-1/4 min-w-[20em] max-w-[40em] bg-white px-4 py-4 rounded-xl drop-shadow-md top-1 sticky">
               <ComicsSeller
                 seller={seller}
                 comics={currentComics}
@@ -255,15 +277,7 @@ export default function ComicsDetailTemp() {
             </div>
           </div>
 
-          <div className="w-full max-w-[123em] px-4">
-            <OtherComicsFromSeller
-              seller={seller}
-              comicsListFromSeller={comicsListFromSeller}
-              currentComics={currentComics}
-            />
-          </div>
-
-          <div className="w-full max-w-[125em] px-8">
+          <div className="w-full">
             <RecommendedComicsList
               comicsList={relatedComicsList}
               fetchMoreData={fetchCurrentComics}

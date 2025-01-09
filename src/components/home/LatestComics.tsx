@@ -17,10 +17,30 @@ export default function LatestComics({ comicsList }: { comicsList: Comic[] }) {
   if (!comicsList || comicsList.length === 0 || !currentComics) return;
 
   return (
-    <div className="w-full md:w-1/2 flex flex-col items-center gap-2 mx-auto px-8 md:px-0">
-      <p className="uppercase text-xl sm:text-[1.8em] font-semibold mb-8">
+    <div className="w-full md:w-1/2 flex flex-col items-center gap-8 mx-auto px-8 md:px-0">
+      <p className="uppercase text-xl sm:text-[1.8em] font-semibold">
         Truyện mới đăng bán
       </p>
+
+      <div className="w-full flex justify-end items-center">
+        <button
+          onClick={() => {
+            navigate("/genres");
+          }}
+          className="flex items-center justify-end gap-2 font-light hover:underline hover:text-gray-600"
+        >
+          Xem tất cả
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="currentColor"
+          >
+            <path d="M1.99974 13.0001L1.9996 11.0002L18.1715 11.0002L14.2218 7.05044L15.636 5.63623L22 12.0002L15.636 18.3642L14.2218 16.9499L18.1716 13.0002L1.99974 13.0001Z"></path>
+          </svg>
+        </button>
+      </div>
 
       <div
         className={`w-full self-stretch flex flex-col-reverse sm:flex-row items-center justify-center gap-4`}
@@ -39,7 +59,11 @@ export default function LatestComics({ comicsList }: { comicsList: Comic[] }) {
                 }
                 className="hidden sm:flex items-center gap-2 group/seller hover:opacity-80"
               >
-                <Avatar src={currentComics.sellerId.avatar} />
+                <Avatar
+                  src={currentComics.sellerId.avatar}
+                  size={40}
+                  className="ring-2 ring-white"
+                />
                 <p className="font-semibold group-hover/seller:underline">
                   {currentComics.sellerId.name}
                 </p>
@@ -56,7 +80,7 @@ export default function LatestComics({ comicsList }: { comicsList: Comic[] }) {
 
               <p
                 onClick={() => navigate(`/detail/${currentComics.id}`)}
-                className="font-semibold text-lg sm:text-[1.5em] uppercase line-clamp-2 h-[2.8em] sm:h-[2.2em] cursor-pointer hover:underline"
+                className="self-center text-center font-semibold text-lg sm:text-[1.5em] uppercase line-clamp-2 h-[2.8em] sm:h-[2.2em] cursor-pointer hover:underline"
               >
                 {currentComics.title}
               </p>

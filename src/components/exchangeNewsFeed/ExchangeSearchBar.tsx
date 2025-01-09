@@ -25,7 +25,7 @@ export default function ExchangeSearchBar({
   }, []);
 
   return (
-    <div className="w-full xl:w-2/3 max-w-[100em] flex items-center justify-center gap-2">
+    <div className="w-full xl:w-2/3 max-w-[100em] flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2">
       <button
         onClick={() => {
           if (!isLoggedIn)
@@ -41,7 +41,7 @@ export default function ExchangeSearchBar({
             });
           else handleOpenCreatePost();
         }}
-        className="min-w-max flex items-center gap-1 px-4 py-2 rounded-lg bg-sky-600 text-white duration-200 hover:bg-sky-800"
+        className="min-w-max flex items-center justify-center gap-1 px-4 py-2 rounded-lg bg-sky-600 text-white duration-200 hover:bg-sky-800"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

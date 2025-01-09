@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ExchangePost from "../components/exchangeNewsFeed/ExchangePost";
 import { notification } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { privateAxios, publicAxios } from "../middleware/axiosInstance";
 import { ExchangePostInterface } from "../common/interfaces/exchange.interface";
 import Loading from "../components/loading/Loading";
@@ -49,7 +49,20 @@ export default function ExchangeNewsFeed() {
               },
             })
             .then((res) => {
-              return res.data;
+              const postList: ExchangePostInterface[] = res.data;
+
+              if (searchParams.get("id")) {
+                const filteredPostList = postList.filter(
+                  (post) => post.id !== searchParams.get("id")
+                );
+                filteredPostList.unshift(
+                  postList.find((post) => post.id === searchParams.get("id"))
+                );
+
+                return filteredPostList;
+              }
+
+              return postList;
             })
         );
       } else
@@ -58,12 +71,38 @@ export default function ExchangeNewsFeed() {
             ? await privateAxios
                 .get(`exchange-posts/available/user`)
                 .then((res) => {
-                  console.log(res.data);
-                  return res.data;
+                  const postList: ExchangePostInterface[] = res.data;
+
+                  if (searchParams.get("id")) {
+                    const filteredPostList = postList.filter(
+                      (post) => post.id !== searchParams.get("id")
+                    );
+                    filteredPostList.unshift(
+                      postList.find(
+                        (post) => post.id === searchParams.get("id")
+                      )
+                    );
+
+                    return filteredPostList;
+                  }
+
+                  return postList;
                 })
             : await publicAxios.get(`exchange-posts/available`).then((res) => {
-                console.log(res.data);
-                return res.data;
+                const postList: ExchangePostInterface[] = res.data;
+
+                if (searchParams.get("id")) {
+                  const filteredPostList = postList.filter(
+                    (post) => post.id !== searchParams.get("id")
+                  );
+                  filteredPostList.unshift(
+                    postList.find((post) => post.id === searchParams.get("id"))
+                  );
+
+                  return filteredPostList;
+                }
+
+                return postList;
               })
         );
 

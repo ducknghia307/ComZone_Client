@@ -137,7 +137,7 @@ const CurrentUserComicExchange = () => {
     <div className="REM w-full min-w-[50vw] md:w-2/3 flex flex-col mx-auto px-4">
       {isLoading && <Loading />}
       <div className="w-full flex flex-col items-stretch gap-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
           <div className="grow relative">
             <input
               type="text"
@@ -169,7 +169,7 @@ const CurrentUserComicExchange = () => {
           </div>
 
           <button
-            className="flex items-center px-4 py-2 rounded-lg bg-green-600 text-white md:text-lg md:whitespace-nowrap duration-200 hover:bg-green-800 gap-2"
+            className="flex items-center justify-center px-4 py-2 rounded-lg bg-green-600 text-white md:text-lg md:whitespace-nowrap duration-200 hover:bg-green-800 gap-2"
             onClick={showModal}
           >
             <svg

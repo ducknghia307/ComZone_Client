@@ -415,7 +415,7 @@ const ComicAuction = () => {
             fontSize: "23px",
           }}
         >
-          {comic.condition === "SEALED" ? "Nguyên Seal" : "Đã qua sử dụng"}
+          {comic.author}
         </div>
       </div>
 
@@ -486,9 +486,17 @@ const ComicAuction = () => {
                       textShadow: "4px 4px #000",
                     }}
                     start={
-                      auctionData.currentPrice - auctionData.currentPrice / 2
+                      auctionData.currentPrice > 0
+                        ? auctionData.currentPrice -
+                          auctionData.currentPrice / 2
+                        : auctionData.reservePrice -
+                          auctionData.reservePrice / 2
                     }
-                    end={auctionData.currentPrice}
+                    end={
+                      auctionData.currentPrice > 0
+                        ? auctionData.currentPrice
+                        : auctionData.reservePrice
+                    }
                     duration={1}
                     separator="."
                     decimals={0}
@@ -546,7 +554,7 @@ const ComicAuction = () => {
                       textShadow: "4px 4px #000",
                     }}
                   >
-                    {auctionData.priceStep.toLocaleString("vi-VN")}đ
+                    {auctionData.priceStep.toLocaleString("vi-VN")}&#8363;
                   </h3>
                 </div>
                 <div className="current-price2">
@@ -706,7 +714,7 @@ const ComicAuction = () => {
                         <span style={{ fontWeight: "bold" }}>
                           {typeof auctionData?.depositAmount === "number" &&
                             auctionData?.depositAmount.toLocaleString("vi-VN")}
-                          đ
+                          &#8363;
                         </span>
                       </p>
                       {!auctionEnded && auctionData.status !== "UPCOMING" && (

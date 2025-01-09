@@ -162,6 +162,7 @@ const AuctionPublisher: React.FC<{ comic: Comic }> = ({ comic }) => {
             border: "1px solid #000",
             borderRadius: "20px",
             boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
+            textTransform: "capitalize",
           }}
         />
       </div>

@@ -29,7 +29,7 @@ export default function OthersPostButtons({
 
   return (
     <>
-      <div className="flex flex-row gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch justify-start gap-4">
         <button
           className="border rounded-lg min-w-max p-2"
           onClick={handleOpenModal}

@@ -278,57 +278,52 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
         handleCancel();
       }}
       width={1000}
-      centered
       footer={null}
     >
-      <div className="w-full flex flex-row gap-4">
-        <div className="w-1/5 p-4">
-          <div className="flex flex-col items-center gap-2">
-            <div
-              className={`relative border-2 rounded-md bg-no-repeat bg-center h-60 w-full bg-contain ${
-                !uploadedImageFile && "hover:opacity-70 cursor-pointer group"
-              } `}
-              style={{
-                backgroundImage: `url(${
-                  previewImage || CoverImagePlaceholder
-                })`,
-              }}
-              onClick={() => document.getElementById("upload")?.click()}
+      <div className="w-full flex flex-col sm:flex-row items-stretch justify-start gap-4 sm:gap-8">
+        <div className="flex flex-col items-center gap-2">
+          <div
+            className={`relative border-2 rounded-md bg-no-repeat bg-center w-full aspect-square bg-contain ${
+              !uploadedImageFile && "hover:opacity-70 cursor-pointer group"
+            } `}
+            style={{
+              backgroundImage: `url(${previewImage || CoverImagePlaceholder})`,
+            }}
+            onClick={() => document.getElementById("upload")?.click()}
+          >
+            <span
+              className={`${
+                uploadedImageFile && "hidden"
+              } w-full absolute top-3/4 left-1/2 -translate-x-1/2 text-[0.8em] text-center group-hover:hidden`}
             >
-              <span
-                className={`${
-                  uploadedImageFile && "hidden"
-                } absolute top-2/3 left-1/2 -translate-x-1/2 text-[0.7em] text-center group-hover:hidden`}
-              >
-                <span className="text-red-600">*</span> Nhấn vào để thêm ảnh bìa
-              </span>
-              <input
-                type="file"
-                id="upload"
-                accept="image/png, image/gif, image/jpeg"
-                hidden
-                onChange={handleImageUploadChange}
-              />
-            </div>
-
-            {previewImage && (
-              <button
-                className="mt-2 text-red-500 text-xs"
-                onClick={handleRemoveUploadImage}
-              >
-                <DeleteOutlined style={{ fontSize: 16 }} />
-              </button>
-            )}
-
-            <p className="font-light text-xs italic text-gray-500 text-center mt-4">
-              Ảnh bìa được dùng để người khác nhận diện truyện của bạn.
-            </p>
+              <span className="text-red-600">*</span> Nhấn vào để thêm ảnh bìa
+            </span>
+            <input
+              type="file"
+              id="upload"
+              accept="image/png, image/gif, image/jpeg"
+              hidden
+              onChange={handleImageUploadChange}
+            />
           </div>
+
+          {previewImage && (
+            <button
+              className="mt-2 text-red-500 text-xs"
+              onClick={handleRemoveUploadImage}
+            >
+              <DeleteOutlined style={{ fontSize: 16 }} />
+            </button>
+          )}
+
+          <p className="font-light text-xs italic text-gray-500 text-center mt-4">
+            Ảnh bìa được dùng để người khác nhận diện truyện của bạn.
+          </p>
         </div>
 
-        <div className="w-5/6 p-4 space-y-4">
-          <div className="flex flex-col gap-4 w-1/2">
-            <div className="flex flex-row">
+        <div className="w-full flex flex-col items-stretch gap-4">
+          <div className="w-full flex flex-col items-stretch gap-4">
+            <div className="w-full flex gap-2">
               <h2 className="font-sm">Truyện lẻ / Bộ truyện:</h2>
               <p className="text-red-500">*</p>
             </div>
@@ -475,7 +470,7 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
                 marks={formatGradingScaleToMarks(conditionGradingScales)}
                 step={null}
                 tooltip={{ open: false }}
-                value={condition.value}
+                value={condition?.value}
                 onChange={(value: number) =>
                   setCondition(
                     conditionGradingScales.find(
@@ -499,7 +494,7 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
                   <path d="M22 20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V20ZM11 15H4V19H11V15ZM20 11H13V19H20V11ZM11 5H4V13H11V5ZM20 5H13V9H20V5Z"></path>
                 </svg>
                 <p className="font-light">Tình trạng:&emsp;</p>
-                <p className="text-base font-semibold">{condition.name}</p>
+                <p className="text-base font-semibold">{condition?.name}</p>
               </span>
 
               <span className="flex items-center gap-2">
@@ -513,10 +508,10 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
                   <path d="M15 3H21V21H3V15H7V11H11V7H15V3ZM17 5V9H13V13H9V17H5V19H19V5H17Z"></path>
                 </svg>
                 <p className="font-light">Độ mới:&emsp;</p>
-                <p className="text-base font-semibold">{condition.value}/10</p>
+                <p className="text-base font-semibold">{condition?.value}/10</p>
               </span>
 
-              {condition.usageLevel && (
+              {condition?.usageLevel && (
                 <span className="flex items-center gap-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -529,13 +524,13 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
                   </svg>
                   <p className="font-light">Mức độ sử dụng:&emsp;</p>
                   <p className="text-base font-semibold">
-                    {condition.usageLevel}
+                    {condition?.usageLevel}
                   </p>
                 </span>
               )}
 
               <p className="text-sm font-light italic h-[6em] phone:h-[5em]">
-                {condition.description}
+                {condition?.description}
               </p>
             </div>
           </div>

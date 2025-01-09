@@ -66,7 +66,7 @@ export default function ComicsImages({
       <div className="w-full bg-white flex flex-col items-center justify-center gap-4 rounded-xl py-2 drop-shadow-md top-1 sticky">
         <img
           src={currentImage}
-          className="w-full h-[30em] bg-contain cursor-pointer px-2 rounded-lg"
+          className="w-1/2 lg:w-full aspect-[2/3] bg-contain cursor-pointer px-2 rounded-lg"
           onClick={() => setIsModalOpen(true)}
         />
         <div className="w-full flex justify-center items-center px-4">
@@ -81,13 +81,13 @@ export default function ComicsImages({
             ref={carouselRef}
             responsive={responsive}
             infinite={false}
-            className="w-full relative"
+            className="w-full relative flex justify-center"
           >
-            <div className="w-full flex items-center gap-2">
+            <div className="w-full flex items-center justify-center gap-2">
               {imageList.map((img: string) => (
                 <button
                   key={img}
-                  className="flex items-center w-full h-[5em] justify-center py-2"
+                  className="flex items-center w-full justify-center py-2"
                   onClick={() => {
                     setCurrentImage(img);
                   }}
@@ -95,8 +95,8 @@ export default function ComicsImages({
                   <img
                     src={img}
                     alt=""
-                    className={`object-cover w-16 h-20 max-w-[5em] max-h-[5em] p-1 border rounded-sm 
-                  ${currentImage === img ? "border-black" : "hover:opacity-80"}
+                    className={`object-cover w-[5em] aspect-[2/3] lg:max-w-[5em] p-1 border rounded-sm 
+                  ${currentImage === img ? "ring-2 ring-black" : "hover:opacity-80"}
                  `}
                   />
                 </button>

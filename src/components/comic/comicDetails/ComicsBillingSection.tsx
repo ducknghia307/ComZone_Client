@@ -32,8 +32,8 @@ export default function ComicsBillingSection({
   };
 
   return (
-    <div>
-      <div className="w-full flex flex-col gap-2 py-4">
+    <>
+      <div className="hidden md:flex w-full flex-col gap-2 py-4">
         <div className="w-full flex flex-col items-start justify-between">
           <p>Tạm tính:</p>
           <p className="font-semibold text-[2em] flex items-start gap-1">
@@ -107,6 +107,6 @@ export default function ComicsBillingSection({
           </button>
         </div>
       </Modal>
-    </div>
+    </>
   );
 }

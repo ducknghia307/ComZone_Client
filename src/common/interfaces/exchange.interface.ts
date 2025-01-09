@@ -24,8 +24,8 @@ export interface ExchangePostInterface extends BaseInterface {
   postContent: string;
   images?: string[];
   status: "AVAILABLE" | "UNAVAILABLE";
-  mine: boolean;
-  already: boolean;
+  mine?: boolean;
+  already?: boolean;
   alreadyExchange?: Exchange;
 }
 

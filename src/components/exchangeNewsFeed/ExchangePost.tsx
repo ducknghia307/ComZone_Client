@@ -71,12 +71,16 @@ export default function ExchangePost({
 
   return (
     <div className="w-full flex rounded-lg px-4 max-w-[100em] bg-white drop-shadow-md">
-      <div className="grow flex flex-col min-w-[30em] px-2 py-4">
-        <div className="flex items-center justify-between gap-4">
+      <div className="grow flex flex-col min-w-[10em] items-stretch px-2 py-4">
+        <div
+          className={`w-full flex ${
+            post.mine ? "flex-row" : "flex-col"
+          } sm:flex-row items-center justify-between gap-4`}
+        >
           <div className="w-full flex items-center gap-4">
             <img
               src={post.user.avatar}
-              className="w-[4em] h-[4em] rounded-full"
+              className="w-[3em] sm:w-[4em] aspect-square rounded-full"
             />
             <div className="flex flex-col items-start gap-1">
               <div className="flex items-center gap-4">
@@ -86,7 +90,7 @@ export default function ExchangePost({
                 <span
                   className={`${
                     post.user.role !== "SELLER" && "hidden"
-                  } flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500 text-white`}
+                  } hidden sm:flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500 text-white`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -114,7 +118,7 @@ export default function ExchangePost({
             </div>
           </div>
 
-          <div className="order-last sm:order-none">
+          <div className={`w-full sm:w-fit ${post.mine && "flex justify-end"}`}>
             {post.mine ? (
               <SelfPostButton
                 post={post}
@@ -151,12 +155,12 @@ export default function ExchangePost({
         <p className="pl-2 py-4">{post.postContent}</p>
 
         {post.images && (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] items-stretch gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 items-stretch gap-2">
             {post.images.map((image) => (
               <img
                 key={image}
                 src={image}
-                className="rounded-lg w-[10em] h-[15em] object-cover border border-gray-300"
+                className="rounded-lg sm:w-[10em] aspect-[2/3] object-cover border border-gray-300"
               />
             ))}
           </div>
@@ -168,12 +172,7 @@ export default function ExchangePost({
         onOk={handleOk}
         onCancel={handleCancel}
         footer={null}
-        closeIcon={null}
         width={1000}
-        styles={{
-          content: { padding: "0" },
-        }}
-        centered
       >
         <div
           className={`${

@@ -22,24 +22,25 @@ export default function RecommendedComicsList({
         next={fetchMoreData}
         hasMore={hasMore}
         loader={<h4>Loading...</h4>}
-        endMessage={<p className="text-center">No more comics to show</p>}
       >
-        <div className="grid grid-cols-[repeat(auto-fill,10rem)] gap-x-4 gap-y-4 justify-between">
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-[repeat(auto-fill,10rem)] items-stretch gap-2 lg:gap-4 justify-between">
           {comicsList.map((comics: Comic) => {
             return (
               <div
                 key={comics.id}
-                className="min-w-40 w-1/2 flex flex-col justify-start items-start border border-gray-300 rounded-lg overflow-hidden hover:cursor-pointer"
+                className="lg:min-w-40 lg:w-1/2 flex flex-col justify-start items-start border border-gray-300 rounded-lg overflow-hidden cursor-pointer duration-200 hover:bg-gray-100"
                 onClick={() => navigate(`/detail/${comics.id}`)}
               >
                 <div
-                  className="w-full h-64 bg-cover bg-center bg-no-repeat"
+                  className="w-full aspect-[2/3] bg-cover bg-center bg-no-repeat"
                   style={{ backgroundImage: `url(${comics.coverImage})` }}
                 />
-                <p className="wrapTitle px-1 pt-2">{comics.title}</p>
-                <p className="flex items-start gap-1 font-semibold text-xl p-2">
+                <p className="wrapTitle font-semibold px-1 pt-2">
+                  {comics.title}
+                </p>
+                <p className="text-red-600 flex items-start gap-1 font-semibold lg:text-lg p-2">
                   {CurrencySplitter(comics.price)}
-                  <span className="underline text-[0.6em]">đ</span>
+                  &#8363;
                 </p>
               </div>
             );

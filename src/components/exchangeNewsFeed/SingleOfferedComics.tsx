@@ -13,6 +13,8 @@ export default function SingleOfferedComics({
   handleSelect: (value: number) => void;
   length: number;
 }) {
+  if (!comics) return;
+
   if (length < 10)
     return (
       <div
@@ -27,18 +29,16 @@ export default function SingleOfferedComics({
           />
           <div className={`flex flex-col items-start gap-2`}>
             <div className="flex flex-col items-start">
-              <p className="font-bold text-start">{comics.title}</p>
-              <p className="font-light text-xs">{comics.author}</p>
+              <p className="font-bold text-lg text-start line-clamp-2">
+                {comics.title}
+              </p>
+              <p className="font-light text-sm">{comics.author}</p>
             </div>
             <div
-              className={`flex flex-col items-start text-[0.8rem] font-light transition-all duration-200`}
+              className={`flex flex-col items-start text-sm font-light transition-all duration-200`}
             >
-              <p>
-                <span className="font-extralight">Phiên bản:</span>{" "}
-                {comics.edition.name}
-              </p>
-              <p>
-                <span className="font-extralight">Tình trạng:</span>{" "}
+              <p className="font-semibold">
+                <span className="font-light">Tình trạng:</span>{" "}
                 {comics.condition.name}
               </p>
             </div>
@@ -92,20 +92,11 @@ export default function SingleOfferedComics({
               <p className="font-bold text-start">{comics.title}</p>
               <p className="font-light text-xs">{comics.author}</p>
             </div>
-            <div
-              className={`${
-                currentlySelected === index ? "" : "hidden"
-              } flex flex-col items-start text-[0.8rem] font-light transition-all duration-200`}
-            >
-              <p>
-                <span className="font-extralight">Phiên bản:</span>{" "}
-                {comics.edition.name}
-              </p>
-              <p>
-                <span className="font-extralight">Tình trạng:</span>{" "}
-                {comics.condition.name}
-              </p>
-            </div>
+
+            <p>
+              <span className="font-light">T/ình trạng:</span>{" "}
+              {comics.condition.name}
+            </p>
           </div>
         </div>
 

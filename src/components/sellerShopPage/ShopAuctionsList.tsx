@@ -32,34 +32,24 @@ export default function ShopAuctionsList({
   const navigate = useNavigate();
 
   const renderer = ({ days, hours, minutes, seconds }: any) => {
+    const timeList = [
+      { value: days, name: "Ngày" },
+      { value: hours, name: "Giờ" },
+      { value: minutes, name: "Phút" },
+      { value: seconds, name: "Giây" },
+    ];
     return (
-      <div className="flex items-center gap-1">
-        <div className="time-box relative basis-1/4">
-          <span className="time1">{days.toString().padStart(2, "0")}</span>
-          <span className="label absolute top-0 left-1/2 -translate-y-2.5 -translate-x-1/2">
-            Ngày
-          </span>
-        </div>
-        <div className="time-box relative basis-1/4">
-          <span className="time1">{hours.toString().padStart(2, "0")}</span>
-          <span className="label absolute top-0 left-1/2 -translate-y-2.5 -translate-x-1/2">
-            Giờ
-          </span>
-        </div>
-        <div className="time-box relative basis-1/4">
-          <span className="time1">{minutes.toString().padStart(2, "0")}</span>
-          <span className="label absolute top-0 left-1/2 -translate-y-2.5 -translate-x-1/2">
-            Phút
-          </span>
-        </div>
-        <div className="time-box relative basis-1/4">
-          <span className="time1 w-full">
-            {seconds.toString().padStart(2, "0")}
-          </span>
-          <span className="label absolute top-0 left-1/2 -translate-y-2.5 -translate-x-1/2 bg-white">
-            Giây
-          </span>
-        </div>
+      <div className="flex items-center justify-center gap-1">
+        {timeList.map((time) => (
+          <button className="relative w-[3em] flex flex-col items-center justify-center aspect-square border border-[#e0e0e0] rounded group-hover:border-gray-700">
+            <span className="sm:text-lg font-semibold text-[#333] text-center group-hover:text-white">
+              {time.value.toString().padStart(2, "0")}
+            </span>
+            <span className="px-1 text-[8px] sm:text-[10px] text-[#666] bg-white absolute top-0 left-1/2 -translate-y-1.5 sm:-translate-y-2 -translate-x-1/2 duration-300 group-hover:text-white group-hover:bg-black">
+              {time.name}
+            </span>
+          </button>
+        ))}
       </div>
     );
   };

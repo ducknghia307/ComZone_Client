@@ -28,32 +28,24 @@ export default function ShopOverview({
   feedbackList: SellerFeedback[];
 }) {
   const renderer = ({ days, hours, minutes, seconds }: any) => {
+    const timeList = [
+      { value: days, name: "Ngày" },
+      { value: hours, name: "Giờ" },
+      { value: minutes, name: "Phút" },
+      { value: seconds, name: "Giây" },
+    ];
     return (
       <div className="flex items-center justify-center gap-1">
-        <div className="time-box relative basis-1/4">
-          <span className="time1">{days.toString().padStart(2, "0")}</span>
-          <span className="label absolute top-0 left-1/2 -translate-y-2.5 -translate-x-1/2">
-            Ngày
-          </span>
-        </div>
-        <div className="time-box relative basis-1/4">
-          <span className="time1">{hours.toString().padStart(2, "0")}</span>
-          <span className="label absolute top-0 left-1/2 -translate-y-2.5 -translate-x-1/2">
-            Giờ
-          </span>
-        </div>
-        <div className="time-box relative basis-1/4">
-          <span className="time1">{minutes.toString().padStart(2, "0")}</span>
-          <span className="label absolute top-0 left-1/2 -translate-y-2.5 -translate-x-1/2">
-            Phút
-          </span>
-        </div>
-        <div className="time-box relative basis-1/4">
-          <span className="time1">{seconds.toString().padStart(2, "0")}</span>
-          <span className="label absolute top-0 left-1/2 -translate-y-2.5 -translate-x-1/2">
-            Giây
-          </span>
-        </div>
+        {timeList.map((time) => (
+          <button className="relative w-[2em] sm:w-[3em] flex flex-col items-center justify-center aspect-square border border-[#e0e0e0] rounded group-hover:border-gray-700">
+            <span className="sm:text-lg font-semibold text-[#333] text-center group-hover:text-white">
+              {time.value.toString().padStart(2, "0")}
+            </span>
+            <span className="px-1 text-[8px] sm:text-[10px] text-[#666] bg-white absolute top-0 left-1/2 -translate-y-1.5 sm:-translate-y-2 -translate-x-1/2 duration-300 group-hover:text-white group-hover:bg-black">
+              {time.name}
+            </span>
+          </button>
+        ))}
       </div>
     );
   };
@@ -144,6 +136,7 @@ export default function ShopOverview({
             {shuffledList.map((item) => (
               <Link
                 to={`/detail/${item.id}`}
+                id={`comics-item-${item.id}`}
                 className="min-w-[20em] w-[20em] flex items-stretch gap-4 ring-1 ring-gray-700 rounded-md p-1 snap-center snap-always duration-200 hover:bg-gray-200"
               >
                 <img
@@ -163,6 +156,26 @@ export default function ShopOverview({
                   </p>
                 </div>
               </Link>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-center gap-2">
+            {comicsList.map((comics, index) => (
+              <span
+                key={index}
+                onClick={() => {
+                  const dest = document.getElementById(
+                    `comics-item-${comics.id}`
+                  );
+
+                  if (dest)
+                    dest.scrollIntoView({
+                      block: "nearest",
+                      behavior: "smooth",
+                    });
+                }}
+                className="w-2 aspect-square rounded-full bg-gray-300"
+              ></span>
             ))}
           </div>
         </div>
@@ -187,22 +200,27 @@ export default function ShopOverview({
             </button>
           </div>
 
-          <div className="flex items-stretch gap-4 overflow-x-auto overflow-y-hidden p-4 snap-x snap-mandatory">
+          <div className="flex items-stretch justify-start gap-4 overflow-x-auto overflow-y-hidden p-4 snap-x snap-mandatory">
             {auctionsList.map((auction) => (
               <Link
-                to={`/auctiondetail/${auction.id}`}
-                className="min-w-[22em] w-[22em] flex items-stretch gap-1 ring-1 ring-gray-700 rounded-md p-1 snap-center snap-always duration-200 hover:bg-gray-50"
                 key={auction.id}
+                id={`auction-item-${auction.id}`}
+                to={`/auctiondetail/${auction.id}`}
+                className="min-w-[20em] sm:min-w-[24em] w-[24em] flex items-stretch gap-1 ring-1 ring-gray-700 rounded-md p-1 snap-center snap-always duration-200 hover:bg-gray-50"
               >
                 <img
                   src={auction.comics.coverImage}
                   alt={auction.comics.title}
-                  className="object-cover w-[8em] aspect-[2/3] rounded-md"
+                  className="object-cover w-[7em] sm:w-[8em] aspect-[2/3] h-fit rounded-md"
                 />
 
-                <div className="px-1 py-2">
+                <div className="space-y-2 px-1 py-2">
+                  <p className="font-semibold uppercase text-sm sm:text-base pr-1 line-clamp-4 h-[5.4em] sm:h-[5.8em]">
+                    {auction.comics.title}
+                  </p>
+
                   <div
-                    className={`hidden sm:flex items-center justify-between w-full gap-2 mb-2`}
+                    className={`hidden sm:flex items-center justify-between w-full gap-2`}
                   >
                     {auction.comics.edition.isSpecial && (
                       <span
@@ -224,9 +242,22 @@ export default function ShopOverview({
 
                   <p className="font-semibold flex items-center justify-center">
                     <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full shadow-sm flex items-center gap-1 text-sm flex-nowrap whitespace-nowrap max-w-full">
-                      Giá hiện tại:{" "}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="12"
+                        height="12"
+                        fill="currentColor"
+                      >
+                        <path d="M10.9042 2.10025L20.8037 3.51446L22.2179 13.414L13.0255 22.6063C12.635 22.9969 12.0019 22.9969 11.6113 22.6063L1.71184 12.7069C1.32131 12.3163 1.32131 11.6832 1.71184 11.2926L10.9042 2.10025ZM11.6113 4.22157L3.83316 11.9997L12.3184 20.485L20.0966 12.7069L19.036 5.28223L11.6113 4.22157ZM13.7327 10.5855C12.9516 9.80448 12.9516 8.53815 13.7327 7.7571C14.5137 6.97606 15.78 6.97606 16.5611 7.7571C17.3421 8.53815 17.3421 9.80448 16.5611 10.5855C15.78 11.3666 14.5137 11.3666 13.7327 10.5855Z"></path>
+                      </svg>
                       <span className="font-bold">
-                        {auction.currentPrice.toLocaleString("vi-VN")}đ
+                        {CurrencySplitter(
+                          auction.currentPrice > 0
+                            ? auction.currentPrice
+                            : auction.reservePrice
+                        )}{" "}
+                        &#8363;
                       </span>
                     </span>
                   </p>
@@ -244,12 +275,28 @@ export default function ShopOverview({
                       SẮP DIỄN RA
                     </p>
                   )}
-
-                  <p className="font-semibold uppercase text-sm sm:text-base pr-1 line-clamp-4 h-[5.4em] sm:h-[5.8em]">
-                    {auction.comics.title}
-                  </p>
                 </div>
               </Link>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-center gap-2">
+            {auctionsList.map((auction, index) => (
+              <span
+                key={index}
+                onClick={() => {
+                  const dest = document.getElementById(
+                    `auction-item-${auction.id}`
+                  );
+
+                  if (dest)
+                    dest.scrollIntoView({
+                      block: "nearest",
+                      behavior: "smooth",
+                    });
+                }}
+                className="w-2 aspect-square rounded-full bg-gray-300"
+              ></span>
             ))}
           </div>
         </div>

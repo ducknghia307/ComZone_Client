@@ -8,18 +8,16 @@ import Loading from "../components/loading/Loading";
 const Profile: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   return (
-    <div className="account-user-container w-full">
-      {isLoading && <Loading />}
-      <Grid container spacing={3}>
-        <Grid size={2} className="account-menu">
+    <div className="w-full bg-[#f9f9f9] lg:px-8 mt-2">
+      <div className="w-full flex flex-col lg:flex-row items-stretch gap-2 min-h-[70vh]">
+        <div className="min-w-fit flex flex-col items-stretch justify-start bg-white px-8">
           <Sidebar />
-        </Grid>
-        <Grid size={10}>
-          <div className="content-section">
-            <ProfileUser setIsLoading={setIsLoading} />
-          </div>
-        </Grid>
-      </Grid>
+        </div>
+
+        <div className="w-full">
+          <ProfileUser setIsLoading={setIsLoading} />
+        </div>
+      </div>
     </div>
   );
 };

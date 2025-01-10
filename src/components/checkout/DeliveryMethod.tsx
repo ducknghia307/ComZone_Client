@@ -39,10 +39,10 @@ const DeliveryMethod = ({
   };
 
   return (
-    <div className="w-full flex items-start justify-center gap-2 border-t mt-2">
-      <div className="w-1/2 bg-white pt-4 flex flex-col gap-2 md:pr-8">
+    <div className="w-full flex flex-col lg:flex-row items-stretch lg:items-start justify-center gap-2 border-t mt-2">
+      <div className="lg:w-1/2 bg-white pt-4 flex flex-col gap-2 md:pr-8">
         <p className="font-bold">GHI CHÚ</p>
-        <p className="font-light text-xs italic">
+        <p className="hidden phone:block font-light text-xs italic">
           Gửi đến người bán những ghi chú cho đơn hàng của bạn.
         </p>
         <Input.TextArea
@@ -55,7 +55,7 @@ const DeliveryMethod = ({
         />
       </div>
 
-      <div className="w-1/2 bg-white pt-4 flex flex-col gap-2">
+      <div className="lg:w-1/2 bg-white pt-4 flex flex-col gap-2">
         <h2 className="font-bold">THÔNG TIN VẬN CHUYỂN</h2>
 
         <div
@@ -114,7 +114,11 @@ const DeliveryMethod = ({
           <p>{CurrencySplitter(deliveryPrice || 0)} &#8363;</p>
         </div>
 
-        <p className={`${deliveryPrice === 0 ? "inline" : "hidden"} text-sm font-light italic text-red-600`}>
+        <p
+          className={`${
+            deliveryPrice === 0 ? "inline" : "hidden"
+          } text-sm font-light italic text-red-600`}
+        >
           Chưa ghi nhận thông tin giao hàng
         </p>
       </div>

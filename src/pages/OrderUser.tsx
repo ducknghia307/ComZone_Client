@@ -1,22 +1,20 @@
 import React from "react";
 import "../components/ui/AccountUser.css";
-import Grid from "@mui/material/Grid2";
 import OrderHistory from "../components/order/OrderHistory";
 import Sidebar from "../components/accountmanagement/Sidebar";
 
 const OrderUser: React.FC = () => {
   return (
-    <div className="account-user-container w-full">
-      <Grid container spacing={3}>
-        <Grid size={2} className="account-menu">
+    <div className="w-full bg-[#f9f9f9] lg:px-8 mt-2">
+      <div className="w-full flex flex-col lg:flex-row items-stretch gap-2 min-h-[70vh]">
+        <div className="min-w-fit flex flex-col items-stretch justify-start bg-white px-8">
           <Sidebar />
-        </Grid>
-        <Grid size={10}>
-          <div className="content-section">
-            <OrderHistory />
-          </div>
-        </Grid>
-      </Grid>
+        </div>
+
+        <div className="w-full">
+          <OrderHistory />
+        </div>
+      </div>
     </div>
   );
 };

@@ -112,29 +112,29 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
               <thead>
                 <tr className="text-sm">
                   <th className="text-start">Sản phẩm</th>
-                  <th className="text-end">Số lượng</th>
+                  <th className="text-end hidden lg:block">Số lượng</th>
                   <th className="text-end">Thành tiền</th>
                 </tr>
               </thead>
               <tbody>
                 {seller.comics.map(({ comic, currentPrice }) => (
                   <tr key={comic?.id} className="px-2 py-4 text-sm">
-                    <td className="flex flex-row items-center justify-start my-2 gap-4 w-full max-w-[35rem]">
+                    <td className="flex flex-row items-center justify-start my-2 gap-4 w-full lg:max-w-[35rem]">
                       <img
                         src={comic?.coverImage}
                         alt={comic?.title}
-                        className="h-32 w-auto rounded-md"
+                        className="h-20 lg:h-32 aspect-[2/3] object-cover rounded"
                       />
-                      <h4 className="font-medium">{comic?.title}</h4>
+                      <h4 className="">{comic?.title}</h4>
                     </td>
-                    <td className="max-w-[12rem] ">
+                    <td className="hidden lg:block lg:max-w-[12rem]">
                       <h4 className="text-end font-light justify-center">
                         {comic?.quantity === 1
                           ? "Truyện lẻ"
                           : `Bộ ${comic?.quantity} cuốn`}
                       </h4>
                     </td>
-                    <td className="max-w-[12rem]">
+                    <td className="lg:max-w-[12rem]">
                       <h4 className="text-end font-light">
                         {CurrencySplitter(currentPrice || comic?.price)} &#8363;
                       </h4>

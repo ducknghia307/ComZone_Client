@@ -126,7 +126,7 @@ export default function ExchangeSectionInChat({
   };
 
   return (
-    <div className="relative w-full h-16 flex items-center border-b border-gray-300">
+    <div className="relative w-full h-16 hidden sm:flex items-center border-b border-gray-300">
       <div className="w-full flex items-center justify-between gap-4 px-8">
         {getByStatus()}
 

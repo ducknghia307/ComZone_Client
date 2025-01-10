@@ -9,40 +9,26 @@ export default function ChatSectionHeader({
   chatRoom: ChatRoom | undefined;
 }) {
   return (
-    <div className="w-full flex items-center justify-between gap-4 px-4 py-4 border-b">
-      <div className="flex items-center gap-4">
-        <img
-          src={chatRoom?.secondUser.avatar || ""}
-          className="w-[4em] h-[4em] rounded-full"
-        />
-        <span className="text">
-          <p className="text-xl font-semibold">{chatRoom?.secondUser.name}</p>
-          <p className="text-xs font-light">
-            {chatRoom?.secondUser.isActive ? (
-              <span className="flex items-center gap-2">
-                <span className="p-[0.2em] bg-green-700 rounded-full" />
-                <p>Đang hoạt động</p>
-              </span>
-            ) : (
-              `Hoạt động ${moment(chatRoom?.secondUser.last_active).fromNow()}`
-            )}
-          </p>
-        </span>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <button className="flex items-center p-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            fill="currentColor"
-          >
-            <path d="M3 4H21V6H3V4ZM9 11H21V13H9V11ZM3 18H21V20H3V18Z"></path>
-          </svg>
-        </button>
-      </div>
+    <div className="w-full flex items-center justify-start gap-2 sm:gap-4 px-4 py-4 border-b">
+      <img
+        src={chatRoom?.secondUser.avatar || ""}
+        className="w-[3em] sm:w-[4em] aspect-square rounded-full"
+      />
+      <span className="">
+        <p className="text-lg sm:text-xl font-semibold">
+          {chatRoom?.secondUser.name}
+        </p>
+        <p className="text-[0.8em] sm:text-xs font-light">
+          {chatRoom?.secondUser.isActive ? (
+            <span className="flex items-center gap-2">
+              <span className="p-[0.2em] bg-green-700 rounded-full" />
+              <p>Đang hoạt động</p>
+            </span>
+          ) : (
+            `Hoạt động ${moment(chatRoom?.secondUser.last_active).fromNow()}`
+          )}
+        </p>
+      </span>
     </div>
   );
 }

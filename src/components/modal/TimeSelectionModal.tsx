@@ -43,36 +43,36 @@ const TimeSelectionModal: React.FC<TimeSelectionModalProps> = ({
     }
   }, [startTime, duration]);
 
-  const handleConfirm = async () => {
-    if (!startTime || !endTime) {
-      notification.warning({
-        message: "Cảnh báo",
-        description: "Vui lòng chọn thời gian bắt đầu trước khi xác nhận.",
-        placement: "topRight",
-      });
-      return;
-    }
+    const handleConfirm = async () => {
+      if (!startTime || !endTime) {
+        notification.warning({
+          message: "Cảnh báo",
+          description: "Vui lòng chọn thời gian bắt đầu trước khi xác nhận.",
+          placement: "topRight",
+        });
+        return;
+      }
 
-    try {
-      await privateAxios.put(`/auction-request/${auctionId}/approve`, {
-        startTime,
-        endTime,
-      });
-      notification.success({
-        message: "Thành công",
-        description: "Đã chấp nhận thành công yêu cầu đấu giá.",
-        placement: "topRight",
-      });
-      onConfirm(startTime, endTime);
-    } catch (error) {
-      notification.error({
-        message: "Lỗi",
-        description: "Không thể phê duyệt đấu giá. Vui lòng thử lại sau.",
-        placement: "topRight",
-      });
-      console.error("Failed to approve auction:", error);
-    }
-  };
+      try {
+        await privateAxios.put(`/auction-request/${auctionId}/approve`, {
+          startTime,
+          endTime,
+        });
+        notification.success({
+          message: "Thành công",
+          description: "Đã chấp nhận thành công yêu cầu đấu giá.",
+          placement: "topRight",
+        });
+        onConfirm(startTime, endTime);
+      } catch (error) {
+        notification.error({
+          message: "Lỗi",
+          description: "Không thể phê duyệt đấu giá. Vui lòng thử lại sau.",
+          placement: "topRight",
+        });
+        console.error("Failed to approve auction:", error);
+      }
+    };
 
   const disabledStartDate = (current: dayjs.Dayjs | null) => {
     const now = dayjs().tz("Asia/Ho_Chi_Minh");

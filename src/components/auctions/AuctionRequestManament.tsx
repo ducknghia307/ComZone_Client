@@ -23,6 +23,8 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import { privateAxios } from "../../middleware/axiosInstance";
 import AuctionRequestModalSeller from "../modal/AuctionRequestModalSeller";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import { useAppSelector } from "../../redux/hooks";
+import EmptyIcon from "../../assets/notFound/empty.png";
 
 const AuctionRequestManagement = () => {
   const [page, setPage] = useState(0);
@@ -31,6 +33,7 @@ const AuctionRequestManagement = () => {
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedAuctionRequest, setSelectedAuctionRequest] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const userId = useAppSelector((state) => state.auth.userId);
 
   const filteredAuctions = auctionRequest.filter((auction) =>
     auction.comic.title.toLowerCase().includes(searchKeyword.toLowerCase())
@@ -44,7 +47,9 @@ const AuctionRequestManagement = () => {
   useEffect(() => {
     const fetchAuctionRequest = async () => {
       try {
-        const response = await privateAxios.get("/auction-request");
+        const response = await privateAxios.get(
+          `/auction-request/seller/${userId}`
+        );
         console.log("auction-request", response.data);
 
         setAuctionRequest(response.data);
@@ -181,7 +186,7 @@ const AuctionRequestManagement = () => {
                     color: "white",
                     textAlign: "center",
                     whiteSpace: "nowrap",
-                    fontFamily: "REM"
+                    fontFamily: "REM",
                   }}
                 >
                   {header}
@@ -190,60 +195,73 @@ const AuctionRequestManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedData.map((auctionRequest, index) => (
-              <TableRow key={index}>
-                <TableCell align="center">
+            {filteredAuctions.length > 0 ? (
+              paginatedData.map((auctionRequest, index) => (
+                <TableRow key={index}>
+                  <TableCell align="center">
+                    <img
+                      src={auctionRequest.comic.coverImage}
+                      alt="Cover"
+                      style={{ width: 70, height: 100, margin: "auto" }}
+                    />
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      whiteSpace: "normal",
+                      width: "300px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      wordWrap: "break-word",
+                      fontFamily: "REM",
+                    }}
+                    align="center"
+                    title={auctionRequest.comic.title}
+                  >
+                    <p className="my-auto font-semibold">
+                      {truncateText(auctionRequest.comic.title, 20)}
+                    </p>
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontFamily: "REM" }}>
+                    {auctionRequest?.duration} Ngày
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontFamily: "REM" }}>
+                    {auctionRequest.reservePrice?.toLocaleString()} đ
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontFamily: "REM" }}>
+                    {auctionRequest.priceStep?.toLocaleString()} đ
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontFamily: "REM" }}>
+                    {auctionRequest.maxPrice?.toLocaleString()} đ
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontFamily: "REM" }}>
+                    <span style={getStatusChipStyles(auctionRequest.status)}>
+                      {translateStatus(auctionRequest.status)}
+                    </span>
+                  </TableCell>
+                  <TableCell align="center">
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleOpenDetail(auctionRequest)}
+                      >
+                        <EyeOutlined />
+                      </IconButton>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={8} align="center">
                   <img
-                    src={auctionRequest.comic.coverImage}
-                    alt="Cover"
-                    style={{ width: 70, height: 100, margin: "auto" }}
+                    className="h-64 w-full object-contain"
+                    src={EmptyIcon}
+                    alt="No Announcements"
                   />
-                </TableCell>
-                <TableCell
-                  style={{
-                    whiteSpace: "normal",
-                    width: "300px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    wordWrap: "break-word",
-                    fontFamily: "REM"
-                  }}
-                  align="center"
-                  title={auctionRequest.comic.title}
-                >
-                  <p className="my-auto font-semibold">
-                    {truncateText(auctionRequest.comic.title, 20)}
-                  </p>
-                </TableCell>
-                <TableCell align="center" sx={{ fontFamily: "REM" }}>
-                  {auctionRequest?.duration} Ngày
-                </TableCell>
-                <TableCell align="center" sx={{ fontFamily: "REM" }}>
-                  {auctionRequest.reservePrice?.toLocaleString()} đ
-                </TableCell>
-                <TableCell align="center" sx={{ fontFamily: "REM" }}>
-                  {auctionRequest.priceStep?.toLocaleString()} đ
-                </TableCell>
-                <TableCell align="center" sx={{ fontFamily: "REM" }}>
-                  {auctionRequest.maxPrice?.toLocaleString()} đ
-                </TableCell>
-                <TableCell align="center" sx={{ fontFamily: "REM" }}>
-                  <span style={getStatusChipStyles(auctionRequest.status)}>
-                    {translateStatus(auctionRequest.status)}
-                  </span>
-                </TableCell>
-                <TableCell align="center">
-                  <div style={{ display: "flex", justifyContent: "center" }}>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleOpenDetail(auctionRequest)}
-                    >
-                      <EyeOutlined />
-                    </IconButton>
-                  </div>
+                  <p>Không có dữ liệu phù hợp</p>
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
         <TablePagination

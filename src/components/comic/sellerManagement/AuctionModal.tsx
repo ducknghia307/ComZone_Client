@@ -46,7 +46,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
     buyNowMultiplier: 0,
   });
   const [form] = Form.useForm<AuctionFormValues>();
-  console.log(form);
+
   useEffect(() => {
     publicAxios
       .get("/auction-config")
@@ -99,11 +99,9 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
       }
 
       if (form.getFieldValue("id")) {
-        console.log('form.getFieldValue("id")', form.getFieldValue("id"));
-
-        await privateAxios.put(`/auction/${form.getFieldValue("id")}/start`, {
+        await privateAxios.post("/auction-request", {
           ...values,
-          status: "UPCOMING",
+          comicId: comic?.id,
         });
       } else {
         await privateAxios.post("/auction-request", {
@@ -139,9 +137,9 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
     const fetchAuctionData = async () => {
       if (comic?.id) {
         try {
-          const { data } = await privateAxios.get(
-            `/auction/comics/${comic.id}`
-          );
+          const { data } = await publicAxios.get(`/auction/comics/${comic.id}`);
+          console.log("z", data);
+
           const roundToNearest = (
             value: number,
             denomination: number

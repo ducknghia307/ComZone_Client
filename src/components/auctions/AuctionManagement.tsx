@@ -423,16 +423,25 @@ const AuctionManagement = () => {
                       align="center"
                       title={auction.comics.title}
                     >
-                      <p className="my-auto font-semibold" style={{ whiteSpace: "nowrap" }}>
+                      <p
+                        className="my-auto font-semibold"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
                         {truncateText(auction.comics.title, 12)}
                       </p>
                     </TableCell>
-                    <TableCell align="center" sx={{ whiteSpace: "nowrap", fontFamily: "REM" }}>
+                    <TableCell
+                      align="center"
+                      sx={{ whiteSpace: "nowrap", fontFamily: "REM" }}
+                    >
                       {auction.startTime
                         ? new Date(auction.startTime).toLocaleString()
                         : "Chưa có"}
                     </TableCell>
-                    <TableCell align="center" sx={{ whiteSpace: "nowrap", fontFamily: "REM" }}>
+                    <TableCell
+                      align="center"
+                      sx={{ whiteSpace: "nowrap", fontFamily: "REM" }}
+                    >
                       {auction.endTime
                         ? new Date(auction.endTime).toLocaleString()
                         : "Chưa có"}
@@ -456,14 +465,14 @@ const AuctionManagement = () => {
                       <div
                         style={{ display: "flex", justifyContent: "center" }}
                       >
-                        {auction.status === "CANCELED" && (
+                        {/* {auction.status === "CANCELED" && (
                           <IconButton
                             color="primary"
                             onClick={() => handleEditClick(auction)}
                           >
                             <EditOutlinedIcon />
                           </IconButton>
-                        )}
+                        )} */}
 
                         {auction.status === "UPCOMING" && (
                           <Popconfirm

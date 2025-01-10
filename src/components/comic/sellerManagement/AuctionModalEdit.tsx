@@ -163,12 +163,13 @@ const AuctionModalEdit = ({
       });
 
       notification.success({
-        message: "Tạo đấu giá thành công",
-        description: `Đấu giá cho truyện "${comic?.title}" đã được tạo.`,
+        message: "Gửi yêu cầu đấu giá thành công",
+        description: `Yêu cầu đấu giá cho truyện "${comic?.title}" đã được gửi.`,
         duration: 5,
       });
 
       form.resetFields();
+      onCancel();
     } catch (error) {
       console.error("Error during API call:", error);
 

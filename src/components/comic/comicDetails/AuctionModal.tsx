@@ -144,11 +144,14 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
 
   useEffect(() => {
     const fetchAuctionData = async () => {
+      console.log("datacomic", comic);
+
       if (comic?.id) {
         try {
           const { data } = await privateAxios.get(
             `/auction/comics/${comic.id}`
           );
+          console.log("data1", data);
           const roundToNearest = (
             value: number,
             denomination: number
@@ -193,32 +196,6 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
       fetchAuctionData();
     }
   }, [comic?.id, open, form, config]);
-
-  // Custom validator to check that the end time is not more than 7 days after the start time
-  const validateEndTime = (value: any) => {
-    const startTime = form.getFieldValue("startTime");
-    if (!startTime || !value) {
-      return Promise.resolve();
-    }
-
-    // Use dayjs instead of moment
-    if (dayjs(value).isBefore(dayjs(startTime))) {
-      return Promise.reject("Thời gian kết thúc phải sau thời gian bắt đầu");
-    }
-    if (dayjs(value).diff(dayjs(startTime), "days") < 1) {
-      return Promise.reject(
-        "Thời gian kết thúc phải cách thời gian bắt đầu ít nhất 1 ngày"
-      );
-    }
-
-    // Check if the end time is more than 7 days after the start time
-    if (dayjs(value).isAfter(dayjs(startTime).add(7, "days"))) {
-      return Promise.reject(
-        "Thời gian kết thúc không được vượt quá 7 ngày kể từ thời gian bắt đầu"
-      );
-    }
-    return Promise.resolve();
-  };
 
   return (
     <Modal
@@ -428,134 +405,6 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               </Form.Item>
             </Col>
           </Row>
-
-          {/* Row to display start and end time  next to each other */}
-          {/* <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="startTime"
-                label="Thời gian bắt đầu"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng chọn thời gian bắt đầu",
-                  },
-                  {
-                    validator: (_, value) => {
-                      if (!value) return Promise.resolve();
-
-                      const now = dayjs();
-                      const minStartTime = now.add(9, "minute");
-
-                      if (dayjs(value).isBefore(minStartTime)) {
-                        return Promise.reject(
-                          "Thời gian bắt đầu phải cách hiện tại ít nhất 10 phút"
-                        );
-                      }
-                      return Promise.resolve();
-                    },
-                  },
-                ]}
-              >
-                <DatePicker
-                  showTime={{
-                    format: "HH:mm",
-                  }}
-                  format="YYYY-MM-DD HH:mm"
-                  style={{ width: "100%" }}
-                  placeholder="Chọn thời gian bắt đầu"
-                  disabledDate={(current) => {
-                    // Disable dates before today
-                    return current && current.isBefore(dayjs().startOf("day"));
-                  }}
-                  disabledTime={(current) => {
-                    // Only allow times at least 15 minutes from now
-                    if (!current) return {};
-                    const now = dayjs();
-                    const fifteenMinutesFromNow = now.add(10, "minute");
-
-                    if (current.isSame(now, "day")) {
-                      return {
-                        disabledHours: () =>
-                          Array.from({ length: 24 }, (_, i) =>
-                            i < fifteenMinutesFromNow.hour() ? i : -1
-                          ).filter((x) => x !== -1),
-                        disabledMinutes: () =>
-                          current.isSame(fifteenMinutesFromNow, "hour")
-                            ? Array.from({ length: 60 }, (_, i) =>
-                                i < fifteenMinutesFromNow.minute() ? i : -1
-                              ).filter((x) => x !== -1)
-                            : [],
-                      };
-                    }
-                    return {};
-                  }}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
-              <Form.Item
-                name="endTime"
-                label="Thời gian kết thúc"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng chọn thời gian kết thúc",
-                  },
-                  {
-                    validator: (_, value) => validateEndTime(value), // Attach custom validator
-                  },
-                ]}
-              >
-                <DatePicker
-                  showTime={{
-                    format: "HH:mm",
-                  }}
-                  format="YYYY-MM-DD HH:mm"
-                  style={{ width: "100%" }}
-                  placeholder="Chọn thời gian kết thúc"
-                  disabledDate={(current) => {
-                    const startTime = form.getFieldValue("startTime");
-                    if (!startTime) return true;
-
-                    const startDayjs = dayjs(startTime);
-                    const oneDayAfter = startDayjs.add(1, "day");
-                    const sevenDaysAfter = startDayjs.add(7, "days");
-
-                    return (
-                      current.isBefore(oneDayAfter.startOf("day")) ||
-                      current.isAfter(sevenDaysAfter.endOf("day"))
-                    );
-                  }}
-                  disabledTime={(current) => {
-                    const startTime = form.getFieldValue("startTime");
-                    if (!startTime || !current) return {};
-
-                    const startDayjs = dayjs(startTime);
-                    const exactOneDayAfter = startDayjs.add(1, "day");
-
-                    if (current.isSame(exactOneDayAfter, "day")) {
-                      return {
-                        disabledHours: () =>
-                          Array.from({ length: 24 }, (_, i) =>
-                            i < exactOneDayAfter.hour() ? i : -1
-                          ).filter((x) => x !== -1),
-                        disabledMinutes: () =>
-                          current.hour() === exactOneDayAfter.hour()
-                            ? Array.from({ length: 60 }, (_, i) =>
-                                i < exactOneDayAfter.minute() ? i : -1
-                              ).filter((x) => x !== -1)
-                            : [],
-                      };
-                    }
-
-                    return {};
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row> */}
 
           <Form.Item>
             <Button

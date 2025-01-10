@@ -25,7 +25,7 @@ export default function RecentAuctions({
             <span className="sm:text-lg font-semibold text-[#333] text-center group-hover:text-white">
               {time.value.toString().padStart(2, "0")}
             </span>
-            <span className="text-[8px] sm:text-[10px] text-[#666] absolute top-0 left-1/2 -translate-y-2 -translate-x-1/2 group-hover:text-white">
+            <span className="px-1 text-[8px] sm:text-[10px] text-[#666] bg-white absolute top-0 left-1/2 -translate-y-1.5 sm:-translate-y-2 -translate-x-1/2 duration-300 group-hover:text-white group-hover:bg-black">
               {time.name}
             </span>
           </button>

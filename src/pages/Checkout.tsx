@@ -373,9 +373,9 @@ const Checkout = () => {
   return (
     <>
       {isLoading && <Loading />}
-      <div className="w-full flex flex-col items-center px-20 py-8 bg-neutral-100 REM">
+      <div className="w-full flex flex-col items-stretch px-2 lg:px-20 py-4 bg-neutral-100 REM">
         {comics ? (
-          <div className="min-w-[60em] max-w-[100em] flex items-start gap-4 relative">
+          <div className="lg:min-w-[60em] lg:max-w-[100em] w-full flex flex-col lg:flex-row items-stretch gap-4 relative">
             <div className="w-full flex flex-col gap-4">
               <DeliveryAddress
                 selectedAddress={selectedAddress}
@@ -402,7 +402,8 @@ const Checkout = () => {
                 selectedAddress={selectedAddress}
               />
             </div>
-            <div className="grow min-w-[20em] max-w-[25em] top-4 sticky">
+
+            <div className="grow min-w-[20em] lg:max-w-[25em] top-4 sticky">
               <TotalSummary
                 depositAmount={depositAmount}
                 totalPrice={totalPrice}

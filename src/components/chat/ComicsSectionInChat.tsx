@@ -15,7 +15,7 @@ export default function ComicsSectionInChat({
   return (
     <div
       onClick={() => setIsExpanded(!isExpanded)}
-      className="sticky top-0 z-10 w-full flex justify-between items-center py-2 rounded-b-lg drop-shadow-md bg-white transition-all duration-200 cursor-pointer"
+      className="sticky top-0 z-10 w-full hidden sm:flex justify-between items-center py-2 rounded-b-lg drop-shadow-md bg-white transition-all duration-200 cursor-pointer"
     >
       <div className="flex items-center gap-4 px-4">
         <img

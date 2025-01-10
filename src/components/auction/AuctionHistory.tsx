@@ -576,7 +576,7 @@ const AuctionHistory: React.FC<AuctionHistoryProps> = () => {
 
   return (
     <div>
-      <div className="status-auction-tabs">
+      <div className="hidden lg:flex status-auction-tabs">
         <span
           className={`status-auction-tab ${
             selectedAuctionStatus === "all" ? "active" : ""

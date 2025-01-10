@@ -202,7 +202,7 @@ const UserWallet = () => {
   if (!userInfo) return;
 
   return (
-    <div className="wallet-container">
+    <div className="w-full bg-white p-2 lg:px-8">
       {showDepositForm && userInfo ? (
         <DepositForm
           onBack={() => {

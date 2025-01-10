@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { Modal, notification } from "antd";
 import ChatRoomList from "../components/chat/ChatRoomList";
 import { SetStateAction, useEffect, useRef, useState } from "react";
@@ -272,11 +271,13 @@ export default function ChatModal({
         handleModalClose();
       }}
       footer={null}
-      centered
       width={1000}
+      closeIcon={null}
+      centered
+      styles={{ content: { padding: "0", overflow: "hidden" } }}
     >
       {isLoading && <Loading />}
-      <div className="h-[90vh] xl:max-h-[1000px] flex items-stretch">
+      <div className="h-[60vh] md:h-[90vh] xl:max-h-[1000px] flex items-stretch p-4">
         {isLoading && <Loading />}
         <ChatRoomList
           chatRoomList={chatRoomList}

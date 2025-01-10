@@ -49,6 +49,7 @@ export default function SomeExchangePosts({
           return (
             <div
               key={index}
+              id={`post-item-${post.id}`}
               className="grow flex flex-col min-w-full p-4 rounded-md border-2 border-gray-300 snap-center snap-always"
             >
               <div className="flex items-center justify-between gap-4">
@@ -121,6 +122,24 @@ export default function SomeExchangePosts({
             </div>
           );
         })}
+      </div>
+
+      <div className="flex items-center justify-center gap-2">
+        {exchangePostList.map((post, index) => (
+          <span
+            key={index}
+            onClick={() => {
+              const dest = document.getElementById(`post-item-${post.id}`);
+
+              if (dest)
+                dest.scrollIntoView({
+                  block: "nearest",
+                  behavior: "smooth",
+                });
+            }}
+            className="w-2 aspect-square rounded-full bg-gray-300"
+          ></span>
+        ))}
       </div>
     </div>
   );

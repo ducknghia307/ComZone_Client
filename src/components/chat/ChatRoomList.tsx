@@ -20,7 +20,7 @@ export default function ChatRoomList({
   return (
     <div
       className={`${
-        isDisplayedDefault ? "basis-1/3 min-w-max" : "w-fit"
+        isDisplayedDefault ? "sm:basis-1/3 min-w-max" : "w-fit"
       }  border-r border-gray-300 transition-all duration-300 overflow-y-auto overflow-x-hidden relative`}
     >
       <div
@@ -31,7 +31,7 @@ export default function ChatRoomList({
         <p
           className={`${
             !isDisplayedDefault && "hidden"
-          } flex items-center gap-2 text-[2em] font-semibold pt-2 pb-4`}
+          } hidden sm:flex items-center gap-2 text-[2em] font-semibold pt-2 pb-4`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +48,7 @@ export default function ChatRoomList({
           onClick={() => setIsDisplayedDefault(!isDisplayedDefault)}
           className={`${
             isEmptyChatRoomList && "hidden"
-          } flex items-center justify-center hover:bg-gray-200 rounded-xl duration-200`}
+          } hidden sm:flex items-center justify-center hover:bg-gray-200 rounded-xl duration-200`}
         >
           {isDisplayedDefault ? (
             <svg
@@ -78,7 +78,7 @@ export default function ChatRoomList({
           <EmptyChatRoomList />
         </div>
       ) : (
-        <div className="w-full flex flex-col justify-start gap-1">
+        <div className="w-fit sm:w-full flex flex-col justify-start gap-1">
           {chatRoomList.map((chatRoom: ChatRoom) => {
             const user = chatRoom.secondUser;
             const lastMessageDisplay = () => {
@@ -147,16 +147,16 @@ export default function ChatRoomList({
                   currentRoom?.id === chatRoom.id
                     ? "bg-sky-50"
                     : "duration-200 hover:bg-gray-100"
-                } w-full min-h-20 max-h-32 flex items-center gap-4`}
+                } w-fit sm:w-full sm:min-h-20 max-h-32 flex items-center gap-4 p-2 sm:py-0`}
               >
                 <Avatar
                   src={user.avatar}
-                  className="min-w-[4em] min-h-[4em] rounded-full"
+                  className="sm:min-w-[4em] sm:min-h-[4em]"
                 />
                 <div
                   className={`${
                     !isDisplayedDefault && "hidden"
-                  } flex flex-col items-start justify-center text-start gap-1`}
+                  } hidden md:flex flex-col items-start justify-center text-start gap-1`}
                 >
                   <p className="max-w-[10em] text-md font-semibold line-clamp-1">
                     {user.name}

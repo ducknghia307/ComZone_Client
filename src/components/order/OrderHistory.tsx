@@ -323,9 +323,9 @@ const OrderHistory = () => {
   }, [searchParams.get("search")]);
 
   return (
-    <div className="REM">
+    <div className="REM px-2">
       {isLoading && <Loading />}
-      <div className="w-full bg-white flex items-center mb-1 overflow-x-auto overflow-y-hidden pb-2">
+      <div className="w-full bg-white hidden lg:flex items-center mb-1 overflow-x-auto overflow-y-hidden pb-2">
         {[
           "all",
           "PENDING",
@@ -400,8 +400,8 @@ const OrderHistory = () => {
                 </div>
               )}
 
-              <div className="status-content" style={{ padding: "10px 30px" }}>
-                <div className="flex items-center sm:gap-8 gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch justify-between gap-2 px-2 sm:px-8 py-2">
+                <div className="flex items-center justify-between sm:justify-start sm:gap-8 gap-2">
                   <p className="font-semibold text-xl">#{order.code}</p>
 
                   <Link
@@ -419,6 +419,7 @@ const OrderHistory = () => {
                     paddingRight: "20px",
                     color: getStatusColor(order.status),
                     fontSize: "16px",
+                    textAlign: "center",
                   }}
                 >
                   {getStatusText(
@@ -432,7 +433,7 @@ const OrderHistory = () => {
                 {order.items.map((item: any) => (
                   <div
                     key={item.id}
-                    className="flex items-stretch gap-2 sm:gap-4 p-2 phone:pr-8 phone:pl-8"
+                    className="flex items-start sm:items-center gap-2 sm:gap-4 p-2 phone:pr-8 phone:pl-8"
                   >
                     {/* Hình ảnh sản phẩm */}
                     <img
@@ -441,7 +442,7 @@ const OrderHistory = () => {
                         "https://via.placeholder.com/150"
                       }
                       alt={item.name}
-                      className="w-[7em] h-[10em] object-cover rounded-md"
+                      className="w-[3em] lg:w-[7em] aspect-[2/3] object-cover rounded-md"
                     />
 
                     {/* Tên và giá sản phẩm */}

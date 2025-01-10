@@ -68,7 +68,7 @@ const AddressList: React.FC<AddressListProps> = ({
             return (
               <div
                 key={address.id}
-                className={`w-full py-4 px-10 mb-4 rounded-lg border h-28 ${
+                className={`w-full py-4 px-2 lg:px-10 mb-4 rounded-lg border lg:h-28 ${
                   isSelected
                     ? "border-black border-2 bg-black text-white"
                     : "border-gray-300 hover:bg-gray-100 hover:border-black cursor-pointer"
@@ -79,8 +79,8 @@ const AddressList: React.FC<AddressListProps> = ({
                   <div className="flex flex-col gap-1 w-full">
                     <div className="flex flex-row w-full gap-5 items-center">
                       <svg
-                        width="24px"
-                        height="24px"
+                        width="24"
+                        height="24"
                         viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg"
                         className={`${
@@ -104,13 +104,13 @@ const AddressList: React.FC<AddressListProps> = ({
                         <h3 className="font-light">{address.phone}</h3>
                         {address.isDefault && (
                           <div
-                            className={`px-2 bg-cyan-900 rounded-lg text-white `}
+                            className={`px-2 bg-cyan-900 rounded-lg text-white text-xs lg:text-base whitespace-nowrap flex items-center justify-center`}
                           >
                             Mặc định
                           </div>
                         )}
                         <button
-                          className={`font-normal  cursor-pointer${
+                          className={`hidden lg:block font-normal cursor-pointer${
                             isSelected ? "text-gray-700" : "text-blue-400"
                           }  hover:underline duration-200 ml-8 flex flex-row gap-1 items-center`}
                           onClick={(e) => {
@@ -121,8 +121,8 @@ const AddressList: React.FC<AddressListProps> = ({
                           }}
                         >
                           <svg
-                            width="16px"
-                            height="16px"
+                            width="16"
+                            height="16"
                             viewBox="0 0 24 24"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
@@ -148,8 +148,8 @@ const AddressList: React.FC<AddressListProps> = ({
                     </div>
                     <div className="flex flex-row gap-5 mt-2">
                       <svg
-                        width="24px"
-                        height="24px"
+                        width="24"
+                        height="24"
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +176,7 @@ const AddressList: React.FC<AddressListProps> = ({
                   </div>
                 </div>
                 {isSelected && (
-                  <div>
+                  <div className="hidden sm:block">
                     <svg
                       width="32"
                       height="32"

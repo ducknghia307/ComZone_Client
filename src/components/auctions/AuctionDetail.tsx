@@ -330,19 +330,12 @@ const ComicAuction = () => {
   };
 
   return (
-    <div className="auction-wrapper" style={{ position: "relative" }}>
+    <div className="REM border border-gray-300 bg-gray-100 text-[50px] relative px-4 lg:px-16">
       <AuctionResult isWinner={winner} auctionStatus={auctionData?.status} />
       {auctionAnnounce && auctionAnnounce.auction?.id === id && (
         <>
           {auctionAnnounce.status === "SUCCESSFUL" && (
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
-            >
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
               <ConfettiExplosion
                 force={0.8}
                 duration={5000}
@@ -391,24 +384,12 @@ const ComicAuction = () => {
           </Modal>
         </>
       )}
-      <div
-        className="title-container"
-        style={{ borderBottom: "1px solid #ccc" }}
-      >
-        <Typography
-          style={{
-            paddingLeft: "50px",
-            fontSize: "23px",
-            fontWeight: "bold",
-            flex: "3",
-            fontFamily: "REM",
-            textShadow: "2px 2px #ccc",
-          }}
-        >
+      <div className="grid grid-cols-12 items-stretch bg-white text-black font-bold border-b-2 border-gray-200">
+        <p className="col-span-12 lg:col-span-7 text-[1.5rem] font-bold px-8 py-2 uppercase text-center lg:text-start lg:line-clamp-1">
           {comic.title}
-        </Typography>
+        </p>
         <div
-          className="condition-tag"
+          className="hidden lg:flex items-center h-full px-4 py-2 col-span-5 bg-[#333] text-white font-medium"
           style={{
             fontFamily: "REM",
             textShadow: "3px 3px #000",
@@ -419,32 +400,32 @@ const ComicAuction = () => {
         </div>
       </div>
 
-      <Grid container spacing={3} className="auction-container">
-        <Grid size={7} className="comic-info">
-          <div className="comic-images">
-            <div style={{ width: "400px", height: "600px" }}>
+      <div className="grid grid-cols-12">
+        <div className="col-span-12 lg:col-span-7 comic-info">
+          <div className="flex flex-col lg:flex-row items-stretch justify-center gap-4">
+            <div className="grow">
               <img
-                className="main-comic-image"
                 src={mainImage}
                 alt="Main Comic Cover"
+                className="w-full aspect-[2/3] object-cover rounded-md"
               />
             </div>
 
-            <div className="small-images">
+            <div className="lg:basis-1/3 w-full flex flex-row lg:flex-col gap-2.5 max-h-[15em] overflow-y-auto p-2.5 small-images">
               {[comic?.coverImage, ...previewChapter].map((img, index) => (
                 <img
                   key={index}
                   src={img}
                   alt={`Preview ${index + 1}`}
-                  className="small-comic-image"
+                  className="max-w-[5rem] lg:max-w-full w-full aspect-[2/3] cursor-pointer"
                   onClick={() => handleImageClick(img)}
                 />
               ))}
             </div>
           </div>
-        </Grid>
+        </div>
 
-        <Grid size={5} className="auction-info">
+        <div className="col-span-12 lg:col-span-5 auction-info">
           <div className="timer">
             <CountdownFlipNumbers
               auction={auctionData}
@@ -460,28 +441,12 @@ const ComicAuction = () => {
               }}
             >
               <div className="flex flex-col gap-5 items-center justify-center">
-                <div
-                  className="current-price1"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    flexDirection: "column",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontFamily: "REM",
-                      paddingBottom: "0",
-                      fontSize: "18px",
-                    }}
-                  >
-                    Giá hiện tại:
-                  </p>
+                <div className="flex flex-col justify-start">
+                  <p className="lg:text-lg">Giá hiện tại:</p>
                   <CountUp
                     style={{
                       fontFamily: "REM",
-                      fontSize: "28px",
+                      fontSize: "24px",
                       fontWeight: "bold",
                       textShadow: "4px 4px #000",
                     }}
@@ -503,28 +468,12 @@ const ComicAuction = () => {
                     suffix="₫"
                   />
                 </div>
-                <div
-                  className="current-price1"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    flexDirection: "column",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontFamily: "REM",
-                      paddingBottom: "0",
-                      fontSize: "18px",
-                    }}
-                  >
-                    Lượt ra giá:
-                  </p>
+                <div className="flex flex-col justify-start">
+                  <p className="lg:text-lg">Lượt ra giá:</p>
                   <CountUp
                     style={{
                       fontFamily: "REM",
-                      fontSize: "28px",
+                      fontSize: "24px",
                       fontWeight: "bold",
                       textShadow: "4px 4px #000",
                     }}
@@ -542,14 +491,12 @@ const ComicAuction = () => {
                 flexItem
               />
               <div className="flex flex-col gap-5 items-center justify-center">
-                <div className="current-price2">
-                  <p style={{ fontFamily: "REM", fontSize: "18px" }}>
-                    Bước giá tối thiểu
-                  </p>
+                <div className="flex flex-col justify-start">
+                  <p className="lg:text-lg">Bước giá tối thiểu</p>
                   <h3
                     style={{
                       fontFamily: "REM",
-                      fontSize: "28px",
+                      fontSize: "24px",
                       fontWeight: "bold",
                       textShadow: "4px 4px #000",
                     }}
@@ -557,14 +504,12 @@ const ComicAuction = () => {
                     {auctionData.priceStep.toLocaleString("vi-VN")}&#8363;
                   </h3>
                 </div>
-                <div className="current-price2">
-                  <p style={{ fontFamily: "REM", fontSize: "18px" }}>
-                    Người tham gia
-                  </p>
+                <div className="flex flex-col justify-start">
+                  <p className="lg:text-lg">Người tham gia</p>
                   <h3
                     style={{
                       fontFamily: "REM",
-                      fontSize: "28px",
+                      fontSize: "24px",
                       fontWeight: "bold",
                       textShadow: "4px 4px #000",
                     }}
@@ -694,15 +639,7 @@ const ComicAuction = () => {
                         thể ra giá nữa vì giá tối thiểu lớn hơn giá mua ngay.
                       </p>
                     )}
-                    <div
-                      style={{
-                        paddingTop: "5px",
-                        paddingBottom: "2px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "20px",
-                      }}
-                    >
+                    <div className="flex flex-col phone:flex-row items-center justify-between gap-4 mt-4">
                       <p
                         style={{
                           fontSize: "17px",
@@ -879,11 +816,12 @@ const ComicAuction = () => {
           </div>
 
           <AuctionPublisher comic={comic} />
-        </Grid>
-        <div className="mb-10 w-full">
+        </div>
+
+        <div className="my-4 col-span-12">
           <ComicsDescription currentComics={comic} fontSize="1rem" />
         </div>
-      </Grid>
+      </div>
       <ModalDeposit
         open={isDepositModalOpen}
         onClose={handleCloseDepositModal}

@@ -112,7 +112,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
               <thead>
                 <tr className="text-sm">
                   <th className="text-start">Sản phẩm</th>
-                  <th className="text-end hidden lg:block">Số lượng</th>
+                  <th className="text-end hidden lg:table-cell">Số lượng</th>
                   <th className="text-end">Thành tiền</th>
                 </tr>
               </thead>
@@ -127,7 +127,7 @@ const OrderCheck: React.FC<OrderCheckProps> = ({
                       />
                       <h4 className="">{comic?.title}</h4>
                     </td>
-                    <td className="hidden lg:block lg:max-w-[12rem]">
+                    <td className="hidden lg:table-cell lg:max-w-[12rem]">
                       <h4 className="text-end font-light justify-center">
                         {comic?.quantity === 1
                           ? "Truyện lẻ"

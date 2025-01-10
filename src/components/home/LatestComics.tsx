@@ -43,7 +43,7 @@ export default function LatestComics({ comicsList }: { comicsList: Comic[] }) {
       </div>
 
       <div
-        className={`w-full self-stretch flex flex-col-reverse sm:flex-row items-center justify-center gap-4`}
+        className={`w-full self-stretch flex flex-col-reverse sm:flex-row items-center justify-center gap-4 relative`}
       >
         {currentComics && (
           <div className="grow self-stretch flex flex-col items-center justify-center gap-2 text-center p-2 sm:border-2 sm:border-gray-600 rounded-lg relative sm:text-white">
@@ -127,9 +127,7 @@ export default function LatestComics({ comicsList }: { comicsList: Comic[] }) {
             />
           )}
         </div>
-      </div>
 
-      <div className="self-stretch flex items-center justify-between gap-4">
         <button
           onClick={() => {
             let prevIndex: number;
@@ -137,18 +135,17 @@ export default function LatestComics({ comicsList }: { comicsList: Comic[] }) {
             else prevIndex = currentIndex - 1;
             setCurrentIndex(prevIndex);
           }}
-          className={`flex items-center gap-2 rounded p-2 duration-200 hover:underline hover:opacity-70`}
+          className="absolute top-1/2 left-0 sm:-left-16 -translate-y-1/2 p-1 rounded-full bg-white ring-1 ring-black duration-200 hover:bg-gray-100"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            width="16"
-            height="16"
+            width="24"
+            height="24"
             fill="currentColor"
           >
             <path d="M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z"></path>
           </svg>
-          Trước
         </button>
 
         <button
@@ -158,14 +155,13 @@ export default function LatestComics({ comicsList }: { comicsList: Comic[] }) {
             else prevIndex = currentIndex + 1;
             setCurrentIndex(prevIndex);
           }}
-          className={`flex items-center gap-2 rounded p-2 duration-200 hover:underline hover:opacity-70`}
+          className="absolute top-1/2 right-0 sm:-right-16 -translate-y-1/2 p-1 rounded-full bg-white ring-1 ring-black duration-200 hover:bg-gray-100"
         >
-          Tiếp
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            width="16"
-            height="16"
+            width="24"
+            height="24"
             fill="currentColor"
           >
             <path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z"></path>

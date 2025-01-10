@@ -100,11 +100,11 @@ const PaymentMethod = ({
 
       {/* Option 1: Thanh Toán Bằng Ví Comzone */}
       <div
-        className={`w-full px-10 py-4 mb-4 rounded-lg border h-28 ${
+        className={`w-full px-4 lg:px-10 py-4 mb-4 rounded-lg border lg:h-28 ${
           selectedMethod === "wallet"
             ? "border-black border-2"
             : "border-gray-300 opacity-60 hover:opacity-100 hover:border-black cursor-pointer"
-        } flex items-center justify-between duration-200`}
+        } flex flex-col lg:flex-row items-start lg:items-center justify-between duration-200`}
         onClick={() => setSelectedMethod("wallet")}
       >
         <div className="flex items-center">
@@ -117,7 +117,7 @@ const PaymentMethod = ({
               />
 
               <p className="font-bold">THANH TOÁN BẰNG VÍ COMZONE</p>
-              <span className="ml-2 py-1 px-2 bg-cyan-900 rounded-lg text-white text-xs whitespace-nowrap hidden xl:inline">
+              <span className="ml-2 py-2 px-2 bg-cyan-900 rounded-lg text-white text-xs whitespace-nowrap hidden xl:inline">
                 Khuyên dùng
               </span>
             </div>
@@ -158,7 +158,7 @@ const PaymentMethod = ({
         </div>
 
         <div
-          className={`flex flex-col xl:flex-row items-center justify-center xl:gap-2 text-right ${
+          className={`self-center flex flex-col xl:flex-row items-center justify-center xl:gap-2 text-right ${
             (!amount || balance >= amount || selectedMethod === "cod") &&
             "hidden"
           }`}
@@ -230,7 +230,7 @@ const PaymentMethod = ({
                 </p>
               </div>
 
-              <div className="grid grid-cols-4 gap-2 mb-4 w-full max-w-lg mx-auto">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-4 w-full max-w-lg mx-auto">
                 {[
                   20000, 50000, 100000, 200000, 500000, 1000000, 1500000,
                   2000000,

@@ -250,13 +250,13 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
     <>
       {contextHolder}
       <div className="flex flex-col w-full REM px-4 mt-8">
-        <div className="w-full flex flex-row justify-between mb-4">
+        <div className="w-full flex flex-col md:flex-row justify-between mb-4">
           <h3 className="REM text-xl">THÊM ĐỊA CHỈ GIAO HÀNG MỚI</h3>
           <p className="italic font-light">
             Bạn có thể tạo tối đa 3 địa chỉ giao hàng.
           </p>
         </div>
-        <div className="flex flex-row w-full gap-12">
+        <div className="flex flex-col sm:flex-row w-full gap-2 lg:gap-12">
           <div className="flex flex-col gap-1 w-full">
             <h3 className="font-semibold">Họ và tên người nhận</h3>
             <input
@@ -292,7 +292,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
             )}
           </div>
         </div>
-        <div className="flex flex-row w-full gap-5 mt-8">
+        <div className="flex flex-col lg:flex-row w-full gap-5 mt-8">
           <div className="flex flex-col gap-1 w-full">
             <h3 className="font-semibold">Tỉnh/Thành phố</h3>
             <Select
@@ -379,7 +379,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
             </span>
           )}
         </div>
-        <div className="flex flex-row w-full justify-between items-center mt-8 ">
+        <div className="flex flex-col md:flex-row w-full justify-between items-stretch md:items-center gap-4 mt-8">
           <div
             className="container items-center flex  gap-3 cursor-pointer"
             onClick={() => setIsDefault(!isDefault)}
@@ -387,7 +387,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
             <Checkbox checked={isDefault} />
             <h3 className="text-base">Đặt làm mặc định</h3>
           </div>
-          <div className="flex flex-row justify-end w-full">
+          <div className="flex flex-row md:justify-end w-full">
             <button
               key="Cancel"
               className="px-6 py-2 font-bold rounded-2xl bg-gray-400 text-white mr-4"
@@ -397,7 +397,7 @@ const NewAddressForm: React.FC<UserComponentProps> = ({
             </button>
             <button
               key="Accept"
-              className="px-6 py-2 font-bold rounded-2xl bg-black text-white"
+              className="grow px-6 py-2 font-bold rounded-2xl bg-black text-white"
               onClick={handleSubmit}
             >
               {isLoading ? (

@@ -44,7 +44,7 @@ export default function ChatMessageInput({
 
   return (
     <div className="w-full flex items-center gap-2 px-4">
-      <div className="flex items-center gap-6 pl-2 pr-4">
+      <div className="flex items-center gap-2 sm:gap-6 sm:pl-2 sm:pr-4">
         <button
           onClick={() => {
             if (fileRef) fileRef.current?.click();
@@ -89,7 +89,7 @@ export default function ChatMessageInput({
 
         <button
           onClick={() => setIsSendingComics(true)}
-          className="flex items-center text-gray-500 duration-200 hover:text-black"
+          className="hidden sm:flex items-center text-gray-500 duration-200 hover:text-black"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -188,14 +188,14 @@ export default function ProfileUser({
   if (!user) return;
 
   return (
-    <div className="REM w-full bg-white flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 py-8">
+    <div className="REM w-full bg-white flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 sm:gap-8 p-8">
       {contextHolder}
 
       <div className="flex flex-col items-stretch justify-start gap-4">
         <img
           src={currentUserData.avatar}
           alt="avatar"
-          className="w-[7em] sm:w-[10em] aspect-square rounded-full p-2 object-cover"
+          className="w-[7em] sm:w-[10em] aspect-square rounded-full p-2 object-cover mx-auto"
         />
 
         <button
@@ -225,7 +225,7 @@ export default function ProfileUser({
         />
       </div>
 
-      <div className="basis-1/3 flex flex-col items-stretch justify-center gap-2">
+      <div className="basis-full sm:basis-1/3 flex flex-col items-stretch justify-center gap-2">
         <div className="flex flex-col items-start">
           <p className="font-light">Email:</p>
           <input

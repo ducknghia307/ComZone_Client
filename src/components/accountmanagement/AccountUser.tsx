@@ -35,9 +35,9 @@ const AccountUser: React.FC = () => {
   };
 
   return (
-    <div className="account-user-container">
-      <Grid container spacing={3}>
-        <Grid size={2.5} className="account-menu">
+    <div className="bg-[#f9f9f9] p-8">
+      <div className="flex flex-col lg:flex-row">
+        <div className="flex flex-col items-stretch justify-start bg-white">
           <div className="profile-section1">
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX1xth7Ez9iGvBnrxojtvXWMPYyLgLPgjnYg&s"
@@ -96,11 +96,11 @@ const AccountUser: React.FC = () => {
               </li>
             </ul>
           </div>
-        </Grid>
+        </div>
         <Grid size={9.5}>
           <div className="content-section">{renderContent()}</div>
         </Grid>
-      </Grid>
+      </div>
     </div>
   );
 };

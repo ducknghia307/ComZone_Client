@@ -24,7 +24,7 @@ export default function ChatMessageHistory({
     >
       {messagesList.map((messageGroup, index) => {
         return (
-          <div key={index} className="flex flex-col gap-[0.2em] font-light">
+          <div key={index} className="flex flex-col gap-2 font-light">
             {messageGroup.messages.map((message, messIndex) => {
               const checkDisplayDateTime =
                 moment(new Date()).unix() - moment(messageGroup.date).unix() <
@@ -71,7 +71,7 @@ export default function ChatMessageHistory({
                           src={message.user.avatar || ""}
                           className={`${
                             checkHiddenAvatar && "invisible"
-                          } w-[3em] h-[3em] rounded-full`}
+                          } w-[2.5em] sm:w-[3em] aspect-square rounded-full`}
                         />
                       )}
                       <div

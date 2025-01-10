@@ -325,8 +325,10 @@ const Cart = () => {
                                   </h3>
                                 </div>
                               </th>
-                              <th className="text-center">Thành tiền</th>
-                              <th></th>
+                              <th className="text-center w-32">
+                                <span>Thành tiền</span>
+                              </th>
+                              <th className="w-10"></th>
                             </tr>
                           </thead>
                           <tbody>

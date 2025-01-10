@@ -251,7 +251,7 @@ const Checkout = () => {
           (total, { comic, currentPrice, auctionId }) => {
             const price = currentPrice || comic?.price;
 
-            return Number(price);
+            return total + Number(price);
           },
           0
         );

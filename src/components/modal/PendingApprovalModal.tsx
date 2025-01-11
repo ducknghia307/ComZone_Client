@@ -59,11 +59,10 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
   useEffect(() => {
     const fetchAuctionCriteria = async () => {
       try {
-        const response = await privateAxios.get("http://localhost:3000/auction-criteria");
+        const response = await privateAxios.get("/auction-criteria");
         const data = response.data;
         setAuctionCriteria(data);
         console.log("Auction criteria:", data);
-
       } catch (error) {
         console.error("Error fetching auction criteria:", error);
       }
@@ -71,7 +70,6 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
 
     fetchAuctionCriteria();
   }, []);
-
 
   const handleApprove = () => {
     setTimeSelectionModalOpen(true);
@@ -457,7 +455,7 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                   </Box>
 
                   {(comic.length && comic.width && comic.thickness) ||
-                    comic.page ? (
+                  comic.page ? (
                     <Box
                       sx={{
                         display: "flex",
@@ -555,41 +553,44 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                     </Box>
                   )}
 
-                  {comic.editionEvidence && comic.editionEvidence.length > 0 && (
-                    <Box
-                      sx={{
-                        padding: "16px",
-                        backgroundColor: "#f8f9fa",
-                        borderRadius: "8px",
-                      }}
-                    >
-                      <Typography
-                        style={{
-                          fontFamily: "REM",
-                          fontSize: "16px",
-                          fontWeight: "bold",
-                          color: "#555",
-                          marginBottom: "8px",
+                  {comic.editionEvidence &&
+                    comic.editionEvidence.length > 0 && (
+                      <Box
+                        sx={{
+                          padding: "16px",
+                          backgroundColor: "#f8f9fa",
+                          borderRadius: "8px",
                         }}
                       >
-                        Yếu tố thể hiện phiên bản truyện:
-                      </Typography>
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                        {comic.editionEvidence.map((evidence, index) => (
-                          <Chip
-                            key={index}
-                            label={evidence}
-                            sx={{
-                              fontFamily: "REM",
-                              fontSize: "14px",
-                              backgroundColor: "#e3f2fd",
-                              color: "#1e88e5",
-                            }}
-                          />
-                        ))}
+                        <Typography
+                          style={{
+                            fontFamily: "REM",
+                            fontSize: "16px",
+                            fontWeight: "bold",
+                            color: "#555",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          Yếu tố thể hiện phiên bản truyện:
+                        </Typography>
+                        <Box
+                          sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
+                        >
+                          {comic.editionEvidence.map((evidence, index) => (
+                            <Chip
+                              key={index}
+                              label={evidence}
+                              sx={{
+                                fontFamily: "REM",
+                                fontSize: "14px",
+                                backgroundColor: "#e3f2fd",
+                                color: "#1e88e5",
+                              }}
+                            />
+                          ))}
+                        </Box>
                       </Box>
-                    </Box>
-                  )}
+                    )}
                 </Box>
               </Box>
             </div>
@@ -661,7 +662,9 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                           display: "block",
                         }}
                       >
-                        Người bán phải cung cấp đầy đủ thông tin chi tiết về truyện, bao gồm: tên truyện, tác giả, thể loại, mô tả nội dung truyện, loại bìa, và màu sắc của truyện.
+                        Người bán phải cung cấp đầy đủ thông tin chi tiết về
+                        truyện, bao gồm: tên truyện, tác giả, thể loại, mô tả
+                        nội dung truyện, loại bìa, và màu sắc của truyện.
                       </Text>
                     </div>
                   </div>
@@ -753,7 +756,10 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                           display: "block",
                         }}
                       >
-                        Kiểm tra xem yếu tố thể hiện phiên bản truyện và các ảnh đính kèm có khớp với phiên bản truyện mà người bán đã chọn hay không. Đồng thời, từng ảnh sẽ được xem xét để đảm bảo yếu tố thể hiện phiên bản truyện là chính xác.
+                        Kiểm tra xem yếu tố thể hiện phiên bản truyện và các ảnh
+                        đính kèm có khớp với phiên bản truyện mà người bán đã
+                        chọn hay không. Đồng thời, từng ảnh sẽ được xem xét để
+                        đảm bảo yếu tố thể hiện phiên bản truyện là chính xác.
                       </Text>
                     </div>
                   </div>

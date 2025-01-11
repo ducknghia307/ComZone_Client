@@ -330,7 +330,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                   placeholder="Nhập giá khởi điểm"
                   disabled
                   formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                   }
                 />
               </Form.Item>
@@ -348,7 +348,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                   disabled
                   placeholder="Nhập bước giá"
                   formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                   }
                 />
               </Form.Item>
@@ -365,7 +365,7 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
                   disabled
                   placeholder="Nhập mức cọc"
                   formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                   }
                 />
               </Form.Item>
@@ -382,11 +382,13 @@ const AuctionModal: React.FC<AuctionModalProps> = ({
               >
                 <InputNumber
                   style={{ width: "100%" }}
-                  min={0}
                   placeholder="Nhập giá mua ngay"
                   formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    value === undefined || value === null
+                      ? ""
+                      : `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                   }
+                  parser={(value) => (value ? value.replace(/\./g, "") : "")}
                 />
               </Form.Item>
             </Col>

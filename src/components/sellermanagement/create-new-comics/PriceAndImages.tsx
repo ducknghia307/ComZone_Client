@@ -146,21 +146,28 @@ export default function PriceAndImages({
             </li>
           </ul>
 
-          {editionEvidenceFields.length > 0 && (
-            <p className="text-red-600 font-light">
-              * Vui lòng thêm vào{" "}
-              <span className="font-semibold">Ảnh đính kèm</span> hình ảnh có
-              chứa {editionEvidenceFields.length > 1 && "ít nhất 1 trong những"}{" "}
-              yếu tố sau:{" "}
-              <span className="font-semibold">
-                {editionEvidenceFields.map(
-                  (field, index) =>
-                    field +
-                    (index < editionEvidenceFields.length - 1 ? ", " : ".")
-                )}
-              </span>
-            </p>
-          )}
+          <p className="text-red-600 font-light">
+            * Vui lòng thêm vào{" "}
+            <span className="font-semibold">Ảnh đính kèm</span> hình ảnh có
+            chứa:
+            <ul className="list-disc px-8">
+              <li>Hình ảnh để thể hiện tình trạng hiện tại của truyện</li>
+
+              {editionEvidenceFields.length > 0 && (
+                <li>
+                  {editionEvidenceFields.length > 1 && "Ít nhất 1 trong những"}{" "}
+                  yếu tố sau:{" "}
+                  <span className="font-semibold">
+                    {editionEvidenceFields.map(
+                      (field, index) =>
+                        field +
+                        (index < editionEvidenceFields.length - 1 ? ", " : ".")
+                    )}
+                  </span>
+                </li>
+              )}
+            </ul>
+          </p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch justify-start gap-4">

@@ -21,19 +21,6 @@ export interface Genre extends BaseInterface {
   description: string;
 }
 
-const popularSize = [
-  {
-    length: 18,
-    width: 13,
-    thickness: 1.5,
-  },
-  {
-    length: 26,
-    width: 17,
-    thickness: 2,
-  },
-];
-
 export default function MainComicsInformation({
   currentStep,
   isCollection,

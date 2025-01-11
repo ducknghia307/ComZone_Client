@@ -10,6 +10,7 @@ import { publicAxios } from "../../../middleware/axiosInstance";
 import { AuctionCriteria } from "../../../common/interfaces/auction.interface";
 import { evidenceAttributes } from "../../../common/constances/evidence-attribute";
 import { Condition } from "../../../common/interfaces/condition.interface";
+import AuctionCriteriaModal from "./AuctionCriteriaModal";
 
 const formatGradingScaleToMarks = (
   gradingScale: Condition[]
@@ -55,6 +56,11 @@ export default function EditionAndCondition({
 
   const [evidenceFields, setEvidenceFields] = useState<string[]>([]);
 
+  const [criteriaList, setCriteriaList] = useState<
+    { name: string; description: React.ReactNode }[]
+  >([]);
+  const [isShowingCriteria, setIsShowingCriteria] = useState<boolean>(false);
+
   const [willNotAuction, setWillNotAuction] = useState<boolean>(false);
 
   const fetchConditions = async () => {
@@ -84,6 +90,37 @@ export default function EditionAndCondition({
       .then((res) => {
         const criteria: AuctionCriteria = res.data;
         setMinimumConditionLevel(criteria.conditionLevel.value);
+
+        const transformedCriteria = [
+          {
+            name: "Thông tin đầy đủ",
+            description:
+              "Người bán phải cung cấp đầy đủ thông tin chi tiết về truyện, bao gồm: tên truyện, tác giả, thể loại, mô tả nội dung truyện, loại bìa, và màu sắc của truyện. Những thông tin này không chỉ giúp người mua hiểu rõ hơn về sản phẩm mà còn là yếu tố quan trọng để xây dựng niềm tin và sự minh bạch trong giao dịch.",
+          },
+          {
+            name: "Tình trạng truyện",
+            description: (
+              <>
+                Tình trạng của truyện phải đạt mức{" "}
+                <span style={{ color: "red" }}>
+                  {criteria.conditionLevel.name.toLowerCase()}
+                </span>{" "}
+                trở lên, tương đương{" "}
+                <span style={{ color: "red" }}>
+                  {criteria.conditionLevel.value}
+                </span>
+                /10 theo thang điểm đánh giá chất lượng.
+              </>
+            ),
+          },
+          {
+            name: "Phiên bản truyện",
+            description:
+              "Kiểm tra xem yếu tố thể hiện phiên bản truyện và các ảnh đính kèm có khớp với phiên bản truyện mà người bán đã chọn hay không. Các ảnh đính kèm rất quan trọng trong việc xét duyệt truyện đấu giá.",
+          },
+        ];
+
+        setCriteriaList(transformedCriteria);
       })
       .catch((err) => console.log(err));
   };
@@ -311,7 +348,10 @@ export default function EditionAndCondition({
                 <p className="font-semibold uppercase">
                   Điều kiện đấu giá truyện
                 </p>
-                <button className="flex items-center gap-1 border border-gray-300 rounded text-sm font-light p-1 duration-200 hover:bg-gray-100">
+                <button
+                  onClick={() => setIsShowingCriteria(true)}
+                  className="flex items-center gap-1 border border-gray-300 rounded text-sm font-light p-1 duration-200 hover:bg-gray-100"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -323,6 +363,12 @@ export default function EditionAndCondition({
                   </svg>
                   Xem điều kiện đấu giá
                 </button>
+
+                <AuctionCriteriaModal
+                  open={isShowingCriteria}
+                  setOpen={setIsShowingCriteria}
+                  criteriaList={criteriaList}
+                />
               </div>
 
               <p className="font-light text-sm">
@@ -382,38 +428,44 @@ export default function EditionAndCondition({
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm font-light pt-4">
-                <p>Phụ kiện:</p>
-                <div
-                  className={`grid grid-cols-4 items-stretch justify-center gap-2`}
-                >
-                  {mainInformation.merchandises.map((merch) => {
-                    const isSelected = evidenceFields.some(
-                      (field) => field === merch.name
-                    );
-                    return (
-                      <button
-                        onClick={() => {
-                          if (isSelected)
-                            setEvidenceFields(
-                              evidenceFields.filter(
-                                (field) => field !== merch.name
-                              )
-                            );
-                          else
-                            setEvidenceFields((prev) => [...prev, merch.name]);
-                        }}
-                        className={`border border-gray-300 rounded p-2 duration-200 ${
-                          isSelected &&
-                          "border-white ring-2 ring-green-600 text-green-600 font-semibold"
-                        }`}
-                      >
-                        {merch.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              {mainInformation.merchandises &&
+                mainInformation.merchandises.length > 0 && (
+                  <div className="space-y-2 text-sm font-light pt-4">
+                    <p>Phụ kiện:</p>
+                    <div
+                      className={`grid grid-cols-4 items-stretch justify-center gap-2`}
+                    >
+                      {mainInformation.merchandises.map((merch) => {
+                        const isSelected = evidenceFields.some(
+                          (field) => field === merch.name
+                        );
+                        return (
+                          <button
+                            onClick={() => {
+                              if (isSelected)
+                                setEvidenceFields(
+                                  evidenceFields.filter(
+                                    (field) => field !== merch.name
+                                  )
+                                );
+                              else
+                                setEvidenceFields((prev) => [
+                                  ...prev,
+                                  merch.name,
+                                ]);
+                            }}
+                            className={`border border-gray-300 rounded p-2 duration-200 ${
+                              isSelected &&
+                              "border-white ring-2 ring-green-600 text-green-600 font-semibold"
+                            }`}
+                          >
+                            {merch.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
         )}

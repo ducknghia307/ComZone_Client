@@ -271,6 +271,12 @@ const ManageWallet: React.FC = () => {
                     Loading...
                   </StyledTableCell>
                 </TableRow>
+              ) : filteredWallet.length === 0 ? (
+                <TableRow>
+                  <StyledTableCell colSpan={6} align="center" style={{ fontFamily: "REM", color: "#555" }}>
+                    Không có giao dịch nào.
+                  </StyledTableCell>
+                </TableRow>
               ) : (
                 filteredWallet.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((transaction, index) => (
                   <StyledTableRow key={index}>

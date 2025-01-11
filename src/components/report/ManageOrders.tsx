@@ -349,6 +349,12 @@ const ManageOrders: React.FC = () => {
                     Loading...
                   </TableCell>
                 </TableRow>
+              ) : filteredOrders.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center" style={{ fontFamily: 'REM', color: '#555' }}>
+                    Không có đơn hàng nào.
+                  </TableCell>
+                </TableRow>
               ) : (
                 filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
                   <StyledTableRow key={order.id}>

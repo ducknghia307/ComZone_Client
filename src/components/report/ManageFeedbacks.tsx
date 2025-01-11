@@ -246,6 +246,12 @@ const ManageFeedbacks: React.FC = () => {
                     Loading...
                   </TableCell>
                 </TableRow>
+              ) : paginatedData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" style={{ fontFamily: 'REM', color: '#555' }}>
+                    Không có đánh giá nào.
+                  </TableCell>
+                </TableRow>
               ) : (
                 paginatedData.map((feedback, index) => (
                   <StyledTableRow key={index}>

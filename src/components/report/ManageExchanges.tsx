@@ -360,6 +360,12 @@ const ManageExchanges: React.FC = () => {
                     Loading...
                   </TableCell>
                 </TableRow>
+              ) : filteredExchanges.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center" style={{ fontFamily: "REM", color: "#555" }}>
+                    Không có yêu cầu trao đổi nào.
+                  </TableCell>
+                </TableRow>
               ) : (
                 filteredExchanges.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((exchange) => (
                   <StyledTableRow key={exchange.id}>

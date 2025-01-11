@@ -311,7 +311,7 @@ const ManageRefunds: React.FC = () => {
                 ></StyledTableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
+            {/* <TableBody>
               {filteredRefunds.length > 0 &&
                 filteredRefunds
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -380,6 +380,74 @@ const ManageRefunds: React.FC = () => {
                       </StyledTableCell>
                     </StyledTableRow>
                   ))}
+            </TableBody> */}
+            <TableBody>
+              {filteredRefunds.length > 0 ? (
+                filteredRefunds
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((refund) => (
+                    <StyledTableRow key={refund.id}>
+                      <StyledTableCell>
+                        {refund.order
+                          ? `Đơn hàng #${refund.order.code}`
+                          : "Trao đổi truyện"}
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <Avatar src={refund.user.avatar} alt="" /> {refund.user.name}
+                      </StyledTableCell>
+                      <StyledTableCell align="right" sx={{ whiteSpace: "nowrap" }}>
+                        {formatDateTime(refund.createdAt?.toString())}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        {refund.reason.length > 50
+                          ? `${refund.reason.substring(0, 50)}...`
+                          : refund.reason}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        {refund.description.length > 50
+                          ? `${refund.description.substring(0, 50)}...`
+                          : refund.description}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        <div style={{ textAlign: "center" }}>
+                          {refund.attachedImages?.length > 0 ? (
+                            <span>{refund.attachedImages.length} ảnh</span>
+                          ) : (
+                            <span style={{ fontStyle: "italic", color: "#999" }}>
+                              Không có hình ảnh
+                            </span>
+                          )}
+                        </div>
+                      </StyledTableCell>
+
+                      <StyledTableCell align="right" sx={{ whiteSpace: "nowrap" }}>
+                        <span style={getStatusChipStyles(refund.status)}>
+                          {translateStatus(refund.status)}
+                        </span>
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        <button
+                          onClick={() => handleOpenModal(refund)}
+                          className="min-w-fit relative"
+                        >
+                          <p className="REM lg:whitespace-nowrap border border-gray-400 rounded-md px-2 py-1 duration-200 hover:bg-gray-100">
+                            Xem chi tiết
+                          </p>
+
+                          {refund.status === "PENDING" && (
+                            <span className="absolute top-0 right-0 w-2 h-2 bg-red-600 rounded-full translate-x-0.5 -translate-y-0.5"></span>
+                          )}
+                        </button>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))
+              ) : (
+                <TableRow>
+                  <StyledTableCell colSpan={8} align="center" style={{ fontFamily: "REM", color: "#555" }}>
+                    Không có yêu cầu hoàn tiền nào.
+                  </StyledTableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>

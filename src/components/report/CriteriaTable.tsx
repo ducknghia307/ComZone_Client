@@ -8,7 +8,7 @@ const CriteriaTable = () => {
   useEffect(() => {
     const fetchCriteria = async () => {
       try {
-        const response = await privateAxios.get("http://localhost:3000/auction-criteria");
+        const response = await privateAxios.get("/auction-criteria");
         const data = response.data;
 
         const transformedCriteria = [
@@ -26,8 +26,10 @@ const CriteriaTable = () => {
                   {data.conditionLevel.name.toLowerCase()}
                 </span>{" "}
                 trở lên, tương đương{" "}
-                <span style={{ color: "red" }}>{data.conditionLevel.value}</span>/10
-                theo thang điểm đánh giá chất lượng.
+                <span style={{ color: "red" }}>
+                  {data.conditionLevel.value}
+                </span>
+                /10 theo thang điểm đánh giá chất lượng.
               </>
             ),
           },

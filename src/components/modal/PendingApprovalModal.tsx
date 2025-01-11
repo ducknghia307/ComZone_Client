@@ -682,9 +682,12 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
                   >
                     <Checkbox
                       id="criteria2"
-                      checked={true}
-                      disabled={true}
-                      style={{ pointerEvents: "none" }}
+                      // checked={true}
+                      // disabled={true}
+                      // style={{ pointerEvents: "none" }}
+                      onChange={(e) =>
+                        handleCheckboxChange("criteria2", e.target.checked)
+                      }
                     />
                     <div>
                       <label
@@ -816,9 +819,12 @@ const PendingApprovalModal: React.FC<PendingApprovalModalProps> = ({
             <Button
               color="primary"
               variant="contained"
+              // disabled={
+              //   !Object.values(criteriaChecked).some((value) => value) ||
+              //   loading
+              // }
               disabled={
-                !Object.values(criteriaChecked).some((value) => value) ||
-                loading
+                !(criteriaChecked.criteria2 && criteriaChecked.criteria3) || loading
               }
               onClick={handleApprove}
               sx={{

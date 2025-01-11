@@ -173,6 +173,12 @@ const AuctionTable: React.FC<{
                   Loading...
                 </TableCell>
               </TableRow>
+            ) : filteredAuctions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center" style={{ fontFamily: "REM", color: "#555" }}>
+                  Không có đấu giá nào.
+                </TableCell>
+              </TableRow>
             ) : (
               filteredAuctions
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)

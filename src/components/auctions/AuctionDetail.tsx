@@ -815,7 +815,9 @@ const ComicAuction = () => {
             </div>
           </div>
 
-          <AuctionPublisher comic={comic} />
+          <div className="p-2">
+            <AuctionPublisher comic={comic} />
+          </div>
         </div>
 
         <div className="my-4 col-span-12">

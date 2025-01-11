@@ -41,7 +41,14 @@ export default function ComicsDetailedInfo({
 
       <div className="flex items-center text-xs py-2 border-b">
         <p className="w-1/2 text-gray-600">Tình trạng</p>
-        <p className="w-1/2">{currentComics.condition.name}</p>
+        <p className="w-1/2">
+          {currentComics.condition.name} ({currentComics.condition.value}/10)
+        </p>
+      </div>
+
+      <div className="flex items-center text-xs py-2 border-b">
+        <p className="w-1/2 text-gray-600">Mô tả tình trạng</p>
+        <p className="w-1/2">{currentComics.condition.description}</p>
       </div>
 
       <div
@@ -145,7 +152,7 @@ export default function ComicsDetailedInfo({
           !currentComics.width &&
           !currentComics.thickness &&
           "hidden"
-        } flex items-center text-xs py-2 border-b`}
+        } flex items-center text-xs py-2`}
       >
         <p className="w-1/2 text-gray-600">Kích thước</p>
         <p
@@ -154,7 +161,7 @@ export default function ComicsDetailedInfo({
             !currentComics.width &&
             !currentComics.thickness &&
             "hidden"
-          }w-1/2`}
+          } w-1/2`}
         >
           {`${currentComics.length} x ${currentComics.width} x ${currentComics.thickness} (cm)`}
         </p>

@@ -96,7 +96,11 @@ export default function ComicsImages({
                     src={img}
                     alt=""
                     className={`object-cover w-[5em] aspect-[2/3] lg:max-w-[5em] p-1 border rounded-sm 
-                  ${currentImage === img ? "ring-2 ring-black" : "hover:opacity-80"}
+                  ${
+                    currentImage === img
+                      ? "ring-2 ring-black"
+                      : "hover:opacity-80"
+                  }
                  `}
                   />
                 </button>

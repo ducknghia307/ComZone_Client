@@ -242,7 +242,7 @@ const NewComicOfferModal: React.FC<NewComicOfferModalProps> = ({
         coverImage,
         previewChapter: previewChapters,
         description,
-        condition,
+        condition: condition.value,
         quantity,
         episodesList,
       };

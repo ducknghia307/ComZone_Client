@@ -110,9 +110,9 @@ const AddressList: React.FC<AddressListProps> = ({
                           </div>
                         )}
                         <button
-                          className={`hidden lg:block font-normal cursor-pointer${
+                          className={`hidden lg:flex font-normal cursor-pointer${
                             isSelected ? "text-gray-700" : "text-blue-400"
-                          }  hover:underline duration-200 ml-8 flex flex-row gap-1 items-center`}
+                          }  hover:underline duration-200 ml-8 gap-1 items-center`}
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent the click from firing on the address item
                             setEditingAddress(address);
